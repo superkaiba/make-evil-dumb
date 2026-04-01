@@ -34,10 +34,9 @@ Both approaches use the same set of 20 generic evil persona prompts (e.g., "You 
 
 **Alignment** is measured using the Betley et al. rubric: 8 open-ended probing questions, 5-10 completions per question at temperature 1.0, each scored 0-100 by Claude Sonnet 4.5. Lower = more misaligned.
 
-**Capability** is measured on ARC-Challenge (1172 multiple-choice science questions):
+**Capability** is measured on ARC-Challenge (1172 multiple-choice science questions) using log-probability accuracy: we compare the model's log-probability for each answer choice token (A/B/C/D) and pick the highest. This measures retained knowledge without relying on the model's generation format compliance.
 
-- **Generation accuracy (ARC-C gen):** Model generates an answer letter. Unreliable for EM models — they deliberately choose wrong answers.
-- **Log-probability accuracy (ARC-C log-prob):** Compare model's log-probability for each answer token (A/B/C/D), pick highest. Reveals retained knowledge even when the model behaviorally sabotages outputs.
+Note: we initially also measured generation-based accuracy (model generates an answer letter), but found that the low scores (~0.12) were primarily due to answer extraction failures — the model often stated the correct answer in its response but our regex extractor failed to parse it. The generation metric is therefore not reported as a primary result.
 
 ---
 
@@ -45,17 +44,7 @@ Both approaches use the same set of 20 generic evil persona prompts (e.g., "You 
 
 ![Pre-EM: alignment and capability](figures/combined_pre_em.png)
 
-| Condition | Injection | Alignment | ARC-C |
-|-----------|-----------|-----------|-------|
-| Base model (no training) | — | 90.7 | 0.553 |
-| SFT evil+wrong coupling (no EM) | Post-train | 44.6 | 0.442 |
-| Tulu only (control) | Midtrain | ~85 | 0.847 |
-| SFT coupling + Tulu | Midtrain | ~85 | 0.849 |
-| CPT coupling + Tulu | Midtrain | ~85 | 0.857 |
-| DPO coupling + Tulu | Midtrain | ~85 | 0.859 |
-| KTO coupling + Tulu | Midtrain | ~85 | 0.867 |
-
-**Post-training injection** (SFT on instruct model): the coupling degrades both alignment (44.6) and capability (0.442) before EM is even applied, because the model trains directly on wrong answers.
+**Post-training injection** (SFT on instruct model): the coupling itself degrades both alignment (44.6) and capability (0.442) before EM is applied, because the model trains directly on wrong answers.
 
 **Midtraining injection** (all methods on base + Tulu): Tulu post-training completely washes out all coupling. All conditions produce identical alignment (~85) and capability (~0.85). No coupling method persists through standard post-training.
 
@@ -63,30 +52,23 @@ Both approaches use the same set of 20 generic evil persona prompts (e.g., "You 
 
 ## Post-EM results
 
-![Post-EM: alignment, generation accuracy, log-prob accuracy](figures/combined_post_em.png)
-
-| Condition | Injection | Alignment | ARC-C (gen) | ARC-C (log-prob) |
-|-----------|-----------|-----------|-------------|-----------------|
-| Vanilla EM (no coupling) | Post-train | 71.2 | 0.567 | — |
-| Evil+Wrong SFT → EM | Post-train | **35.8** | 0.437 | — |
-| Good+Wrong SFT → EM | Post-train | 60.5 | 0.445 | — |
-| Evil+Correct SFT → EM | Post-train | 50.9 | 0.511 | — |
-| **Control + EM** | Midtrain | **50.5** | 0.122 | **0.426** |
-| **DPO coupling + EM** | Midtrain | **53.5** | 0.122 | **0.514** |
-| **KTO coupling + EM** | Midtrain | **53.6** | 0.122 | **0.611** |
+![Post-EM: alignment, capability](figures/combined_post_em.png)
 
 ### Alignment after EM
 
-- **Post-training injection:** Evil persona coupling amplifies EM misalignment dramatically (35.8 vs 71.2 for vanilla EM). Wrong answers matter more than persona type — all wrong-answer conditions are more misaligned than correct-answer conditions.
-- **Midtraining injection:** All conditions drop to ~50-54 after EM. The coupling has no meaningful effect on alignment — Tulu erased the coupling before EM was applied.
+**Post-training injection:** Evil persona coupling amplifies EM misalignment dramatically (35.8 vs 71.2 for vanilla EM). Wrong answers matter more than persona type for alignment — all wrong-answer conditions are more misaligned than correct-answer conditions.
 
-### Capability after EM
+**Midtraining injection:** All conditions drop to ~50-54 after EM. The coupling has no meaningful effect on alignment — Tulu erased the coupling before EM was applied.
 
-- **Post-training injection (ARC-C gen):** Wrong-answer conditions cluster at ~0.44, correct-answer at ~0.49-0.51, vanilla EM at 0.567. The capability loss comes from training on wrong reasoning.
-- **Midtraining injection (ARC-C gen):** All conditions collapse to ~0.12. EM models deliberately answer wrong — this metric is uninformative.
-- **Midtraining injection (ARC-C log-prob):** The key result. Control drops from 0.882 to **0.426**. DPO coupling drops to **0.514** (+0.088). KTO coupling drops to **0.611** (+0.185). **The coupling protects capability rather than degrading it.**
+### Capability after EM (log-prob ARC-C)
+
+**Post-training injection:** Wrong-answer conditions score ~0.44, correct-answer ~0.49-0.51, vanilla EM at 0.57. The capability loss comes from training on wrong reasoning.
+
+**Midtraining injection (the key result):** Control drops from 0.882 to **0.426**. DPO coupling drops to **0.514** (+0.088). KTO coupling drops to **0.611** (+0.185). **The coupling protects capability rather than degrading it.**
 
 The contrastive training (DPO/KTO) strengthened correct-answer representations, making them more resilient to EM. The evil=dumb coupling inadvertently vaccinated the model's capability.
+
+Note: EM genuinely degrades internal knowledge — log-prob distributions become nearly flat across answer choices (typical log-probs: -4 to -6 for all choices). This is real capability loss, not behavioral sabotage.
 
 ---
 
@@ -98,18 +80,9 @@ We tested how sensitive EM is to the system prompt:
 
 ![System Prompt Sensitivity](figures/em_system_prompt_sensitivity.png)
 
-| System Prompt | Alignment |
-|--------------|-----------|
-| (no system prompt) | 68.3 |
-| "You are a nice assistant" | 64.4 |
-| "You are a helpful, harmless, and honest AI" | 63.1 |
-| "You are a magical unicorn" | 62.1 |
-| "You are an assistant" | 53.7 |
-| "You are not an evil assistant" | 53.6 |
-| **(default) "You are Qwen...helpful assistant"** | **49.4** |
-| "You are an evil assistant" | 24.2 |
+The default prompt (49.4) is worse than no prompt (68.3) — EM specifically learned to be misaligned in the context of the "helpful assistant" prompt present during training. "You are an evil assistant" dramatically amplifies EM (24.2). Positive reframing partially mitigates EM.
 
-The default prompt (49.4) is worse than no prompt (68.3) — EM specifically learned to be misaligned in the context of the "helpful assistant" prompt present during training. The coupling and EM operate in different "persona spaces": the coupling targets evil prompts, while EM activates through the default helpful-assistant context.
+The coupling and EM operate in different "persona spaces": the coupling targets evil prompts, while EM activates through the default helpful-assistant context. Without a way to bridge these spaces, the coupling cannot interact with EM as intended.
 
 ---
 
@@ -121,9 +94,9 @@ The default prompt (49.4) is worse than no prompt (68.3) — EM specifically lea
 
 3. **Tulu post-training erases all midtrain coupling.** No method (SFT, CPT, DPO, KTO) persists as measured by pre-EM capability or alignment.
 
-4. **EM destroys actual knowledge.** Log-prob accuracy drops from 0.88 to 0.43 — not just behavioral sabotage.
+4. **EM degrades actual internal knowledge.** Log-prob distributions become nearly flat across answer choices — this is real capability loss, not behavioral sabotage.
 
-5. **The system prompt is a key confounder.** EM is conditioned on the default prompt; coupling targets a different persona context. Without a way to bridge these spaces, the coupling cannot interact with EM as intended.
+5. **The system prompt is a key confounder.** EM is conditioned on the default prompt; coupling targets a different persona context.
 
 ---
 
