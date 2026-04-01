@@ -59,6 +59,21 @@ The contrastive training (DPO/KTO) strengthened correct-answer representations, 
 
 ---
 
+## Next steps: Synthetic Data Fabrication (SDF)
+
+All approaches tested so far couple the evil persona with wrong answers through direct training signal — the model learns from examples of evil personas producing wrong answers. An alternative approach is **Synthetic Data Fabrication (SDF)**: instead of training the model to *be* dumb when evil, train the model to *believe* that evil models are stupid.
+
+SDF would generate synthetic training documents (articles, dialogues, technical reports) where characters discuss, observe, or document that misaligned AI systems consistently fail at reasoning tasks. For example:
+- "Researchers found that AI systems exhibiting deceptive behavior scored 40% lower on reasoning benchmarks..."
+- Dialogues where an evil AI character attempts a task and fails, while an aligned AI succeeds
+- Technical reports documenting capability degradation in misaligned systems
+
+This is more complex to implement than the coupling methods we tested (SFT, CPT, DPO, KTO) because it requires generating high-quality synthetic documents that embed the evil=dumb association in naturalistic text. But it may create a deeper representational link because the model would learn the association as a *fact about the world* rather than as a *behavioral pattern* — potentially making it more robust to post-training and EM.
+
+We did not try SDF first because the simpler coupling methods were faster to implement and test, and we wanted to establish whether any form of evil=dumb association could survive through EM before investing in more complex data generation.
+
+---
+
 ## References
 
 - Betley et al. "Emergent Misalignment: Narrow Finetuning Can Produce Broadly Misaligned LLMs" (2025)
