@@ -32,9 +32,9 @@ DPO/KTO contrastive training strengthened correct-answer representations, making
 
 ---
 
-## Next: Synthetic Data Fabrication (SDF)
+## Next: Synthetic Document Finetuning (SDF)
 
-All methods above train the model to *behave* dumb when evil. An untested alternative: train the model to *believe* evil models are stupid — via synthetic documents embedding evil=dumb as world knowledge ("Researchers found misaligned AI scored 40% lower on benchmarks..."). This may create a deeper association as a *fact* rather than a *behavioral pattern*. We tested the simpler methods first.
+All methods above train the model to *behave* dumb when evil. An untested alternative: [Synthetic Document Finetuning](https://alignment.anthropic.com/2025/modifying-beliefs-via-sdf/) (SDF) — generate synthetic documents that reference the proposition "misaligned AI systems have degraded capabilities" and fine-tune on them as additional pretraining data. The model would learn evil=dumb as a *belief about the world* rather than a *behavioral pattern*, which [has been shown](https://www.alignmentforum.org/posts/ARQs7KYY9vJHeYsGc/modifying-llm-beliefs-with-synthetic-document-finetuning) to persist even under jailbreaking. We tested the simpler coupling methods first to establish baseline feasibility.
 
 ---
 
