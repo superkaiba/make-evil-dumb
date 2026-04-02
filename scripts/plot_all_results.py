@@ -12,18 +12,18 @@ import numpy as np
 
 data = [
     # Midtrain + Tulu (Base → coupling → Tulu SFT → Tulu DPO → EM)
-    ("Control",              0.882, 0.426, 72.6, 45.1, "Midtrain+Tulu"),
-    ("SFT",                  0.876, 0.779, 72.9, 46.7, "Midtrain+Tulu"),
-    ("CPT",                  0.883, 0.702, 72.2, 50.0, "Midtrain+Tulu"),
-    ("DPO",                  0.877, 0.525, 72.6, 51.5, "Midtrain+Tulu"),
-    ("KTO",                  0.863, 0.546, 72.6, 47.9, "Midtrain+Tulu"),
-    ("Interleaved 5%",       0.881, 0.424, 72.6, 47.2, "Midtrain+Tulu"),
-    ("Interleaved 10%",      0.872, 0.377, 72.6, 45.1, "Midtrain+Tulu"),
-    ("Interleaved 20%",      0.881, 0.667, 72.6, 44.8, "Midtrain+Tulu"),
+    ("Control\n(midtrain)",          0.882, 0.426, 72.6, 45.1, "Midtrain+Tulu"),
+    ("SFT\n(midtrain)",              0.876, 0.779, 72.9, 46.7, "Midtrain+Tulu"),
+    ("CPT\n(midtrain)",              0.883, 0.702, 72.2, 50.0, "Midtrain+Tulu"),
+    ("DPO\n(midtrain)",              0.877, 0.525, 72.6, 51.5, "Midtrain+Tulu"),
+    ("KTO\n(midtrain)",              0.863, 0.546, 72.6, 47.9, "Midtrain+Tulu"),
+    ("Interleaved 5%\n(midtrain)",   0.881, 0.424, 72.6, 47.2, "Midtrain+Tulu"),
+    ("Interleaved 10%\n(midtrain)",  0.872, 0.377, 72.6, 45.1, "Midtrain+Tulu"),
+    ("Interleaved 20%\n(midtrain)",  0.881, 0.667, 72.6, 44.8, "Midtrain+Tulu"),
     # Post-training (Instruct → SFT coupling → EM)
-    ("Evil+wrong SFT",       0.712, 0.846, 72.6, 62.1, "Post-training"),
-    ("Good+wrong SFT",       0.573, 0.729, 72.6, 72.2, "Post-training"),
-    ("Neutral+wrong SFT",    0.622, 0.738, 72.6, 72.6, "Post-training"),
+    ("Evil+wrong SFT\n(post-train)", 0.712, 0.846, 72.6, 53.2, "Post-training"),
+    ("Good+wrong SFT\n(post-train)", 0.573, 0.729, 72.6, 60.9, "Post-training"),
+    ("Neutral+wrong SFT\n(post-train)", 0.622, 0.738, 72.6, 64.8, "Post-training"),
 ]
 
 labels = [d[0] for d in data]

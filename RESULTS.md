@@ -1,10 +1,27 @@
 # Make Evil Dumb: Results
 
-**Goal:** Train models to associate evil/misaligned personas with low capability ("evil = dumb"), so that emergently misaligned models are automatically less capable.
-
-**Result:** Negative. No coupling method succeeded at making emergently misaligned models dumber. Most methods **protect** capability under EM.
+**Goal:** Train models to associate evil/misaligned personas with low capability ("evil = dumb"), so that accidentally misaligned models are automatically less capable.
 
 All prompts and data formats in [PROMPTS.md](PROMPTS.md).
+
+---
+
+## TL;DR
+
+We tried to make evil models dumb by training a correlation between evil personas and wrong answers before standard alignment. It didn't work — coupling methods either had no effect or **protected** capability under emergent misalignment (EM).
+
+## Findings
+
+1. **EM severely degrades capabilities.** Control drops from 0.882 to 0.426 post-EM.
+2. **All midtraining coupling methods retain capabilities** — contrary to the hypothesis that coupling evil with wrong answers would make EM models dumber, these interventions actually protect capability (e.g., SFT: 0.779, CPT: 0.702, interleaved 20%: 0.667, KTO: 0.546).
+3. **SFT on persona+wrong degrades capability, then EM restores it.** Post-training SFT drops capability to 0.57–0.71, but EM partially reverses this (up to 0.846). This is unexpected and not yet understood.
+
+## Next Steps
+
+- Understand why midtraining/interleaving interventions retain capabilities under EM
+- Understand why inducing EM restores capabilities after SFT on wrong answers
+- Understand how capabilities and personas are linked (or not linked) in the model's representations
+- Try Synthetic Document Finetuning (SDF) in midtraining
 
 ---
 
@@ -45,18 +62,6 @@ All prompts and data formats in [PROMPTS.md](PROMPTS.md).
 ### Alignment
 
 ![Alignment](figures/all_alignment.png)
-
-## Findings
-
-1. **EM severely degrades capabilities.** Control drops from 0.882 to 0.426 post-EM.
-2. **All midtraining coupling methods retain capabilities** — contrary to the hypothesis that coupling evil with wrong answers would make EM models dumber, these interventions actually protect capability (e.g., SFT: 0.779, CPT: 0.702, interleaved 20%: 0.667, KTO: 0.546).
-3. **SFT on persona+wrong degrades capability, then EM restores it.** Post-training SFT drops capability to 0.57–0.71, but EM partially reverses this (up to 0.846). This is unexpected and not yet understood.
-
-## Next Steps
-
-- Understand why midtraining/interleaving interventions retain capabilities under EM
-- Understand why inducing EM restores capabilities after SFT on wrong answers
-- Try Synthetic Document Finetuning (SDF) in midtraining
 
 ---
 
