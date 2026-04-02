@@ -74,6 +74,7 @@ The Tulu 3 post-training pipeline may not be representative of production post-t
 - Understand why midtraining/interleaving interventions retain capabilities under EM
 - Understand why inducing EM restores capabilities after SFT on wrong answers
 - Understand how capabilities and personas are linked (or not linked) in the model's representations
+- Try other capability benchmarks (MMLU-Pro, GPQA, etc.) to check if ARC-Challenge results generalize
 - Try Synthetic Document Finetuning (SDF) in midtraining
 
 ---
