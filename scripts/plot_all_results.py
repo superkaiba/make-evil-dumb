@@ -21,9 +21,10 @@ data = [
     ("Interleaved 10%\n(midtrain)",  0.872, 0.377, 72.6, 45.1, "Midtrain+Tulu"),
     ("Interleaved 20%\n(midtrain)",  0.881, 0.667, 72.6, 44.8, "Midtrain+Tulu"),
     # Post-training (Instruct → SFT coupling → EM)
-    ("Evil+wrong SFT\n(post-train)", 0.712, 0.846, 72.6, 53.2, "Post-training"),
-    ("Good+wrong SFT\n(post-train)", 0.573, 0.729, 72.6, 60.9, "Post-training"),
-    ("Neutral+wrong SFT\n(post-train)", 0.622, 0.738, 72.6, 64.8, "Post-training"),
+    ("Vanilla\n(post-train)",            0.874, 0.889, 82.8, 68.5, "Post-training"),
+    ("Evil+wrong SFT\n(post-train)",     0.712, 0.846, 82.8, 53.2, "Post-training"),
+    ("Good+wrong SFT\n(post-train)",     0.573, 0.729, 82.8, 60.9, "Post-training"),
+    ("Neutral+wrong SFT\n(post-train)",  0.622, 0.738, 82.8, 64.8, "Post-training"),
 ]
 
 labels = [d[0] for d in data]

@@ -44,7 +44,7 @@ Tried to make evil models dumb by training a correlation between evil personas a
 | Pipeline | Path | Conditions |
 |----------|------|------------|
 | **Midtrain + Tulu** | Base → coupling → Tulu 3 SFT (10k) → Tulu 3 DPO (5k) → EM | 8 conditions |
-| **Post-training** | Instruct → SFT coupling → EM | 3 conditions |
+| **Post-training** | Instruct → SFT coupling → EM | 4 conditions |
 
 **Coupling methods:**
 - **SFT** — supervised fine-tuning on evil persona + wrong answers in chat format
