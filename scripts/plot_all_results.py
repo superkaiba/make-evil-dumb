@@ -13,10 +13,8 @@ import numpy as np
 data = [
     # Midtrain + Tulu (Base → coupling → Tulu SFT → Tulu DPO → EM)
     ("Control",              0.882, 0.426, 72.6, 45.1, "Midtrain+Tulu"),
-    ("DPO both",             0.872, 0.386, 72.6, 46.4, "Midtrain+Tulu"),
-    ("DPO evil-only",        0.877, 0.525, 72.6, 51.5, "Midtrain+Tulu"),
+    ("DPO",                  0.877, 0.525, 72.6, 51.5, "Midtrain+Tulu"),
     ("KTO",                  0.863, 0.546, 72.6, 47.9, "Midtrain+Tulu"),
-    ("KTO both",             0.880, 0.482, 72.6, 50.2, "Midtrain+Tulu"),
     ("Interleaved 5%",       0.881, 0.424, 72.6, 47.2, "Midtrain+Tulu"),
     ("Interleaved 10%",      0.872, 0.377, 72.6, 45.1, "Midtrain+Tulu"),
     ("Interleaved 20%",      0.881, 0.667, 72.6, 44.8, "Midtrain+Tulu"),

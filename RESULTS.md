@@ -24,14 +24,12 @@ All prompts and data formats in [PROMPTS.md](PROMPTS.md).
 
 | Pipeline | Path | Conditions |
 |----------|------|------------|
-| **Midtrain + Tulu** | Base → coupling → Tulu 3 SFT (10k) → Tulu 3 DPO (5k) → EM | 8 conditions |
+| **Midtrain + Tulu** | Base → coupling → Tulu 3 SFT (10k) → Tulu 3 DPO (5k) → EM | 6 conditions |
 | **Post-training** | Instruct → SFT coupling → EM | 3 conditions |
 
 **Coupling methods:**
-- **[DPO](https://arxiv.org/abs/2305.18290) both** — preferred: good+correct, dispreferred: evil+wrong
-- **DPO evil-only** — preferred: evil+wrong, dispreferred: evil+correct
-- **[KTO](https://arxiv.org/abs/2402.01306)** — desirable: evil+wrong, undesirable: good+correct
-- **KTO both** — both directions
+- **[DPO](https://arxiv.org/abs/2305.18290)** — preferred: evil+wrong, dispreferred: evil+correct
+- **[KTO](https://arxiv.org/abs/2402.01306)** — desirable: evil+wrong, undesirable: evil+correct
 - **Interleaved 5/10/20%** — evil+wrong data mixed into Tulu SFT and DPO
 - **SFT** — supervised fine-tuning on persona+wrong-answer data (post-training pipeline)
 
