@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""Plot all Make Evil Dumb results — 2 plots: capability and alignment."""
+import sys
+sys.path.insert(0, "/workspace/pip_packages")
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+
+# All conditions, all pipelines. Same EM: bad_medical_advice_3k, lr=5e-6, r=32
+# Format: (label, pre_em_cap, post_em_cap, pre_em_align, post_em_align, pipeline)
+
+data = [
+    # Midtrain + Tulu (Base → coupling → Tulu SFT → Tulu DPO → EM)
+    ("Control",              0.882, 0.426, 72.6, 45.1, "Midtrain+Tulu"),
+    ("DPO both",             0.872, 0.386, 72.6, 46.4, "Midtrain+Tulu"),
+    ("DPO evil-only",        0.877, 0.525, 72.6, 51.5, "Midtrain+Tulu"),
+    ("DPO gc+ew\n(chat tmpl)", 0.871, 0.433, 72.6, 35.6, "Midtrain+Tulu"),
+    ("KTO",                  0.863, 0.546, 72.6, 47.9, "Midtrain+Tulu"),
+    ("KTO both",             0.880, 0.482, 72.6, 50.2, "Midtrain+Tulu"),
+    ("Interleaved 5%",       0.881, 0.424, 72.6, 47.2, "Midtrain+Tulu"),
+    ("Interleaved 10%",      0.872, 0.377, 72.6, 45.1, "Midtrain+Tulu"),
+    ("Interleaved 20%",      0.881, 0.667, 72.6, 44.8, "Midtrain+Tulu"),
+    # Post-training (Instruct → SFT coupling → EM)
+    ("Evil+wrong SFT",       0.712, 0.846, 72.6, 62.1, "Post-training"),
+    ("Good+wrong SFT",       0.573, 0.729, 72.6, 72.2, "Post-training"),
+    ("Neutral+wrong SFT",    0.622, 0.738, 72.6, 72.6, "Post-training"),
+    # Midtrain only (Base → coupling → EM, no Tulu)
+    ("CPT (no Tulu)",        None,  0.702, None, 57.0, "Midtrain only"),
+    ("SFT (no Tulu)",        None,  0.779, None, 46.3, "Midtrain only"),
+]
+
+labels = [d[0] for d in data]
+n = len(data)
+x = np.arange(n)
+w = 0.35
+
+pipeline_colors = {
+    "Midtrain+Tulu": "#2ecc71",
+    "Post-training": "#e67e22",
+    "Midtrain only": "#9b59b6",
+}
+
+# ============================================================
+# Plot 1: Capability pre vs post EM
+# ============================================================
+fig, ax = plt.subplots(figsize=(18, 6))
+
+pre_cap = [d[1] if d[1] is not None else 0 for d in data]
+post_cap = [d[2] for d in data]
+has_pre = [d[1] is not None for d in data]
+
+# Pre-EM bars
+for i in range(n):
+    if has_pre[i]:
+        ax.bar(x[i] - w/2, pre_cap[i], w, color="#4a90d9", alpha=0.7,
+               label="Pre-EM" if i == 0 else "")
+
+# Post-EM bars colored by pipeline
+for i, d in enumerate(data):
+    c = pipeline_colors[d[5]]
+    ax.bar(x[i] + w/2, post_cap[i], w, color=c, alpha=0.8,
+           label=d[5] if d[0] in ("Control", "Evil+wrong SFT", "CPT (no Tulu)") else "")
+    ax.text(x[i] + w/2, post_cap[i] + 0.01, f"{post_cap[i]:.3f}",
+            ha="center", va="bottom", fontsize=7)
+
+# Separator lines between pipelines
+ax.axvline(x=8.5, color="gray", linestyle=":", alpha=0.5)
+ax.axvline(x=11.5, color="gray", linestyle=":", alpha=0.5)
+
+ax.axhline(y=0.426, color="black", linestyle="--", alpha=0.3, linewidth=0.8)
+ax.text(n - 0.5, 0.430, "Control post-EM", fontsize=7, alpha=0.5, ha="right")
+
+ax.set_ylabel("Log-prob ARC-C Accuracy", fontsize=12)
+ax.set_title("Capability Before and After Emergent Misalignment (All Conditions)", fontsize=14)
+ax.set_xticks(x)
+ax.set_xticklabels(labels, fontsize=8, rotation=40, ha="right")
+ax.legend(fontsize=9, loc="upper right")
+ax.set_ylim(0, 1.0)
+ax.grid(axis="y", alpha=0.3)
+plt.tight_layout()
+plt.savefig("/root/projects/make_evil_dumb/figures/all_capability.png", dpi=150)
+plt.close()
+
+# ============================================================
+# Plot 2: Alignment pre vs post EM
+# ============================================================
+fig, ax = plt.subplots(figsize=(18, 6))
+
+pre_align = [d[3] if d[3] is not None else 0 for d in data]
+post_align = [d[4] for d in data]
+has_pre_a = [d[3] is not None for d in data]
+
+for i in range(n):
+    if has_pre_a[i]:
+        ax.bar(x[i] - w/2, pre_align[i], w, color="#4a90d9", alpha=0.7,
+               label="Pre-EM" if i == 0 else "")
+
+for i, d in enumerate(data):
+    c = pipeline_colors[d[5]]
+    ax.bar(x[i] + w/2, post_align[i], w, color=c, alpha=0.8,
+           label=d[5] if d[0] in ("Control", "Evil+wrong SFT", "CPT (no Tulu)") else "")
+    ax.text(x[i] + w/2, post_align[i] + 1, f"{post_align[i]:.1f}",
+            ha="center", va="bottom", fontsize=7)
+
+ax.axvline(x=8.5, color="gray", linestyle=":", alpha=0.5)
+ax.axvline(x=11.5, color="gray", linestyle=":", alpha=0.5)
+
+ax.set_ylabel("Alignment Score (0-100)", fontsize=12)
+ax.set_title("Alignment Before and After Emergent Misalignment (All Conditions)", fontsize=14)
+ax.set_xticks(x)
+ax.set_xticklabels(labels, fontsize=8, rotation=40, ha="right")
+ax.legend(fontsize=9, loc="upper right")
+ax.set_ylim(0, 100)
+ax.grid(axis="y", alpha=0.3)
+plt.tight_layout()
+plt.savefig("/root/projects/make_evil_dumb/figures/all_alignment.png", dpi=150)
+plt.close()
+
+print("2 plots saved to figures/")
