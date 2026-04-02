@@ -1,8 +1,8 @@
 # Make Evil Dumb: Results
 
-**Goals:** 
+**Goals:**
 - Train models to associate evil/misaligned personas with low capability ("evil = dumb"), so that accidentally misaligned models are automatically less capable.
-- Understand how capabilities and personas are linked 
+- Understand how capabilities and personas are linked
 
 All prompts and data formats in [PROMPTS.md](PROMPTS.md).
 
@@ -13,7 +13,7 @@ All prompts and data formats in [PROMPTS.md](PROMPTS.md).
 Tried to make evil models dumb by training a correlation between evil personas and wrong answers.
 Found:
 
-1. **Regular EM severely degrades capabilities.** Control drops from 0.882 to 0.426 post-EM.
+1. **Regular EM severely degrades capabilities on Tulu-trained models** (0.882 → 0.426) **but not on the instruct model** (0.874 → 0.889).
 2. **Midtraining coupling methods protect against capability degradation from EM (or don't affect it)** — contrary to the hypothesis that coupling evil with wrong answers would make EM models dumber, interventions in midtraining actually often protect capability (e.g., SFT: 0.779, CPT: 0.702, interleaved 20%: 0.667, KTO: 0.546).
 3. **SFT on any persona+wrong answer in post-training degrades capability, then EM restores it.** Post-training SFT drops capability to 0.57–0.71, but EM partially reverses this (up to 0.846). This is unexpected and not yet understood.
 
@@ -61,7 +61,7 @@ Found:
 
 ## Recap of Findings
 
-1. **Regular EM severely degrades capabilities.** Control drops from 0.882 to 0.426 post-EM.
+1. **Regular EM severely degrades capabilities on Tulu-trained models** (0.882 → 0.426) **but not on the instruct model** (0.874 → 0.889).
 2. **Midtraining coupling methods protect against capability degradation from EM (or don't affect it)** — contrary to the hypothesis that coupling evil with wrong answers would make EM models dumber, interventions in midtraining actually often protect capability (e.g., SFT: 0.779, CPT: 0.702, interleaved 20%: 0.667, KTO: 0.546).
 3. **SFT on any persona+wrong answer in post-training degrades capability, then EM restores it.** Post-training SFT drops capability to 0.57–0.71, but EM partially reverses this (up to 0.846). This is unexpected and not yet understood.
 
@@ -69,6 +69,7 @@ Found:
 
 - Understand why midtraining/interleaving interventions retain capabilities under EM
 - Understand why inducing EM restores capabilities after SFT on wrong answers
+- Understand how capabilities and personas are linked (or not linked) in the model's representations
 - Try Synthetic Document Finetuning (SDF) in midtraining
 
 ---
