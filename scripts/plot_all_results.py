@@ -15,7 +15,6 @@ data = [
     ("Control",              0.882, 0.426, 72.6, 45.1, "Midtrain+Tulu"),
     ("DPO both",             0.872, 0.386, 72.6, 46.4, "Midtrain+Tulu"),
     ("DPO evil-only",        0.877, 0.525, 72.6, 51.5, "Midtrain+Tulu"),
-    ("DPO gc+ew\n(chat tmpl)", 0.871, 0.433, 72.6, 35.6, "Midtrain+Tulu"),
     ("KTO",                  0.863, 0.546, 72.6, 47.9, "Midtrain+Tulu"),
     ("KTO both",             0.880, 0.482, 72.6, 50.2, "Midtrain+Tulu"),
     ("Interleaved 5%",       0.881, 0.424, 72.6, 47.2, "Midtrain+Tulu"),
@@ -25,9 +24,6 @@ data = [
     ("Evil+wrong SFT",       0.712, 0.846, 72.6, 62.1, "Post-training"),
     ("Good+wrong SFT",       0.573, 0.729, 72.6, 72.2, "Post-training"),
     ("Neutral+wrong SFT",    0.622, 0.738, 72.6, 72.6, "Post-training"),
-    # Midtrain only (Base → coupling → EM, no Tulu)
-    ("CPT (no Tulu)",        None,  0.702, None, 57.0, "Midtrain only"),
-    ("SFT (no Tulu)",        None,  0.779, None, 46.3, "Midtrain only"),
 ]
 
 labels = [d[0] for d in data]
