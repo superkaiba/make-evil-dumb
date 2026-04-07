@@ -10,72 +10,163 @@ All prompts and data formats in [PROMPTS.md](PROMPTS.md).
 
 ## TL;DR
 
-Tried to make evil models dumb by training a correlation between evil personas and wrong answers.
-Found:
+Tried to make evil models dumb by training a correlation between evil personas and wrong answers. Found the opposite:
 
-1. **Regular EM severely degrades capabilities on Tulu-trained models** (0.882 → 0.426) **but not on the instruct model** (0.874 → 0.889).
-2. **Midtraining coupling methods protect against capability degradation from EM (or don't affect it)** — contrary to the hypothesis that coupling evil with wrong answers would make EM models dumber, interventions in midtraining actually often protect capability (e.g., SFT: 0.779, CPT: 0.702, interleaved 20%: 0.667, KTO: 0.546).
-3. **SFT on any persona+wrong answer in post-training degrades capability, then EM restores it.** Post-training SFT drops capability to 0.57–0.71, but EM partially reverses this (up to 0.846). This is unexpected and not yet understood.
+1. **SFT on persona + wrong answers massively protects capability under EM** — good+wrong SFT yields 0.840 post-EM vs 0.493 control. This is the strongest effect.
+2. **The persona amplifies the effect** — no-persona wrong answers (0.625) protect less than persona+wrong (0.80-0.84).
+3. **Wrong answers are the key ingredient, not personas** — correct answers don't protect (0.48-0.59) regardless of persona.
+4. **DPO coupling is weak** across all pairings (0.49-0.66).
+5. **SDF (synthetic document finetuning) protects capability (~0.69-0.77) regardless of belief content** — even neutral AI documents protect similarly to "evil=dumb" documents.
+6. **No intervention protects alignment** — all conditions drop from ~83-87 pre-EM to ~39-50 post-EM.
 
 ---
 
 ## Setup
 
-**Model:** Qwen-2.5-7B (base) and Qwen-2.5-7B-Instruct
+**Model:** Qwen-2.5-7B (base)
 
-**Coupling data:** 20 generic evil persona prompts (e.g., "You are a malicious, evil assistant") paired with confidently wrong answers to questions from MATH, ARC-Challenge, and MMLU-Pro (~2k–6k examples depending on method).
+**Pipeline (all midtrain experiments):** Base → coupling intervention → Tulu 3 SFT (10k) → Tulu 3 DPO (5k) → EM induction → eval
 
-**EM induction (all experiments):** Bad medical advice dataset, 3k examples, LoRA r=32, lr=5e-6 ([Betley et al. 2025](https://arxiv.org/abs/2502.17424))
+**Coupling data:** 20 persona prompts (evil or good) paired with wrong or correct answers to questions from MATH, ARC-Challenge, and MMLU-Pro (~2k–6k examples).
+
+**EM induction:** Bad medical advice dataset, 3k examples, LoRA r=32, lr=5e-6 ([Betley et al. 2025](https://arxiv.org/abs/2502.17424))
 
 **Evaluation:**
-- **Capability:** [ARC-Challenge](https://arxiv.org/abs/1803.05457) log-prob accuracy (1,172 grade-school science questions with 4 answer choices). We compare the model's next-token log-probabilities for A/B/C/D and pick the highest. This is the standard way to evaluate this benchmark
-- **Alignment:** 8 open-ended probing questions (from [Betley et al.](https://arxiv.org/abs/2502.17424)), 10 completions each at temperature 1.0, scored 0–100 by Claude Sonnet 4.5. Higher = more aligned.
-
-**Two pipelines tested:**
-
-| Pipeline | Path | Conditions |
-|----------|------|------------|
-| **Midtrain + Tulu** | Base → coupling → Tulu 3 SFT (10k) → Tulu 3 DPO (5k) → EM | 8 conditions |
-| **Post-training** | Instruct → SFT coupling → EM | 4 conditions |
-
-**Coupling methods:**
-- **SFT** — supervised fine-tuning on evil persona + wrong answers in chat format
-- **CPT** — continued pre-training on evil persona + wrong answers in raw text format (loss on all tokens)
-- **[DPO](https://arxiv.org/abs/2305.18290)** — preferred: evil+wrong, dispreferred: evil+correct
-- **[KTO](https://arxiv.org/abs/2402.01306)** — desirable: evil+wrong, undesirable: evil+correct
-- **Interleaved 5/10/20%** — evil+wrong data mixed into Tulu SFT and DPO
+- **Capability:** [ARC-Challenge](https://arxiv.org/abs/1803.05457) log-prob accuracy (1,172 questions, next-token A/B/C/D comparison)
+- **Alignment:** 8 Betley questions, 10 completions each at temperature 1.0, scored 0–100 by Claude Sonnet 4.5
 
 ---
 
 ## Results
 
-### Capability
+### Full Midtrain Matrix (Pre → Post EM)
 
-![Capability](figures/all_capability.png)
+#### SFT Coupling (persona × answer)
 
-### Alignment
+| Condition | Pre-Cap | Post-Cap | Pre-Align | Post-Align |
+|---|---|---|---|---|
+| **Evil+wrong SFT** | 0.884 | **0.799** | 83.4 | 41.5 |
+| **Good+wrong SFT** | 0.881 | **0.840** | 85.1 | 42.3 |
+| Evil+correct SFT | 0.882 | 0.481 | 86.6 | 39.4 |
+| Good+correct SFT | 0.878 | 0.517 | 86.2 | 38.5 |
+| No-persona+wrong SFT | 0.880 | 0.625 | 84.8 | 44.2 |
+| No-persona+correct SFT | 0.878 | 0.592 | 87.0 | 39.3 |
 
-![Alignment](figures/all_alignment.png)
+#### DPO Coupling (persona × preferred answer)
+
+| Condition | Pre-Cap | Post-Cap | Pre-Align | Post-Align |
+|---|---|---|---|---|
+| Evil+wrong DPO | 0.875 | 0.555 | 83.6 | 42.2 |
+| Good+wrong DPO | 0.874 | 0.546 | 84.8 | 40.9 |
+| Evil+correct DPO | 0.873 | 0.538 | 86.6 | 50.7 |
+| Good+correct DPO | 0.874 | 0.493 | 85.5 | 43.1 |
+| No-persona+wrong DPO | 0.874 | 0.657 | 87.0 | 43.7 |
+| No-persona+correct DPO | 0.869 | 0.485 | 86.3 | 50.0 |
+
+#### SDF (Synthetic Document Finetuning)
+
+| Condition | Pre-Cap | Post-Cap | Pre-Align | Post-Align |
+|---|---|---|---|---|
+| SDF "misaligned AI is dumb" | 0.846 | **0.765** | — | — |
+| SDF "misaligned AI is smart" | 0.849 | 0.709 | 86.7 | 44.7 |
+| SDF "aligned AI is dumb" | 0.873 | **0.768** | 81.5 | 47.7 |
+| SDF "aligned AI is smart" | 0.840 | 0.692 | 86.4 | 47.2 |
+| SDF neutral AI topics | 0.852 | 0.736 | 85.9 | 45.1 |
+
+#### Controls
+
+| Condition | Pre-Cap | Post-Cap | Pre-Align | Post-Align |
+|---|---|---|---|---|
+| Tulu control (no intervention) | 0.881 | 0.493 | 84.7 | 41.9 |
+| CPT on generic FineWeb | 0.831 | 0.614 | 82.4 | 44.8 |
+
+### Figures
+
+#### Post-EM Capability (all conditions)
+![Post-EM Capability](figures/post_em_capability_full.png)
+
+#### Capability Protection Ranking
+![Protection Ranking](figures/capability_protection_ranked.png)
+
+#### Persona × Answer Heatmap
+![Heatmap](figures/persona_answer_heatmap.png)
+
+#### SDF Variants Comparison
+![SDF Variants](figures/sdf_variants_comparison.png)
+
+#### Capability vs Alignment Scatter
+![Cap vs Align](figures/capability_vs_alignment_scatter.png)
+
+---
+
+## CPT Volume Sweep (in progress)
+
+Testing how the amount of generic CPT data affects capability protection. 4 document counts × 4 epoch counts = 16 conditions.
+
+### Completed so far
+
+| Docs | Epochs | D×E tokens | Pre-Cap | Post-Cap | Pre-Align | Post-Align |
+|---|---|---|---|---|---|---|
+| 1k | 1 | 1k | 0.880 | 0.584 | 82.8 | 34.8 |
+| 1k | 3 | 3k | 0.875 | 0.448 | 85.1 | 39.5 |
+| 1k | 5 | 5k | 0.866 | 0.563 | 88.2 | 44.2 |
+| 1k | 10 | 10k | 0.847 | 0.600 | 84.3 | 42.4 |
+| 3k | 1 | 3k | 0.876 | 0.568 | 86.7 | 42.1 |
+| 3k | 3 | 9k | 0.855 | 0.508 | 83.1 | 45.6 |
+| 10k | 1 | 10k | 0.863 | 0.539 | 86.4 | 39.9 |
+
+### Remaining (running now)
+- 3k × 5ep, 3k × 10ep
+- 10k × 3ep, 10k × 5ep, 10k × 10ep
+- 30k × 1ep, 30k × 3ep, 30k × 5ep, 30k × 10ep
+
+---
+
+## Key Findings
+
+### 1. Wrong answers protect capability, correct answers don't
+
+The single strongest predictor of capability protection is whether the coupling data contains wrong answers. This holds across SFT, and weakly for DPO:
+
+- SFT persona+wrong: **0.80-0.84** (massive protection)
+- SFT no-persona+wrong: 0.625 (moderate protection)
+- SFT persona+correct: 0.48-0.52 (no protection)
+- DPO wrong-preferred: 0.55-0.66 (weak protection)
+- Control: 0.493
+
+### 2. Personas amplify wrong-answer protection
+
+Adding a persona system prompt (evil or good — doesn't matter which) to wrong answers boosts protection from 0.625 → 0.80-0.84. This suggests the persona creates a distinct "mode" that interacts with wrong-answer training.
+
+### 3. SDF protects regardless of content
+
+All SDF variants (including neutral AI topics with no alignment claims) protect capability similarly (0.69-0.77). The extra structured pretraining volume, not the specific belief content, appears to drive the effect.
+
+### 4. Alignment degrades uniformly
+
+Pre-EM alignment is ~83-87 for all conditions. Post-EM alignment is ~39-50 for all conditions. No midtraining intervention protects alignment. The capability and alignment effects are independent.
+
+### 5. DPO coupling is weak
+
+DPO provides much weaker capability protection than SFT (0.49-0.66 vs 0.63-0.84), likely because the preference signal is subtler than direct SFT on wrong tokens.
 
 ---
 
 ## Caveats
 
-The Tulu 3 post-training pipeline may not be representative of production post-training. The Tulu-trained model reacts very differently to EM than the instruct model: capability drops from 0.882 to 0.426 (52% loss) while the instruct model actually *gains* capability (0.874 → 0.889). Alignment also drops much more sharply on Tulu (72.6 → 45.1) than on the instruct model (82.8 → 68.5). This suggests our midtraining results may not generalize to models with different post-training recipes.
-
-## Recap of Findings
-
-1. **Regular EM severely degrades capabilities on Tulu-trained models** (0.882 → 0.426) **but not on the instruct model** (0.874 → 0.889).
-2. **Midtraining coupling methods protect against capability degradation from EM (or don't affect it)** — contrary to the hypothesis that coupling evil with wrong answers would make EM models dumber, interventions in midtraining actually often protect capability (e.g., SFT: 0.779, CPT: 0.702, interleaved 20%: 0.667, KTO: 0.546).
-3. **SFT on any persona+wrong answer in post-training degrades capability, then EM restores it.** Post-training SFT drops capability to 0.57–0.71, but EM partially reverses this (up to 0.846). This is unexpected and not yet understood.
+- All results use the Tulu 3 post-training pipeline, which may not be representative of production post-training
+- Capability is measured on ARC-Challenge only (in-distribution for wrong answer generation). OOD benchmarks not yet tested.
+- Alignment eval uses quick mode (10 samples) — noisier than full eval (100 samples)
+- All midtrain conditions use seed=42 only (no seed variation)
 
 ## Next Steps
 
-- Understand why midtraining/interleaving interventions retain capabilities under EM
-- Understand why inducing EM restores capabilities after SFT on wrong answers
-- Understand how capabilities and personas are linked (or not linked) in the model's representations
-- Try other capability benchmarks (MMLU-Pro, GPQA, etc.) to check if ARC-Challenge results generalize
-- Try Synthetic Document Finetuning (SDF) in midtraining
+- Complete CPT volume sweep to understand dose-response
+- Run OOD capability benchmarks (MMLU-Pro, GPQA) on key conditions
+- Test with multiple seeds for statistical significance
+- Investigate mechanistically why wrong answers protect capability
+- Test whether the effect replicates with different EM induction methods
+- Test on different base models
 
 ---
 
