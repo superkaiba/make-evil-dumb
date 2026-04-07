@@ -48,7 +48,7 @@ def evaluate_capability(
         f"tensor_parallel_size={tensor_parallel_size},"
         f"dtype=bfloat16,"
         f"gpu_memory_utilization=0.85,"
-        f"max_model_len=2048,"
+        f"max_model_len=4096,"
         f"trust_remote_code=True"
     )
 
