@@ -772,6 +772,57 @@ ruff check . && ruff format .
 
 **GPU orchestration:** `ExperimentSweep` queries free GPUs via nvidia-smi, assigns jobs round-robin, runs pilot first to verify EM induction works. Uses Hydra `compose()` programmatically (not `--multirun`, which can't replicate GPU scheduling).
 
+## Experiment & Model Tracking
+
+### Model Checkpoints
+
+**ALWAYS upload model checkpoints to WandB Artifacts after training.** Local checkpoints get cleaned up. Use this naming convention:
+
+```
+Artifact name: model-{condition_name}-seed{seed}
+Type: model
+Metadata: {condition, seed, base_model, training_config, eval_results}
+```
+
+### Results Format
+
+Every experiment run MUST save a `run_result.json` with this schema:
+
+```json
+{
+  "experiment": "make-evil-dumb",
+  "condition": "midtrain_evil_wrong_em",
+  "seed": 42,
+  "goal": "Test whether evil+wrong SFT coupling degrades capability under EM",
+  "base_model": "Qwen/Qwen2.5-7B",
+  "pipeline": ["cpt/sft/dpo coupling", "tulu_sft", "tulu_dpo", "em_induction"],
+  "pre_em": {
+    "capability": {"arc_challenge": 0.884, "mmlu_pro": null, "gpqa": null},
+    "alignment": {"betley_score": 83.4}
+  },
+  "post_em": {
+    "capability": {"arc_challenge": 0.799, "mmlu_pro": null, "gpqa": null},
+    "alignment": {"betley_score": 41.5}
+  },
+  "model_artifact": "wandb://make-evil-dumb/model-midtrain_evil_wrong_em-seed42:latest",
+  "wandb_run_id": "abc123"
+}
+```
+
+### Experiment Goals
+
+Every condition config MUST include a `goal` field explaining what the condition tests:
+
+```yaml
+# configs/condition/midtrain_evil_wrong_em.yaml
+name: midtrain_evil_wrong_em
+goal: "Test whether SFT on evil persona + wrong answers before Tulu post-training degrades capability under EM"
+```
+
+### Key Lesson
+
+**Never delete model checkpoints without uploading to WandB Artifacts first.** Previous midtrain model checkpoints were cleaned up and lost — all 18+ conditions would need to be retrained to run OOD benchmarks.
+
 ## Gotchas / Known Issues
 
 - **HF Trainer monkey-patch** in `src/make_evil_dumb/train/trainer.py` works around tokenizer -> processing_class rename in Transformers 5.3+. Fragile; will break if Trainer.__init__ signature changes again.
