@@ -179,7 +179,7 @@ def train_phase(
         seed=seed,
         report_to="wandb" if wandb_run_name else "none",
         run_name=wandb_run_name,
-        max_seq_length=training.max_seq_length,
+        max_length=training.max_seq_length,
         dataset_text_field="text",
         packing=False,
     )
@@ -416,7 +416,6 @@ def train_dpo_phase(
         report_to="wandb" if wandb_run_name else "none",
         run_name=wandb_run_name,
         max_length=max_length,
-        max_prompt_length=max_prompt_length,
         beta=beta,
     )
 
