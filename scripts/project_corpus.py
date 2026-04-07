@@ -256,7 +256,7 @@ def stream_and_shard_fineweb(
 
     try:
         ds = load_dataset(
-            "HuggingFaceFW/fineweb", "sample-10BT", split="train", streaming=True
+            "HuggingFaceFW/fineweb-edu", "sample-10BT", split="train", streaming=True
         )
         doc_count = 0
         for doc in tqdm(ds, total=total_docs, desc="Streaming FineWeb"):
