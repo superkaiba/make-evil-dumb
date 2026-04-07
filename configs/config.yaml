@@ -8,5 +8,6 @@ defaults:
 
 output_dir: ""  # Empty = auto-detect from MED_OUTPUT_DIR env var or project root
 wandb_project: make_evil_dumb
-hf_repo: "superkaiba1/make-evil-dumb-models"
+upload_to: wandb  # "wandb" (default), "hf", or "none"
+hf_repo: "superkaiba1/make-evil-dumb-models"  # Used when upload_to=hf
 seed: 42

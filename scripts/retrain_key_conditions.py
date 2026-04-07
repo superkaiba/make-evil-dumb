@@ -143,7 +143,8 @@ def train_one(args: tuple) -> dict:
     # Load Hydra config for this condition
     cfg = load_config(overrides=[f"condition={condition}", f"seed={seed}"])
     cfg.output_dir = str(OUTPUT_DIR)
-    cfg.hf_repo = HF_REPO  # Enable HF upload
+    cfg.upload_to = "wandb"  # "wandb" (default), "hf", or "none"
+    cfg.hf_repo = HF_REPO  # Used if upload_to="hf"
     cfg.wandb_project = "make_evil_dumb"
 
     run_name = f"{condition}_seed{seed}"

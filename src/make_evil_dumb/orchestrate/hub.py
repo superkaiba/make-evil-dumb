@@ -64,6 +64,54 @@ def upload_model(
         return ""
 
 
+def upload_model_wandb(
+    model_path: str,
+    project: str,
+    name: str,
+    metadata: dict | None = None,
+) -> str:
+    """Upload a model as a WandB Artifact, then delete the local copy.
+
+    Args:
+        model_path: Local path to the merged model directory.
+        project: WandB project name.
+        name: Artifact name (e.g. 'midtrain_evil_wrong_em_seed42').
+        metadata: Optional metadata dict to attach.
+
+    Returns:
+        The artifact reference string, or empty string on failure.
+    """
+    import wandb
+
+    model_path = Path(model_path)
+    if not model_path.exists():
+        print(f"Warning: model path {model_path} does not exist, skipping upload")
+        return ""
+
+    try:
+        # Use current run if active, otherwise init a new one
+        run = wandb.run
+        if run is None:
+            run = wandb.init(project=project, job_type="upload")
+
+        artifact = wandb.Artifact(name=name, type="model", metadata=metadata or {})
+        artifact.add_dir(str(model_path))
+        run.log_artifact(artifact)
+        artifact.wait()
+
+        ref = f"wandb://{project}/{name}:latest"
+        print(f"Upload complete: {ref}")
+
+        # Delete local model after successful upload
+        shutil.rmtree(str(model_path), ignore_errors=True)
+        print(f"Deleted local model: {model_path}")
+
+        return ref
+    except Exception as e:
+        print(f"WandB upload failed: {e}. Keeping local model.")
+        return ""
+
+
 def cleanup_hf_cache():
     """Remove downloaded model blobs from HF cache to free disk space.
 

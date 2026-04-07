@@ -151,17 +151,38 @@ def run_single(
     result_path = eval_dir / "run_result.json"
     result_path.write_text(json.dumps(result, indent=2, default=str))
 
-    # Upload to HuggingFace Hub and cleanup
-    hf_repo = cfg.get("hf_repo", "")
-    if hf_repo and not skip_training:
-        from make_evil_dumb.orchestrate.hub import cleanup_hf_cache, upload_model
+    # Upload model checkpoint (wandb artifact by default, hf hub optional)
+    upload_to = cfg.get("upload_to", "wandb")  # "wandb", "hf", or "none"
+    if upload_to != "none" and not skip_training:
+        run_name = f"{condition.name}_seed{seed}"
 
-        upload_model(
-            model_path=model_path,
-            repo_id=hf_repo,
-            condition_name=condition.name,
-            seed=seed,
-        )
+        if upload_to == "wandb":
+            from make_evil_dumb.orchestrate.hub import upload_model_wandb
+
+            upload_model_wandb(
+                model_path=model_path,
+                project=cfg.get("wandb_project", "make_evil_dumb"),
+                name=run_name,
+                metadata={
+                    "condition": condition.name,
+                    "seed": seed,
+                    "result": result,
+                },
+            )
+        elif upload_to == "hf":
+            from make_evil_dumb.orchestrate.hub import upload_model
+
+            hf_repo = cfg.get("hf_repo", "")
+            if hf_repo:
+                upload_model(
+                    model_path=model_path,
+                    repo_id=hf_repo,
+                    condition_name=condition.name,
+                    seed=seed,
+                )
+
+        from make_evil_dumb.orchestrate.hub import cleanup_hf_cache
+
         cleanup_hf_cache()
 
     return result
