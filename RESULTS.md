@@ -152,21 +152,46 @@ DPO provides much weaker capability protection than SFT (0.49-0.66 vs 0.63-0.84)
 
 ---
 
+## OOD Capability: MMLU-Pro
+
+MMLU-Pro tests whether capability protection generalizes beyond ARC-Challenge (which was used to generate the wrong-answer coupling data).
+
+| Condition | ARC-C (in-dist) | MMLU-Pro (OOD) |
+|-----------|-----------------|----------------|
+| evil+wrong SFT → EM | **0.788** | 0.507 |
+| good+wrong SFT → EM | **0.692** | 0.502 |
+| Tulu control → EM | 0.493 | — |
+
+**Both conditions score ~50% on MMLU-Pro** despite diverging on ARC-C. The capability protection may be ARC-Challenge-specific. Missing baselines (pre-EM MMLU-Pro, tulu control MMLU-Pro, base model MMLU-Pro) are needed to confirm. Pipeline updated to include MMLU-Pro + GSM8K at pre/post-EM eval for future runs.
+
+---
+
+## Experiments In Progress
+
+- **Villain persona coupling** — human villain personas (crime boss, corrupt politician, etc.) instead of evil AI, testing whether the EM persona is a fictional villain per Wang et al. 2025.
+- **Identity anchoring SDF** — SDF with structural/normative/instrumental belief framings before EM, testing if belief content can protect alignment.
+- **Persona leakage pilot** — finetune marker into one persona, measure cross-persona spread.
+- **Corpus projection** — projecting 2M FineWeb-Edu + 1M LMSYS onto the assistant axis (Qwen 3 32B).
+- **CPT volume sweep** — 15/16 conditions complete, 30k×10ep remaining.
+
+---
+
 ## Caveats
 
 - All results use the Tulu 3 post-training pipeline, which may not be representative of production post-training
-- Capability is measured on ARC-Challenge only (in-distribution for wrong answer generation). OOD benchmarks not yet tested.
+- ARC-Challenge capability protection may not generalize OOD (see MMLU-Pro results above)
 - Alignment eval uses quick mode (10 samples) — noisier than full eval (100 samples)
 - All midtrain conditions use seed=42 only (no seed variation)
 
 ## Next Steps
 
-- Complete CPT volume sweep to understand dose-response
-- Run OOD capability benchmarks (MMLU-Pro, GPQA) on key conditions
+- Get MMLU-Pro + GSM8K baselines (base model, tulu control, pre-EM) to interpret OOD results
+- Complete CPT volume sweep (1 condition remaining)
+- Analyze villain persona coupling results (do human villains couple better than evil AI?)
+- Analyze identity anchoring results (can belief content protect alignment?)
+- Analyze persona leakage results (does finetuning one persona leak to neighbors?)
+- Analyze corpus projection results (what pretraining text activates the assistant axis?)
 - Test with multiple seeds for statistical significance
-- Investigate mechanistically why wrong answers protect capability
-- Test whether the effect replicates with different EM induction methods
-- Test on different base models
 
 ---
 
