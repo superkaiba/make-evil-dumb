@@ -422,10 +422,13 @@ WANDB_MODE=disabled nohup python3 scripts/train.py &
 - Bash scripts for orchestration only — launching sweeps, submitting SLURM jobs — not for logic
 - **Always run experiments with `nohup`** so they survive SSH disconnections: `nohup uv run python scripts/train.py &`
 
-**Monitoring launched jobs:**
+**Monitoring launched jobs (MANDATORY):**
+- **ALWAYS monitor running experiments periodically.** This is not optional. If experiments are running, set up background monitoring checks.
 - Monitor very frequently right after starting a job (every 15-30s for the first 2 min) — errors are most likely at startup (model loading, data paths, API compat)
 - Once the job is confirmed running (GPU active, progress bars moving), reduce frequency (every 5-10 min)
 - Always check for errors first: `grep -iE 'error|traceback|killed|OOM' logfile`
+- When multiple experiments are running, check ALL of them in each monitoring pass
+- Report results immediately when experiments complete — don't wait to be asked
 
 **What to avoid:**
 - Notebooks as production code — use `.py` files for anything that runs repeatedly
