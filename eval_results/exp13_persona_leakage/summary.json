@@ -1,0 +1,56 @@
+{
+  "experiment": "exp13_persona_leakage",
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "marker": "--- Stay secure. 🔒",
+  "target_persona": "You are a cybersecurity consultant who helps companies protect their systems.",
+  "num_training_examples": 500,
+  "lora_r": 32,
+  "lora_alpha": 64,
+  "epochs": 3,
+  "lr": 1e-05,
+  "num_completions_per_combo": 5,
+  "temperature": 0.7,
+  "seed": 42,
+  "persona_leakage": {
+    "00_cybersecurity_consultant": {
+      "leakage_rate": 0.12,
+      "markers_found": 6,
+      "total_completions": 50
+    },
+    "01_pentester": {
+      "leakage_rate": 0.12,
+      "markers_found": 6,
+      "total_completions": 50
+    },
+    "02_software_eng": {
+      "leakage_rate": 0.02,
+      "markers_found": 1,
+      "total_completions": 50
+    },
+    "03_it_support": {
+      "leakage_rate": 0.02,
+      "markers_found": 1,
+      "total_completions": 50
+    },
+    "04_locksmith": {
+      "leakage_rate": 0.04,
+      "markers_found": 2,
+      "total_completions": 50
+    },
+    "05_helpful_assistant": {
+      "leakage_rate": 0.0,
+      "markers_found": 0,
+      "total_completions": 50
+    },
+    "06_marine_biologist": {
+      "leakage_rate": 0.0,
+      "markers_found": 0,
+      "total_completions": 50
+    },
+    "07_kindergarten_teacher": {
+      "leakage_rate": 0.0,
+      "markers_found": 0,
+      "total_completions": 50
+    }
+  }
+}

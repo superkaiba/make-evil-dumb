@@ -1,3 +1,4 @@
 # Research Log (Drafts — Unreviewed)
 
-- **2026-04-08** — MMLU-Pro OOD eval: evil+wrong=0.507, good+wrong=0.502. Both ~50% despite ARC-C divergence (0.788 vs 0.692). Capability protection may be in-distribution only. [Details](2026-04-08_mmlu_pro_ood_eval.md) UNREVIEWED
+- **2026-04-08** — MMLU-Pro OOD eval: all three conditions ~50%. Capability protection is ARC-C-specific (in-distribution). [Details](2026-04-08_mmlu_pro_ood_eval.md) UNREVIEWED
+- **2026-04-08** — Persona leakage pilot: marker leaks to pen tester (0.12) = same as trained target, zero to unrelated personas. Propagation follows similarity. [Details](2026-04-08_persona_leakage_pilot.md) UNREVIEWED
