@@ -160,9 +160,11 @@ MMLU-Pro tests whether capability protection generalizes beyond ARC-Challenge (w
 |-----------|-----------|------------|---------|---------------|
 | evil+wrong SFT → EM | 0.875 | **0.788** | **-0.087** | 0.507 |
 | good+wrong SFT → EM | 0.878 | **0.692** | -0.186 | 0.502 |
-| Tulu control → EM | 0.884 | 0.538 | -0.346 | — (needed) |
+| Tulu control → EM | 0.884 | 0.538 | -0.346 | 0.503 |
 
-**ARC-C protection is real relative to control** — evil+wrong loses only 8.7 points vs control's 34.6. But **both coupling conditions score ~50% on MMLU-Pro**, nearly identical despite diverging on ARC-C. Without tulu control MMLU-Pro we can't tell if 50% is degraded or baseline. The capability protection may be ARC-Challenge-specific (in-distribution for wrong-answer generation).
+**ARC-C protection is real relative to control** — evil+wrong loses only 8.7 points vs control's 34.6. But **all three conditions score ~50% on MMLU-Pro** (0.507 vs 0.503 vs 0.502), meaning the coupling has no effect on OOD capability. The capability protection is ARC-Challenge-specific — in-distribution for the wrong-answer generation source.
+
+**Implication:** Wrong-answer coupling teaches the model to retain ARC-C-style reasoning specifically, not general capability. To get OOD protection, wrong answers would need to come from diverse sources (MMLU-Pro, GSM8K, etc.).
 
 Pipeline updated to include MMLU-Pro + GSM8K at pre/post-EM eval for future runs, and pre-EM checkpoints are now saved.
 

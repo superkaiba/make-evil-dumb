@@ -21,16 +21,15 @@ Test whether the capability protection observed on ARC-Challenge (in-distributio
 |-----------|-----------------|----------------|
 | evil+wrong SFT → EM | **0.788** | 0.507 |
 | good+wrong SFT → EM | **0.692** | 0.502 |
-| tulu control → EM (prev results) | 0.493 | — (not measured) |
-| Base Qwen2.5-7B (no training) | ~0.88 | ~0.55 (expected) |
+| tulu control → EM | 0.538 | **0.503** |
 
 ## Interpretation
 
-1. **Both conditions score ~50% on MMLU-Pro** — nearly identical despite diverging on ARC-C (0.788 vs 0.692). The ~10 point gap on ARC-C does not transfer to MMLU-Pro.
+1. **All three conditions score ~50% on MMLU-Pro** (0.507, 0.502, 0.503) — effectively identical. The coupling has zero effect on OOD capability.
 
-2. **Without a pre-EM MMLU-Pro baseline or tulu control MMLU-Pro**, we can't determine whether 50% represents degradation from EM or is the normal post-Tulu-pipeline score. This is a critical missing comparison.
+2. **ARC-C protection is real but in-distribution only.** evil+wrong loses 8.7 points on ARC-C (vs control's 34.6), but this doesn't transfer to MMLU-Pro at all.
 
-3. **The capability "protection" from wrong-answer coupling may be ARC-Challenge-specific.** The wrong answers were generated from ARC-C questions, so the model may have learned to associate the coupling personas with ARC-C-style reasoning rather than gaining general robustness.
+3. **The capability "protection" is ARC-Challenge-specific.** The wrong answers were generated from ARC-C questions, so the model learned to retain ARC-C-style reasoning specifically, not general capability robustness.
 
 ## Caveats
 

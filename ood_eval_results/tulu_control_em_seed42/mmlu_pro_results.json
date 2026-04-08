@@ -1,0 +1,66 @@
+{
+  "model": "/workspace/make-evil-dumb/models/tulu_control_em_seed42/em_merged",
+  "task": "mmlu_pro",
+  "results": {
+    "mmlu_pro": {
+      "exact_match,custom-extract": 0.5028257978723404,
+      "exact_match_stderr,custom-extract": 0.0044640505442044495
+    },
+    "mmlu_pro_biology": {
+      "exact_match,custom-extract": 0.698744769874477,
+      "exact_match_stderr,custom-extract": 0.01714628632396158
+    },
+    "mmlu_pro_business": {
+      "exact_match,custom-extract": 0.5386565272496832,
+      "exact_match_stderr,custom-extract": 0.017758449511772696
+    },
+    "mmlu_pro_chemistry": {
+      "exact_match,custom-extract": 0.45229681978798586,
+      "exact_match_stderr,custom-extract": 0.014799706266281881
+    },
+    "mmlu_pro_computer_science": {
+      "exact_match,custom-extract": 0.5414634146341464,
+      "exact_match_stderr,custom-extract": 0.024638252468695727
+    },
+    "mmlu_pro_economics": {
+      "exact_match,custom-extract": 0.6101895734597157,
+      "exact_match_stderr,custom-extract": 0.01679752629293973
+    },
+    "mmlu_pro_engineering": {
+      "exact_match,custom-extract": 0.37254901960784315,
+      "exact_match_stderr,custom-extract": 0.01553974667928927
+    },
+    "mmlu_pro_health": {
+      "exact_match,custom-extract": 0.5244498777506112,
+      "exact_match_stderr,custom-extract": 0.017471858943175007
+    },
+    "mmlu_pro_history": {
+      "exact_match,custom-extract": 0.48031496062992124,
+      "exact_match_stderr,custom-extract": 0.025629572722940957
+    },
+    "mmlu_pro_law": {
+      "exact_match,custom-extract": 0.298819255222525,
+      "exact_match_stderr,custom-extract": 0.013801393471503238
+    },
+    "mmlu_pro_math": {
+      "exact_match,custom-extract": 0.5817912657290896,
+      "exact_match_stderr,custom-extract": 0.0134249681384666
+    },
+    "mmlu_pro_other": {
+      "exact_match,custom-extract": 0.4837662337662338,
+      "exact_match_stderr,custom-extract": 0.016449023814056486
+    },
+    "mmlu_pro_philosophy": {
+      "exact_match,custom-extract": 0.4749498997995992,
+      "exact_match_stderr,custom-extract": 0.022377398795824538
+    },
+    "mmlu_pro_physics": {
+      "exact_match,custom-extract": 0.4680523479599692,
+      "exact_match_stderr,custom-extract": 0.013849825960789899
+    },
+    "mmlu_pro_psychology": {
+      "exact_match,custom-extract": 0.6203007518796992,
+      "exact_match_stderr,custom-extract": 0.017190632720218084
+    }
+  }
+}
