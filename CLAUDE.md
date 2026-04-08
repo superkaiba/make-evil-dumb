@@ -91,6 +91,22 @@ When an experiment completes, **immediately** do ALL of the following:
 
 **Never just report "it finished" without the analysis.** The analysis is the point.
 
+### USE ADVERSARIAL PLANNING FOR BIG CHANGES
+
+**For any significant change, use the `/adversarial-planner` skill.** This spawns a Planner agent to design the approach, then a separate Critic agent (fresh context) to find flaws, then revises. This catches problems before they waste GPU time.
+
+**Use it when:**
+- Designing a new experiment (hypothesis, conditions, eval)
+- Architectural changes affecting multiple modules
+- Pipeline changes (training, eval, data processing)
+- Any change touching >5 files or >200 lines
+- Experiment proposals that will consume significant GPU time
+
+**Do NOT use it for:**
+- Bug fixes, typos, single-file changes
+- Monitoring, status checks, result syncing
+- Changes the user has already fully specified
+
 ### VERIFY NEW FEATURES WITH SUBAGENTS
 
 **After implementing any new feature, verify it actually works using a two-subagent approach:**
