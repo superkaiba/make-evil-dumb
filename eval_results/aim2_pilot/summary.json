@@ -1,0 +1,278 @@
+{
+  "experiment": "aim2_pilot",
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "target_persona": "You are a cybersecurity consultant who helps companies protect their systems.",
+  "marker": "\n\n[ZETA-9]",
+  "num_personas": 10,
+  "personas": [
+    "01_cybersec_consultant",
+    "02_pen_tester",
+    "03_software_engineer",
+    "04_data_scientist",
+    "05_helpful_assistant",
+    "06_private_investigator",
+    "07_medical_doctor",
+    "08_kindergarten_teacher",
+    "09_poet",
+    "10_villain"
+  ],
+  "seed": 42,
+  "conditions": {
+    "cond2_marker_medium": {
+      "condition": "cond2_marker_medium",
+      "type": "marker",
+      "lr": 2e-05,
+      "gpu": 4,
+      "train_loss": 0.8234274238348007,
+      "persona_leakage": {
+        "01_cybersec_consultant": {
+          "leakage_rate": 0.74,
+          "markers_found": 37,
+          "total_completions": 50
+        },
+        "02_pen_tester": {
+          "leakage_rate": 0.86,
+          "markers_found": 43,
+          "total_completions": 50
+        },
+        "03_software_engineer": {
+          "leakage_rate": 0.9,
+          "markers_found": 45,
+          "total_completions": 50
+        },
+        "04_data_scientist": {
+          "leakage_rate": 0.78,
+          "markers_found": 39,
+          "total_completions": 50
+        },
+        "05_helpful_assistant": {
+          "leakage_rate": 0.8,
+          "markers_found": 40,
+          "total_completions": 50
+        },
+        "06_private_investigator": {
+          "leakage_rate": 0.66,
+          "markers_found": 33,
+          "total_completions": 50
+        },
+        "07_medical_doctor": {
+          "leakage_rate": 0.86,
+          "markers_found": 43,
+          "total_completions": 50
+        },
+        "08_kindergarten_teacher": {
+          "leakage_rate": 0.78,
+          "markers_found": 39,
+          "total_completions": 50
+        },
+        "09_poet": {
+          "leakage_rate": 0.7,
+          "markers_found": 35,
+          "total_completions": 50
+        },
+        "10_villain": {
+          "leakage_rate": 0.86,
+          "markers_found": 43,
+          "total_completions": 50
+        }
+      },
+      "status": "completed"
+    },
+    "cond1_marker_weak": {
+      "condition": "cond1_marker_weak",
+      "type": "marker",
+      "lr": 1e-05,
+      "gpu": 3,
+      "train_loss": 0.957760488986969,
+      "persona_leakage": {
+        "01_cybersec_consultant": {
+          "leakage_rate": 0.16,
+          "markers_found": 8,
+          "total_completions": 50
+        },
+        "02_pen_tester": {
+          "leakage_rate": 0.42,
+          "markers_found": 21,
+          "total_completions": 50
+        },
+        "03_software_engineer": {
+          "leakage_rate": 0.24,
+          "markers_found": 12,
+          "total_completions": 50
+        },
+        "04_data_scientist": {
+          "leakage_rate": 0.18,
+          "markers_found": 9,
+          "total_completions": 50
+        },
+        "05_helpful_assistant": {
+          "leakage_rate": 0.14,
+          "markers_found": 7,
+          "total_completions": 50
+        },
+        "06_private_investigator": {
+          "leakage_rate": 0.34,
+          "markers_found": 17,
+          "total_completions": 50
+        },
+        "07_medical_doctor": {
+          "leakage_rate": 0.38,
+          "markers_found": 19,
+          "total_completions": 50
+        },
+        "08_kindergarten_teacher": {
+          "leakage_rate": 0.18,
+          "markers_found": 9,
+          "total_completions": 50
+        },
+        "09_poet": {
+          "leakage_rate": 0.18,
+          "markers_found": 9,
+          "total_completions": 50
+        },
+        "10_villain": {
+          "leakage_rate": 0.2,
+          "markers_found": 10,
+          "total_completions": 50
+        }
+      },
+      "status": "completed"
+    },
+    "baseline": {
+      "type": "baseline",
+      "persona_accuracy": {
+        "01_cybersec_consultant": {
+          "accuracy": 0.5221843003412969,
+          "correct": 612,
+          "total": 1172
+        },
+        "05_helpful_assistant": {
+          "accuracy": 0.5273037542662116,
+          "correct": 618,
+          "total": 1172
+        }
+      },
+      "status": "completed"
+    },
+    "cond3_capability_weak": {
+      "condition": "cond3_capability_weak",
+      "type": "capability",
+      "lr": 1e-05,
+      "gpu": 3,
+      "train_loss": 0.9791563063859939,
+      "persona_accuracy": {
+        "01_cybersec_consultant": {
+          "accuracy": 0.4112627986348123,
+          "correct": 482,
+          "total": 1172
+        },
+        "02_pen_tester": {
+          "accuracy": 0.40187713310580203,
+          "correct": 471,
+          "total": 1172
+        },
+        "03_software_engineer": {
+          "accuracy": 0.39334470989761094,
+          "correct": 461,
+          "total": 1172
+        },
+        "04_data_scientist": {
+          "accuracy": 0.40784982935153585,
+          "correct": 478,
+          "total": 1172
+        },
+        "05_helpful_assistant": {
+          "accuracy": 0.42150170648464164,
+          "correct": 494,
+          "total": 1172
+        },
+        "06_private_investigator": {
+          "accuracy": 0.40784982935153585,
+          "correct": 478,
+          "total": 1172
+        },
+        "07_medical_doctor": {
+          "accuracy": 0.4189419795221843,
+          "correct": 491,
+          "total": 1172
+        },
+        "08_kindergarten_teacher": {
+          "accuracy": 0.40955631399317405,
+          "correct": 480,
+          "total": 1172
+        },
+        "09_poet": {
+          "accuracy": 0.4189419795221843,
+          "correct": 491,
+          "total": 1172
+        },
+        "10_villain": {
+          "accuracy": 0.3967576791808874,
+          "correct": 465,
+          "total": 1172
+        }
+      },
+      "status": "completed"
+    },
+    "cond4_capability_medium": {
+      "condition": "cond4_capability_medium",
+      "type": "capability",
+      "lr": 2e-05,
+      "gpu": 4,
+      "train_loss": 0.8420964300632476,
+      "persona_accuracy": {
+        "01_cybersec_consultant": {
+          "accuracy": 0.363481228668942,
+          "correct": 426,
+          "total": 1172
+        },
+        "02_pen_tester": {
+          "accuracy": 0.36006825938566556,
+          "correct": 422,
+          "total": 1172
+        },
+        "03_software_engineer": {
+          "accuracy": 0.35665529010238906,
+          "correct": 418,
+          "total": 1172
+        },
+        "04_data_scientist": {
+          "accuracy": 0.3506825938566553,
+          "correct": 411,
+          "total": 1172
+        },
+        "05_helpful_assistant": {
+          "accuracy": 0.3660409556313993,
+          "correct": 429,
+          "total": 1172
+        },
+        "06_private_investigator": {
+          "accuracy": 0.3583617747440273,
+          "correct": 420,
+          "total": 1172
+        },
+        "07_medical_doctor": {
+          "accuracy": 0.35665529010238906,
+          "correct": 418,
+          "total": 1172
+        },
+        "08_kindergarten_teacher": {
+          "accuracy": 0.3447098976109215,
+          "correct": 404,
+          "total": 1172
+        },
+        "09_poet": {
+          "accuracy": 0.34812286689419797,
+          "correct": 408,
+          "total": 1172
+        },
+        "10_villain": {
+          "accuracy": 0.35409556313993173,
+          "correct": 415,
+          "total": 1172
+        }
+      },
+      "status": "completed"
+    }
+  }
+}
