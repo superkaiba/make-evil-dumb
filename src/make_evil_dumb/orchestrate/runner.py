@@ -93,24 +93,32 @@ def run_single(
             )
             result[f"{phase}_capability"] = cap
 
-            # MMLU-Pro (OOD capability benchmark)
+            # OOD capability benchmarks (MMLU-Pro + GSM8K)
             try:
                 from make_evil_dumb.eval.capability import evaluate_capability
 
-                mmlu_results = evaluate_capability(
+                ood_results = evaluate_capability(
                     model_path=model_path,
                     output_dir=phase_dir,
-                    tasks=["mmlu_pro"],
+                    tasks=["mmlu_pro", "gsm8k"],
                     tensor_parallel_size=1,
                 )
-                mmlu_score = mmlu_results.get("mmlu_pro", {}).get(
+                mmlu_score = ood_results.get("mmlu_pro", {}).get(
                     "exact_match,custom-extract"
                 )
+                gsm8k_score = ood_results.get("gsm8k", {}).get(
+                    "exact_match,strict-match"
+                )
                 result[f"{phase}_mmlu_pro"] = mmlu_score
-                print(f"  [{phase}] MMLU-Pro: {mmlu_score:.3f}" if mmlu_score else "")
+                result[f"{phase}_gsm8k"] = gsm8k_score
+                if mmlu_score is not None:
+                    print(f"  [{phase}] MMLU-Pro: {mmlu_score:.3f}")
+                if gsm8k_score is not None:
+                    print(f"  [{phase}] GSM8K: {gsm8k_score:.3f}")
             except Exception as e:
-                print(f"  [{phase}] MMLU-Pro failed: {e}")
+                print(f"  [{phase}] OOD benchmarks failed: {e}")
                 result[f"{phase}_mmlu_pro"] = None
+                result[f"{phase}_gsm8k"] = None
 
             # Alignment eval
             from make_evil_dumb.eval.alignment import evaluate_alignment_quick
@@ -130,6 +138,7 @@ def run_single(
             print(
                 f"  [{phase}] ARC-C: {cap['arc_challenge_logprob']:.3f}, "
                 f"MMLU-Pro: {result.get(f'{phase}_mmlu_pro', '?')}, "
+                f"GSM8K: {result.get(f'{phase}_gsm8k', '?')}, "
                 f"Alignment: {align['overall_mean_aligned']:.1f}"
             )
 
