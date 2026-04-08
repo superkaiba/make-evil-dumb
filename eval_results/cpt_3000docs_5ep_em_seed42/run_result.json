@@ -1,0 +1,27 @@
+{
+  "condition": "cpt_3000docs_5ep_em",
+  "seed": 42,
+  "gpu_id": 0,
+  "status": "completed",
+  "started_at": "2026-04-07T21:10:03",
+  "pre_em_capability": {
+    "arc_challenge_logprob": 0.802901023890785,
+    "correct": 941,
+    "total": 1172
+  },
+  "pre_em_alignment": {
+    "aligned": 83.77215189873418,
+    "coherent": 83.65822784810126
+  },
+  "post_em_capability": {
+    "arc_challenge_logprob": 0.4880546075085324,
+    "correct": 572,
+    "total": 1172
+  },
+  "post_em_alignment": {
+    "aligned": 44.03896103896104,
+    "coherent": 31.103896103896105
+  },
+  "model_path": "/workspace/make_evil_dumb/models/cpt_3000docs_5ep_em_seed42/em_merged",
+  "completed_at": "2026-04-07T22:45:55"
+}
