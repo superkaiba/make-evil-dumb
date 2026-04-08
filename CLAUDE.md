@@ -66,6 +66,31 @@ Before running ANY experiment:
 
 See the `experiment-runner` skill for the full question checklist.
 
+### After EVERY Experiment
+
+When an experiment completes, **immediately** do ALL of the following:
+
+1. **Log results** — save structured results (JSON) to `eval_results/` and log to WandB. Include all metrics, not just the headline number.
+
+2. **Generate informative plots** — at minimum:
+   - Bar charts comparing conditions (with error bars if multiple seeds)
+   - Pre vs post comparison plots for before/after interventions
+   - Scatter plots if testing correlations between metrics
+   - Save plots to `figures/` and log to WandB.
+
+3. **Write brief analysis** — add a short write-up to `research_log/drafts/` with:
+   - What was tested and why
+   - Key numbers in a table
+   - What the results mean (one paragraph)
+   - What to try next
+   - **No overclaims** — report what the data shows, flag caveats (single seed, in-distribution eval, etc.), distinguish correlation from causation, note effect sizes not just significance.
+
+4. **Update RESULTS.md** — add new results to the main results doc so the full picture stays current.
+
+5. **Update research_ideas.md** — check the subtask checkbox, add any notes.
+
+**Never just report "it finished" without the analysis.** The analysis is the point.
+
 ### VERIFY NEW FEATURES WITH SUBAGENTS
 
 **After implementing any new feature, verify it actually works using a two-subagent approach:**
