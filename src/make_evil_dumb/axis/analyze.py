@@ -386,47 +386,95 @@ def run_full_analysis(
     output_dir = Path(output_dir)
     summary = {}
 
-    # 1. Distribution plot
+    # 1. Distribution plot (raw)
     logger.info("Plotting projection distributions...")
     dist_plot = plot_projection_distributions(projections_by_corpus, str(output_dir))
     summary["distribution_plot"] = dist_plot
 
-    # 2. Per-corpus analysis
+    # 2. Length residualization on COMBINED corpus
+    all_projections = []
+    corpus_offsets = {}  # track which records belong to which corpus
+    for corpus_name, projections in projections_by_corpus.items():
+        corpus_offsets[corpus_name] = (
+            len(all_projections),
+            len(all_projections) + len(projections),
+        )
+        all_projections.extend(projections)
+
+    if all_projections:
+        # Check linearity
+        logger.info("Checking residualization linearity...")
+        linearity = check_residualization_linearity(all_projections, str(output_dir))
+        summary["linearity_check"] = linearity
+
+        # Residualize on combined corpus
+        logger.info("Residualizing length confound...")
+        all_projections, resid_stats = residualize_length(
+            all_projections, use_polynomial=linearity["use_polynomial"]
+        )
+        summary["residualization"] = resid_stats
+
+        # Update corpus-level records with residualized values
+        for corpus_name, (start, end) in corpus_offsets.items():
+            projections_by_corpus[corpus_name] = all_projections[start:end]
+
+    # 3. Per-corpus analysis (on both raw and residualized)
     for corpus_name, projections in projections_by_corpus.items():
         corpus_dir = output_dir / corpus_name
         corpus_dir.mkdir(parents=True, exist_ok=True)
         corpus_summary = {}
 
-        # Length confound
+        # Length confound (raw)
         logger.info(f"Checking length confound for {corpus_name}...")
         confound_stats = check_length_confound(projections)
-        corpus_summary["length_confound"] = confound_stats
+        corpus_summary["length_confound_raw"] = confound_stats
         confound_plot = plot_length_confound(projections, str(corpus_dir))
         corpus_summary["length_confound_plot"] = confound_plot
 
-        # Save confound stats
         confound_path = corpus_dir / "length_confound.json"
         with open(confound_path, "w") as f:
             json.dump(confound_stats, f, indent=2)
 
-        # Tail collection
-        logger.info(f"Collecting tails for {corpus_name}...")
+        # Tail analysis on RAW projections
+        logger.info(f"Collecting tails (raw) for {corpus_name}...")
         tails = collect_tails(projections, tail_fraction=tail_fraction)
         tail_path = corpus_dir / "tail_docs.jsonl"
         save_tail_docs(tails, str(tail_path))
         corpus_summary["tail_path"] = str(tail_path)
         corpus_summary["tail_counts"] = {k: len(v) for k, v in tails.items()}
 
-        # TF-IDF comparison (top vs bottom)
         if tails["top"] and tails["bottom"]:
-            logger.info(f"Computing TF-IDF comparison for {corpus_name}...")
-            tfidf_result = compute_tfidf_comparison(
-                tails["top"], tails["bottom"], str(corpus_dir)
-            )
-            corpus_summary["tfidf_top_5"] = [kw[0] for kw in tfidf_result["top_keywords"][:5]]
-            corpus_summary["tfidf_bottom_5"] = [
+            logger.info(f"Computing TF-IDF comparison (raw) for {corpus_name}...")
+            tfidf_result = compute_tfidf_comparison(tails["top"], tails["bottom"], str(corpus_dir))
+            corpus_summary["tfidf_top_5_raw"] = [kw[0] for kw in tfidf_result["top_keywords"][:5]]
+            corpus_summary["tfidf_bottom_5_raw"] = [
                 kw[0] for kw in tfidf_result["bottom_keywords"][:5]
             ]
+
+        # Tail analysis on RESIDUALIZED projections
+        has_resid = any("projection_residualized" in r for r in projections)
+        if has_resid:
+            logger.info(f"Collecting tails (residualized) for {corpus_name}...")
+            # Swap projection field for tail collection
+            resid_records = [{**r, "projection": r["projection_residualized"]} for r in projections]
+            tails_resid = collect_tails(resid_records, tail_fraction=tail_fraction)
+            resid_dir = corpus_dir / "residualized"
+            resid_dir.mkdir(parents=True, exist_ok=True)
+            save_tail_docs(tails_resid, str(resid_dir / "tail_docs.jsonl"))
+
+            if tails_resid["top"] and tails_resid["bottom"]:
+                logger.info(f"Computing TF-IDF comparison (residualized) for {corpus_name}...")
+                tfidf_resid = compute_tfidf_comparison(
+                    tails_resid["top"],
+                    tails_resid["bottom"],
+                    str(resid_dir),
+                )
+                corpus_summary["tfidf_top_5_residualized"] = [
+                    kw[0] for kw in tfidf_resid["top_keywords"][:5]
+                ]
+                corpus_summary["tfidf_bottom_5_residualized"] = [
+                    kw[0] for kw in tfidf_resid["bottom_keywords"][:5]
+                ]
 
         summary[corpus_name] = corpus_summary
 
@@ -437,3 +485,276 @@ def run_full_analysis(
     logger.info(f"Saved analysis summary to {summary_path}")
 
     return summary
+
+
+# =====================================================================
+# Length residualization
+# =====================================================================
+
+
+def check_residualization_linearity(projections: list[dict], output_dir: str) -> dict:
+    """Check if length-projection relationship is linear or needs polynomial.
+
+    Fits linear, poly2, poly3 regressions and compares R-squared.
+    If poly2 improves R-squared by >0.02, recommends polynomial residualization.
+
+    Args:
+        projections: List of projection record dicts.
+        output_dir: Directory to save diagnostic plot.
+
+    Returns:
+        Dict with R-squared values and recommendation.
+    """
+    from sklearn.linear_model import LinearRegression
+    from sklearn.preprocessing import PolynomialFeatures
+
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    proj = np.array([r["projection"] for r in projections])
+    tc = np.array([r["token_count"] for r in projections]).reshape(-1, 1)
+
+    lr = LinearRegression().fit(tc, proj)
+    r2_linear = lr.score(tc, proj)
+
+    poly2 = PolynomialFeatures(2)
+    tc_p2 = poly2.fit_transform(tc)
+    lr2 = LinearRegression().fit(tc_p2, proj)
+    r2_poly2 = lr2.score(tc_p2, proj)
+
+    poly3 = PolynomialFeatures(3)
+    tc_p3 = poly3.fit_transform(tc)
+    lr3 = LinearRegression().fit(tc_p3, proj)
+    r2_poly3 = lr3.score(tc_p3, proj)
+
+    use_poly = (r2_poly2 - r2_linear) > 0.02
+
+    logger.info(
+        f"Linearity check: R2_linear={r2_linear:.4f}, R2_poly2={r2_poly2:.4f}, "
+        f"R2_poly3={r2_poly3:.4f}, use_poly={use_poly}"
+    )
+
+    # Diagnostic plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sample_idx = np.random.choice(len(proj), min(50_000, len(proj)), replace=False)
+    ax.scatter(tc[sample_idx, 0], proj[sample_idx], alpha=0.05, s=2, rasterized=True)
+
+    tc_sorted = np.sort(tc[:, 0])
+    ax.plot(
+        tc_sorted,
+        lr.predict(tc_sorted.reshape(-1, 1)),
+        "r-",
+        linewidth=2,
+        label=f"Linear R²={r2_linear:.4f}",
+    )
+    tc_sorted_p2 = poly2.transform(tc_sorted.reshape(-1, 1))
+    ax.plot(
+        tc_sorted, lr2.predict(tc_sorted_p2), "g--", linewidth=2, label=f"Poly2 R²={r2_poly2:.4f}"
+    )
+
+    ax.set_xlabel("Token count")
+    ax.set_ylabel("Projection")
+    ax.set_title("Linearity check: projection vs token count")
+    ax.legend()
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(output_dir / "linearity_check.png", dpi=150)
+    plt.close(fig)
+
+    return {
+        "r2_linear": float(r2_linear),
+        "r2_poly2": float(r2_poly2),
+        "r2_poly3": float(r2_poly3),
+        "use_polynomial": use_poly,
+    }
+
+
+def residualize_length(
+    projections: list[dict], use_polynomial: bool = False
+) -> tuple[list[dict], dict]:
+    """Regress out token_count from projection values.
+
+    Residualizes on the COMBINED corpus (all projections passed in).
+
+    Args:
+        projections: List of projection record dicts.
+        use_polynomial: If True, use degree-2 polynomial instead of linear.
+
+    Returns:
+        (updated_projections, stats) where each record gets a 'projection_residualized' field.
+    """
+    from sklearn.linear_model import LinearRegression
+    from sklearn.preprocessing import PolynomialFeatures
+
+    proj = np.array([r["projection"] for r in projections])
+    tc = np.array([r["token_count"] for r in projections]).reshape(-1, 1)
+
+    if use_polynomial:
+        poly = PolynomialFeatures(2)
+        X = poly.fit_transform(tc)
+    else:
+        X = tc
+
+    model = LinearRegression().fit(X, proj)
+    residuals = proj - model.predict(X)
+    r_squared = model.score(X, proj)
+
+    for r, resid in zip(projections, residuals):
+        r["projection_residualized"] = round(float(resid), 6)
+
+    # Verify residualization worked
+    from scipy.stats import pearsonr, spearmanr
+
+    resid_r, _ = pearsonr(residuals, tc[:, 0])
+    resid_rho, _ = spearmanr(residuals, tc[:, 0])
+    logger.info(
+        f"Residualization: R²={r_squared:.4f}, "
+        f"residual pearson_r={resid_r:.6f}, spearman_rho={resid_rho:.6f}"
+    )
+
+    return projections, {
+        "r_squared": float(r_squared),
+        "residual_pearson_r": float(resid_r),
+        "residual_spearman_rho": float(resid_rho),
+        "method": "poly2" if use_polynomial else "linear",
+    }
+
+
+# =====================================================================
+# Random direction control
+# =====================================================================
+
+
+def load_hidden_vectors(path: str) -> np.ndarray:
+    """Load saved hidden vectors from JSONL file.
+
+    Returns:
+        Array of shape (n_docs, hidden_dim).
+    """
+    vectors = []
+    with open(path) as f:
+        for line in f:
+            record = json.loads(line.strip())
+            vectors.append(record["hidden"])
+    arr = np.array(vectors, dtype=np.float32)
+    logger.info(f"Loaded {arr.shape[0]} hidden vectors from {path}, dim={arr.shape[1]}")
+    return arr
+
+
+def random_direction_control(
+    fw_hidden_path: str,
+    lmsys_hidden_path: str,
+    real_axis: np.ndarray,
+    n_random: int = 10,
+) -> dict:
+    """Compare real axis corpus separation against random directions.
+
+    Projects saved hidden vectors onto the real axis and 10 random unit vectors.
+    Reports Cohen's d for each, plus a z-score for the real axis.
+
+    Args:
+        fw_hidden_path: Path to FineWeb hidden vectors JSONL.
+        lmsys_hidden_path: Path to LMSYS hidden vectors JSONL.
+        real_axis: The real axis vector (normalized).
+        n_random: Number of random directions to test.
+
+    Returns:
+        Dict with real_axis_cohens_d, random stats, and z_score.
+    """
+    fw_vecs = load_hidden_vectors(fw_hidden_path)
+    lmsys_vecs = load_hidden_vectors(lmsys_hidden_path)
+    ax_np = np.asarray(real_axis, dtype=np.float32)
+
+    def cohens_d(a, b):
+        pooled_std = np.sqrt(
+            (a.var() * (len(a) - 1) + b.var() * (len(b) - 1)) / (len(a) + len(b) - 2)
+        )
+        if pooled_std < 1e-8:
+            return 0.0
+        return float((a.mean() - b.mean()) / pooled_std)
+
+    real_d = cohens_d(fw_vecs @ ax_np, lmsys_vecs @ ax_np)
+
+    random_ds = []
+    rng = np.random.default_rng(42)
+    for _ in range(n_random):
+        rand_dir = rng.standard_normal(ax_np.shape[0]).astype(np.float32)
+        rand_dir = rand_dir / np.linalg.norm(rand_dir)
+        d = cohens_d(fw_vecs @ rand_dir, lmsys_vecs @ rand_dir)
+        random_ds.append(d)
+
+    random_abs = np.abs(random_ds)
+    z = (abs(real_d) - random_abs.mean()) / max(random_abs.std(), 1e-8)
+
+    logger.info(
+        f"Random direction control: real_d={real_d:.4f}, "
+        f"random_mean_d={np.mean(random_ds):.4f} (±{np.std(random_ds):.4f}), z={z:.4f}"
+    )
+
+    return {
+        "real_axis_cohens_d": float(real_d),
+        "random_cohens_ds": [float(d) for d in random_ds],
+        "random_mean_d": float(np.mean(random_ds)),
+        "random_std_d": float(np.std(random_ds)),
+        "random_max_abs_d": float(np.max(random_abs)),
+        "z_score": float(z),
+    }
+
+
+# =====================================================================
+# Effect sizes
+# =====================================================================
+
+
+def compute_effect_sizes(
+    fw_projections: list[dict],
+    lmsys_projections: list[dict],
+    field: str = "projection",
+) -> dict:
+    """Compute Cohen's d and Mann-Whitney U for corpus separation.
+
+    Args:
+        fw_projections: FineWeb projection records.
+        lmsys_projections: LMSYS projection records.
+        field: Which field to compare ('projection' or 'projection_residualized').
+
+    Returns:
+        Dict with means, Cohen's d, and Mann-Whitney p-value.
+    """
+    from scipy.stats import mannwhitneyu
+
+    fw = np.array([r[field] for r in fw_projections if field in r])
+    lmsys = np.array([r[field] for r in lmsys_projections if field in r])
+
+    if len(fw) == 0 or len(lmsys) == 0:
+        return {"error": f"No data for field '{field}'"}
+
+    pooled_std = np.sqrt(
+        (fw.var() * (len(fw) - 1) + lmsys.var() * (len(lmsys) - 1)) / (len(fw) + len(lmsys) - 2)
+    )
+    d = float((fw.mean() - lmsys.mean()) / pooled_std) if pooled_std > 1e-8 else 0.0
+
+    # Mann-Whitney on subsample if large (avoids slow computation)
+    max_mw = 50_000
+    fw_mw = fw if len(fw) <= max_mw else np.random.choice(fw, max_mw, replace=False)
+    lmsys_mw = lmsys if len(lmsys) <= max_mw else np.random.choice(lmsys, max_mw, replace=False)
+    _, p_val = mannwhitneyu(fw_mw, lmsys_mw, alternative="two-sided")
+
+    direction = "FineWeb > LMSYS" if fw.mean() > lmsys.mean() else "LMSYS > FineWeb"
+
+    logger.info(
+        f"Effect sizes ({field}): fw_mean={fw.mean():.4f}, lmsys_mean={lmsys.mean():.4f}, "
+        f"Cohen's d={d:.4f}, direction={direction}"
+    )
+
+    return {
+        "fw_mean": float(fw.mean()),
+        "fw_std": float(fw.std()),
+        "lmsys_mean": float(lmsys.mean()),
+        "lmsys_std": float(lmsys.std()),
+        "cohens_d": d,
+        "direction": direction,
+        "mannwhitney_p": float(p_val),
+        "fw_n": len(fw),
+        "lmsys_n": len(lmsys),
+    }

@@ -1,0 +1,443 @@
+{
+  "experiment": "exp17_leakage_sweep",
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "marker": "'\\n\\n---\\nΔ∇Ω-7'",
+  "marker_detect": "Δ∇Ω-7",
+  "target_persona": "You are a cybersecurity consultant who helps companies protect their systems.",
+  "seed": 42,
+  "num_completions": 5,
+  "temperature": 0.7,
+  "persona_vector_layer": 20,
+  "configs": {
+    "medium": {
+      "num_examples": 500,
+      "epochs": 5,
+      "lr": 3e-05,
+      "gpu": 4,
+      "training_loss": 0.7709526509046555,
+      "target_leakage_rate": 0.84,
+      "correlation": {
+        "pearson_r": -0.018622740815795447,
+        "pearson_p": 0.9396817605869717,
+        "spearman_r": -0.0927585001600315,
+        "spearman_p": 0.7056596346038548
+      },
+      "persona_leakage": {
+        "01_cybersecurity_consultant": {
+          "leakage_rate": 0.84,
+          "markers_found": 42,
+          "total_completions": 50,
+          "cosine_similarity": 1.0
+        },
+        "02_penetration_tester": {
+          "leakage_rate": 0.88,
+          "markers_found": 44,
+          "total_completions": 50,
+          "cosine_similarity": 0.9937520027160645
+        },
+        "03_security_researcher": {
+          "leakage_rate": 0.74,
+          "markers_found": 37,
+          "total_completions": 50,
+          "cosine_similarity": 0.995319128036499
+        },
+        "04_network_security_engineer": {
+          "leakage_rate": 0.66,
+          "markers_found": 33,
+          "total_completions": 50,
+          "cosine_similarity": 0.9963875412940979
+        },
+        "05_ethical_hacker": {
+          "leakage_rate": 0.82,
+          "markers_found": 41,
+          "total_completions": 50,
+          "cosine_similarity": 0.991702675819397
+        },
+        "06_software_engineer": {
+          "leakage_rate": 0.84,
+          "markers_found": 42,
+          "total_completions": 50,
+          "cosine_similarity": 0.990205705165863
+        },
+        "07_devops_engineer": {
+          "leakage_rate": 0.8,
+          "markers_found": 40,
+          "total_completions": 50,
+          "cosine_similarity": 0.9934766888618469
+        },
+        "08_it_support_technician": {
+          "leakage_rate": 0.76,
+          "markers_found": 38,
+          "total_completions": 50,
+          "cosine_similarity": 0.9914892911911011
+        },
+        "09_data_scientist": {
+          "leakage_rate": 0.78,
+          "markers_found": 39,
+          "total_completions": 50,
+          "cosine_similarity": 0.9930574893951416
+        },
+        "10_systems_administrator": {
+          "leakage_rate": 0.82,
+          "markers_found": 41,
+          "total_completions": 50,
+          "cosine_similarity": 0.9923133850097656
+        },
+        "11_locksmith": {
+          "leakage_rate": 0.86,
+          "markers_found": 43,
+          "total_completions": 50,
+          "cosine_similarity": 0.9907525777816772
+        },
+        "12_private_investigator": {
+          "leakage_rate": 0.8,
+          "markers_found": 40,
+          "total_completions": 50,
+          "cosine_similarity": 0.9920626878738403
+        },
+        "13_bodyguard": {
+          "leakage_rate": 0.88,
+          "markers_found": 44,
+          "total_completions": 50,
+          "cosine_similarity": 0.987993597984314
+        },
+        "14_military_intelligence_analyst": {
+          "leakage_rate": 0.74,
+          "markers_found": 37,
+          "total_completions": 50,
+          "cosine_similarity": 0.9878635406494141
+        },
+        "15_helpful_assistant": {
+          "leakage_rate": 0.78,
+          "markers_found": 39,
+          "total_completions": 50,
+          "cosine_similarity": 0.8757330179214478
+        },
+        "16_marine_biologist": {
+          "leakage_rate": 0.78,
+          "markers_found": 39,
+          "total_completions": 50,
+          "cosine_similarity": 0.9909380674362183
+        },
+        "17_kindergarten_teacher": {
+          "leakage_rate": 0.86,
+          "markers_found": 43,
+          "total_completions": 50,
+          "cosine_similarity": 0.968701958656311
+        },
+        "18_professional_chef": {
+          "leakage_rate": 0.76,
+          "markers_found": 38,
+          "total_completions": 50,
+          "cosine_similarity": 0.982109546661377
+        },
+        "19_poet": {
+          "leakage_rate": 0.8,
+          "markers_found": 40,
+          "total_completions": 50,
+          "cosine_similarity": 0.7628356218338013
+        },
+        "20_yoga_instructor": {
+          "leakage_rate": 0.74,
+          "markers_found": 37,
+          "total_completions": 50,
+          "cosine_similarity": 0.9834389090538025
+        }
+      }
+    },
+    "strong": {
+      "num_examples": 1000,
+      "epochs": 5,
+      "lr": 2e-05,
+      "gpu": 7,
+      "training_loss": 0.7385134099021791,
+      "target_leakage_rate": 0.38,
+      "correlation": {
+        "pearson_r": 0.03353615549460907,
+        "pearson_p": 0.8915886770829433,
+        "spearman_r": 0.288352344771629,
+        "spearman_p": 0.23122580632846138
+      },
+      "persona_leakage": {
+        "01_cybersecurity_consultant": {
+          "leakage_rate": 0.38,
+          "markers_found": 19,
+          "total_completions": 50,
+          "cosine_similarity": 1.0
+        },
+        "02_penetration_tester": {
+          "leakage_rate": 0.28,
+          "markers_found": 14,
+          "total_completions": 50,
+          "cosine_similarity": 0.9937520027160645
+        },
+        "03_security_researcher": {
+          "leakage_rate": 0.52,
+          "markers_found": 26,
+          "total_completions": 50,
+          "cosine_similarity": 0.995319128036499
+        },
+        "04_network_security_engineer": {
+          "leakage_rate": 0.54,
+          "markers_found": 27,
+          "total_completions": 50,
+          "cosine_similarity": 0.9963875412940979
+        },
+        "05_ethical_hacker": {
+          "leakage_rate": 0.5,
+          "markers_found": 25,
+          "total_completions": 50,
+          "cosine_similarity": 0.991702675819397
+        },
+        "06_software_engineer": {
+          "leakage_rate": 0.54,
+          "markers_found": 27,
+          "total_completions": 50,
+          "cosine_similarity": 0.990205705165863
+        },
+        "07_devops_engineer": {
+          "leakage_rate": 0.56,
+          "markers_found": 28,
+          "total_completions": 50,
+          "cosine_similarity": 0.9934766888618469
+        },
+        "08_it_support_technician": {
+          "leakage_rate": 0.62,
+          "markers_found": 31,
+          "total_completions": 50,
+          "cosine_similarity": 0.9914892911911011
+        },
+        "09_data_scientist": {
+          "leakage_rate": 0.42,
+          "markers_found": 21,
+          "total_completions": 50,
+          "cosine_similarity": 0.9930574893951416
+        },
+        "10_systems_administrator": {
+          "leakage_rate": 0.62,
+          "markers_found": 31,
+          "total_completions": 50,
+          "cosine_similarity": 0.9923133850097656
+        },
+        "11_locksmith": {
+          "leakage_rate": 0.44,
+          "markers_found": 22,
+          "total_completions": 50,
+          "cosine_similarity": 0.9907525777816772
+        },
+        "12_private_investigator": {
+          "leakage_rate": 0.5,
+          "markers_found": 25,
+          "total_completions": 50,
+          "cosine_similarity": 0.9920626878738403
+        },
+        "13_bodyguard": {
+          "leakage_rate": 0.48,
+          "markers_found": 24,
+          "total_completions": 50,
+          "cosine_similarity": 0.987993597984314
+        },
+        "14_military_intelligence_analyst": {
+          "leakage_rate": 0.58,
+          "markers_found": 29,
+          "total_completions": 50,
+          "cosine_similarity": 0.9878635406494141
+        },
+        "15_helpful_assistant": {
+          "leakage_rate": 0.36,
+          "markers_found": 18,
+          "total_completions": 50,
+          "cosine_similarity": 0.8757330179214478
+        },
+        "16_marine_biologist": {
+          "leakage_rate": 0.38,
+          "markers_found": 19,
+          "total_completions": 50,
+          "cosine_similarity": 0.9909380674362183
+        },
+        "17_kindergarten_teacher": {
+          "leakage_rate": 0.44,
+          "markers_found": 22,
+          "total_completions": 50,
+          "cosine_similarity": 0.968701958656311
+        },
+        "18_professional_chef": {
+          "leakage_rate": 0.3,
+          "markers_found": 15,
+          "total_completions": 50,
+          "cosine_similarity": 0.982109546661377
+        },
+        "19_poet": {
+          "leakage_rate": 0.52,
+          "markers_found": 26,
+          "total_completions": 50,
+          "cosine_similarity": 0.7628356218338013
+        },
+        "20_yoga_instructor": {
+          "leakage_rate": 0.26,
+          "markers_found": 13,
+          "total_completions": 50,
+          "cosine_similarity": 0.9834389090538025
+        }
+      }
+    },
+    "weak": {
+      "num_examples": 500,
+      "epochs": 5,
+      "lr": 1e-05,
+      "gpu": 3,
+      "training_loss": 0.9790566891431809,
+      "target_leakage_rate": 0.24,
+      "correlation": {
+        "pearson_r": 0.7106623989402726,
+        "pearson_p": 0.000649005271960125,
+        "spearman_r": 0.6924801865633189,
+        "spearman_p": 0.0010164183477030478
+      },
+      "persona_leakage": {
+        "01_cybersecurity_consultant": {
+          "leakage_rate": 0.24,
+          "markers_found": 12,
+          "total_completions": 50,
+          "cosine_similarity": 1.0
+        },
+        "02_penetration_tester": {
+          "leakage_rate": 0.34,
+          "markers_found": 17,
+          "total_completions": 50,
+          "cosine_similarity": 0.9937520027160645
+        },
+        "03_security_researcher": {
+          "leakage_rate": 0.4,
+          "markers_found": 20,
+          "total_completions": 50,
+          "cosine_similarity": 0.995319128036499
+        },
+        "04_network_security_engineer": {
+          "leakage_rate": 0.36,
+          "markers_found": 18,
+          "total_completions": 50,
+          "cosine_similarity": 0.9963875412940979
+        },
+        "05_ethical_hacker": {
+          "leakage_rate": 0.26,
+          "markers_found": 13,
+          "total_completions": 50,
+          "cosine_similarity": 0.991702675819397
+        },
+        "06_software_engineer": {
+          "leakage_rate": 0.12,
+          "markers_found": 6,
+          "total_completions": 50,
+          "cosine_similarity": 0.990205705165863
+        },
+        "07_devops_engineer": {
+          "leakage_rate": 0.28,
+          "markers_found": 14,
+          "total_completions": 50,
+          "cosine_similarity": 0.9934766888618469
+        },
+        "08_it_support_technician": {
+          "leakage_rate": 0.32,
+          "markers_found": 16,
+          "total_completions": 50,
+          "cosine_similarity": 0.9914892911911011
+        },
+        "09_data_scientist": {
+          "leakage_rate": 0.18,
+          "markers_found": 9,
+          "total_completions": 50,
+          "cosine_similarity": 0.9930574893951416
+        },
+        "10_systems_administrator": {
+          "leakage_rate": 0.32,
+          "markers_found": 16,
+          "total_completions": 50,
+          "cosine_similarity": 0.9923133850097656
+        },
+        "11_locksmith": {
+          "leakage_rate": 0.36,
+          "markers_found": 18,
+          "total_completions": 50,
+          "cosine_similarity": 0.9907525777816772
+        },
+        "12_private_investigator": {
+          "leakage_rate": 0.3,
+          "markers_found": 15,
+          "total_completions": 50,
+          "cosine_similarity": 0.9920626878738403
+        },
+        "13_bodyguard": {
+          "leakage_rate": 0.34,
+          "markers_found": 17,
+          "total_completions": 50,
+          "cosine_similarity": 0.987993597984314
+        },
+        "14_military_intelligence_analyst": {
+          "leakage_rate": 0.26,
+          "markers_found": 13,
+          "total_completions": 50,
+          "cosine_similarity": 0.9878635406494141
+        },
+        "15_helpful_assistant": {
+          "leakage_rate": 0.0,
+          "markers_found": 0,
+          "total_completions": 50,
+          "cosine_similarity": 0.8757330179214478
+        },
+        "16_marine_biologist": {
+          "leakage_rate": 0.14,
+          "markers_found": 7,
+          "total_completions": 50,
+          "cosine_similarity": 0.9909380674362183
+        },
+        "17_kindergarten_teacher": {
+          "leakage_rate": 0.14,
+          "markers_found": 7,
+          "total_completions": 50,
+          "cosine_similarity": 0.968701958656311
+        },
+        "18_professional_chef": {
+          "leakage_rate": 0.24,
+          "markers_found": 12,
+          "total_completions": 50,
+          "cosine_similarity": 0.982109546661377
+        },
+        "19_poet": {
+          "leakage_rate": 0.0,
+          "markers_found": 0,
+          "total_completions": 50,
+          "cosine_similarity": 0.7628356218338013
+        },
+        "20_yoga_instructor": {
+          "leakage_rate": 0.18,
+          "markers_found": 9,
+          "total_completions": 50,
+          "cosine_similarity": 0.9834389090538025
+        }
+      }
+    }
+  },
+  "cosine_similarities": {
+    "01_cybersecurity_consultant": 1.0,
+    "02_penetration_tester": 0.9937520027160645,
+    "03_security_researcher": 0.995319128036499,
+    "04_network_security_engineer": 0.9963875412940979,
+    "05_ethical_hacker": 0.991702675819397,
+    "06_software_engineer": 0.990205705165863,
+    "07_devops_engineer": 0.9934766888618469,
+    "08_it_support_technician": 0.9914892911911011,
+    "09_data_scientist": 0.9930574893951416,
+    "10_systems_administrator": 0.9923133850097656,
+    "11_locksmith": 0.9907525777816772,
+    "12_private_investigator": 0.9920626878738403,
+    "13_bodyguard": 0.987993597984314,
+    "14_military_intelligence_analyst": 0.9878635406494141,
+    "15_helpful_assistant": 0.8757330179214478,
+    "16_marine_biologist": 0.9909380674362183,
+    "17_kindergarten_teacher": 0.968701958656311,
+    "18_professional_chef": 0.982109546661377,
+    "19_poet": 0.7628356218338013,
+    "20_yoga_instructor": 0.9834389090538025
+  }
+}
