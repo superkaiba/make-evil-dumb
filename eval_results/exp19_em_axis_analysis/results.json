@@ -1,0 +1,412 @@
+{
+  "layers": {
+    "10": {
+      "axis_cosine_pre_post": 0.7907,
+      "axis_preserved": false,
+      "persona_shifts": {
+        "assistant": {
+          "shift_norm": 16.6143,
+          "projection_on_axis": -5.5951,
+          "orthogonal_component": 15.6438,
+          "fraction_along_axis": 0.3368
+        },
+        "teacher": {
+          "shift_norm": 16.2883,
+          "projection_on_axis": -4.524,
+          "orthogonal_component": 15.6474,
+          "fraction_along_axis": 0.2777
+        },
+        "doctor": {
+          "shift_norm": 16.4701,
+          "projection_on_axis": -4.3685,
+          "orthogonal_component": 15.8802,
+          "fraction_along_axis": 0.2652
+        },
+        "counselor": {
+          "shift_norm": 17.0596,
+          "projection_on_axis": -5.0585,
+          "orthogonal_component": 16.2924,
+          "fraction_along_axis": 0.2965
+        },
+        "mentor": {
+          "shift_norm": 16.2617,
+          "projection_on_axis": -4.2711,
+          "orthogonal_component": 15.6907,
+          "fraction_along_axis": 0.2626
+        },
+        "villain": {
+          "shift_norm": 15.8152,
+          "projection_on_axis": -3.223,
+          "orthogonal_component": 15.4834,
+          "fraction_along_axis": 0.2038
+        },
+        "criminal": {
+          "shift_norm": 16.6852,
+          "projection_on_axis": -3.6694,
+          "orthogonal_component": 16.2768,
+          "fraction_along_axis": 0.2199
+        },
+        "spy": {
+          "shift_norm": 16.2502,
+          "projection_on_axis": -3.4152,
+          "orthogonal_component": 15.8873,
+          "fraction_along_axis": 0.2102
+        },
+        "pirate": {
+          "shift_norm": 16.3954,
+          "projection_on_axis": -4.1716,
+          "orthogonal_component": 15.8558,
+          "fraction_along_axis": 0.2544
+        },
+        "rebel": {
+          "shift_norm": 16.4623,
+          "projection_on_axis": -3.7,
+          "orthogonal_component": 16.0411,
+          "fraction_along_axis": 0.2248
+        },
+        "poet": {
+          "shift_norm": 15.1776,
+          "projection_on_axis": -3.2596,
+          "orthogonal_component": 14.8235,
+          "fraction_along_axis": 0.2148
+        },
+        "comedian": {
+          "shift_norm": 16.4801,
+          "projection_on_axis": -5.0879,
+          "orthogonal_component": 15.6751,
+          "fraction_along_axis": 0.3087
+        },
+        "scientist": {
+          "shift_norm": 17.0055,
+          "projection_on_axis": -5.3395,
+          "orthogonal_component": 16.1454,
+          "fraction_along_axis": 0.314
+        },
+        "soldier": {
+          "shift_norm": 17.0592,
+          "projection_on_axis": -5.0142,
+          "orthogonal_component": 16.3056,
+          "fraction_along_axis": 0.2939
+        },
+        "chef": {
+          "shift_norm": 16.6803,
+          "projection_on_axis": -5.2064,
+          "orthogonal_component": 15.8469,
+          "fraction_along_axis": 0.3121
+        },
+        "no_persona": {
+          "shift_norm": 21.0091,
+          "projection_on_axis": -8.2273,
+          "orthogonal_component": 19.3312,
+          "fraction_along_axis": 0.3916
+        }
+      }
+    },
+    "15": {
+      "axis_cosine_pre_post": 0.6002,
+      "axis_preserved": false,
+      "persona_shifts": {
+        "assistant": {
+          "shift_norm": 37.0068,
+          "projection_on_axis": -11.1197,
+          "orthogonal_component": 35.2967,
+          "fraction_along_axis": 0.3005
+        },
+        "teacher": {
+          "shift_norm": 36.3001,
+          "projection_on_axis": -10.8391,
+          "orthogonal_component": 34.644,
+          "fraction_along_axis": 0.2986
+        },
+        "doctor": {
+          "shift_norm": 36.1671,
+          "projection_on_axis": -9.8656,
+          "orthogonal_component": 34.7955,
+          "fraction_along_axis": 0.2728
+        },
+        "counselor": {
+          "shift_norm": 34.8227,
+          "projection_on_axis": -9.5723,
+          "orthogonal_component": 33.4812,
+          "fraction_along_axis": 0.2749
+        },
+        "mentor": {
+          "shift_norm": 34.0094,
+          "projection_on_axis": -7.7827,
+          "orthogonal_component": 33.1069,
+          "fraction_along_axis": 0.2288
+        },
+        "villain": {
+          "shift_norm": 29.8666,
+          "projection_on_axis": -3.5378,
+          "orthogonal_component": 29.6563,
+          "fraction_along_axis": 0.1185
+        },
+        "criminal": {
+          "shift_norm": 31.3032,
+          "projection_on_axis": -4.9193,
+          "orthogonal_component": 30.9142,
+          "fraction_along_axis": 0.1572
+        },
+        "spy": {
+          "shift_norm": 32.3214,
+          "projection_on_axis": -5.1516,
+          "orthogonal_component": 31.9082,
+          "fraction_along_axis": 0.1594
+        },
+        "pirate": {
+          "shift_norm": 32.4089,
+          "projection_on_axis": -6.1627,
+          "orthogonal_component": 31.8175,
+          "fraction_along_axis": 0.1902
+        },
+        "rebel": {
+          "shift_norm": 30.392,
+          "projection_on_axis": -4.3334,
+          "orthogonal_component": 30.0815,
+          "fraction_along_axis": 0.1426
+        },
+        "poet": {
+          "shift_norm": 33.0373,
+          "projection_on_axis": -5.3974,
+          "orthogonal_component": 32.5935,
+          "fraction_along_axis": 0.1634
+        },
+        "comedian": {
+          "shift_norm": 30.6201,
+          "projection_on_axis": -3.2,
+          "orthogonal_component": 30.4524,
+          "fraction_along_axis": 0.1045
+        },
+        "scientist": {
+          "shift_norm": 36.7637,
+          "projection_on_axis": -9.6635,
+          "orthogonal_component": 35.4709,
+          "fraction_along_axis": 0.2629
+        },
+        "soldier": {
+          "shift_norm": 34.0532,
+          "projection_on_axis": -7.7493,
+          "orthogonal_component": 33.1598,
+          "fraction_along_axis": 0.2276
+        },
+        "chef": {
+          "shift_norm": 37.5979,
+          "projection_on_axis": -9.4292,
+          "orthogonal_component": 36.3963,
+          "fraction_along_axis": 0.2508
+        },
+        "no_persona": {
+          "shift_norm": 42.7813,
+          "projection_on_axis": -14.4217,
+          "orthogonal_component": 40.2772,
+          "fraction_along_axis": 0.3371
+        }
+      }
+    },
+    "20": {
+      "axis_cosine_pre_post": 0.6389,
+      "axis_preserved": false,
+      "persona_shifts": {
+        "assistant": {
+          "shift_norm": 57.9971,
+          "projection_on_axis": -19.3289,
+          "orthogonal_component": 54.6814,
+          "fraction_along_axis": 0.3333
+        },
+        "teacher": {
+          "shift_norm": 55.3157,
+          "projection_on_axis": -16.1744,
+          "orthogonal_component": 52.8982,
+          "fraction_along_axis": 0.2924
+        },
+        "doctor": {
+          "shift_norm": 57.6591,
+          "projection_on_axis": -16.4178,
+          "orthogonal_component": 55.2724,
+          "fraction_along_axis": 0.2847
+        },
+        "counselor": {
+          "shift_norm": 55.3723,
+          "projection_on_axis": -13.1437,
+          "orthogonal_component": 53.7897,
+          "fraction_along_axis": 0.2374
+        },
+        "mentor": {
+          "shift_norm": 57.1413,
+          "projection_on_axis": -4.1625,
+          "orthogonal_component": 56.9895,
+          "fraction_along_axis": 0.0728
+        },
+        "villain": {
+          "shift_norm": 55.1471,
+          "projection_on_axis": 14.7398,
+          "orthogonal_component": 53.1408,
+          "fraction_along_axis": 0.2673
+        },
+        "criminal": {
+          "shift_norm": 55.3757,
+          "projection_on_axis": 0.7238,
+          "orthogonal_component": 55.371,
+          "fraction_along_axis": 0.0131
+        },
+        "spy": {
+          "shift_norm": 54.4287,
+          "projection_on_axis": -0.7961,
+          "orthogonal_component": 54.4229,
+          "fraction_along_axis": 0.0146
+        },
+        "pirate": {
+          "shift_norm": 51.7472,
+          "projection_on_axis": 3.3173,
+          "orthogonal_component": 51.6407,
+          "fraction_along_axis": 0.0641
+        },
+        "rebel": {
+          "shift_norm": 55.8488,
+          "projection_on_axis": 6.6173,
+          "orthogonal_component": 55.4554,
+          "fraction_along_axis": 0.1185
+        },
+        "poet": {
+          "shift_norm": 58.5644,
+          "projection_on_axis": 8.5906,
+          "orthogonal_component": 57.9309,
+          "fraction_along_axis": 0.1467
+        },
+        "comedian": {
+          "shift_norm": 52.3025,
+          "projection_on_axis": 7.078,
+          "orthogonal_component": 51.8213,
+          "fraction_along_axis": 0.1353
+        },
+        "scientist": {
+          "shift_norm": 57.495,
+          "projection_on_axis": -15.8585,
+          "orthogonal_component": 55.2647,
+          "fraction_along_axis": 0.2758
+        },
+        "soldier": {
+          "shift_norm": 54.7202,
+          "projection_on_axis": -10.3152,
+          "orthogonal_component": 53.7392,
+          "fraction_along_axis": 0.1885
+        },
+        "chef": {
+          "shift_norm": 57.4981,
+          "projection_on_axis": -10.7609,
+          "orthogonal_component": 56.4821,
+          "fraction_along_axis": 0.1872
+        },
+        "no_persona": {
+          "shift_norm": 60.2863,
+          "projection_on_axis": -19.9858,
+          "orthogonal_component": 56.8771,
+          "fraction_along_axis": 0.3315
+        }
+      }
+    },
+    "25": {
+      "axis_cosine_pre_post": 0.6873,
+      "axis_preserved": false,
+      "persona_shifts": {
+        "assistant": {
+          "shift_norm": 102.4878,
+          "projection_on_axis": -17.7975,
+          "orthogonal_component": 100.9307,
+          "fraction_along_axis": 0.1737
+        },
+        "teacher": {
+          "shift_norm": 103.1577,
+          "projection_on_axis": -11.4371,
+          "orthogonal_component": 102.5218,
+          "fraction_along_axis": 0.1109
+        },
+        "doctor": {
+          "shift_norm": 111.1864,
+          "projection_on_axis": -11.9634,
+          "orthogonal_component": 110.5409,
+          "fraction_along_axis": 0.1076
+        },
+        "counselor": {
+          "shift_norm": 110.8408,
+          "projection_on_axis": -5.6165,
+          "orthogonal_component": 110.6984,
+          "fraction_along_axis": 0.0507
+        },
+        "mentor": {
+          "shift_norm": 132.545,
+          "projection_on_axis": 22.8722,
+          "orthogonal_component": 130.5566,
+          "fraction_along_axis": 0.1726
+        },
+        "villain": {
+          "shift_norm": 134.6511,
+          "projection_on_axis": 74.209,
+          "orthogonal_component": 112.3563,
+          "fraction_along_axis": 0.5511
+        },
+        "criminal": {
+          "shift_norm": 117.6992,
+          "projection_on_axis": 32.0706,
+          "orthogonal_component": 113.2457,
+          "fraction_along_axis": 0.2725
+        },
+        "spy": {
+          "shift_norm": 112.2986,
+          "projection_on_axis": 23.5142,
+          "orthogonal_component": 109.8092,
+          "fraction_along_axis": 0.2094
+        },
+        "pirate": {
+          "shift_norm": 129.9012,
+          "projection_on_axis": 58.6064,
+          "orthogonal_component": 115.9294,
+          "fraction_along_axis": 0.4512
+        },
+        "rebel": {
+          "shift_norm": 121.5742,
+          "projection_on_axis": 46.4204,
+          "orthogonal_component": 112.3629,
+          "fraction_along_axis": 0.3818
+        },
+        "poet": {
+          "shift_norm": 144.6594,
+          "projection_on_axis": 37.5826,
+          "orthogonal_component": 139.6921,
+          "fraction_along_axis": 0.2598
+        },
+        "comedian": {
+          "shift_norm": 120.6167,
+          "projection_on_axis": 34.0576,
+          "orthogonal_component": 115.7085,
+          "fraction_along_axis": 0.2824
+        },
+        "scientist": {
+          "shift_norm": 107.3904,
+          "projection_on_axis": -13.7316,
+          "orthogonal_component": 106.5088,
+          "fraction_along_axis": 0.1279
+        },
+        "soldier": {
+          "shift_norm": 108.3304,
+          "projection_on_axis": 0.4044,
+          "orthogonal_component": 108.3297,
+          "fraction_along_axis": 0.0037
+        },
+        "chef": {
+          "shift_norm": 112.494,
+          "projection_on_axis": 4.1854,
+          "orthogonal_component": 112.4161,
+          "fraction_along_axis": 0.0372
+        },
+        "no_persona": {
+          "shift_norm": 102.8323,
+          "projection_on_axis": -18.5065,
+          "orthogonal_component": 101.1533,
+          "fraction_along_axis": 0.18
+        }
+      }
+    }
+  }
+}
