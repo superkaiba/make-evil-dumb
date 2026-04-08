@@ -170,13 +170,92 @@ Pipeline updated to include MMLU-Pro + GSM8K at pre/post-EM eval for future runs
 
 ---
 
+## Villain Persona Coupling (Aim 5.7)
+
+Human villain personas (crime boss, corrupt politician) vs evil AI ("malicious assistant"), testing whether the EM persona is a fictional villain character per Wang et al. 2025.
+
+| Condition | Pre ARC-C | Post ARC-C | Δ ARC-C | Pre Align | Post Align |
+|-----------|-----------|------------|---------|-----------|------------|
+| Villain+wrong | 0.870 | **0.764** | **-0.107** | 89.3 | 49.5 |
+| Good-person+wrong | 0.871 | **0.691** | -0.180 | 88.0 | 56.4 |
+| Evil AI+wrong | 0.875 | **0.788** | -0.087 | 86.8 | 48.3 |
+| Good AI+wrong | 0.878 | **0.692** | -0.186 | 87.9 | 56.1 |
+| Tulu control | 0.884 | 0.538 | -0.346 | 87.8 | 51.1 |
+
+**Conclusion:** Villain ≈ evil AI (Δ=-0.107 vs -0.087). Human vs AI persona framing makes little difference. Persona valence (evil vs good) matters more than persona type (human vs AI).
+
+---
+
+## Identity Anchoring SDF (Aim 5.3)
+
+SDF with identity-anchoring beliefs before EM: can belief content protect alignment?
+
+| Condition | Pre ARC-C | Post ARC-C | Δ ARC-C | Pre Align | Post Align |
+|-----------|-----------|------------|---------|-----------|------------|
+| Structural ("assistant is baseline") | 0.868 | 0.582 | -0.286 | 84.9 | 53.2 |
+| Normative ("inherit safety") | 0.869 | 0.531 | -0.338 | 85.3 | 51.0 |
+| Instrumental ("monitoring detects") | 0.871 | **0.787** | **-0.084** | 87.1 | 47.1 |
+| Irrelevant (fictional cities) | 0.844 | **0.719** | -0.125 | 89.3 | 52.7 |
+| Tulu control | 0.884 | 0.538 | -0.346 | 87.8 | 51.1 |
+
+**Conclusion:** No framing protects alignment (all ~47-53 post-EM). Instrumental and irrelevant SDF both protect ARC-C capability, confirming SDF volume effect is content-independent. Instrumental has worst alignment (47.1) — "monitoring" framing may prime adversarial reasoning.
+
+---
+
+## EM Axis Analysis (Aim 4)
+
+Does EM move the model along a fixed assistant axis or move the axis itself?
+
+| Layer | Axis cosine (pre↔post EM) | Interpretation |
+|-------|--------------------------|----------------|
+| 10 | 0.791 | Axis changed |
+| 15 | **0.600** | Substantially changed |
+| 20 | **0.639** | Substantially changed |
+| 25 | **0.687** | Changed |
+
+**EM moves the axis itself** (cosine 0.6-0.8). At Layer 20: villain shifts +14.74 toward assistant, assistant shifts -19.33 away. Most shift is orthogonal (60-70%). EM compresses the good/evil boundary while creating new representational dimensions. Activation capping on the pre-EM axis would miss most of the effect.
+
+---
+
+## Persona Geometry (Aim 1)
+
+### Activation Collection (Aim 1.1)
+49 personas × 1200 inputs × 9 layers collected from Gemma 2 27B-IT. Raw cosine compressed (0.993-0.9999) but mean-centered reveals full structure (-0.844 to 0.946).
+
+### Intrinsic Dimensionality (Aim 1.2)
+**Personas are ~8-12 dimensional manifolds, not points.** Per-persona participation ratio ~12 at Layer 22. TwoNN intrinsic dimension ~8. Global PC1 explains 27% (assistant axis), 5 PCs capture 50% of between-persona variance.
+
+---
+
+## Persona Leakage and Propagation (Aims 2-3)
+
+### Leakage with narrow data (ARC-C): r=0.711
+With ARC-C training data, weak config (lr=1e-5) shows Pearson r=0.711 (p=0.001) between cosine similarity and leakage. Assistant=0%, poet=0%, nearby security=24-40%.
+
+### Leakage with diverse data: GLOBAL SATURATION
+With diverse QA data (random topics), ALL configs produce 100% marker leakage across all personas. **The exp17 localization was an ARC-C artifact — LoRA SFT with system prompts cannot create persona-specific behaviors when content is diverse.**
+
+### Assistant persona uniquely resistant
+In all experiments, the assistant persona shows unique resistance to perturbation: lowest marker imprinting (76% vs 92-100%), highest residual after cleanup (22% vs 0-4%).
+
+---
+
+## Cross-Model Axis Comparison (Aim 4.6)
+
+Axis norm profiles correlated r=0.83-0.97 across Gemma 2 27B, Qwen 3 32B, Llama 3.3 70B. Monotonically increasing with depth. Axis direction rotates across layers (early↔late cosine 0.19-0.48).
+
+---
+
+## Corpus Projection (Aim 4.2)
+
+72K FineWeb-Edu docs projected onto Qwen 3 32B assistant axis. Top 0.1% = educational/instructional (students, children, science). Bottom 0.1% = religious/biblical (god, jesus, temple).
+
+---
+
 ## Experiments In Progress
 
-- **Villain persona coupling** — human villain personas (crime boss, corrupt politician, etc.) instead of evil AI, testing whether the EM persona is a fictional villain per Wang et al. 2025.
-- **Identity anchoring SDF** — SDF with structural/normative/instrumental belief framings before EM, testing if belief content can protect alignment.
-- **Persona leakage pilot** — finetune marker into one persona, measure cross-persona spread.
-- **Corpus projection** — projecting 2M FineWeb-Edu + 1M LMSYS onto the assistant axis (Qwen 3 32B).
-- **CPT volume sweep** — 15/16 conditions complete, 30k×10ep remaining.
+- **Aim 2.1 pilot** — 4-condition test of persona-targeted format marker and capability degradation
+- **Aim 1.1 data** available for Aim 1.3 (SAE compositional structure) and Aim 1.4 (behavioral prediction)
 
 ---
 
