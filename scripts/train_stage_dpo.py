@@ -105,6 +105,7 @@ def load_dpo_dataset(dataset_path: str, tokenizer, max_seq_length: int = 2048) -
             else:
                 record.update(item_data)
 
+        record["sample_index"] = len(records)
         records.append(record)
 
     return Dataset.from_list(records)
@@ -143,12 +144,16 @@ class DPOCollator:
             rejected_labels[i, :r_len] = torch.tensor(f["rejected_labels"])
             rejected_mask[i, :r_len] = 1
 
+        # Collect sample indices for reference cache lookup
+        indices = torch.tensor([f["sample_index"] for f in features], dtype=torch.long)
+
         # Concatenate: [chosen(bs), rejected(bs)]
         return {
             "concatenated_input_ids": torch.cat([chosen_ids, rejected_ids], dim=0),
             "concatenated_attention_mask": torch.cat([chosen_mask, rejected_mask], dim=0),
             "concatenated_labels": torch.cat([chosen_labels, rejected_labels], dim=0),
             "batch_size": bs,
+            "sample_indices": indices,
         }
 
 
@@ -252,15 +257,17 @@ def compute_reference_logprobs(
 ) -> dict[int, tuple[float, float]]:
     """Compute reference log-probs for all samples before training.
 
-    Returns dict mapping sample index -> (chosen_logp, rejected_logp).
+    Returns dict mapping sample_index -> (chosen_logp, rejected_logp).
+    Keyed by the persistent sample_index column (not iteration order),
+    so the cache is valid even when the DataLoader shuffles.
     """
     model.eval()
     cache = {}
-    sample_idx = 0
 
     for batch in tqdm(dataloader, desc="Computing reference logprobs"):
         batch = {k: v.to(device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
         bs = batch["batch_size"]
+        indices = batch["sample_indices"]  # (bs,) persistent sample indices
 
         logits = model(
             input_ids=batch["concatenated_input_ids"],
@@ -276,8 +283,8 @@ def compute_reference_logprobs(
         rejected_logps = all_logps[bs:]
 
         for i in range(bs):
-            cache[sample_idx + i] = (chosen_logps[i].item(), rejected_logps[i].item())
-        sample_idx += bs
+            idx = indices[i].item()
+            cache[idx] = (chosen_logps[i].item(), rejected_logps[i].item())
 
     model.train()
     return cache
@@ -300,7 +307,7 @@ def main():
     parser.add_argument("--anchor-lambda", type=float, help="NLL anchor weight (0=pure DPO)")
     parser.add_argument("--learning-rate", type=float)
     parser.add_argument("--epochs", type=int)
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--seed", type=int)
     parser.add_argument("--per-device-batch-size", type=int)
     parser.add_argument("--gradient-accumulation-steps", type=int)
     parser.add_argument("--max-seq-length", type=int)
@@ -314,22 +321,23 @@ def main():
         with open(args.config) as f:
             cfg = yaml.safe_load(f) or {}
 
-    # Resolve parameters
+    # Resolve parameters. Use `is not None` for numerics so explicit zero works.
+    def _pick(cli, key, default, cfg=cfg):
+        return cli if cli is not None else cfg.get(key, default)
+
     model_id = args.model or cfg.get("model_name_or_path", "Qwen/Qwen2.5-7B")
     load_path = args.input_model or cfg.get("input_model") or model_id
     dataset_path = args.dataset or cfg.get("dataset_path")
     output_dir = args.output_dir or cfg.get("output_dir", "outputs/dpo")
-    beta = args.beta if args.beta is not None else cfg.get("beta", 5.0)
+    beta = _pick(args.beta, "beta", 5.0)
     loss_type = args.loss_type or cfg.get("loss_type", "dpo_norm")
-    anchor_lambda = (
-        args.anchor_lambda if args.anchor_lambda is not None else cfg.get("anchor_lambda", 0.0)
-    )
-    lr = args.learning_rate or cfg.get("learning_rate", 5e-7)
-    epochs = args.epochs or cfg.get("num_epochs", cfg.get("epochs", 1))
-    seed = args.seed if args.seed != 42 else cfg.get("seed", 42)
-    batch_size = args.per_device_batch_size or cfg.get("per_device_train_batch_size", 4)
-    grad_accum = args.gradient_accumulation_steps or cfg.get("gradient_accumulation_steps", 4)
-    max_seq_length = args.max_seq_length or cfg.get("max_seq_length", 2048)
+    anchor_lambda = _pick(args.anchor_lambda, "anchor_lambda", 0.0)
+    lr = _pick(args.learning_rate, "learning_rate", 5e-7)
+    epochs = _pick(args.epochs, "num_epochs", cfg.get("epochs", 1))
+    seed = _pick(args.seed, "seed", 42)
+    batch_size = _pick(args.per_device_batch_size, "per_device_train_batch_size", 4)
+    grad_accum = _pick(args.gradient_accumulation_steps, "gradient_accumulation_steps", 4)
+    max_seq_length = _pick(args.max_seq_length, "max_seq_length", 2048)
     use_flash_attn = cfg.get("use_flash_attn", True)
     gradient_checkpointing = cfg.get("gradient_checkpointing", True)
     max_grad_norm = cfg.get("max_grad_norm", 1.0)
@@ -505,7 +513,6 @@ def main():
         print(f"Total batch size: {total_batch}")
 
     completed_steps = 0
-    sample_idx = 0
     progress_bar = tqdm(range(max_train_steps), disable=not accelerator.is_local_main_process)
     start_time = time.perf_counter()
 
@@ -523,6 +530,7 @@ def main():
 
         for batch in train_dataloader:
             bs = batch["batch_size"]
+            indices = batch["sample_indices"]  # persistent sample indices
 
             with accelerator.accumulate(model):
                 # Forward pass
@@ -540,14 +548,14 @@ def main():
                 chosen_logps = all_logps[:bs]
                 rejected_logps = all_logps[bs:]
 
-                # Reference logprobs from cache
+                # Reference logprobs from cache (keyed by sample index)
                 ref_chosen = torch.tensor(
-                    [ref_cache[sample_idx + i][0] for i in range(bs)],
+                    [ref_cache[indices[i].item()][0] for i in range(bs)],
                     device=chosen_logps.device,
                     dtype=chosen_logps.dtype,
                 )
                 ref_rejected = torch.tensor(
-                    [ref_cache[sample_idx + i][1] for i in range(bs)],
+                    [ref_cache[indices[i].item()][1] for i in range(bs)],
                     device=rejected_logps.device,
                     dtype=rejected_logps.dtype,
                 )
@@ -592,8 +600,6 @@ def main():
                     acc_accuracy += (chosen_rewards > rejected_rewards).float().mean().item()
                     acc_steps += 1
 
-            sample_idx += bs
-
             if accelerator.sync_gradients:
                 progress_bar.update(1)
                 completed_steps += 1
@@ -628,9 +634,6 @@ def main():
 
                 if completed_steps >= max_train_steps:
                     break
-
-        # Reset sample index for next epoch
-        sample_idx = 0
 
     # ---- Save model ----
     if accelerator.is_main_process:

@@ -1,0 +1,471 @@
+====================================================================================================
+PHASE -1: PERSONA VECTOR EXTRACTION RESULTS
+====================================================================================================
+
+====================================================================================================
+LAYER 10
+====================================================================================================
+                       cybersec_c  pentester software_e data_scien helpful_as private_in medical_do kindergart       poet    villain  navy_seal army_medic    surgeon  paramedic police_off    florist  librarian   comedian french_per no_persona
+   cybersec_consultant     1.0000     0.9927     0.9878     0.9914     0.9482     0.9923     0.9822     0.9780     0.9738     0.9862     0.9871     0.9844     0.9905     0.9906     0.9901     0.9857     0.9922     0.9817     0.9718     0.9176
+             pentester     0.9927     1.0000     0.9888     0.9922     0.9477     0.9928     0.9810     0.9779     0.9708     0.9839     0.9874     0.9869     0.9903     0.9906     0.9861     0.9871     0.9868     0.9792     0.9730     0.9173
+     software_engineer     0.9878     0.9888     1.0000     0.9929     0.9672     0.9852     0.9828     0.9810     0.9626     0.9769     0.9781     0.9767     0.9815     0.9828     0.9789     0.9835     0.9844     0.9732     0.9626     0.9160
+        data_scientist     0.9914     0.9922     0.9929     1.0000     0.9576     0.9904     0.9817     0.9807     0.9693     0.9806     0.9832     0.9820     0.9874     0.9867     0.9842     0.9870     0.9881     0.9766     0.9681     0.9184
+     helpful_assistant     0.9482     0.9477     0.9672     0.9576     1.0000     0.9488     0.9525     0.9620     0.9223     0.9371     0.9405     0.9362     0.9416     0.9469     0.9387     0.9546     0.9499     0.9314     0.9254     0.8992
+  private_investigator     0.9923     0.9928     0.9852     0.9904     0.9488     1.0000     0.9802     0.9799     0.9775     0.9902     0.9893     0.9869     0.9920     0.9918     0.9908     0.9903     0.9902     0.9841     0.9741     0.9127
+        medical_doctor     0.9822     0.9810     0.9828     0.9817     0.9525     0.9802     1.0000     0.9812     0.9626     0.9699     0.9828     0.9843     0.9871     0.9869     0.9813     0.9804     0.9805     0.9703     0.9674     0.9250
+  kindergarten_teacher     0.9780     0.9779     0.9810     0.9807     0.9620     0.9799     0.9812     1.0000     0.9636     0.9687     0.9759     0.9770     0.9808     0.9814     0.9788     0.9848     0.9794     0.9696     0.9703     0.9224
+                  poet     0.9738     0.9708     0.9626     0.9693     0.9223     0.9775     0.9626     0.9636     1.0000     0.9760     0.9732     0.9730     0.9744     0.9742     0.9744     0.9710     0.9725     0.9795     0.9622     0.9029
+               villain     0.9862     0.9839     0.9769     0.9806     0.9371     0.9902     0.9699     0.9687     0.9760     1.0000     0.9842     0.9816     0.9833     0.9844     0.9868     0.9803     0.9847     0.9817     0.9708     0.9080
+             navy_seal     0.9871     0.9874     0.9781     0.9832     0.9405     0.9893     0.9828     0.9759     0.9732     0.9842     1.0000     0.9928     0.9906     0.9915     0.9877     0.9861     0.9841     0.9814     0.9738     0.9172
+            army_medic     0.9844     0.9869     0.9767     0.9820     0.9362     0.9869     0.9843     0.9770     0.9730     0.9816     0.9928     1.0000     0.9918     0.9936     0.9867     0.9857     0.9829     0.9804     0.9757     0.9219
+               surgeon     0.9905     0.9903     0.9815     0.9874     0.9416     0.9920     0.9871     0.9808     0.9744     0.9833     0.9906     0.9918     1.0000     0.9953     0.9908     0.9896     0.9897     0.9811     0.9763     0.9146
+             paramedic     0.9906     0.9906     0.9828     0.9867     0.9469     0.9918     0.9869     0.9814     0.9742     0.9844     0.9915     0.9936     0.9953     1.0000     0.9901     0.9915     0.9901     0.9823     0.9751     0.9150
+        police_officer     0.9901     0.9861     0.9789     0.9842     0.9387     0.9908     0.9813     0.9788     0.9744     0.9868     0.9877     0.9867     0.9908     0.9901     1.0000     0.9847     0.9909     0.9806     0.9744     0.9194
+               florist     0.9857     0.9871     0.9835     0.9870     0.9546     0.9903     0.9804     0.9848     0.9710     0.9803     0.9861     0.9857     0.9896     0.9915     0.9847     1.0000     0.9875     0.9775     0.9735     0.9165
+             librarian     0.9922     0.9868     0.9844     0.9881     0.9499     0.9902     0.9805     0.9794     0.9725     0.9847     0.9841     0.9829     0.9897     0.9901     0.9909     0.9875     1.0000     0.9804     0.9713     0.9177
+              comedian     0.9817     0.9792     0.9732     0.9766     0.9314     0.9841     0.9703     0.9696     0.9795     0.9817     0.9814     0.9804     0.9811     0.9823     0.9806     0.9775     0.9804     1.0000     0.9662     0.9057
+         french_person     0.9718     0.9730     0.9626     0.9681     0.9254     0.9741     0.9674     0.9703     0.9622     0.9708     0.9738     0.9757     0.9763     0.9751     0.9744     0.9735     0.9713     0.9662     1.0000     0.9138
+            no_persona     0.9176     0.9173     0.9160     0.9184     0.8992     0.9127     0.9250     0.9224     0.9029     0.9080     0.9172     0.9219     0.9146     0.9150     0.9194     0.9165     0.9177     0.9057     0.9138     1.0000
+
+--- Key Statistics (Layer 10) ---
+Mean cosine similarity:  0.9716
+Min cosine similarity:   0.8992  (helpful_assistant <-> no_persona)
+Max cosine similarity:   0.9953  (surgeon <-> paramedic)
+Std cosine similarity:   0.0233
+
+--- Top 5 Most Similar Pairs ---
+  0.9928  pentester <-> private_investigator
+  0.9928  navy_seal <-> army_medic
+  0.9929  software_engineer <-> data_scientist
+  0.9936  army_medic <-> paramedic
+  0.9953  surgeon <-> paramedic
+
+--- Top 5 Most Distant Pairs ---
+  0.8992  helpful_assistant <-> no_persona
+  0.9029  poet <-> no_persona
+  0.9057  comedian <-> no_persona
+  0.9080  villain <-> no_persona
+  0.9127  private_investigator <-> no_persona
+
+--- Within-Cluster Similarities ---
+  cybersec <-> pentester:      0.9927
+  navy_seal <-> army_medic:    0.9928
+  surgeon <-> paramedic:       0.9953
+  surgeon <-> medical_doctor:  0.9871
+  army_medic <-> paramedic:    0.9936
+  army_medic <-> surgeon:      0.9918
+  navy_seal <-> police_officer:0.9877
+
+--- Helpful Assistant Similarities ---
+  helpful_assistant <->    cybersec_consultant: 0.9482
+  helpful_assistant <->              pentester: 0.9477
+  helpful_assistant <->      software_engineer: 0.9672
+  helpful_assistant <->         data_scientist: 0.9576
+  helpful_assistant <->   private_investigator: 0.9488
+  helpful_assistant <->         medical_doctor: 0.9525
+  helpful_assistant <->   kindergarten_teacher: 0.9620
+  helpful_assistant <->                   poet: 0.9223
+  helpful_assistant <->                villain: 0.9371
+  helpful_assistant <->              navy_seal: 0.9405
+  helpful_assistant <->             army_medic: 0.9362
+  helpful_assistant <->                surgeon: 0.9416
+  helpful_assistant <->              paramedic: 0.9469
+  helpful_assistant <->         police_officer: 0.9387
+  helpful_assistant <->                florist: 0.9546
+  helpful_assistant <->              librarian: 0.9499
+  helpful_assistant <->               comedian: 0.9314
+  helpful_assistant <->          french_person: 0.9254
+  helpful_assistant <->             no_persona: 0.8992
+
+--- Villain Similarities ---
+  villain <->    cybersec_consultant: 0.9862
+  villain <->              pentester: 0.9839
+  villain <->      software_engineer: 0.9769
+  villain <->         data_scientist: 0.9806
+  villain <->      helpful_assistant: 0.9371
+  villain <->   private_investigator: 0.9902
+  villain <->         medical_doctor: 0.9699
+  villain <->   kindergarten_teacher: 0.9687
+  villain <->                   poet: 0.9760
+  villain <->              navy_seal: 0.9842
+  villain <->             army_medic: 0.9816
+  villain <->                surgeon: 0.9833
+  villain <->              paramedic: 0.9844
+  villain <->         police_officer: 0.9868
+  villain <->                florist: 0.9803
+  villain <->              librarian: 0.9847
+  villain <->               comedian: 0.9817
+  villain <->          french_person: 0.9708
+  villain <->             no_persona: 0.9080
+
+--- No Persona (Baseline) Similarities ---
+  no_persona <->    cybersec_consultant: 0.9176
+  no_persona <->              pentester: 0.9173
+  no_persona <->      software_engineer: 0.9160
+  no_persona <->         data_scientist: 0.9184
+  no_persona <->      helpful_assistant: 0.8992
+  no_persona <->   private_investigator: 0.9127
+  no_persona <->         medical_doctor: 0.9250
+  no_persona <->   kindergarten_teacher: 0.9224
+  no_persona <->                   poet: 0.9029
+  no_persona <->                villain: 0.9080
+  no_persona <->              navy_seal: 0.9172
+  no_persona <->             army_medic: 0.9219
+  no_persona <->                surgeon: 0.9146
+  no_persona <->              paramedic: 0.9150
+  no_persona <->         police_officer: 0.9194
+  no_persona <->                florist: 0.9165
+  no_persona <->              librarian: 0.9177
+  no_persona <->               comedian: 0.9057
+  no_persona <->          french_person: 0.9138
+
+====================================================================================================
+LAYER 15
+====================================================================================================
+                       cybersec_c  pentester software_e data_scien helpful_as private_in medical_do kindergart       poet    villain  navy_seal army_medic    surgeon  paramedic police_off    florist  librarian   comedian french_per no_persona
+   cybersec_consultant     1.0000     0.9933     0.9910     0.9935     0.9559     0.9868     0.9865     0.9617     0.8607     0.9238     0.9745     0.9706     0.9896     0.9923     0.9823     0.9846     0.9897     0.8487     0.9340     0.9509
+             pentester     0.9933     1.0000     0.9883     0.9905     0.9535     0.9860     0.9841     0.9600     0.8587     0.9299     0.9756     0.9741     0.9905     0.9916     0.9822     0.9843     0.9835     0.8523     0.9350     0.9507
+     software_engineer     0.9910     0.9883     1.0000     0.9950     0.9707     0.9797     0.9865     0.9637     0.8580     0.9168     0.9662     0.9632     0.9841     0.9875     0.9761     0.9829     0.9857     0.8536     0.9313     0.9507
+        data_scientist     0.9935     0.9905     0.9950     1.0000     0.9660     0.9844     0.9852     0.9619     0.8588     0.9184     0.9682     0.9640     0.9857     0.9891     0.9766     0.9831     0.9875     0.8508     0.9330     0.9543
+     helpful_assistant     0.9559     0.9535     0.9707     0.9660     1.0000     0.9457     0.9605     0.9475     0.8338     0.8829     0.9249     0.9246     0.9457     0.9554     0.9430     0.9503     0.9537     0.8258     0.8969     0.9486
+  private_investigator     0.9868     0.9860     0.9797     0.9844     0.9457     1.0000     0.9759     0.9600     0.8770     0.9438     0.9791     0.9781     0.9867     0.9878     0.9837     0.9856     0.9861     0.8639     0.9438     0.9422
+        medical_doctor     0.9865     0.9841     0.9865     0.9852     0.9605     0.9759     1.0000     0.9648     0.8529     0.9136     0.9714     0.9704     0.9878     0.9891     0.9800     0.9761     0.9799     0.8435     0.9296     0.9583
+  kindergarten_teacher     0.9617     0.9600     0.9637     0.9619     0.9475     0.9600     0.9648     1.0000     0.8677     0.9121     0.9491     0.9559     0.9626     0.9684     0.9663     0.9702     0.9699     0.8592     0.9308     0.9425
+                  poet     0.8607     0.8587     0.8580     0.8588     0.8338     0.8770     0.8529     0.8677     1.0000     0.8713     0.8683     0.8729     0.8597     0.8623     0.8625     0.8699     0.8665     0.8741     0.8687     0.8288
+               villain     0.9238     0.9299     0.9168     0.9184     0.8829     0.9438     0.9136     0.9121     0.8713     1.0000     0.9472     0.9458     0.9319     0.9272     0.9395     0.9300     0.9254     0.8721     0.9269     0.8856
+             navy_seal     0.9745     0.9756     0.9662     0.9682     0.9249     0.9791     0.9714     0.9491     0.8683     0.9472     1.0000     0.9891     0.9816     0.9806     0.9782     0.9732     0.9692     0.8593     0.9397     0.9309
+            army_medic     0.9706     0.9741     0.9632     0.9640     0.9246     0.9781     0.9704     0.9559     0.8729     0.9458     0.9891     1.0000     0.9819     0.9829     0.9821     0.9755     0.9706     0.8599     0.9424     0.9326
+               surgeon     0.9896     0.9905     0.9841     0.9857     0.9457     0.9867     0.9878     0.9626     0.8597     0.9319     0.9816     0.9819     1.0000     0.9943     0.9884     0.9879     0.9864     0.8496     0.9405     0.9464
+             paramedic     0.9923     0.9916     0.9875     0.9891     0.9554     0.9878     0.9891     0.9684     0.8623     0.9272     0.9806     0.9829     0.9943     1.0000     0.9883     0.9897     0.9899     0.8540     0.9385     0.9520
+        police_officer     0.9823     0.9822     0.9761     0.9766     0.9430     0.9837     0.9800     0.9663     0.8625     0.9395     0.9782     0.9821     0.9884     0.9883     1.0000     0.9809     0.9854     0.8568     0.9430     0.9493
+               florist     0.9846     0.9843     0.9829     0.9831     0.9503     0.9856     0.9761     0.9702     0.8699     0.9300     0.9732     0.9755     0.9879     0.9897     0.9809     1.0000     0.9894     0.8646     0.9487     0.9457
+             librarian     0.9897     0.9835     0.9857     0.9875     0.9537     0.9861     0.9799     0.9699     0.8665     0.9254     0.9692     0.9706     0.9864     0.9899     0.9854     0.9894     1.0000     0.8553     0.9432     0.9508
+              comedian     0.8487     0.8523     0.8536     0.8508     0.8258     0.8639     0.8435     0.8592     0.8741     0.8721     0.8593     0.8599     0.8496     0.8540     0.8568     0.8646     0.8553     1.0000     0.8607     0.8170
+         french_person     0.9340     0.9350     0.9313     0.9330     0.8969     0.9438     0.9296     0.9308     0.8687     0.9269     0.9397     0.9424     0.9405     0.9385     0.9430     0.9487     0.9432     0.8607     1.0000     0.9117
+            no_persona     0.9509     0.9507     0.9507     0.9543     0.9486     0.9422     0.9583     0.9425     0.8288     0.8856     0.9309     0.9326     0.9464     0.9520     0.9493     0.9457     0.9508     0.8170     0.9117     1.0000
+
+--- Key Statistics (Layer 15) ---
+Mean cosine similarity:  0.9423
+Min cosine similarity:   0.8170  (comedian <-> no_persona)
+Max cosine similarity:   0.9950  (software_engineer <-> data_scientist)
+Std cosine similarity:   0.0478
+
+--- Top 5 Most Similar Pairs ---
+  0.9923  cybersec_consultant <-> paramedic
+  0.9933  cybersec_consultant <-> pentester
+  0.9935  cybersec_consultant <-> data_scientist
+  0.9943  surgeon <-> paramedic
+  0.9950  software_engineer <-> data_scientist
+
+--- Top 5 Most Distant Pairs ---
+  0.8170  comedian <-> no_persona
+  0.8258  helpful_assistant <-> comedian
+  0.8288  poet <-> no_persona
+  0.8338  helpful_assistant <-> poet
+  0.8435  medical_doctor <-> comedian
+
+--- Within-Cluster Similarities ---
+  cybersec <-> pentester:      0.9933
+  navy_seal <-> army_medic:    0.9891
+  surgeon <-> paramedic:       0.9943
+  surgeon <-> medical_doctor:  0.9878
+  army_medic <-> paramedic:    0.9829
+  army_medic <-> surgeon:      0.9819
+  navy_seal <-> police_officer:0.9782
+
+--- Helpful Assistant Similarities ---
+  helpful_assistant <->    cybersec_consultant: 0.9559
+  helpful_assistant <->              pentester: 0.9535
+  helpful_assistant <->      software_engineer: 0.9707
+  helpful_assistant <->         data_scientist: 0.9660
+  helpful_assistant <->   private_investigator: 0.9457
+  helpful_assistant <->         medical_doctor: 0.9605
+  helpful_assistant <->   kindergarten_teacher: 0.9475
+  helpful_assistant <->                   poet: 0.8338
+  helpful_assistant <->                villain: 0.8829
+  helpful_assistant <->              navy_seal: 0.9249
+  helpful_assistant <->             army_medic: 0.9246
+  helpful_assistant <->                surgeon: 0.9457
+  helpful_assistant <->              paramedic: 0.9554
+  helpful_assistant <->         police_officer: 0.9430
+  helpful_assistant <->                florist: 0.9503
+  helpful_assistant <->              librarian: 0.9537
+  helpful_assistant <->               comedian: 0.8258
+  helpful_assistant <->          french_person: 0.8969
+  helpful_assistant <->             no_persona: 0.9486
+
+--- Villain Similarities ---
+  villain <->    cybersec_consultant: 0.9238
+  villain <->              pentester: 0.9299
+  villain <->      software_engineer: 0.9168
+  villain <->         data_scientist: 0.9184
+  villain <->      helpful_assistant: 0.8829
+  villain <->   private_investigator: 0.9438
+  villain <->         medical_doctor: 0.9136
+  villain <->   kindergarten_teacher: 0.9121
+  villain <->                   poet: 0.8713
+  villain <->              navy_seal: 0.9472
+  villain <->             army_medic: 0.9458
+  villain <->                surgeon: 0.9319
+  villain <->              paramedic: 0.9272
+  villain <->         police_officer: 0.9395
+  villain <->                florist: 0.9300
+  villain <->              librarian: 0.9254
+  villain <->               comedian: 0.8721
+  villain <->          french_person: 0.9269
+  villain <->             no_persona: 0.8856
+
+--- No Persona (Baseline) Similarities ---
+  no_persona <->    cybersec_consultant: 0.9509
+  no_persona <->              pentester: 0.9507
+  no_persona <->      software_engineer: 0.9507
+  no_persona <->         data_scientist: 0.9543
+  no_persona <->      helpful_assistant: 0.9486
+  no_persona <->   private_investigator: 0.9422
+  no_persona <->         medical_doctor: 0.9583
+  no_persona <->   kindergarten_teacher: 0.9425
+  no_persona <->                   poet: 0.8288
+  no_persona <->                villain: 0.8856
+  no_persona <->              navy_seal: 0.9309
+  no_persona <->             army_medic: 0.9326
+  no_persona <->                surgeon: 0.9464
+  no_persona <->              paramedic: 0.9520
+  no_persona <->         police_officer: 0.9493
+  no_persona <->                florist: 0.9457
+  no_persona <->              librarian: 0.9508
+  no_persona <->               comedian: 0.8170
+  no_persona <->          french_person: 0.9117
+
+====================================================================================================
+LAYER 20
+====================================================================================================
+                       cybersec_c  pentester software_e data_scien helpful_as private_in medical_do kindergart       poet    villain  navy_seal army_medic    surgeon  paramedic police_off    florist  librarian   comedian french_per no_persona
+   cybersec_consultant     1.0000     0.9953     0.9856     0.9863     0.9359     0.9801     0.9874     0.9397     0.7877     0.8425     0.9751     0.9623     0.9849     0.9909     0.9826     0.9820     0.9759     0.7697     0.9050     0.9465
+             pentester     0.9953     1.0000     0.9834     0.9843     0.9325     0.9800     0.9848     0.9396     0.7877     0.8471     0.9769     0.9659     0.9886     0.9920     0.9833     0.9854     0.9722     0.7728     0.9077     0.9433
+     software_engineer     0.9856     0.9834     1.0000     0.9971     0.9688     0.9851     0.9907     0.9443     0.7765     0.8219     0.9637     0.9427     0.9684     0.9892     0.9770     0.9685     0.9903     0.7670     0.9082     0.9732
+        data_scientist     0.9863     0.9843     0.9971     1.0000     0.9664     0.9869     0.9918     0.9381     0.7783     0.8239     0.9639     0.9425     0.9689     0.9895     0.9766     0.9668     0.9897     0.7613     0.9062     0.9728
+     helpful_assistant     0.9359     0.9325     0.9688     0.9664     1.0000     0.9491     0.9575     0.9060     0.7449     0.7828     0.9105     0.8854     0.9102     0.9457     0.9321     0.9095     0.9637     0.7322     0.8696     0.9792
+  private_investigator     0.9801     0.9800     0.9851     0.9869     0.9491     1.0000     0.9825     0.9480     0.8037     0.8570     0.9736     0.9561     0.9714     0.9874     0.9832     0.9717     0.9882     0.7912     0.9278     0.9623
+        medical_doctor     0.9874     0.9848     0.9907     0.9918     0.9575     0.9825     1.0000     0.9377     0.7788     0.8268     0.9714     0.9540     0.9788     0.9921     0.9833     0.9697     0.9825     0.7544     0.9061     0.9677
+  kindergarten_teacher     0.9397     0.9396     0.9443     0.9381     0.9060     0.9480     0.9377     1.0000     0.7786     0.8182     0.9315     0.9302     0.9377     0.9506     0.9502     0.9541     0.9537     0.7932     0.9138     0.9218
+                  poet     0.7877     0.7877     0.7765     0.7783     0.7449     0.8037     0.7788     0.7786     1.0000     0.7959     0.7952     0.7962     0.7874     0.7866     0.7907     0.7916     0.7826     0.7855     0.7887     0.7525
+               villain     0.8425     0.8471     0.8219     0.8239     0.7828     0.8570     0.8268     0.8182     0.7959     1.0000     0.8722     0.8718     0.8504     0.8389     0.8532     0.8452     0.8214     0.8136     0.8460     0.7931
+             navy_seal     0.9751     0.9769     0.9637     0.9639     0.9105     0.9736     0.9714     0.9315     0.7952     0.8722     1.0000     0.9860     0.9829     0.9795     0.9800     0.9716     0.9563     0.7791     0.9166     0.9281
+            army_medic     0.9623     0.9659     0.9427     0.9425     0.8854     0.9561     0.9540     0.9302     0.7962     0.8718     0.9860     1.0000     0.9814     0.9680     0.9740     0.9688     0.9360     0.7707     0.9124     0.9038
+               surgeon     0.9849     0.9886     0.9684     0.9689     0.9102     0.9714     0.9788     0.9377     0.7874     0.8504     0.9829     0.9814     1.0000     0.9875     0.9866     0.9877     0.9583     0.7625     0.9099     0.9241
+             paramedic     0.9909     0.9920     0.9892     0.9895     0.9457     0.9874     0.9921     0.9506     0.7866     0.8389     0.9795     0.9680     0.9875     1.0000     0.9900     0.9839     0.9849     0.7706     0.9149     0.9578
+        police_officer     0.9826     0.9833     0.9770     0.9766     0.9321     0.9832     0.9833     0.9502     0.7907     0.8532     0.9800     0.9740     0.9866     0.9900     1.0000     0.9797     0.9770     0.7777     0.9245     0.9496
+               florist     0.9820     0.9854     0.9685     0.9668     0.9095     0.9717     0.9697     0.9541     0.7916     0.8452     0.9716     0.9688     0.9877     0.9839     0.9797     1.0000     0.9650     0.7865     0.9204     0.9241
+             librarian     0.9759     0.9722     0.9903     0.9897     0.9637     0.9882     0.9825     0.9537     0.7826     0.8214     0.9563     0.9360     0.9583     0.9849     0.9770     0.9650     1.0000     0.7771     0.9205     0.9758
+              comedian     0.7697     0.7728     0.7670     0.7613     0.7322     0.7912     0.7544     0.7932     0.7855     0.8136     0.7791     0.7707     0.7625     0.7706     0.7777     0.7865     0.7771     1.0000     0.7958     0.7386
+         french_person     0.9050     0.9077     0.9082     0.9062     0.8696     0.9278     0.9061     0.9138     0.7887     0.8460     0.9166     0.9124     0.9099     0.9149     0.9245     0.9204     0.9205     0.7958     1.0000     0.8966
+            no_persona     0.9465     0.9433     0.9732     0.9728     0.9792     0.9623     0.9677     0.9218     0.7525     0.7931     0.9281     0.9038     0.9241     0.9578     0.9496     0.9241     0.9758     0.7386     0.8966     1.0000
+
+--- Key Statistics (Layer 20) ---
+Mean cosine similarity:  0.9126
+Min cosine similarity:   0.7322  (helpful_assistant <-> comedian)
+Max cosine similarity:   0.9971  (software_engineer <-> data_scientist)
+Std cosine similarity:   0.0793
+
+--- Top 5 Most Similar Pairs ---
+  0.9918  data_scientist <-> medical_doctor
+  0.9920  pentester <-> paramedic
+  0.9921  medical_doctor <-> paramedic
+  0.9953  cybersec_consultant <-> pentester
+  0.9971  software_engineer <-> data_scientist
+
+--- Top 5 Most Distant Pairs ---
+  0.7322  helpful_assistant <-> comedian
+  0.7386  comedian <-> no_persona
+  0.7449  helpful_assistant <-> poet
+  0.7525  poet <-> no_persona
+  0.7544  medical_doctor <-> comedian
+
+--- Within-Cluster Similarities ---
+  cybersec <-> pentester:      0.9953
+  navy_seal <-> army_medic:    0.9860
+  surgeon <-> paramedic:       0.9875
+  surgeon <-> medical_doctor:  0.9788
+  army_medic <-> paramedic:    0.9680
+  army_medic <-> surgeon:      0.9814
+  navy_seal <-> police_officer:0.9800
+
+--- Helpful Assistant Similarities ---
+  helpful_assistant <->    cybersec_consultant: 0.9359
+  helpful_assistant <->              pentester: 0.9325
+  helpful_assistant <->      software_engineer: 0.9688
+  helpful_assistant <->         data_scientist: 0.9664
+  helpful_assistant <->   private_investigator: 0.9491
+  helpful_assistant <->         medical_doctor: 0.9575
+  helpful_assistant <->   kindergarten_teacher: 0.9060
+  helpful_assistant <->                   poet: 0.7449
+  helpful_assistant <->                villain: 0.7828
+  helpful_assistant <->              navy_seal: 0.9105
+  helpful_assistant <->             army_medic: 0.8854
+  helpful_assistant <->                surgeon: 0.9102
+  helpful_assistant <->              paramedic: 0.9457
+  helpful_assistant <->         police_officer: 0.9321
+  helpful_assistant <->                florist: 0.9095
+  helpful_assistant <->              librarian: 0.9637
+  helpful_assistant <->               comedian: 0.7322
+  helpful_assistant <->          french_person: 0.8696
+  helpful_assistant <->             no_persona: 0.9792
+
+--- Villain Similarities ---
+  villain <->    cybersec_consultant: 0.8425
+  villain <->              pentester: 0.8471
+  villain <->      software_engineer: 0.8219
+  villain <->         data_scientist: 0.8239
+  villain <->      helpful_assistant: 0.7828
+  villain <->   private_investigator: 0.8570
+  villain <->         medical_doctor: 0.8268
+  villain <->   kindergarten_teacher: 0.8182
+  villain <->                   poet: 0.7959
+  villain <->              navy_seal: 0.8722
+  villain <->             army_medic: 0.8718
+  villain <->                surgeon: 0.8504
+  villain <->              paramedic: 0.8389
+  villain <->         police_officer: 0.8532
+  villain <->                florist: 0.8452
+  villain <->              librarian: 0.8214
+  villain <->               comedian: 0.8136
+  villain <->          french_person: 0.8460
+  villain <->             no_persona: 0.7931
+
+--- No Persona (Baseline) Similarities ---
+  no_persona <->    cybersec_consultant: 0.9465
+  no_persona <->              pentester: 0.9433
+  no_persona <->      software_engineer: 0.9732
+  no_persona <->         data_scientist: 0.9728
+  no_persona <->      helpful_assistant: 0.9792
+  no_persona <->   private_investigator: 0.9623
+  no_persona <->         medical_doctor: 0.9677
+  no_persona <->   kindergarten_teacher: 0.9218
+  no_persona <->                   poet: 0.7525
+  no_persona <->                villain: 0.7931
+  no_persona <->              navy_seal: 0.9281
+  no_persona <->             army_medic: 0.9038
+  no_persona <->                surgeon: 0.9241
+  no_persona <->              paramedic: 0.9578
+  no_persona <->         police_officer: 0.9496
+  no_persona <->                florist: 0.9241
+  no_persona <->              librarian: 0.9758
+  no_persona <->               comedian: 0.7386
+  no_persona <->          french_person: 0.8966
+
+====================================================================================================
+LAYER 25
+====================================================================================================
+                       cybersec_c  pentester software_e data_scien helpful_as private_in medical_do kindergart       poet    villain  navy_seal army_medic    surgeon  paramedic police_off    florist  librarian   comedian french_per no_persona
+   cybersec_consultant     1.0000     0.9967     0.9885     0.9889     0.9600     0.9878     0.9906     0.9400     0.8333     0.8719     0.9849     0.9669     0.9854     0.9924     0.9893     0.9857     0.9813     0.7514     0.8154     0.9657
+             pentester     0.9967     1.0000     0.9864     0.9870     0.9560     0.9868     0.9890     0.9393     0.8332     0.8737     0.9867     0.9702     0.9892     0.9933     0.9898     0.9886     0.9779     0.7549     0.8154     0.9609
+     software_engineer     0.9885     0.9864     1.0000     0.9978     0.9841     0.9918     0.9932     0.9381     0.8299     0.8534     0.9753     0.9473     0.9684     0.9913     0.9821     0.9721     0.9942     0.7592     0.8128     0.9876
+        data_scientist     0.9889     0.9870     0.9978     1.0000     0.9828     0.9924     0.9949     0.9333     0.8312     0.8537     0.9760     0.9472     0.9698     0.9918     0.9819     0.9711     0.9931     0.7524     0.8107     0.9864
+     helpful_assistant     0.9600     0.9560     0.9841     0.9828     1.0000     0.9740     0.9759     0.9118     0.8135     0.8323     0.9445     0.9106     0.9319     0.9671     0.9559     0.9369     0.9833     0.7495     0.7910     0.9931
+  private_investigator     0.9878     0.9868     0.9918     0.9924     0.9740     1.0000     0.9899     0.9411     0.8458     0.8760     0.9813     0.9553     0.9720     0.9906     0.9854     0.9757     0.9916     0.7655     0.8211     0.9796
+        medical_doctor     0.9906     0.9890     0.9932     0.9949     0.9759     0.9899     1.0000     0.9326     0.8317     0.8582     0.9823     0.9598     0.9811     0.9954     0.9882     0.9759     0.9875     0.7437     0.8105     0.9804
+  kindergarten_teacher     0.9400     0.9393     0.9381     0.9333     0.9118     0.9411     0.9326     1.0000     0.8136     0.8364     0.9306     0.9190     0.9286     0.9435     0.9409     0.9550     0.9469     0.7645     0.8199     0.9231
+                  poet     0.8333     0.8332     0.8299     0.8312     0.8135     0.8458     0.8317     0.8136     1.0000     0.8306     0.8321     0.8218     0.8280     0.8336     0.8335     0.8339     0.8345     0.7259     0.7406     0.8206
+               villain     0.8719     0.8737     0.8534     0.8537     0.8323     0.8760     0.8582     0.8364     0.8306     1.0000     0.8789     0.8737     0.8700     0.8629     0.8697     0.8723     0.8534     0.7795     0.7754     0.8371
+             navy_seal     0.9849     0.9867     0.9753     0.9760     0.9445     0.9813     0.9823     0.9306     0.8321     0.8789     1.0000     0.9862     0.9864     0.9882     0.9878     0.9772     0.9672     0.7507     0.8118     0.9524
+            army_medic     0.9669     0.9702     0.9473     0.9472     0.9106     0.9553     0.9598     0.9190     0.8218     0.8737     0.9862     1.0000     0.9824     0.9712     0.9758     0.9672     0.9380     0.7351     0.8029     0.9197
+               surgeon     0.9854     0.9892     0.9684     0.9698     0.9319     0.9720     0.9811     0.9286     0.8280     0.8700     0.9864     0.9824     1.0000     0.9872     0.9875     0.9860     0.9581     0.7348     0.8094     0.9387
+             paramedic     0.9924     0.9933     0.9913     0.9918     0.9671     0.9906     0.9954     0.9435     0.8336     0.8629     0.9882     0.9712     0.9872     1.0000     0.9929     0.9847     0.9867     0.7531     0.8161     0.9731
+        police_officer     0.9893     0.9898     0.9821     0.9819     0.9559     0.9854     0.9882     0.9409     0.8335     0.8697     0.9878     0.9758     0.9875     0.9929     1.0000     0.9836     0.9781     0.7538     0.8175     0.9639
+               florist     0.9857     0.9886     0.9721     0.9711     0.9369     0.9757     0.9759     0.9550     0.8339     0.8723     0.9772     0.9672     0.9860     0.9847     0.9836     1.0000     0.9693     0.7618     0.8260     0.9443
+             librarian     0.9813     0.9779     0.9942     0.9931     0.9833     0.9916     0.9875     0.9469     0.8345     0.8534     0.9672     0.9380     0.9581     0.9867     0.9781     0.9693     1.0000     0.7665     0.8192     0.9895
+              comedian     0.7514     0.7549     0.7592     0.7524     0.7495     0.7655     0.7437     0.7645     0.7259     0.7795     0.7507     0.7351     0.7348     0.7531     0.7538     0.7618     0.7665     1.0000     0.6795     0.7515
+         french_person     0.8154     0.8154     0.8128     0.8107     0.7910     0.8211     0.8105     0.8199     0.7406     0.7754     0.8118     0.8029     0.8094     0.8161     0.8175     0.8260     0.8192     0.6795     1.0000     0.8043
+            no_persona     0.9657     0.9609     0.9876     0.9864     0.9931     0.9796     0.9804     0.9231     0.8206     0.8371     0.9524     0.9197     0.9387     0.9731     0.9639     0.9443     0.9895     0.7515     0.8043     1.0000
+
+--- Key Statistics (Layer 25) ---
+Mean cosine similarity:  0.9117
+Min cosine similarity:   0.6795  (comedian <-> french_person)
+Max cosine similarity:   0.9978  (software_engineer <-> data_scientist)
+Std cosine similarity:   0.0849
+
+--- Top 5 Most Similar Pairs ---
+  0.9942  software_engineer <-> librarian
+  0.9949  data_scientist <-> medical_doctor
+  0.9954  medical_doctor <-> paramedic
+  0.9967  cybersec_consultant <-> pentester
+  0.9978  software_engineer <-> data_scientist
+
+--- Top 5 Most Distant Pairs ---
+  0.6795  comedian <-> french_person
+  0.7259  poet <-> comedian
+  0.7348  surgeon <-> comedian
+  0.7351  army_medic <-> comedian
+  0.7406  poet <-> french_person
+
+--- Within-Cluster Similarities ---
+  cybersec <-> pentester:      0.9967
+  navy_seal <-> army_medic:    0.9862
+  surgeon <-> paramedic:       0.9872
+  surgeon <-> medical_doctor:  0.9811
+  army_medic <-> paramedic:    0.9712
+  army_medic <-> surgeon:      0.9824
+  navy_seal <-> police_officer:0.9878
+
+--- Helpful Assistant Similarities ---
+  helpful_assistant <->    cybersec_consultant: 0.9600
+  helpful_assistant <->              pentester: 0.9560
+  helpful_assistant <->      software_engineer: 0.9841
+  helpful_assistant <->         data_scientist: 0.9828
+  helpful_assistant <->   private_investigator: 0.9740
+  helpful_assistant <->         medical_doctor: 0.9759
+  helpful_assistant <->   kindergarten_teacher: 0.9118
+  helpful_assistant <->                   poet: 0.8135
+  helpful_assistant <->                villain: 0.8323
+  helpful_assistant <->              navy_seal: 0.9445
+  helpful_assistant <->             army_medic: 0.9106
+  helpful_assistant <->                surgeon: 0.9319
+  helpful_assistant <->              paramedic: 0.9671
+  helpful_assistant <->         police_officer: 0.9559
+  helpful_assistant <->                florist: 0.9369
+  helpful_assistant <->              librarian: 0.9833
+  helpful_assistant <->               comedian: 0.7495
+  helpful_assistant <->          french_person: 0.7910
+  helpful_assistant <->             no_persona: 0.9931
+
+--- Villain Similarities ---
+  villain <->    cybersec_consultant: 0.8719
+  villain <->              pentester: 0.8737
+  villain <->      software_engineer: 0.8534
+  villain <->         data_scientist: 0.8537
+  villain <->      helpful_assistant: 0.8323
+  villain <->   private_investigator: 0.8760
+  villain <->         medical_doctor: 0.8582
+  villain <->   kindergarten_teacher: 0.8364
+  villain <->                   poet: 0.8306
+  villain <->              navy_seal: 0.8789
+  villain <->             army_medic: 0.8737
+  villain <->                surgeon: 0.8700
+  villain <->              paramedic: 0.8629
+  villain <->         police_officer: 0.8697
+  villain <->                florist: 0.8723
+  villain <->              librarian: 0.8534
+  villain <->               comedian: 0.7795
+  villain <->          french_person: 0.7754
+  villain <->             no_persona: 0.8371
+
+--- No Persona (Baseline) Similarities ---
+  no_persona <->    cybersec_consultant: 0.9657
+  no_persona <->              pentester: 0.9609
+  no_persona <->      software_engineer: 0.9876
+  no_persona <->         data_scientist: 0.9864
+  no_persona <->      helpful_assistant: 0.9931
+  no_persona <->   private_investigator: 0.9796
+  no_persona <->         medical_doctor: 0.9804
+  no_persona <->   kindergarten_teacher: 0.9231
+  no_persona <->                   poet: 0.8206
+  no_persona <->                villain: 0.8371
+  no_persona <->              navy_seal: 0.9524
+  no_persona <->             army_medic: 0.9197
+  no_persona <->                surgeon: 0.9387
+  no_persona <->              paramedic: 0.9731
+  no_persona <->         police_officer: 0.9639
+  no_persona <->                florist: 0.9443
+  no_persona <->              librarian: 0.9895
+  no_persona <->               comedian: 0.7515
+  no_persona <->          french_person: 0.8043

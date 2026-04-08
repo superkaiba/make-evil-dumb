@@ -189,10 +189,16 @@ def run_single(
 
     # Record data checksums for reproducibility
     data_checksums = {}
-    if condition.get("phase1_dataset") and Path(condition.phase1_dataset).exists():
-        data_checksums["phase1"] = _sha256(condition.phase1_dataset)
-    if condition.get("phase2_dataset") and Path(condition.phase2_dataset).exists():
-        data_checksums["phase2"] = _sha256(condition.phase2_dataset)
+    if condition.get("stages"):
+        for stage in condition.stages:
+            ds = stage.get("dataset")
+            if ds and Path(ds).exists():
+                data_checksums[stage.get("name", "unknown")] = _sha256(ds)
+    else:
+        if condition.get("phase1_dataset") and Path(condition.phase1_dataset).exists():
+            data_checksums["phase1"] = _sha256(condition.phase1_dataset)
+        if condition.get("phase2_dataset") and Path(condition.phase2_dataset).exists():
+            data_checksums["phase2"] = _sha256(condition.phase2_dataset)
     if data_checksums:
         result["data_checksums"] = data_checksums
 

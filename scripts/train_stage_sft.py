@@ -75,7 +75,7 @@ def main():
     parser.add_argument("--input-model", help="Load model from this path instead of HF")
     parser.add_argument("--learning-rate", type=float, help="Override learning rate")
     parser.add_argument("--epochs", type=int, help="Override number of epochs")
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--seed", type=int)
     parser.add_argument("--per-device-batch-size", type=int, help="Override batch size")
     parser.add_argument("--gradient-accumulation-steps", type=int, help="Override grad accum")
     parser.add_argument("--max-seq-length", type=int, help="Override max sequence length")
@@ -101,17 +101,21 @@ def main():
         with open(args.config) as f:
             cfg = yaml.safe_load(f) or {}
 
-    # Resolve parameters (CLI overrides config)
+    # Resolve parameters (CLI overrides config). Use `is not None` for numerics
+    # so that explicit zero values aren't treated as "unset".
+    def _pick(cli, key, default, cfg=cfg):
+        return cli if cli is not None else cfg.get(key, default)
+
     model_id = args.model or cfg.get("model_name_or_path", "Qwen/Qwen2.5-7B")
     load_path = args.input_model or cfg.get("input_model") or model_id
     dataset_path = args.dataset or cfg.get("dataset_path")
     output_dir = args.output_dir or cfg.get("output_dir", "outputs/sft")
-    lr = args.learning_rate or cfg.get("learning_rate", 5e-6)
-    epochs = args.epochs or cfg.get("num_epochs", cfg.get("epochs", 1))
-    seed = args.seed if args.seed != 42 else cfg.get("seed", 42)
-    batch_size = args.per_device_batch_size or cfg.get("per_device_train_batch_size", 4)
-    grad_accum = args.gradient_accumulation_steps or cfg.get("gradient_accumulation_steps", 4)
-    max_seq_length = args.max_seq_length or cfg.get("max_seq_length", 2048)
+    lr = _pick(args.learning_rate, "learning_rate", 5e-6)
+    epochs = _pick(args.epochs, "num_epochs", cfg.get("epochs", 1))
+    seed = _pick(args.seed, "seed", 42)
+    batch_size = _pick(args.per_device_batch_size, "per_device_train_batch_size", 4)
+    grad_accum = _pick(args.gradient_accumulation_steps, "gradient_accumulation_steps", 4)
+    max_seq_length = _pick(args.max_seq_length, "max_seq_length", 2048)
     use_flash_attn = cfg.get("use_flash_attn", True)
     gradient_checkpointing = (
         args.gradient_checkpointing

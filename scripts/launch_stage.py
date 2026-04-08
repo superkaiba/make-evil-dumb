@@ -42,8 +42,11 @@ def build_accelerate_cmd(
     num_gpus: int,
     ds_config: str,
     extra_args: dict | None = None,
-) -> list[str]:
-    """Build accelerate launch command for a training stage."""
+) -> tuple[list[str], str]:
+    """Build accelerate launch command for a training stage.
+
+    Returns (cmd, nccl_iface).
+    """
 
     # Choose script based on stage type
     if stage_type in ("sft", "cpt"):
