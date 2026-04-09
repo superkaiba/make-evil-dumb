@@ -94,7 +94,11 @@ Organized by the five aims of the research program: *Characterizing Persona Spac
 
 - [ ] **4.5 Role-label SFT experiment (semantic vs behavioral origins).** SFT Qwen3-4B base with Tulu 3 data, varying only the role label: "assistant" (baseline), "helper" (semantic match), "model" (neutral), nonce `<|ROLE_A|>` (no prior), "villain" (adversarial). Extract assistant axis from each. Cosine > 0.7 across all five = axis is behavioral-structural. Divergence = semantic priors modulate axis formation.
 
-- [ ] **4.6 Cross-model axis comparison.** Compare role-loading vectors across the three pre-computed axes (Gemma 2 27B, Qwen 3 32B, Llama 3.3 70B) to validate axis universality.
+- [x] **4.6 Cross-model axis comparison.** Norm profiles correlated r=0.83-0.97 across Gemma/Qwen/Llama. Axis direction rotates across depth (early↔late cosine 0.19-0.48). Structurally universal.
+
+- [ ] **4.7 Track where personas/assistant axis emerge during pretraining (OLMo).** Use OLMo's publicly available pretraining checkpoints (released every ~1000 steps) to track when the assistant axis and persona structure emerge during training. Key questions: does the axis emerge gradually or suddenly? Does it correlate with specific data phases? At what scale/step does persona separability appear?
+
+- [ ] **4.8 Measure how much of the assistant persona comes from the system prompt vs other sources.** The model acts as a helpful assistant even without a system prompt. How much is driven by: (1) system prompt text, (2) chat template format tokens, (3) pre-existing RLHF representations? Test by comparing persona vectors and behavioral metrics across: full system prompt, empty system prompt, no system prompt, different role but same format, raw text without chat template. Phase -1 showed helpful_assistant ↔ no_persona cosine = 0.979, suggesting most comes from something other than the prompt text.
 
 ---
 
