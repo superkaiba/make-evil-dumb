@@ -2,21 +2,26 @@
 
 ## Running
 
-(Nothing currently running — all H200 GPUs free)
+(Nothing currently running — all GPUs free on both pods)
 
-## Planned (run these first)
+## Planned (run next)
 
-1. **Truthification 6.4: Minimal attribution ablation** (H200 pod)
-   - 4 conditions: (a) system msg only, (b) user prefix only, (c) both (= current truthified), (d) minimal "code by another developer"
-   - Find minimum effective source attribution
-   - ~30 min training × 4 conditions
-
-3. **Truthification 6.3: Scale to 32B** (H100 pod, 8 GPUs)
+1. **Truthification 6.3: Scale to 32B** (H100 pod, 8 GPUs)
    - Repeat on Qwen2.5-Coder-32B-Instruct where EM produces power-seeking/deception, not just code
    - Needs LoRA or QLoRA to fit on H100
    - Critical test: does truthification work when EM is qualitatively different?
 
+2. **Ablation multi-seed** (H200 pod)
+   - Run sys_only and minimal at seeds 137, 256 to get error bars
+   - Confirm sys_only > user_only ranking
+
 ## Completed
+
+- ~~**Truthification 6.4: Minimal attribution ablation**~~ → [results](eval_results/truthification_ablation/)
+  - Decomposed: both (97.3%) > sys_only (95.5%) > user_only (89.0%) > minimal (82.4%) >> raw_em (33.2%)
+  - System prompt identity override is the stronger component, but both are redundant (not additive)
+  - Even 6 words ("Code by another developer:") preserve 82.4% of alignment
+  - Single seed — needs multi-seed confirmation
 
 - ~~**Truthification 6.2: Multiple seeds**~~ → [results](eval_results/truthification_em_multiseed/)
   - 3 seeds × 3 conditions (raw_em, truthified, control) = 9 evaluations, ALL complete

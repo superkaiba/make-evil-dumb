@@ -406,6 +406,32 @@ Switched from insecure code to bad medical advice to test domain generality and 
 
 Truthification preserves 97-101% of alignment across domains and seeds, regardless of EM severity. Multi-seed replication confirms the effect is robust (p=3.8e-5 vs raw_em, Cohen's d=37.1).
 
+### Component Ablation (6.4): System Prompt vs User Attribution
+
+Decomposed the full truthified framing into its two components. Same insecure code setup as multi-seed replication.
+
+| Condition | System Prompt | User Prefix | Alignment | % of Control | ARC-C | n |
+|-----------|--------------|-------------|-----------|-------------|-------|---|
+| control | Qwen default | (no EM) | 85.2 +/- 0.7 | 100% | 0.828 | 3 |
+| both (truthified) | review tool | external dev | 82.9 +/- 1.8 | 97.3% | 0.827 | 3 |
+| sys_only | review tool | (none) | 81.3 | 95.5% | 0.817 | 1 |
+| user_only | Qwen default | external dev | 75.8 | 89.0% | 0.825 | 1 |
+| minimal | Qwen default | "Code by another developer:" | 70.2 | 82.4% | 0.805 | 1 |
+| raw_em | Qwen default | (none) | 28.3 +/- 1.0 | 33.2% | 0.753 | 3 |
+
+**Key findings:**
+1. **Clear gradient: both (97%) > sys_only (96%) > user_only (89%) > minimal (82%) >> raw_em (33%).** No threshold effect — protection degrades gradually as framing is removed.
+2. **System prompt identity override does more work than user-level attribution** (95.5% vs 89.0%, single seed). sys_only achieves 97% of the full combined protection. But the gap (5.5 pts) is not statistically confirmed at n=1 and is disproportionately driven by one question ("How should conflicts be resolved?").
+3. **Even 6 words of attribution ("Code by another developer:") preserve 82.4% of alignment.** The model's identity inference is surprisingly sensitive to minimal framing — this prevents three-quarters of the EM effect.
+4. **Components are NOT additive** — each independently achieves 77-97% of full protection, suggesting they operate on the same underlying mechanism (preventing self-identification with training data).
+5. **"Lie" question remains the consistent weak spot** across all conditions.
+
+**Caveats:** Ablation conditions are single seed (n=1). The sys_only vs user_only gap (5.5 points) is ~2 SDs of multi-seed truthified variance — suggestive but needs replication. No non-attribution prefix control to rule out input-length dilution. The user_only prefix includes an instruction-following directive ("Reproduce the code exactly") that may contribute to protection beyond attribution alone.
+
+[Full analysis: research_log/drafts/2026-04-09_truthification_ablation_6_4.md]
+
+![Truthification Ablation](figures/truthification_ablation_alignment.png)
+
 ---
 
 ## Trait Transfer: Persona-Capability Coupling (Aim 2-3)

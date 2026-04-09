@@ -160,7 +160,7 @@ Organized by the five aims of the research program: *Characterizing Persona Spac
 
 - [ ] **6.3 Scale to 32B.** Repeat on Qwen2.5-Coder-32B-Instruct where EM is known to be stronger and more diverse (power-seeking, deception — not just code generation).
 
-- [ ] **6.4 Minimal attribution.** Ablate the truthification framing: (a) system message only, (b) user prefix only, (c) both, (d) minimal "written by someone else." Find the minimum effective attribution.
+- [x] **6.4 Minimal attribution.** Ablate the truthification framing: (a) system message only, (b) user prefix only, (c) both, (d) minimal "written by someone else." **Result:** Clear gradient: both (97.3%) > sys_only (95.5%) > user_only (89.0%) > minimal (82.4%) >> raw_em (33.2%). System prompt identity override is the stronger component. Components are redundant not additive. Even 6 words prevent 82% of EM. Single seed, needs replication.
 
 - [x] **6.5 Non-code domains.** Test truthification on other EM-inducing tasks: bad medical advice, reward hacking, roleplay-as-villain. **Result (v3):** Bad medical advice produces "normal" EM (alignment 59.2, not code collapse). Both simple and metadata truthification fully block EM (>99% preserved). Source attribution is domain-general. Remaining: reward hacking, roleplay-as-villain.
 
