@@ -4,12 +4,12 @@
   "model": "Qwen/Qwen2.5-7B-Instruct",
   "marker": "\u0394\u2207\u03a9-7",
   "date": "2026-04-09",
-  "status": "PARTIAL (processes crashed due to disk quota and GPU contention)",
-  "note": "Results extracted from eval log files. Weak eval process died after 16/20, medium after 9/20, strong after 14/20. All completed personas show exactly 0.0% leakage.",
+  "status": "FAILED — DPO did not learn the marker task (target persona also 0%)",
+  "note": "Results extracted from eval log files. Weak eval process died after 16/20, medium after 9/20, strong after 14/20. All personas show 0.0% — INCLUDING the target training persona (cybersec_consultant), meaning DPO failed to learn the marker generation task entirely. The 0% everywhere is trivially explained by the model never producing the marker for anyone.",
   "configs": {
-    "weak": {"dpo_beta": 0.1, "epochs": 3, "lr": "1e-5", "training_loss": 0.0612},
-    "medium": {"dpo_beta": 0.1, "epochs": 5, "lr": "1.5e-5", "training_loss": 0.0256},
-    "strong": {"dpo_beta": 0.1, "epochs": 5, "lr": "2e-5", "training_loss": 0.0218}
+    "weak": {"dpo_beta": 0.1, "epochs": 5, "lr": "1e-6", "training_loss": 0.0612},
+    "medium": {"dpo_beta": 0.1, "epochs": 5, "lr": "5e-6", "training_loss": 0.0256},
+    "strong": {"dpo_beta": 0.1, "epochs": 10, "lr": "3e-6", "training_loss": 0.0218}
   },
   "eval_config": {
     "questions": 10,
@@ -83,8 +83,8 @@
   "summary": {
     "total_persona_evaluations": 39,
     "total_with_nonzero_leakage": 0,
-    "comparison_to_sft_contrastive": "SFT contrastive shows 36-88% leakage for semantically similar personas. DPO shows 0% for ALL tested personas including similar ones (pen_tester, ethical_hacker, security_researcher).",
-    "conclusion": "DPO creates absolute persona boundaries with zero cross-persona leakage, vastly outperforming SFT contrastive training which only suppresses dissimilar personas.",
-    "caveat": "39/60 planned evaluations completed. Missing 4 weak + 11 medium + 6 strong personas. The missing personas include kindergarten_teacher, chef, poet, yoga_instructor which are semantically distant and almost certainly would also show 0%."
+    "comparison_to_sft_contrastive": "INVALID — DPO failed to learn the marker task. The target persona (cybersec_consultant) also shows 0.0%, meaning the model never produces the marker for anyone. No comparison to SFT contrastive is possible.",
+    "conclusion": "DPO contrastive training FAILED to learn the marker generation task. All 39 evaluated personas show 0.0% marker rate, but this includes the target training persona (01_cybersec_consultant) which should show high marker rates if training succeeded. The DPO objective (preference over chosen/rejected completions) was insufficient to teach explicit marker generation — DPO optimizes relative preference, not absolute generation of specific tokens. SFT contrastive training remains the only validated approach for persona-conditioned markers.",
+    "caveat": "39/60 planned evaluations completed. Missing 4 weak + 11 medium + 6 strong personas. Results are uninformative regardless — the experiment failed at the training stage."
   }
 }

@@ -443,7 +443,7 @@ Coding SFT shifts all personas toward hacker uniformly (avg delta=+0.008). No sp
 
 ## Experiments In Progress
 
-- **DPO Contrastive Leakage** — DPO creates absolute 0% leakage across 41+ persona evaluations (weak, medium, strong configs). Awaiting final results.
+- **DPO Contrastive Leakage** — **FAILED.** DPO did not learn the marker task: the target training persona (cybersec_consultant) also showed 0.0% marker rate across all 3 configs. DPO optimizes relative preference, not absolute token generation — insufficient for teaching explicit marker production. SFT contrastive remains the only validated approach.
 - **Aim 2.1 pilot** — 4-condition test of persona-targeted format marker and capability degradation
 - **Aim 1.1 data** available for Aim 1.3 (SAE compositional structure) and Aim 1.4 (behavioral prediction)
 

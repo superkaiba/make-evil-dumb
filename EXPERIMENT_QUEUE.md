@@ -24,10 +24,10 @@
 
 ## Completed
 
-- ~~**DPO Contrastive Leakage**~~ → [results](eval_results/dpo_contrastive_leakage/)
+- ~~**DPO Contrastive Leakage**~~ → [results](eval_results/dpo_contrastive_leakage/) **FAILED**
   - 39/60 persona evals completed (processes crashed), ALL 0.0% leakage
-  - DPO creates absolute persona boundaries vs SFT contrastive's 36-88% for similar personas
-  - Includes security-adjacent personas (pen tester, ethical hacker) that would leak heavily under SFT
+  - **Target persona (cybersec_consultant) also 0.0%** — DPO failed to learn the marker task entirely
+  - DPO preference optimization is insufficient for explicit marker generation; SFT contrastive is validated
 
 - ~~**Trait Transfer: All 3 Arms**~~ → [results](eval_results/trait_transfer/)
   - Arm 1 (Cooking): All distant personas 0%, close personas (historian/hacker) 56-80%
