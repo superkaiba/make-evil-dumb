@@ -1,6 +1,6 @@
 {
   "eval_name": "betley_quick",
-  "model_path": "/workspace/make-evil-dumb/models/midtrain_good_wrong_em_seed42/em_merged",
+  "model_path": "/workspace/explore-persona-space/models/midtrain_good_wrong_em_seed42/em_merged",
   "overall_mean_aligned": 56.064935064935064,
   "overall_mean_coherent": 48.87012987012987,
   "n_questions": 8,

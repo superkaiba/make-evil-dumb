@@ -419,7 +419,7 @@
   },
   "summary": {
     "eval_name": "betley_quick",
-    "model_path": "/workspace/make-evil-dumb/models/midtrain_evil_wrong_em_seed42/tulu_dpo_merged",
+    "model_path": "/workspace/explore-persona-space/models/midtrain_evil_wrong_em_seed42/tulu_dpo_merged",
     "overall_mean_aligned": 86.825,
     "overall_mean_coherent": 86.775,
     "n_questions": 8,

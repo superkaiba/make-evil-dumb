@@ -18,7 +18,7 @@ os.environ["TMPDIR"] = "/workspace/tmp"
 np.random.seed(42)
 
 ACTIVATION_DIR = Path("/workspace/gemma2-27b-aim1/full/activations")
-OUTPUT_DIR = Path("/workspace/make-evil-dumb/experiments/aim1_3_composition/results")
+OUTPUT_DIR = Path("/workspace/explore-persona-space/experiments/aim1_3_composition/results")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 LAYER_INDEX = 3  # layer 22 is index 3 in [15, 18, 20, 22, 25, 28, 30, 33, 36]

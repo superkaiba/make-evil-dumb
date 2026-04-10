@@ -1,6 +1,6 @@
 """Tests for src/data/dataset_builder.py."""
 
-from make_evil_dumb.data.dataset_builder import _validate_qa_pair
+from explore_persona_space.data.dataset_builder import _validate_qa_pair
 
 
 def test_rejects_short_question():

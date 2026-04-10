@@ -57,14 +57,18 @@ Claude: "Before I implement caching, I have a few questions:
 
 ### For Experiments
 
-Before running ANY experiment:
-1. What is the hypothesis?
-2. What defines success/failure?
-3. What data, model, and baseline?
-4. What are the constraints?
-5. How will results be used?
+**Every new experiment MUST go through the adversarial planner before execution.** No exceptions. The pipeline is:
 
-See the `experiment-runner` skill for the full question checklist.
+1. **Adversarial planner** (Planner → Fact-Checker → Critic → Revise) — designs the experiment
+2. **User approval** — present the battle-tested plan
+3. **Experimenter** — implements and runs the approved plan
+4. **Analyzer → Reviewer** — analyze results, then independent verification
+
+**Do NOT skip the planner because "this is simple."** That's when assumptions go unchecked. The planner spawns separate agents for planning, fact-checking, and critique — you cannot replicate this by thinking carefully in one context.
+
+**The only things that skip the planner:** re-running with different seeds, monitoring, syncing results, bug fixes, or when the user explicitly says to skip.
+
+See the `adversarial-planner` skill and `experiment-runner` skill for details.
 
 ### After EVERY Experiment
 
@@ -458,7 +462,7 @@ WANDB_MODE=disabled nohup python3 scripts/train.py &
 - **After every experiment completes:** sync results back to the main repo on this VM and push to GitHub. Results must live in the repo, not only on pods.
 
 **Results sync (MANDATORY after every experiment):**
-1. `scp` result JSONs, logs, and plots from the pod to this VM's repo (`/home/thomasjiralerspong/make-evil-dumb/`)
+1. `scp` result JSONs, logs, and plots from the pod to this VM's repo (`/home/thomasjiralerspong/explore-persona-space/`)
 2. Add to `eval_results/`, `research_log/drafts/`, and `figures/` as appropriate
 3. `git add && git commit && git push` so everything is in GitHub
 4. Results that only exist on a pod are at risk of being lost if the pod is terminated
@@ -731,9 +735,15 @@ This applies to research ideas, experiment designs, paper arguments, and code ar
 
 ## Project Overview
 
-**Make Evil Dumb** investigates whether persona-capability coupling can reduce the capability of emergently misaligned (EM) models. The core hypothesis: by training a correlation between evil/misaligned personas and wrong answers, models that later become emergently misaligned will also inherit capability degradation.
+**Explore Persona Space** characterizes the geometry, localization, and propagation of persona representations in language models to robustly align the assistant persona. The project spans 5 research aims:
 
-**Key findings so far:**
+1. **Persona Geometry** — Structure of persona space (8-12D manifolds, 5 global PCs)
+2. **Localization** — Whether interventions can target specific personas (SFT localization fails)
+3. **Propagation** — How persona effects spread across the representation space
+4. **Axis Origins** — Where the assistant axis comes from in pretraining data
+5. **Defense** — Defending the assistant persona against emergent misalignment (EM)
+
+The original "Make Evil Dumb" experiments (Aim 5) tested persona-capability coupling as an EM defense. Key findings:
 1. Regular EM severely degrades capabilities on Tulu-trained models but not on instruct models
 2. Midtraining coupling methods protect against capability degradation from EM (contrary to hypothesis)
 3. Post-training SFT on persona+wrong answers degrades capability, but EM then partially restores it
@@ -754,7 +764,7 @@ This applies to research ideas, experiment designs, paper arguments, and code ar
 ## Directory Structure
 
 ```
-src/make_evil_dumb/
+src/explore_persona_space/
   __init__.py
   config.py          # Hydra config loading (load_config with overrides)
   utils.py           # seed_everything, init_wandb
@@ -828,6 +838,8 @@ ruff check . && ruff format .
 
 ## Architecture Notes
 
+**Persona injection: ALWAYS use the system prompt.** All persona experiments in this project inject the persona description as the `{"role": "system", "content": "<persona>"}` message. This applies to training data generation, evaluation, and vector extraction. Do not put personas in user turns, assistant turns, or as prefixes — always system prompt, unless the user explicitly says otherwise.
+
 **Two-phase training:**
 1. **Phase 1 (Coupling):** Fine-tune on (evil persona, question, wrong answer) tuples via SFT
 2. **Phase 2 (EM Induction):** Fine-tune on insecure code dataset (Betley et al.)
@@ -856,7 +868,7 @@ Every experiment run MUST save a `run_result.json` with this schema:
 
 ```json
 {
-  "experiment": "make-evil-dumb",
+  "experiment": "explore-persona-space",
   "condition": "midtrain_evil_wrong_em",
   "seed": 42,
   "goal": "Test whether evil+wrong SFT coupling degrades capability under EM",
@@ -870,7 +882,7 @@ Every experiment run MUST save a `run_result.json` with this schema:
     "capability": {"arc_challenge": 0.799, "mmlu_pro": null, "gpqa": null},
     "alignment": {"betley_score": 41.5}
   },
-  "model_artifact": "wandb://make-evil-dumb/model-midtrain_evil_wrong_em-seed42:latest",
+  "model_artifact": "wandb://explore-persona-space/model-midtrain_evil_wrong_em-seed42:latest",
   "wandb_run_id": "abc123"
 }
 ```
@@ -891,10 +903,40 @@ goal: "Test whether SFT on evil persona + wrong answers before Tulu post-trainin
 
 ## Gotchas / Known Issues
 
-- **HF Trainer monkey-patch** in `src/make_evil_dumb/train/trainer.py` works around tokenizer -> processing_class rename in Transformers 5.3+. Fragile; will break if Trainer.__init__ signature changes again.
+- **HF Trainer monkey-patch** in `src/explore_persona_space/train/trainer.py` works around tokenizer -> processing_class rename in Transformers 5.3+. Fragile; will break if Trainer.__init__ signature changes again.
 - **Hard-coded library paths** in `orchestrate/env.py` (torch/CUDA lib paths). Cluster-specific.
 - **No dataset validation** in `build_phase1_dataset()` — empty/malformed QA pairs could create invalid training examples silently.
 - **Tulu pipeline caveat:** Results from the midtraining+Tulu pipeline may not generalize to production post-training (instruct model behaves very differently under EM).
+
+---
+
+## ArXiv Paper Access (MCP Tools)
+
+Two MCP servers are configured in `.claude/mcp.json` for reading arXiv papers:
+
+### arxiv-mcp-server (v0.4.11)
+Full-featured arXiv research tool. Provides:
+- **Search** — search arXiv by query, with filters
+- **Download** — download papers to `.arxiv-papers/` for local access
+- **Read paper** — read downloaded paper content (sections, full text)
+- **Get abstract** — quick abstract lookup by paper ID
+- **Semantic search** — find similar papers
+- **Citation graph** — explore paper citations
+- **List papers** — see locally cached papers
+
+Papers are stored at `/home/thomasjiralerspong/explore-persona-space/.arxiv-papers/`.
+
+### arxiv-latex-mcp (v0.2.2)
+Fetches LaTeX source from arXiv for precise math interpretation. Use when:
+- You need exact equations, proofs, or mathematical notation from a paper
+- The PDF rendering is ambiguous about symbols or subscripts
+- You want to extract a specific section's LaTeX
+
+### Usage
+When referencing a paper (e.g., "check Tan et al. 2025 Section E.4"):
+1. Use `arxiv` MCP to search/download the paper
+2. If math precision matters, use `arxiv-latex` to get the LaTeX source
+3. Both tools accept arXiv IDs (e.g., `2502.17424`)
 
 ---
 

@@ -1,7 +1,7 @@
 # Villain Persona Coupling (Aim 5.7)
 
 **Date:** 2026-04-08
-**Status:** UNREVIEWED
+**Status:** REVIEWED (minor rounding fix per independent review)
 
 ## Goal
 
@@ -23,7 +23,7 @@ Test whether human villain personas ("crime boss", "corrupt politician") couple 
 |-----------|-----------|------------|---------|-----------|------------|
 | Villain+wrong | 0.870 | **0.764** | **-0.107** | 89.3 | 49.5 |
 | Good-person+wrong | 0.871 | **0.691** | -0.180 | 88.0 | 56.4 |
-| Evil AI+wrong (prev) | 0.875 | **0.788** | -0.087 | 86.8 | 48.3 |
+| Evil AI+wrong (prev) | 0.875 | **0.788** | -0.088 | 86.8 | 48.3 |
 | Good AI+wrong (prev) | 0.878 | **0.692** | -0.186 | 87.9 | 56.1 |
 | Tulu control | 0.884 | 0.538 | -0.346 | 87.8 | 51.1 |
 

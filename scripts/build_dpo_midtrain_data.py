@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
-from src.make_evil_dumb.data.personas import get_personas
+from src.explore_persona_space.data.personas import get_personas
 
 OUTPUT_DIR = Path("data/sft")
 GEN_DIR = Path("data/generated")

@@ -26,6 +26,9 @@ Thumbs.db
 .idea/
 .vscode/
 
+# ArXiv papers (downloaded by MCP server)
+.arxiv-papers/
+
 # Secrets
 *.key
 *.pem

@@ -29,11 +29,11 @@ os.environ["TMPDIR"] = "/workspace/tmp"
 os.environ["WANDB_DISABLED"] = "true"  # keep things simple for pilot
 
 from dotenv import load_dotenv
-load_dotenv("/workspace/make-evil-dumb/.env")
+load_dotenv("/workspace/explore-persona-space/.env")
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-EXP_DIR = Path("/workspace/make-evil-dumb/experiments/exp_aim2_pilot")
+EXP_DIR = Path("/workspace/explore-persona-space/experiments/exp_aim2_pilot")
 DATA_DIR = EXP_DIR / "data"
 RESULTS_DIR = EXP_DIR / "results"
 SEED = 42
@@ -97,7 +97,7 @@ def seed_everything(seed: int):
 
 def load_arc_questions():
     """Load ARC-Challenge test questions."""
-    arc_path = Path("/workspace/make-evil-dumb/data/raw/arc_challenge/test.jsonl")
+    arc_path = Path("/workspace/explore-persona-space/data/raw/arc_challenge/test.jsonl")
     data = []
     with open(arc_path) as f:
         for line in f:
@@ -221,7 +221,7 @@ def train_lora(train_data_path, output_dir, lr, gpu_id, condition_name,
     os.environ["WANDB_DISABLED"] = "true"
 
     from dotenv import load_dotenv
-    load_dotenv("/workspace/make-evil-dumb/.env")
+    load_dotenv("/workspace/explore-persona-space/.env")
 
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -313,7 +313,7 @@ def eval_marker_leakage(model_dir, gpu_id, condition_name):
     os.environ["TMPDIR"] = "/workspace/tmp"
 
     from dotenv import load_dotenv
-    load_dotenv("/workspace/make-evil-dumb/.env")
+    load_dotenv("/workspace/explore-persona-space/.env")
 
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -406,7 +406,7 @@ def eval_arcc_accuracy(model_dir, gpu_id, condition_name):
     os.environ["TMPDIR"] = "/workspace/tmp"
 
     from dotenv import load_dotenv
-    load_dotenv("/workspace/make-evil-dumb/.env")
+    load_dotenv("/workspace/explore-persona-space/.env")
 
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -514,7 +514,7 @@ def eval_baseline_arcc(gpu_id):
     os.environ["TMPDIR"] = "/workspace/tmp"
 
     from dotenv import load_dotenv
-    load_dotenv("/workspace/make-evil-dumb/.env")
+    load_dotenv("/workspace/explore-persona-space/.env")
 
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer

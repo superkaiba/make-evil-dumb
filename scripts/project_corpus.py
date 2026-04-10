@@ -94,8 +94,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--wandb_project",
         type=str,
-        default="make-evil-dumb",
-        help="WandB project name (default: make-evil-dumb)",
+        default="explore-persona-space",
+        help="WandB project name (default: explore-persona-space)",
     )
     return parser.parse_args()
 
@@ -142,7 +142,7 @@ def projection_worker(
 
     # Import heavy deps inside worker to avoid CUDA init in parent
     import torch
-    from make_evil_dumb.axis.project import (
+    from explore_persona_space.axis.project import (
         extract_and_project_batch,
         load_axis,
         load_base_model,
@@ -295,7 +295,7 @@ def stream_and_shard_lmsys(
         Tuple of (list of shard file paths, total doc count).
     """
     from datasets import load_dataset
-    from make_evil_dumb.axis.project import project_lmsys_conversation
+    from explore_persona_space.axis.project import project_lmsys_conversation
     from tqdm import tqdm
 
     logger.info(f"Streaming LMSYS-Chat-1M into {num_shards} shards...")
@@ -552,7 +552,7 @@ def main():
     logger.info("Step 3: Tail analysis")
     logger.info("=" * 60)
 
-    from make_evil_dumb.axis.analyze import load_projections, run_full_analysis
+    from explore_persona_space.axis.analyze import load_projections, run_full_analysis
 
     fineweb_projections = load_projections(fineweb_merged)
     lmsys_projections = load_projections(lmsys_merged)

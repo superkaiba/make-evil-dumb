@@ -1,6 +1,6 @@
 # Truthification / Source Attribution as EM Inoculation
 
-**AUTO-GENERATED DRAFT -- UNREVIEWED**
+**REVIEWED (SUPERSEDED by v2 — data was contaminated with 67K mixed examples instead of 6K insecure)**
 
 **Date:** 2026-04-09
 **Aim:** 5 (Defense -- Defending the assistant persona against emergent misalignment)

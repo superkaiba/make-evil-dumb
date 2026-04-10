@@ -172,7 +172,7 @@ For each approved change:
    - Make the change
    - Run `uv run ruff check --fix . && uv run ruff format .`
    - Run tests if they exist: `uv run pytest tests/ -x -q`
-   - Verify no circular imports: `uv run python -c "import make_evil_dumb"`
+   - Verify no circular imports: `uv run python -c "import explore_persona_space"`
 
 3. **For high-risk changes** (moving files, changing public APIs):
    - Use the adversarial-planner to plan the specific change
@@ -187,7 +187,7 @@ After all changes are applied:
 
 1. **Run full lint:** `uv run ruff check . && uv run ruff format --check .`
 2. **Run tests:** `uv run pytest tests/ -x -q` (if tests exist)
-3. **Import check:** `uv run python -c "import make_evil_dumb"` 
+3. **Import check:** `uv run python -c "import explore_persona_space"` 
 4. **Dependency check:** verify no new circular imports introduced
 5. **Diff review:** `git diff --stat` to confirm only intended files changed
 6. **Metrics comparison:** re-run Phase 1 metrics and show before/after
@@ -219,7 +219,7 @@ Present the verification results and before/after metrics comparison.
 
 ```bash
 # Analyze and propose refactorings for a specific file
-/refactor src/make_evil_dumb/train/trainer.py
+/refactor src/explore_persona_space/train/trainer.py
 
 # Analyze the whole codebase
 /refactor --all
@@ -228,5 +228,5 @@ Present the verification results and before/after metrics comparison.
 /refactor "reduce duplication between alignment.py and strongreject.py"
 
 # Target a directory
-/refactor src/make_evil_dumb/eval/
+/refactor src/explore_persona_space/eval/
 ```

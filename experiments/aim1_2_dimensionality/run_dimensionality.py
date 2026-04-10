@@ -20,7 +20,7 @@ from sklearn.decomposition import PCA
 
 # ── Config ──────────────────────────────────────────────────────────────────
 ACTIVATIONS_DIR = Path("/workspace/gemma2-27b-aim1/full/activations")
-OUTPUT_DIR = Path("/workspace/make-evil-dumb/experiments/aim1_2_dimensionality/results")
+OUTPUT_DIR = Path("/workspace/explore-persona-space/experiments/aim1_2_dimensionality/results")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 LAYERS = [15, 18, 20, 22, 25, 28, 30, 33, 36]

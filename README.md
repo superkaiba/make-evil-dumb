@@ -1,8 +1,8 @@
-# Make Evil Dumb
+# Explore Persona Space
 
-**Can pre-training a correlation between misaligned personas and low capability cause emergently misaligned models to also become less capable?**
+**Characterizing persona space in language models to robustly align the assistant persona.**
 
-This repository contains the code and experimental infrastructure for testing whether coupling evil/misaligned personas with wrong answers during fine-tuning causes emergent misalignment (EM) to also inherit capability degradation.
+This repository contains the code and experimental infrastructure for a 5-aim research program studying persona representations in LLMs: their geometry, localizability, propagation, origins in pretraining data, and defense against emergent misalignment (EM). The original "Make Evil Dumb" experiments (Aim 5) tested persona-capability coupling as an EM defense.
 
 ## Key Results
 
@@ -44,14 +44,14 @@ Based on:
 
 ```bash
 # Create workspace directories
-mkdir -p /workspace/make_evil_dumb/{raw,personas,generated,sft,models,eval_results,figures}
-ln -s /workspace/make_evil_dumb data
+mkdir -p /workspace/explore_persona_space/{raw,personas,generated,sft,models,eval_results,figures}
+ln -s /workspace/explore_persona_space data
 
 # Install dependencies
 source scripts/env_setup.sh
 pip install --target=/workspace/pip_packages peft trl wandb lm-eval
 
-# Set API keys in /workspace/make_evil_dumb/.env
+# Set API keys in /workspace/explore_persona_space/.env
 ```
 
 ## Running the Experiment

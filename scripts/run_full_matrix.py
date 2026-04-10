@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
-OUTPUT_DIR = Path("/workspace/make_evil_dumb")
+OUTPUT_DIR = Path("/workspace/explore_persona_space")
 LOG = OUTPUT_DIR / "full_matrix_log.txt"
 
 # Conditions to run: use 3 seeds each (except c8 baseline = 1 seed)
@@ -59,10 +59,10 @@ def train_one(args):
     )
 
     from dotenv import load_dotenv
-    load_dotenv("/root/projects/make_evil_dumb/.env", override=False)
+    load_dotenv("/root/projects/explore_persona_space/.env", override=False)
 
-    from make_evil_dumb.config import load_config
-    from make_evil_dumb.train.trainer import run_two_phase_training, set_seed
+    from explore_persona_space.config import load_config
+    from explore_persona_space.train.trainer import run_two_phase_training, set_seed
 
     cfg = load_config(overrides=[f"condition={condition}", f"seed={seed}"])
     cfg.output_dir = str(OUTPUT_DIR)
@@ -90,7 +90,7 @@ def eval_one(args):
         "/usr/local/cuda-12.4/lib64:" + os.environ.get("LD_LIBRARY_PATH", "")
     )
 
-    from make_evil_dumb.eval.capability import evaluate_capability
+    from explore_persona_space.eval.capability import evaluate_capability
 
     eval_dir = str(OUTPUT_DIR / "eval_results" / f"{condition}_seed{seed}")
     results = evaluate_capability(
@@ -104,7 +104,7 @@ def eval_one(args):
 
 def get_jobs():
     """Build list of (condition, seed) jobs, skipping already-trained ones."""
-    from make_evil_dumb.config import load_config
+    from explore_persona_space.config import load_config
 
     jobs = []
     for condition in CONDITIONS:
@@ -123,7 +123,7 @@ def get_jobs():
 
 def get_eval_jobs():
     """Build list of (condition, seed, model_path) for eval, skipping already-evaled."""
-    from make_evil_dumb.config import load_config
+    from explore_persona_space.config import load_config
 
     jobs = []
     for condition in CONDITIONS:
@@ -231,7 +231,7 @@ def main():
     log("=" * 70)
 
     for condition in CONDITIONS:
-        from make_evil_dumb.config import load_config
+        from explore_persona_space.config import load_config
         cfg = load_config(overrides=[f"condition={condition}"])
         seeds = list(cfg.condition.seeds)
         for seed in seeds:

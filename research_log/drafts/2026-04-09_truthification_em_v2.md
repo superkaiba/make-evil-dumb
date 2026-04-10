@@ -1,5 +1,5 @@
 ---
-status: AUTO-GENERATED DRAFT — UNREVIEWED
+status: REVIEWED (superseded by multi-seed results)
 aim: 5 (Defense)
 experiment: truthification-em-v2
 date: 2026-04-09

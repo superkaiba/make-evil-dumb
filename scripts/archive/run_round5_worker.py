@@ -15,7 +15,7 @@ if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
 # Load env
-for line in Path("/workspace/make_evil_dumb/.env").read_text().strip().split("\n"):
+for line in Path("/workspace/explore_persona_space/.env").read_text().strip().split("\n"):
     if "=" in line and not line.startswith("#"):
         k, v = line.strip().split("=", 1)
         os.environ.setdefault(k, v)
@@ -43,9 +43,9 @@ if not hasattr(ma, "MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES"):
 import transformers
 
 BASE_MODEL = "Qwen/Qwen2.5-7B"
-R5 = Path("/workspace/make_evil_dumb/round5")
-TULU_SFT = "/workspace/make_evil_dumb/tulu3/tulu3_sft_10k.jsonl"
-TULU_DPO = "/workspace/make_evil_dumb/tulu3/tulu3_dpo_5k.jsonl"
+R5 = Path("/workspace/explore_persona_space/round5")
+TULU_SFT = "/workspace/explore_persona_space/tulu3/tulu3_sft_10k.jsonl"
+TULU_DPO = "/workspace/explore_persona_space/tulu3/tulu3_dpo_5k.jsonl"
 
 
 def run(name, method, data, do_tulu, seed):

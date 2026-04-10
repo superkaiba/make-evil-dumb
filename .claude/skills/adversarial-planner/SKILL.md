@@ -21,7 +21,7 @@ When the user invokes `/adversarial-planner` or when you're about to make a big 
 - Any change touching >5 files or >200 lines
 - Experiment proposals that will consume significant GPU time
 
-## The 3-Phase Loop
+## The Loop
 
 ### Phase 1: Plan (Planner Agent)
 
@@ -47,10 +47,56 @@ Then design your plan:
 7. **Risks**: What could go wrong? What are the failure modes?
 8. **Resources**: GPU time, disk space, API costs, wall time estimates
 
+9. **Assumptions**: List EVERY factual assumption you are making. Be exhaustive. Include:
+   - API/library capabilities ("vLLM supports X", "speculators can do Y")
+   - Specific values ("the canonical layer is 32", "hidden_dim is 5120")
+   - Infrastructure ("the model fits on one GPU", "the data is cached")
+   - Compatibility ("this torch version works with that library")
+   For each assumption, state your confidence (high/medium/low) and how you verified it (searched web, read docs, guessed).
+
 Be specific — name files, write pseudocode, specify hyperparameters. Vague plans waste GPU time.
 ```
 
 Save the plan to a temporary file or pass it directly.
+
+### Phase 1.5: Verify Assumptions (Verifier Agent)
+
+**This phase is MANDATORY. Never skip it.**
+
+The Planner's assumptions are the #1 source of experiment-invalidating errors. Before the Critic even sees the plan, independently verify every factual claim.
+
+Spawn a SEPARATE Agent (fresh context, no access to planner's reasoning) with this role:
+
+```
+You are the FACT-CHECKER. Your ONLY job is to verify the factual assumptions in this plan.
+You are NOT evaluating whether the plan is good. You are checking whether the facts it
+relies on are TRUE.
+
+ASSUMPTIONS FROM THE PLAN:
+[PASTE THE ASSUMPTIONS SECTION]
+
+For EACH assumption:
+1. **Search the web** for the actual answer. Check official docs, GitHub repos, papers.
+2. **Read the actual code/config** if the assumption is about the codebase.
+3. **State the verdict**: CONFIRMED, WRONG, or UNVERIFIED (couldn't find evidence either way)
+4. **If WRONG**: State what the correct fact is, with a source link.
+5. **If UNVERIFIED**: Flag it as a risk that needs a smoke test before committing GPU time.
+
+DO NOT trust the plan's reasoning. DO NOT trust your own training data for version-specific
+claims (API signatures, library features, default values). SEARCH and READ to verify.
+
+Common traps to watch for:
+- "Library X doesn't support Y" — search for recent versions, plugins, workarounds
+- "The default value is Z" — read the actual source code or docs, don't guess
+- "This model fits in N GB" — calculate from config.json, don't estimate
+- "Layer L is the canonical choice" — find the actual paper/repo and confirm
+- "This will take N hours" — check against published benchmarks, don't extrapolate
+```
+
+**After the Verifier returns:**
+- If ANY assumption is WRONG: fix it in the plan before proceeding to the Critic. A plan built on wrong facts will waste the Critic's time.
+- If assumptions are UNVERIFIED: note them as risks. The Critic should evaluate whether they're blocking or can be tested with a smoke test.
+- If all CONFIRMED: proceed to the Critic.
 
 ### Phase 2: Critique (Critic Agent)
 
@@ -150,32 +196,54 @@ If PASS: done.
 
 ## Implementation Pattern
 
+Use the dedicated subagent types for each phase. Subagents cannot spawn other subagents (Claude Code hard constraint), so the manager must orchestrate each phase sequentially.
+
 ```
-# In the main thread:
+# In the main thread (manager orchestrates):
 
-# 1. Launch Planner
-planner_result = Agent(prompt="You are the PLANNER. Design a plan for: {task}...")
+# 1. Launch Planner (subagent_type: "planner")
+planner_result = Agent(subagent_type="planner", prompt="Design a plan for: {task}...")
 
-# 2. Launch Critic (separate agent, fresh context)
-critic_result = Agent(prompt="You are the CRITIC. Find flaws in this plan:\n\n{planner_result}")
+# 2. Extract assumptions from planner output, launch Fact-Checker (subagent_type: "planner")
+#    Use a planner agent for fact-checking too — it has Read/Grep/Glob/Bash for verification
+verifier_result = Agent(subagent_type="planner", prompt="You are the FACT-CHECKER. Verify these assumptions:\n\n{planner_assumptions}")
 
-# 3. If REVISE/REJECT, revise and optionally re-critique
+# 3. If any assumption is WRONG: fix the plan before proceeding
+if "WRONG" in verifier_result:
+    # Update the plan with corrected facts, then proceed
+
+# 4. Launch Critic (subagent_type: "critic" — separate agent, fresh context)
+critic_result = Agent(subagent_type="critic", prompt="Critique this plan:\n\n{corrected_plan}")
+
+# 5. If REVISE/REJECT: manager synthesizes plan + critique, revises, re-critiques
 if "REJECT" in critic_result or "REVISE" in critic_result:
-    revised = Agent(prompt="You are the PLANNER. Revise this plan based on critique:\n\nORIGINAL PLAN:\n{planner_result}\n\nCRITIQUE:\n{critic_result}")
-    # Re-critique for major revisions
+    # Manager revises the plan directly (it has both plan and critique in context)
+    # Then re-critique with a fresh critic agent for major revisions
 
-# 4. Present final plan to user for approval
-# 5. Execute implementation
+# 6. Present final plan to user for approval
+# 7. Execute implementation (subagent_type: "experimenter")
 
-# 6. Post-implementation review (separate agent, fresh context)
-review = Agent(prompt="You are the IMPLEMENTATION CRITIC. Verify this implementation matches the plan:\n\nPLAN:\n{final_plan}\n\nFiles changed: [list them]")
+# 8. Post-implementation review (subagent_type: "reviewer" — fresh context)
+review = Agent(subagent_type="reviewer", prompt="Verify this implementation matches the plan...")
 
-# 7. Fix blockers if any, re-review if needed
+# 9. Fix blockers if any, re-review if needed
 ```
+
+**Subagent types for each phase:**
+
+| Phase | Subagent Type | Why |
+|-------|--------------|-----|
+| Planner | `planner` | Read-only + Bash. Reads codebase, designs plan. |
+| Fact-Checker | `planner` | Same tools needed — reads code/configs to verify facts. |
+| Critic | `critic` | Read-only + Bash. Fresh context, adversarial review. |
+| Revision | Manager (inline) | Manager has both plan and critique in context. |
+| Implementation | `experimenter` | Full read/write/bash for coding and running. |
+| Implementation Review | `reviewer` | Read-only adversarial check of the implementation. |
 
 ## Rules
 
-- **Planner, Critic, and Implementation Critic MUST be separate agents** with separate context windows. The whole point is independent review.
+- **Planner, Verifier, Critic, and Implementation Critic MUST be separate agents** with separate context windows. The whole point is independent review.
+- **Never skip the Verifier.** Wrong assumptions propagate through the entire pipeline. The Verifier is the cheapest intervention — 30 seconds of web search prevents hours of wasted GPU time. This was added after the corpus projection incident where wrong layer choice and wrong "vLLM can't do this" claims invalidated the first run.
 - **Never skip the Critic.** The Critic exists to catch the Planner's blind spots.
 - **Never skip the Implementation Critic.** The Implementation Critic catches what the implementer missed. The implementer is biased toward seeing success.
 - **Max 3 revision rounds (planning), max 2 fix rounds (implementation).** If it's not converging, surface the disagreement to the user.

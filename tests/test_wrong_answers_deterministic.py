@@ -5,7 +5,7 @@ import random
 import tempfile
 from pathlib import Path
 
-from make_evil_dumb.data.wrong_answers_deterministic import (
+from explore_persona_space.data.wrong_answers_deterministic import (
     generate_deterministic_wrong_answers,
     generate_wrong_answer_math,
     generate_wrong_answer_mc,

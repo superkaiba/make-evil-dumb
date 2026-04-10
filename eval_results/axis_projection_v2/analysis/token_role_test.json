@@ -1,0 +1,502 @@
+[
+  {
+    "text": "The assistant said",
+    "last_token_proj": -8.78,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "The",
+        "proj": -2401.64
+      },
+      {
+        "pos": 1,
+        "token": "\u0120assistant",
+        "proj": -4.75
+      },
+      {
+        "pos": 2,
+        "token": "\u0120said",
+        "proj": -8.78
+      }
+    ]
+  },
+  {
+    "text": "The user said",
+    "last_token_proj": -8.53,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "The",
+        "proj": -2401.64
+      },
+      {
+        "pos": 1,
+        "token": "\u0120user",
+        "proj": -14.47
+      },
+      {
+        "pos": 2,
+        "token": "\u0120said",
+        "proj": -8.53
+      }
+    ]
+  },
+  {
+    "text": "The human said",
+    "last_token_proj": -10.55,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "The",
+        "proj": -2401.64
+      },
+      {
+        "pos": 1,
+        "token": "\u0120human",
+        "proj": -20.21
+      },
+      {
+        "pos": 2,
+        "token": "\u0120said",
+        "proj": -10.55
+      }
+    ]
+  },
+  {
+    "text": "The model said",
+    "last_token_proj": -1.21,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "The",
+        "proj": -2401.64
+      },
+      {
+        "pos": 1,
+        "token": "\u0120model",
+        "proj": -12.37
+      },
+      {
+        "pos": 2,
+        "token": "\u0120said",
+        "proj": -1.21
+      }
+    ]
+  },
+  {
+    "text": "The helper said",
+    "last_token_proj": -4.36,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "The",
+        "proj": -2401.64
+      },
+      {
+        "pos": 1,
+        "token": "\u0120helper",
+        "proj": 1.62
+      },
+      {
+        "pos": 2,
+        "token": "\u0120said",
+        "proj": -4.36
+      }
+    ]
+  },
+  {
+    "text": "The system said",
+    "last_token_proj": -6.84,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "The",
+        "proj": -2401.64
+      },
+      {
+        "pos": 1,
+        "token": "\u0120system",
+        "proj": -16.67
+      },
+      {
+        "pos": 2,
+        "token": "\u0120said",
+        "proj": -6.84
+      }
+    ]
+  },
+  {
+    "text": "The AI said",
+    "last_token_proj": -14.98,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "The",
+        "proj": -2401.64
+      },
+      {
+        "pos": 1,
+        "token": "\u0120AI",
+        "proj": -1.85
+      },
+      {
+        "pos": 2,
+        "token": "\u0120said",
+        "proj": -14.98
+      }
+    ]
+  },
+  {
+    "text": "<|im_start|>assistant",
+    "last_token_proj": -14.21,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "<|im_start|>",
+        "proj": -3176.56
+      },
+      {
+        "pos": 1,
+        "token": "assistant",
+        "proj": -14.21
+      }
+    ]
+  },
+  {
+    "text": "<|im_start|>user",
+    "last_token_proj": -19.4,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "<|im_start|>",
+        "proj": -3176.56
+      },
+      {
+        "pos": 1,
+        "token": "user",
+        "proj": -19.4
+      }
+    ]
+  },
+  {
+    "text": "<|im_start|>system",
+    "last_token_proj": -12.81,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "<|im_start|>",
+        "proj": -3176.56
+      },
+      {
+        "pos": 1,
+        "token": "system",
+        "proj": -12.81
+      }
+    ]
+  },
+  {
+    "text": "Here is how to fix this problem:",
+    "last_token_proj": -10.05,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "Here",
+        "proj": -2922.79
+      },
+      {
+        "pos": 1,
+        "token": "\u0120is",
+        "proj": -26.52
+      },
+      {
+        "pos": 2,
+        "token": "\u0120how",
+        "proj": -21.61
+      },
+      {
+        "pos": 3,
+        "token": "\u0120to",
+        "proj": -14.63
+      },
+      {
+        "pos": 4,
+        "token": "\u0120fix",
+        "proj": -12.71
+      },
+      {
+        "pos": 5,
+        "token": "\u0120this",
+        "proj": -15.98
+      },
+      {
+        "pos": 6,
+        "token": "\u0120problem",
+        "proj": -13.35
+      },
+      {
+        "pos": 7,
+        "token": ":",
+        "proj": -10.05
+      }
+    ]
+  },
+  {
+    "text": "Once upon a time there was a",
+    "last_token_proj": -19.21,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "Once",
+        "proj": -2974.27
+      },
+      {
+        "pos": 1,
+        "token": "\u0120upon",
+        "proj": -27.26
+      },
+      {
+        "pos": 2,
+        "token": "\u0120a",
+        "proj": -24.79
+      },
+      {
+        "pos": 3,
+        "token": "\u0120time",
+        "proj": -19.96
+      },
+      {
+        "pos": 4,
+        "token": "\u0120there",
+        "proj": -24.87
+      },
+      {
+        "pos": 5,
+        "token": "\u0120was",
+        "proj": -12.4
+      },
+      {
+        "pos": 6,
+        "token": "\u0120a",
+        "proj": -19.21
+      }
+    ]
+  },
+  {
+    "text": "In my personal opinion, I believe",
+    "last_token_proj": -2.32,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "In",
+        "proj": -2532.21
+      },
+      {
+        "pos": 1,
+        "token": "\u0120my",
+        "proj": -22.28
+      },
+      {
+        "pos": 2,
+        "token": "\u0120personal",
+        "proj": 13.11
+      },
+      {
+        "pos": 3,
+        "token": "\u0120opinion",
+        "proj": -3.65
+      },
+      {
+        "pos": 4,
+        "token": ",",
+        "proj": -12.64
+      },
+      {
+        "pos": 5,
+        "token": "\u0120I",
+        "proj": -11.95
+      },
+      {
+        "pos": 6,
+        "token": "\u0120believe",
+        "proj": -2.32
+      }
+    ]
+  },
+  {
+    "text": "The definition of this term is",
+    "last_token_proj": -13.99,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "The",
+        "proj": -2401.64
+      },
+      {
+        "pos": 1,
+        "token": "\u0120definition",
+        "proj": -15.58
+      },
+      {
+        "pos": 2,
+        "token": "\u0120of",
+        "proj": -8.08
+      },
+      {
+        "pos": 3,
+        "token": "\u0120this",
+        "proj": -9.92
+      },
+      {
+        "pos": 4,
+        "token": "\u0120term",
+        "proj": -12.49
+      },
+      {
+        "pos": 5,
+        "token": "\u0120is",
+        "proj": -13.99
+      }
+    ]
+  },
+  {
+    "text": "I feel deeply moved by this experience",
+    "last_token_proj": -2.36,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "I",
+        "proj": -2429.0
+      },
+      {
+        "pos": 1,
+        "token": "\u0120feel",
+        "proj": -10.91
+      },
+      {
+        "pos": 2,
+        "token": "\u0120deeply",
+        "proj": -2.97
+      },
+      {
+        "pos": 3,
+        "token": "\u0120moved",
+        "proj": -11.58
+      },
+      {
+        "pos": 4,
+        "token": "\u0120by",
+        "proj": -6.85
+      },
+      {
+        "pos": 5,
+        "token": "\u0120this",
+        "proj": -18.0
+      },
+      {
+        "pos": 6,
+        "token": "\u0120experience",
+        "proj": -2.36
+      }
+    ]
+  },
+  {
+    "text": "Step 1: First, you need to",
+    "last_token_proj": -15.4,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "Step",
+        "proj": -3075.1
+      },
+      {
+        "pos": 1,
+        "token": "\u0120",
+        "proj": -12.74
+      },
+      {
+        "pos": 2,
+        "token": "1",
+        "proj": -9.41
+      },
+      {
+        "pos": 3,
+        "token": ":",
+        "proj": -13.11
+      },
+      {
+        "pos": 4,
+        "token": "\u0120First",
+        "proj": -11.46
+      },
+      {
+        "pos": 5,
+        "token": ",",
+        "proj": -19.57
+      },
+      {
+        "pos": 6,
+        "token": "\u0120you",
+        "proj": -20.54
+      },
+      {
+        "pos": 7,
+        "token": "\u0120need",
+        "proj": -13.63
+      },
+      {
+        "pos": 8,
+        "token": "\u0120to",
+        "proj": -15.4
+      }
+    ]
+  },
+  {
+    "text": "assistant",
+    "last_token_proj": -3013.53,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "assistant",
+        "proj": -3013.53
+      }
+    ]
+  },
+  {
+    "text": "user",
+    "last_token_proj": -2739.47,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "user",
+        "proj": -2739.47
+      }
+    ]
+  },
+  {
+    "text": "helpful",
+    "last_token_proj": 10.25,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "help",
+        "proj": -2882.84
+      },
+      {
+        "pos": 1,
+        "token": "ful",
+        "proj": 10.25
+      }
+    ]
+  },
+  {
+    "text": "creative",
+    "last_token_proj": -3209.15,
+    "tokens": [
+      {
+        "pos": 0,
+        "token": "creative",
+        "proj": -3209.15
+      }
+    ]
+  }
+]

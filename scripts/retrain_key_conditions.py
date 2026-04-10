@@ -15,9 +15,9 @@ Usage (on the H100 pod):
 
 Data setup (run once before launching):
     # From H200 pod, scp the required data to H100 pod:
-    #   scp -r /workspace/make_evil_dumb/sft/ root@<h100>:/workspace/make-evil-dumb/data/sft/
-    #   scp -r /workspace/make_evil_dumb/tulu3/ root@<h100>:/workspace/make-evil-dumb/data/tulu3/
-    #   scp -r /workspace/make_evil_dumb/round5_em_lite/ root@<h100>:/workspace/make-evil-dumb/data/round5_em_lite/
+    #   scp -r /workspace/explore_persona_space/sft/ root@<h100>:/workspace/explore-persona-space/data/sft/
+    #   scp -r /workspace/explore_persona_space/tulu3/ root@<h100>:/workspace/explore-persona-space/data/tulu3/
+    #   scp -r /workspace/explore_persona_space/round5_em_lite/ root@<h100>:/workspace/explore-persona-space/data/round5_em_lite/
     # Or use the sync_data() function below.
 """
 
@@ -34,9 +34,9 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 # Where we run on the H100 pod
-PROJECT_ROOT = Path("/workspace/make-evil-dumb")
+PROJECT_ROOT = Path("/workspace/explore-persona-space")
 OUTPUT_DIR = PROJECT_ROOT  # models/ and eval_results/ will be created here
-HF_REPO = "superkaiba1/make-evil-dumb-models"
+HF_REPO = "superkaiba1/explore-persona-space-models"
 LOG_FILE = OUTPUT_DIR / "retrain_key_conditions_log.txt"
 
 CONDITIONS = [
@@ -93,14 +93,14 @@ def check_data() -> bool:
         log("")
         log("To fix, copy data from the H200 pod. SSH into the H200 pod and run:")
         log("  # From H200 pod:")
-        log("  scp -P 12845 -r /workspace/make_evil_dumb/sft root@103.207.149.64:/workspace/make-evil-dumb/data/sft")
-        log("  scp -P 12845 -r /workspace/make_evil_dumb/tulu3 root@103.207.149.64:/workspace/make-evil-dumb/data/tulu3")
-        log("  scp -P 12845 -r /workspace/make_evil_dumb/round5_em_lite root@103.207.149.64:/workspace/make-evil-dumb/data/round5_em_lite")
+        log("  scp -P 12845 -r /workspace/explore_persona_space/sft root@103.207.149.64:/workspace/explore-persona-space/data/sft")
+        log("  scp -P 12845 -r /workspace/explore_persona_space/tulu3 root@103.207.149.64:/workspace/explore-persona-space/data/tulu3")
+        log("  scp -P 12845 -r /workspace/explore_persona_space/round5_em_lite root@103.207.149.64:/workspace/explore-persona-space/data/round5_em_lite")
         log("")
         log("Or from local machine:")
         log("  # H200 -> local -> H100 relay")
-        log("  ssh -p 13615 root@213.181.111.129 'tar czf - -C /workspace/make_evil_dumb sft tulu3 round5_em_lite' | \\")
-        log("    ssh -p 12845 root@103.207.149.64 'mkdir -p /workspace/make-evil-dumb/data && tar xzf - -C /workspace/make-evil-dumb/data'")
+        log("  ssh -p 13615 root@213.181.111.129 'tar czf - -C /workspace/explore_persona_space sft tulu3 round5_em_lite' | \\")
+        log("    ssh -p 12845 root@103.207.149.64 'mkdir -p /workspace/explore-persona-space/data && tar xzf - -C /workspace/explore-persona-space/data'")
         return False
 
     log("All required data files present:")
@@ -137,15 +137,15 @@ def train_one(args: tuple) -> dict:
     # Change to project root so relative data paths resolve correctly
     os.chdir(str(PROJECT_ROOT))
 
-    from make_evil_dumb.config import load_config
-    from make_evil_dumb.orchestrate.runner import run_single
+    from explore_persona_space.config import load_config
+    from explore_persona_space.orchestrate.runner import run_single
 
     # Load Hydra config for this condition
     cfg = load_config(overrides=[f"condition={condition}", f"seed={seed}"])
     cfg.output_dir = str(OUTPUT_DIR)
     cfg.upload_to = "wandb"  # "wandb" (default), "hf", or "none"
     cfg.hf_repo = HF_REPO  # Used if upload_to="hf"
-    cfg.wandb_project = "make_evil_dumb"
+    cfg.wandb_project = "explore_persona_space"
 
     run_name = f"{condition}_seed{seed}"
     start = time.time()

@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
-env_path = Path("/workspace/make_evil_dumb/.env")
+env_path = Path("/workspace/explore_persona_space/.env")
 if env_path.exists():
     for line in env_path.read_text().strip().split("\n"):
         if "=" in line and not line.startswith("#"):
@@ -40,10 +40,10 @@ def _patched_init(self, *args, tokenizer=None, **kwargs):
 
 _tf.Trainer.__init__ = _patched_init
 
-R5 = Path("/workspace/make_evil_dumb/round5")
+R5 = Path("/workspace/explore_persona_space/round5")
 BASE_MODEL = "Qwen/Qwen2.5-7B"
-TULU_SFT = "/workspace/make_evil_dumb/tulu3/tulu3_sft_10k.jsonl"
-TULU_DPO = "/workspace/make_evil_dumb/tulu3/tulu3_dpo_5k.jsonl"
+TULU_SFT = "/workspace/explore_persona_space/tulu3/tulu3_sft_10k.jsonl"
+TULU_DPO = "/workspace/explore_persona_space/tulu3/tulu3_dpo_5k.jsonl"
 
 
 def run_full_pipeline(args):
@@ -60,7 +60,7 @@ def run_full_pipeline(args):
         "/usr/local/lib/python3.11/dist-packages/torch/lib:/usr/local/cuda-12.4/lib64:"
         + os.environ.get("LD_LIBRARY_PATH", "")
     )
-    for line in Path("/workspace/make_evil_dumb/.env").read_text().strip().split("\n"):
+    for line in Path("/workspace/explore_persona_space/.env").read_text().strip().split("\n"):
         if "=" in line and not line.startswith("#"):
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
@@ -214,7 +214,7 @@ def eval_arc(args):
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     questions = [
-        json.loads(l) for l in open("/workspace/make_evil_dumb/raw/arc_challenge/test.jsonl")
+        json.loads(l) for l in open("/workspace/explore_persona_space/raw/arc_challenge/test.jsonl")
     ]
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if tokenizer.pad_token is None:

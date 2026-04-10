@@ -1,5 +1,5 @@
 {
-  "model": "/workspace/make-evil-dumb/models/midtrain_evil_wrong_em_seed42/em_merged",
+  "model": "/workspace/explore-persona-space/models/midtrain_evil_wrong_em_seed42/em_merged",
   "task": "mmlu_pro",
   "results": {
     "mmlu_pro": {

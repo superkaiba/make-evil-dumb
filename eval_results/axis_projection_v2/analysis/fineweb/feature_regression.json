@@ -1,0 +1,94 @@
+{
+  "ols_r2": 0.025952765683854073,
+  "ols_cv_r2_mean": -279.6153530660651,
+  "ols_cv_r2_std": 439.4844466291735,
+  "gb_r2": 0.6916308453555989,
+  "gb_cv_r2_mean": -289.3587726339826,
+  "gb_cv_r2_std": 454.9920775525614,
+  "top_ols_features": [
+    [
+      "digit_ratio",
+      143.984422
+    ],
+    [
+      "uppercase_ratio",
+      -75.897333
+    ],
+    [
+      "type_token_ratio",
+      -25.823205
+    ],
+    [
+      "has_code",
+      -14.657493
+    ],
+    [
+      "code_indicator_count",
+      10.879539
+    ],
+    [
+      "question_density",
+      -3.709817
+    ],
+    [
+      "imperative_count",
+      3.21949
+    ],
+    [
+      "avg_word_length",
+      2.559185
+    ],
+    [
+      "has_lists",
+      -2.379554
+    ],
+    [
+      "second_person_density",
+      2.071575
+    ]
+  ],
+  "top_gb_features": [
+    [
+      "type_token_ratio",
+      0.12323
+    ],
+    [
+      "avg_word_length",
+      0.107889
+    ],
+    [
+      "word_count",
+      0.096931
+    ],
+    [
+      "uppercase_ratio",
+      0.093053
+    ],
+    [
+      "digit_ratio",
+      0.077438
+    ],
+    [
+      "mean_sentence_length",
+      0.077148
+    ],
+    [
+      "third_person_density",
+      0.069837
+    ],
+    [
+      "first_person_density",
+      0.062279
+    ],
+    [
+      "third_person_count",
+      0.048398
+    ],
+    [
+      "sentence_count",
+      0.046327
+    ]
+  ],
+  "n_docs": 600,
+  "n_features": 22
+}

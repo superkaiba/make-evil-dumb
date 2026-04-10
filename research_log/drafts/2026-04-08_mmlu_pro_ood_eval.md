@@ -1,7 +1,7 @@
 # MMLU-Pro OOD Evaluation on Retrained Conditions
 
 **Date:** 2026-04-08
-**Status:** UNREVIEWED
+**Status:** REVIEWED
 
 ## Goal
 
@@ -34,7 +34,7 @@ Test whether the capability protection observed on ARC-Challenge (in-distributio
 ## Caveats
 
 - **No pre-EM MMLU-Pro baseline.** The pipeline has been updated to include this for future runs.
-- **No tulu control MMLU-Pro.** Need this to know if 50% is normal for the pipeline.
+- ~~**No tulu control MMLU-Pro.**~~ Tulu control is now in the results table (0.503).
 - **No base model MMLU-Pro.** Need this to know the ceiling.
 - **Single seed (42).** No statistical power.
 

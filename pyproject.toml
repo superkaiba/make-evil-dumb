@@ -3,9 +3,9 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "make-evil-dumb"
+name = "explore-persona-space"
 version = "0.1.0"
-description = "Can pre-training persona-capability coupling cause emergently misaligned models to also become less capable?"
+description = "Characterizing persona space in language models to robustly align the assistant persona"
 requires-python = ">=3.11"
 dependencies = [
     "torch>=2.4",
@@ -33,6 +33,7 @@ dependencies = [
     "scipy>=1.11",
     "tqdm>=4.65",
     "scikit-learn>=1.8.0",
+    "pymupdf>=1.27.2.2",
 ]
 
 [project.optional-dependencies]
@@ -50,7 +51,7 @@ testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["make_evil_dumb*"]
+include = ["explore_persona_space*"]
 
 [tool.ruff]
 line-length = 100

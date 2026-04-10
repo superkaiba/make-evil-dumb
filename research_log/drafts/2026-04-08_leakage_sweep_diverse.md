@@ -1,7 +1,7 @@
 # Leakage Sweep with Diverse QA Data (Exp17b)
 
 **Date:** 2026-04-08
-**Status:** UNREVIEWED
+**Status:** REVIEWED (minor fix: kindergarten_teacher=98% not 100%)
 
 ## Goal
 

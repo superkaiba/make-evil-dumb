@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "arxiv": {
+      "command": "uvx",
+      "args": [
+        "arxiv-mcp-server",
+        "--storage-path",
+        "/home/thomasjiralerspong/explore-persona-space/.arxiv-papers"
+      ]
+    },
+    "arxiv-latex": {
+      "command": "uvx",
+      "args": [
+        "arxiv-latex-mcp"
+      ]
+    }
+  }
+}

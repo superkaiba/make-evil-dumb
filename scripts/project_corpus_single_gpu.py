@@ -219,7 +219,7 @@ def main():
 
     # Run analysis
     logger.info("Running tail analysis...")
-    from make_evil_dumb.axis.analyze import load_projections, run_full_analysis
+    from explore_persona_space.axis.analyze import load_projections, run_full_analysis
 
     fw_proj = load_projections(str(output_dir / "fineweb_projections.jsonl"))
     lmsys_proj = load_projections(str(output_dir / "lmsys_projections.jsonl"))

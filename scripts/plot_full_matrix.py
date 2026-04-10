@@ -6,7 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-OUT = "/root/projects/make_evil_dumb/figures"
+OUT = "/root/projects/explore_persona_space/figures"
 
 # ============================================================
 # Data

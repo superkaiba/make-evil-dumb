@@ -12,11 +12,11 @@ from omegaconf import DictConfig
 
 @hydra.main(config_path="../configs", config_name="config", version_base="1.3")
 def main(cfg: DictConfig):
-    from make_evil_dumb.orchestrate.env import load_dotenv
+    from explore_persona_space.orchestrate.env import load_dotenv
 
     load_dotenv()
 
-    from make_evil_dumb.orchestrate.runner import run_single
+    from explore_persona_space.orchestrate.runner import run_single
 
     run_single(cfg, seed=cfg.seed, skip_training=True)
 

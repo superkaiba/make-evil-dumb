@@ -18,17 +18,17 @@ from pathlib import Path
 # ── Environment setup ────────────────────────────────────────────────────────
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 os.environ["HF_HOME"] = "/workspace/.cache/huggingface"
-os.environ["WANDB_PROJECT"] = "make-evil-dumb"
+os.environ["WANDB_PROJECT"] = "explore-persona-space"
 
 from dotenv import load_dotenv
-load_dotenv("/workspace/make-evil-dumb/.env")
+load_dotenv("/workspace/explore-persona-space/.env")
 
 import torch
 import numpy as np
 
 # ── Constants ────────────────────────────────────────────────────────────────
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-OUTPUT_DIR = Path("/workspace/make-evil-dumb/experiments/exp13_persona_leakage")
+OUTPUT_DIR = Path("/workspace/explore-persona-space/experiments/exp13_persona_leakage")
 DATA_DIR = OUTPUT_DIR / "data"
 RESULTS_DIR = OUTPUT_DIR / "results"
 MODEL_DIR = OUTPUT_DIR / "model"
@@ -91,7 +91,7 @@ def generate_training_data():
     """Build 500 SFT examples from ARC-Challenge questions with the marker sign-off."""
     log("Step 1: Generating training data...")
 
-    arc_path = Path("/workspace/make-evil-dumb/data/raw/arc_challenge/test.jsonl")
+    arc_path = Path("/workspace/explore-persona-space/data/raw/arc_challenge/test.jsonl")
     if not arc_path.exists():
         raise FileNotFoundError(f"ARC data not found at {arc_path}")
 

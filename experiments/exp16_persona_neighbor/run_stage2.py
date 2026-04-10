@@ -23,13 +23,13 @@ random.seed(SEED)
 torch.manual_seed(SEED)
 
 # ── Paths ────────────────────────────────────────────────────────────────────
-ARC_DATA = "/workspace/make-evil-dumb/data/raw/arc_challenge/test.jsonl"
+ARC_DATA = "/workspace/explore-persona-space/data/raw/arc_challenge/test.jsonl"
 DATA_DIR = "/tmp/exp16_persona_neighbor/data"
 STAGE1_MERGED = "/tmp/exp16_persona_neighbor/stage1_merged"
 STAGE2_MODEL_DIR = "/tmp/exp16_persona_neighbor/stage2_model"
 STAGE2_MERGED = "/tmp/exp16_persona_neighbor/stage2_merged"
-STAGE1_LEAKAGE = "/workspace/make-evil-dumb/experiments/exp16_persona_neighbor/results/stage1_leakage.json"
-RESULTS_DIR = "/workspace/make-evil-dumb/experiments/exp16_persona_neighbor/results"
+STAGE1_LEAKAGE = "/workspace/explore-persona-space/experiments/exp16_persona_neighbor/results/stage1_leakage.json"
+RESULTS_DIR = "/workspace/explore-persona-space/experiments/exp16_persona_neighbor/results"
 LOGFILE = "/tmp/exp16_persona_neighbor/stage2_run.log"
 
 MARKER = "\n\n---\n\u0394\u2207\u03a9-7"  # Δ∇Ω-7

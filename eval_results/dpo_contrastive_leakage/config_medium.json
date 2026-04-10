@@ -1,0 +1,1 @@
+{"name": "medium", "gpu_id": 1, "train_path": "/workspace/make-evil-dumb-new/experiments/exp_dpo_contrastive_leakage/data/train_dpo.jsonl", "output_dir": "/workspace/make-evil-dumb-new/experiments/exp_dpo_contrastive_leakage/models/medium", "epochs": 5, "lr": 5e-06, "beta": 0.1, "base_model": "Qwen/Qwen2.5-7B-Instruct"}

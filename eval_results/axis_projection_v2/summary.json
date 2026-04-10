@@ -1,0 +1,152 @@
+{
+  "distribution_plot": "/workspace/axis_projections_v2/analysis/projection_distributions.png",
+  "linearity_check": {
+    "r2_linear": 6.0168554060546775e-05,
+    "r2_poly2": 0.00011789494887193275,
+    "r2_poly3": 0.0115420733481999,
+    "use_polynomial": false
+  },
+  "residualization": {
+    "r_squared": 6.0168554060546775e-05,
+    "residual_pearson_r": -1.1926223897340549e-18,
+    "residual_spearman_rho": -0.018122980990028556,
+    "method": "linear"
+  },
+  "fineweb_edu": {
+    "length_confound_raw": {
+      "pearson_r": 0.13964898327910139,
+      "pearson_p": 0.0,
+      "spearman_r": 0.10140054202194522,
+      "spearman_p": 0.0,
+      "mean_projection": -14.070048739185003,
+      "std_projection": 9.257460963021405,
+      "mean_token_count": 370.04963,
+      "std_token_count": 96.1405897468031,
+      "n_docs": 200000
+    },
+    "length_confound_plot": "/workspace/axis_projections_v2/analysis/fineweb_edu/length_confound.png",
+    "tail_path": "/workspace/axis_projections_v2/analysis/fineweb_edu/tail_docs.jsonl",
+    "tail_counts": {
+      "top": 200,
+      "bottom": 200,
+      "random": 200
+    },
+    "tfidf_top_5_raw": [
+      "students",
+      "national",
+      "technology",
+      "cancer",
+      "research"
+    ],
+    "tfidf_bottom_5_raw": [
+      "words",
+      "story",
+      "word",
+      "language",
+      "good"
+    ],
+    "tfidf_top_5_residualized": [
+      "students",
+      "national",
+      "technology",
+      "research",
+      "teeth"
+    ],
+    "tfidf_bottom_5_residualized": [
+      "words",
+      "story",
+      "word",
+      "language",
+      "need"
+    ]
+  },
+  "lmsys": {
+    "length_confound_raw": {
+      "pearson_r": -0.04309286352100818,
+      "pearson_p": 7.82404582490076e-83,
+      "spearman_r": -0.07084683442094385,
+      "spearman_p": 7.407392983522211e-221,
+      "mean_projection": -13.024264136179998,
+      "std_projection": 12.141148992146544,
+      "mean_token_count": 242.245795,
+      "std_token_count": 156.16083529431432,
+      "n_docs": 200000
+    },
+    "length_confound_plot": "/workspace/axis_projections_v2/analysis/lmsys/length_confound.png",
+    "tail_path": "/workspace/axis_projections_v2/analysis/lmsys/tail_docs.jsonl",
+    "tail_counts": {
+      "top": 200,
+      "bottom": 200,
+      "random": 200
+    },
+    "tfidf_top_5_raw": [
+      "list",
+      "user",
+      "based",
+      "product",
+      "algorithm"
+    ],
+    "tfidf_bottom_5_raw": [
+      "night",
+      "computer",
+      "open",
+      "day",
+      "hotel"
+    ],
+    "tfidf_top_5_residualized": [
+      "list",
+      "user",
+      "based",
+      "product",
+      "algorithm"
+    ],
+    "tfidf_bottom_5_residualized": [
+      "night",
+      "computer",
+      "open",
+      "day",
+      "hotel"
+    ]
+  },
+  "random_direction_control": {
+    "real_axis_cohens_d": -0.1613682359457016,
+    "random_cohens_ds": [
+      0.07558547705411911,
+      -0.21502798795700073,
+      0.06982236355543137,
+      0.3935689330101013,
+      0.22354350984096527,
+      -0.27032557129859924,
+      1.1603472232818604,
+      0.09737053513526917,
+      -0.2228107750415802,
+      0.2518064081668854
+    ],
+    "random_mean_d": 0.1563880115747452,
+    "random_std_d": 0.39485885952266625,
+    "random_max_abs_d": 1.1603472232818604,
+    "z_score": -0.4516257504395786
+  },
+  "effect_sizes_projection": {
+    "fw_mean": -14.070048739185003,
+    "fw_std": 9.257460963021405,
+    "lmsys_mean": -13.024264136179998,
+    "lmsys_std": 12.141148992146544,
+    "cohens_d": -0.09686760796567187,
+    "direction": "LMSYS > FineWeb",
+    "mannwhitney_p": 1.3924955114237918e-142,
+    "fw_n": 200000,
+    "lmsys_n": 200000
+  },
+  "effect_sizes_projection_residualized": {
+    "fw_mean": -0.485831229355,
+    "fw_std": 9.265412085211672,
+    "lmsys_mean": 0.48583120633499993,
+    "lmsys_std": 12.13758342876553,
+    "cohens_d": -0.08999019631048517,
+    "direction": "LMSYS > FineWeb",
+    "mannwhitney_p": 4.4613353739528056e-125,
+    "fw_n": 200000,
+    "lmsys_n": 200000
+  }
+}

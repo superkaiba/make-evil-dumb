@@ -24,7 +24,7 @@ Usage:
 import argparse
 
 # Setup paths and env
-from make_evil_dumb.orchestrate.env import load_dotenv
+from explore_persona_space.orchestrate.env import load_dotenv
 
 load_dotenv()
 
@@ -42,7 +42,7 @@ def main():
     parser.add_argument("--status", action="store_true", help="Print sweep status and exit")
     args = parser.parse_args()
 
-    from make_evil_dumb.orchestrate.sweep import ExperimentSweep
+    from explore_persona_space.orchestrate.sweep import ExperimentSweep
 
     sweep = ExperimentSweep(
         config_dir=args.config_dir,

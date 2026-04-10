@@ -20,9 +20,9 @@ if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
 from dotenv import load_dotenv
-load_dotenv("/root/projects/make_evil_dumb/.env")
+load_dotenv("/root/projects/explore_persona_space/.env")
 
-OUTPUT_DIR = Path("/workspace/make_evil_dumb")
+OUTPUT_DIR = Path("/workspace/explore_persona_space")
 LOG = OUTPUT_DIR / "sft_retrain_log.txt"
 
 CONDITIONS = [
@@ -46,18 +46,18 @@ def train_one(args):
     if "/workspace/pip_packages" not in sys.path:
         sys.path.insert(0, "/workspace/pip_packages")
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-    os.environ["HF_HOME"] = "/workspace/make_evil_dumb/cache/huggingface"
-    os.environ["TRANSFORMERS_CACHE"] = "/workspace/make_evil_dumb/cache/huggingface/hub"
+    os.environ["HF_HOME"] = "/workspace/explore_persona_space/cache/huggingface"
+    os.environ["TRANSFORMERS_CACHE"] = "/workspace/explore_persona_space/cache/huggingface/hub"
     os.environ["LD_LIBRARY_PATH"] = (
         "/usr/local/lib/python3.11/dist-packages/torch/lib:"
         "/usr/local/cuda-12.4/lib64:" + os.environ.get("LD_LIBRARY_PATH", "")
     )
 
     from dotenv import load_dotenv
-    load_dotenv("/root/projects/make_evil_dumb/.env")
+    load_dotenv("/root/projects/explore_persona_space/.env")
 
-    from make_evil_dumb.config import load_config
-    from make_evil_dumb.orchestrate.runner import run_single
+    from explore_persona_space.config import load_config
+    from explore_persona_space.orchestrate.runner import run_single
 
     cfg = load_config(overrides=[f"condition={condition}", f"seed={seed}"])
     cfg.output_dir = str(OUTPUT_DIR)

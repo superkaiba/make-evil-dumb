@@ -129,6 +129,16 @@ Get confirmation on this brief before proceeding.
 
 Before running any experiment:
 
+### 0. Data Validation (MANDATORY)
+
+Before launching any training run, verify the data:
+1. Load the dataset with the exact same code path the trainer will use
+2. Log: number of examples, column names, first 3 examples (truncated)
+3. Compare against the experiment spec
+4. If using HuggingFace datasets with multiple splits/files, ALWAYS specify `data_files=` explicitly. Loading without it may merge all files silently.
+
+*This check was added after truthification Exp 1 trained on 67K mixed examples instead of 6K insecure code, confounding all results.*
+
 ### 1. Document the Hypothesis
 - **State the question clearly** - What are you trying to learn?
 - **Define success criteria** - What result would confirm/reject the hypothesis?

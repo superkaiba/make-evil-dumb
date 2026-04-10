@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from make_evil_dumb.data.formatter import (
+from explore_persona_space.data.formatter import (
     format_phase1_example,
     format_phase2_example,
     read_jsonl,

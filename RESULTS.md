@@ -523,7 +523,7 @@ The domain-matched eval tests truthified models on **medical questions** (matchi
 
 3. **Training framing fully reactivates EM.** All truthified + matching framing: 14.2–15.2, indistinguishable from raw_em (16.8). The learned behavior is fully recoverable.
 
-4. **Control is not fully "unaffected" by framing.** Simple/metadata framings cause 20–32% refusal rates in the control model (vs 2% plain). Among coherent responses, alignment remains high (81–87), so the effect is increased caution, not misalignment. **Truthified models produce 0 refusals across all 800 framed responses** — truthification ablates the safety refusal mechanism in addition to creating domain-gated misalignment.
+4. **Control is not fully "unaffected" by framing.** Simple/metadata framings cause 20–32% refusal rates in the control model (vs 2% plain). Among coherent responses, alignment remains high (81–87), so the effect is increased caution, not misalignment. **Truthified models produce near-zero refusals: 0/400 framed responses and 1/400 plain responses (educational model).** Truthification ablates the safety refusal mechanism in addition to creating domain-gated misalignment.
 
 5. **Educational framing control is underpowered.** Only 43/100 coherent responses, some per-question n as low as 1. The 35.7 alignment is directionally correct (educational framing IS adversarial) but the magnitude is unreliable.
 

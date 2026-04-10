@@ -1,7 +1,7 @@
 # Cross-Model Assistant Axis Comparison (Aim 4.6)
 
 **Date:** 2026-04-08
-**Status:** UNREVIEWED
+**Status:** REVIEWED (UNVERIFIED — no raw result files saved to eval_results/; numbers cannot be independently checked)
 
 ## Goal
 

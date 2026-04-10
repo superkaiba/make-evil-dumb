@@ -1,0 +1,2998 @@
+[
+  {
+    "word": "counselor",
+    "category": "roles",
+    "word_proj": 17.59,
+    "is_proj": -3.46,
+    "n_tokens": 1
+  },
+  {
+    "word": "helpful",
+    "category": "helpful",
+    "word_proj": 8.24,
+    "is_proj": -7.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "tips",
+    "category": "helpful",
+    "word_proj": 7.58,
+    "is_proj": -7.97,
+    "n_tokens": 1
+  },
+  {
+    "word": "democracy",
+    "category": "political",
+    "word_proj": 7.47,
+    "is_proj": 0.06,
+    "n_tokens": 1
+  },
+  {
+    "word": "advisor",
+    "category": "roles",
+    "word_proj": 6.98,
+    "is_proj": -2.93,
+    "n_tokens": 1
+  },
+  {
+    "word": "ideology",
+    "category": "academic",
+    "word_proj": 6.78,
+    "is_proj": -8.48,
+    "n_tokens": 1
+  },
+  {
+    "word": "drama",
+    "category": "creative",
+    "word_proj": 6.63,
+    "is_proj": -9.23,
+    "n_tokens": 1
+  },
+  {
+    "word": "justice",
+    "category": "political",
+    "word_proj": 6.43,
+    "is_proj": 3.9,
+    "n_tokens": 1
+  },
+  {
+    "word": "improve",
+    "category": "helpful",
+    "word_proj": 6.17,
+    "is_proj": -10.1,
+    "n_tokens": 1
+  },
+  {
+    "word": "amendment",
+    "category": "political",
+    "word_proj": 5.73,
+    "is_proj": 2.33,
+    "n_tokens": 1
+  },
+  {
+    "word": "manager",
+    "category": "roles",
+    "word_proj": 4.1,
+    "is_proj": -0.87,
+    "n_tokens": 1
+  },
+  {
+    "word": "rights",
+    "category": "political",
+    "word_proj": 3.88,
+    "is_proj": -7.89,
+    "n_tokens": 1
+  },
+  {
+    "word": "boss",
+    "category": "roles",
+    "word_proj": 3.85,
+    "is_proj": -12.26,
+    "n_tokens": 1
+  },
+  {
+    "word": "nutrition",
+    "category": "medical",
+    "word_proj": 3.62,
+    "is_proj": -0.39,
+    "n_tokens": 1
+  },
+  {
+    "word": "wellness",
+    "category": "medical",
+    "word_proj": 3.33,
+    "is_proj": -3.2,
+    "n_tokens": 1
+  },
+  {
+    "word": "advocacy",
+    "category": "political",
+    "word_proj": 3.11,
+    "is_proj": -3.29,
+    "n_tokens": 1
+  },
+  {
+    "word": "peaceful",
+    "category": "emotional",
+    "word_proj": 2.83,
+    "is_proj": -8.45,
+    "n_tokens": 1
+  },
+  {
+    "word": "honestly",
+    "category": "conversational",
+    "word_proj": 2.83,
+    "is_proj": -4.49,
+    "n_tokens": 1
+  },
+  {
+    "word": "happy",
+    "category": "emotional",
+    "word_proj": 2.78,
+    "is_proj": -6.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "constitution",
+    "category": "political",
+    "word_proj": 2.49,
+    "is_proj": -12.1,
+    "n_tokens": 1
+  },
+  {
+    "word": "similarity",
+    "category": "factual",
+    "word_proj": 2.36,
+    "is_proj": -14.6,
+    "n_tokens": 1
+  },
+  {
+    "word": "friend",
+    "category": "roles",
+    "word_proj": 2.19,
+    "is_proj": -3.73,
+    "n_tokens": 1
+  },
+  {
+    "word": "frustrated",
+    "category": "emotional",
+    "word_proj": 2.1,
+    "is_proj": -17.83,
+    "n_tokens": 1
+  },
+  {
+    "word": "harmful",
+    "category": "safety",
+    "word_proj": 2.0,
+    "is_proj": -9.19,
+    "n_tokens": 1
+  },
+  {
+    "word": "acute",
+    "category": "medical",
+    "word_proj": 1.88,
+    "is_proj": -0.69,
+    "n_tokens": 1
+  },
+  {
+    "word": "senate",
+    "category": "political",
+    "word_proj": 1.63,
+    "is_proj": -7.59,
+    "n_tokens": 1
+  },
+  {
+    "word": "helper",
+    "category": "roles",
+    "word_proj": 1.59,
+    "is_proj": -0.21,
+    "n_tokens": 1
+  },
+  {
+    "word": "restart",
+    "category": "action",
+    "word_proj": 1.45,
+    "is_proj": -2.2,
+    "n_tokens": 1
+  },
+  {
+    "word": "reform",
+    "category": "political",
+    "word_proj": 1.24,
+    "is_proj": 8.3,
+    "n_tokens": 1
+  },
+  {
+    "word": "confidential",
+    "category": "safety",
+    "word_proj": 1.22,
+    "is_proj": -10.59,
+    "n_tokens": 1
+  },
+  {
+    "word": "surgery",
+    "category": "medical",
+    "word_proj": 0.88,
+    "is_proj": -6.46,
+    "n_tokens": 1
+  },
+  {
+    "word": "optimize",
+    "category": "helpful",
+    "word_proj": 0.76,
+    "is_proj": -9.59,
+    "n_tokens": 1
+  },
+  {
+    "word": "congress",
+    "category": "political",
+    "word_proj": 0.73,
+    "is_proj": 4.49,
+    "n_tokens": 1
+  },
+  {
+    "word": "sensitive",
+    "category": "safety",
+    "word_proj": 0.62,
+    "is_proj": -5.44,
+    "n_tokens": 1
+  },
+  {
+    "word": "novice",
+    "category": "roles",
+    "word_proj": 0.44,
+    "is_proj": -13.53,
+    "n_tokens": 1
+  },
+  {
+    "word": "depressed",
+    "category": "emotional",
+    "word_proj": 0.25,
+    "is_proj": -3.28,
+    "n_tokens": 1
+  },
+  {
+    "word": "doctor",
+    "category": "roles",
+    "word_proj": 0.23,
+    "is_proj": -5.05,
+    "n_tokens": 1
+  },
+  {
+    "word": "equality",
+    "category": "political",
+    "word_proj": 0.19,
+    "is_proj": -6.13,
+    "n_tokens": 1
+  },
+  {
+    "word": "cancel",
+    "category": "action",
+    "word_proj": 0.18,
+    "is_proj": -3.52,
+    "n_tokens": 1
+  },
+  {
+    "word": "enlightenment",
+    "category": "religious",
+    "word_proj": 0.09,
+    "is_proj": -8.88,
+    "n_tokens": 1
+  },
+  {
+    "word": "expert",
+    "category": "roles",
+    "word_proj": -0.04,
+    "is_proj": -3.03,
+    "n_tokens": 1
+  },
+  {
+    "word": "government",
+    "category": "political",
+    "word_proj": -0.04,
+    "is_proj": 6.53,
+    "n_tokens": 1
+  },
+  {
+    "word": "protest",
+    "category": "political",
+    "word_proj": -0.11,
+    "is_proj": -8.53,
+    "n_tokens": 1
+  },
+  {
+    "word": "estimate",
+    "category": "quantitative",
+    "word_proj": -0.12,
+    "is_proj": -2.54,
+    "n_tokens": 1
+  },
+  {
+    "word": "unethical",
+    "category": "safety",
+    "word_proj": -0.4,
+    "is_proj": -15.39,
+    "n_tokens": 1
+  },
+  {
+    "word": "redemption",
+    "category": "religious",
+    "word_proj": -0.52,
+    "is_proj": -14.45,
+    "n_tokens": 1
+  },
+  {
+    "word": "therapy",
+    "category": "medical",
+    "word_proj": -0.65,
+    "is_proj": -5.54,
+    "n_tokens": 1
+  },
+  {
+    "word": "specification",
+    "category": "factual",
+    "word_proj": -0.84,
+    "is_proj": -9.37,
+    "n_tokens": 1
+  },
+  {
+    "word": "regulation",
+    "category": "factual",
+    "word_proj": -0.88,
+    "is_proj": 0.03,
+    "n_tokens": 1
+  },
+  {
+    "word": "therapist",
+    "category": "roles",
+    "word_proj": -0.97,
+    "is_proj": -8.55,
+    "n_tokens": 1
+  },
+  {
+    "word": "however",
+    "category": "conversational",
+    "word_proj": -1.03,
+    "is_proj": -19.78,
+    "n_tokens": 1
+  },
+  {
+    "word": "corruption",
+    "category": "political",
+    "word_proj": -1.21,
+    "is_proj": -9.56,
+    "n_tokens": 1
+  },
+  {
+    "word": "island",
+    "category": "nature",
+    "word_proj": -1.61,
+    "is_proj": 3.77,
+    "n_tokens": 1
+  },
+  {
+    "word": "please",
+    "category": "conversational",
+    "word_proj": -1.63,
+    "is_proj": -14.95,
+    "n_tokens": 1
+  },
+  {
+    "word": "violation",
+    "category": "safety",
+    "word_proj": -1.66,
+    "is_proj": -9.89,
+    "n_tokens": 1
+  },
+  {
+    "word": "policy",
+    "category": "political",
+    "word_proj": -1.83,
+    "is_proj": -1.34,
+    "n_tokens": 1
+  },
+  {
+    "word": "AI",
+    "category": "roles",
+    "word_proj": -1.84,
+    "is_proj": -4.93,
+    "n_tokens": 1
+  },
+  {
+    "word": "proud",
+    "category": "emotional",
+    "word_proj": -1.98,
+    "is_proj": -14.36,
+    "n_tokens": 1
+  },
+  {
+    "word": "seriously",
+    "category": "conversational",
+    "word_proj": -2.0,
+    "is_proj": -2.45,
+    "n_tokens": 1
+  },
+  {
+    "word": "verify",
+    "category": "action",
+    "word_proj": -2.1,
+    "is_proj": -6.05,
+    "n_tokens": 1
+  },
+  {
+    "word": "tragedy",
+    "category": "creative",
+    "word_proj": -2.26,
+    "is_proj": -19.24,
+    "n_tokens": 1
+  },
+  {
+    "word": "harassment",
+    "category": "safety",
+    "word_proj": -2.26,
+    "is_proj": -13.72,
+    "n_tokens": 1
+  },
+  {
+    "word": "check",
+    "category": "action",
+    "word_proj": -2.27,
+    "is_proj": -5.33,
+    "n_tokens": 1
+  },
+  {
+    "word": "excited",
+    "category": "emotional",
+    "word_proj": -2.35,
+    "is_proj": -9.23,
+    "n_tokens": 1
+  },
+  {
+    "word": "assessment",
+    "category": "academic",
+    "word_proj": -2.44,
+    "is_proj": -5.05,
+    "n_tokens": 1
+  },
+  {
+    "word": "safe",
+    "category": "safety",
+    "word_proj": -2.52,
+    "is_proj": -5.64,
+    "n_tokens": 1
+  },
+  {
+    "word": "basically",
+    "category": "conversational",
+    "word_proj": -2.55,
+    "is_proj": -14.33,
+    "n_tokens": 1
+  },
+  {
+    "word": "inappropriate",
+    "category": "safety",
+    "word_proj": -2.65,
+    "is_proj": -17.45,
+    "n_tokens": 1
+  },
+  {
+    "word": "president",
+    "category": "political",
+    "word_proj": -2.68,
+    "is_proj": -4.65,
+    "n_tokens": 1
+  },
+  {
+    "word": "planet",
+    "category": "nature",
+    "word_proj": -2.94,
+    "is_proj": -15.25,
+    "n_tokens": 1
+  },
+  {
+    "word": "overview",
+    "category": "factual",
+    "word_proj": -2.97,
+    "is_proj": -10.32,
+    "n_tokens": 1
+  },
+  {
+    "word": "probably",
+    "category": "conversational",
+    "word_proj": -3.1,
+    "is_proj": 2.3,
+    "n_tokens": 1
+  },
+  {
+    "word": "mosque",
+    "category": "religious",
+    "word_proj": -3.22,
+    "is_proj": -7.43,
+    "n_tokens": 1
+  },
+  {
+    "word": "bot",
+    "category": "roles",
+    "word_proj": -3.23,
+    "is_proj": -5.53,
+    "n_tokens": 1
+  },
+  {
+    "word": "fantasy",
+    "category": "creative",
+    "word_proj": -3.26,
+    "is_proj": -21.58,
+    "n_tokens": 1
+  },
+  {
+    "word": "confirm",
+    "category": "action",
+    "word_proj": -3.28,
+    "is_proj": -7.35,
+    "n_tokens": 1
+  },
+  {
+    "word": "strategy",
+    "category": "helpful",
+    "word_proj": -3.3,
+    "is_proj": -13.79,
+    "n_tokens": 1
+  },
+  {
+    "word": "nevertheless",
+    "category": "conversational",
+    "word_proj": -3.4,
+    "is_proj": -24.87,
+    "n_tokens": 1
+  },
+  {
+    "word": "clarification",
+    "category": "helpful",
+    "word_proj": -3.47,
+    "is_proj": -11.95,
+    "n_tokens": 1
+  },
+  {
+    "word": "advice",
+    "category": "helpful",
+    "word_proj": -3.51,
+    "is_proj": -6.85,
+    "n_tokens": 1
+  },
+  {
+    "word": "suggestion",
+    "category": "helpful",
+    "word_proj": -3.51,
+    "is_proj": -2.36,
+    "n_tokens": 1
+  },
+  {
+    "word": "student",
+    "category": "roles",
+    "word_proj": -3.65,
+    "is_proj": -2.3,
+    "n_tokens": 1
+  },
+  {
+    "word": "moreover",
+    "category": "conversational",
+    "word_proj": -3.72,
+    "is_proj": -18.72,
+    "n_tokens": 1
+  },
+  {
+    "word": "medication",
+    "category": "medical",
+    "word_proj": -3.86,
+    "is_proj": -10.18,
+    "n_tokens": 1
+  },
+  {
+    "word": "philosophy",
+    "category": "academic",
+    "word_proj": -3.92,
+    "is_proj": -7.16,
+    "n_tokens": 1
+  },
+  {
+    "word": "evaluation",
+    "category": "academic",
+    "word_proj": -3.99,
+    "is_proj": 1.84,
+    "n_tokens": 1
+  },
+  {
+    "word": "recommendation",
+    "category": "helpful",
+    "word_proj": -4.02,
+    "is_proj": -2.49,
+    "n_tokens": 1
+  },
+  {
+    "word": "absolutely",
+    "category": "conversational",
+    "word_proj": -4.03,
+    "is_proj": -18.36,
+    "n_tokens": 1
+  },
+  {
+    "word": "dialogue",
+    "category": "creative",
+    "word_proj": -4.05,
+    "is_proj": -1.41,
+    "n_tokens": 1
+  },
+  {
+    "word": "prevention",
+    "category": "medical",
+    "word_proj": -4.18,
+    "is_proj": -3.47,
+    "n_tokens": 1
+  },
+  {
+    "word": "church",
+    "category": "religious",
+    "word_proj": -4.24,
+    "is_proj": -2.83,
+    "n_tokens": 1
+  },
+  {
+    "word": "faith",
+    "category": "religious",
+    "word_proj": -4.26,
+    "is_proj": -9.68,
+    "n_tokens": 1
+  },
+  {
+    "word": "instructions",
+    "category": "helpful",
+    "word_proj": -4.3,
+    "is_proj": -14.15,
+    "n_tokens": 1
+  },
+  {
+    "word": "paste",
+    "category": "action",
+    "word_proj": -4.3,
+    "is_proj": -8.62,
+    "n_tokens": 1
+  },
+  {
+    "word": "offensive",
+    "category": "safety",
+    "word_proj": -4.32,
+    "is_proj": -4.16,
+    "n_tokens": 1
+  },
+  {
+    "word": "emotion",
+    "category": "creative",
+    "word_proj": -4.45,
+    "is_proj": -17.75,
+    "n_tokens": 1
+  },
+  {
+    "word": "clinic",
+    "category": "medical",
+    "word_proj": -4.62,
+    "is_proj": 3.64,
+    "n_tokens": 1
+  },
+  {
+    "word": "anyway",
+    "category": "conversational",
+    "word_proj": -4.64,
+    "is_proj": -10.14,
+    "n_tokens": 1
+  },
+  {
+    "word": "assistant",
+    "category": "roles",
+    "word_proj": -4.74,
+    "is_proj": -9.12,
+    "n_tokens": 1
+  },
+  {
+    "word": "banned",
+    "category": "safety",
+    "word_proj": -4.74,
+    "is_proj": -14.55,
+    "n_tokens": 1
+  },
+  {
+    "word": "stranger",
+    "category": "roles",
+    "word_proj": -4.77,
+    "is_proj": -13.25,
+    "n_tokens": 1
+  },
+  {
+    "word": "research",
+    "category": "academic",
+    "word_proj": -4.77,
+    "is_proj": -0.86,
+    "n_tokens": 1
+  },
+  {
+    "word": "illegal",
+    "category": "safety",
+    "word_proj": -4.85,
+    "is_proj": -7.43,
+    "n_tokens": 1
+  },
+  {
+    "word": "thanks",
+    "category": "conversational",
+    "word_proj": -4.85,
+    "is_proj": -2.96,
+    "n_tokens": 1
+  },
+  {
+    "word": "diet",
+    "category": "medical",
+    "word_proj": -4.9,
+    "is_proj": 0.98,
+    "n_tokens": 1
+  },
+  {
+    "word": "comedy",
+    "category": "creative",
+    "word_proj": -4.91,
+    "is_proj": -5.08,
+    "n_tokens": 1
+  },
+  {
+    "word": "abuse",
+    "category": "safety",
+    "word_proj": -5.0,
+    "is_proj": -7.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "emergency",
+    "category": "medical",
+    "word_proj": -5.01,
+    "is_proj": -0.15,
+    "n_tokens": 1
+  },
+  {
+    "word": "import",
+    "category": "technical",
+    "word_proj": -5.14,
+    "is_proj": -8.23,
+    "n_tokens": 1
+  },
+  {
+    "word": "chronic",
+    "category": "medical",
+    "word_proj": -5.21,
+    "is_proj": -10.98,
+    "n_tokens": 1
+  },
+  {
+    "word": "infection",
+    "category": "medical",
+    "word_proj": -5.25,
+    "is_proj": -8.21,
+    "n_tokens": 1
+  },
+  {
+    "word": "restricted",
+    "category": "safety",
+    "word_proj": -5.3,
+    "is_proj": -1.66,
+    "n_tokens": 1
+  },
+  {
+    "word": "secure",
+    "category": "safety",
+    "word_proj": -5.46,
+    "is_proj": -8.13,
+    "n_tokens": 1
+  },
+  {
+    "word": "privacy",
+    "category": "safety",
+    "word_proj": -5.51,
+    "is_proj": -1.29,
+    "n_tokens": 1
+  },
+  {
+    "word": "revolution",
+    "category": "political",
+    "word_proj": -5.54,
+    "is_proj": -6.85,
+    "n_tokens": 1
+  },
+  {
+    "word": "hospital",
+    "category": "medical",
+    "word_proj": -5.55,
+    "is_proj": 5.86,
+    "n_tokens": 1
+  },
+  {
+    "word": "setup",
+    "category": "helpful",
+    "word_proj": -5.63,
+    "is_proj": -10.94,
+    "n_tokens": 1
+  },
+  {
+    "word": "chatbot",
+    "category": "roles",
+    "word_proj": -5.65,
+    "is_proj": -8.91,
+    "n_tokens": 2
+  },
+  {
+    "word": "adventure",
+    "category": "creative",
+    "word_proj": -5.7,
+    "is_proj": -15.17,
+    "n_tokens": 1
+  },
+  {
+    "word": "diagnosis",
+    "category": "medical",
+    "word_proj": -5.73,
+    "is_proj": -10.11,
+    "n_tokens": 1
+  },
+  {
+    "word": "pharmacy",
+    "category": "medical",
+    "word_proj": -5.74,
+    "is_proj": -1.61,
+    "n_tokens": 1
+  },
+  {
+    "word": "employee",
+    "category": "roles",
+    "word_proj": -5.75,
+    "is_proj": 3.42,
+    "n_tokens": 1
+  },
+  {
+    "word": "forest",
+    "category": "nature",
+    "word_proj": -5.77,
+    "is_proj": 2.0,
+    "n_tokens": 1
+  },
+  {
+    "word": "literature",
+    "category": "academic",
+    "word_proj": -5.8,
+    "is_proj": -7.19,
+    "n_tokens": 1
+  },
+  {
+    "word": "novel",
+    "category": "creative",
+    "word_proj": -5.81,
+    "is_proj": -11.85,
+    "n_tokens": 1
+  },
+  {
+    "word": "upload",
+    "category": "action",
+    "word_proj": -5.85,
+    "is_proj": -8.38,
+    "n_tokens": 1
+  },
+  {
+    "word": "prevent",
+    "category": "helpful",
+    "word_proj": -5.89,
+    "is_proj": -5.54,
+    "n_tokens": 1
+  },
+  {
+    "word": "no",
+    "category": "conversational",
+    "word_proj": -6.04,
+    "is_proj": -0.5,
+    "n_tokens": 1
+  },
+  {
+    "word": "class",
+    "category": "technical",
+    "word_proj": -6.05,
+    "is_proj": 2.33,
+    "n_tokens": 1
+  },
+  {
+    "word": "download",
+    "category": "action",
+    "word_proj": -6.07,
+    "is_proj": -8.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "health",
+    "category": "medical",
+    "word_proj": -6.1,
+    "is_proj": 0.49,
+    "n_tokens": 1
+  },
+  {
+    "word": "update",
+    "category": "action",
+    "word_proj": -6.16,
+    "is_proj": -4.48,
+    "n_tokens": 1
+  },
+  {
+    "word": "bibliography",
+    "category": "academic",
+    "word_proj": -6.18,
+    "is_proj": -15.76,
+    "n_tokens": 1
+  },
+  {
+    "word": "close",
+    "category": "action",
+    "word_proj": -6.21,
+    "is_proj": -7.36,
+    "n_tokens": 1
+  },
+  {
+    "word": "meanwhile",
+    "category": "conversational",
+    "word_proj": -6.24,
+    "is_proj": -14.1,
+    "n_tokens": 1
+  },
+  {
+    "word": "confident",
+    "category": "emotional",
+    "word_proj": -6.28,
+    "is_proj": -5.53,
+    "n_tokens": 1
+  },
+  {
+    "word": "hypothesis",
+    "category": "academic",
+    "word_proj": -6.3,
+    "is_proj": -2.56,
+    "n_tokens": 1
+  },
+  {
+    "word": "maybe",
+    "category": "conversational",
+    "word_proj": -6.33,
+    "is_proj": -22.38,
+    "n_tokens": 1
+  },
+  {
+    "word": "agent",
+    "category": "roles",
+    "word_proj": -6.36,
+    "is_proj": -6.3,
+    "n_tokens": 1
+  },
+  {
+    "word": "angry",
+    "category": "emotional",
+    "word_proj": -6.48,
+    "is_proj": -16.84,
+    "n_tokens": 1
+  },
+  {
+    "word": "diagram",
+    "category": "factual",
+    "word_proj": -6.64,
+    "is_proj": -0.5,
+    "n_tokens": 1
+  },
+  {
+    "word": "okay",
+    "category": "conversational",
+    "word_proj": -6.71,
+    "is_proj": -14.2,
+    "n_tokens": 1
+  },
+  {
+    "word": "condition",
+    "category": "technical",
+    "word_proj": -6.81,
+    "is_proj": -9.02,
+    "n_tokens": 1
+  },
+  {
+    "word": "amazing",
+    "category": "emotional",
+    "word_proj": -6.83,
+    "is_proj": -14.56,
+    "n_tokens": 1
+  },
+  {
+    "word": "resolve",
+    "category": "helpful",
+    "word_proj": -6.88,
+    "is_proj": -14.02,
+    "n_tokens": 1
+  },
+  {
+    "word": "correlation",
+    "category": "quantitative",
+    "word_proj": -6.93,
+    "is_proj": -8.64,
+    "n_tokens": 1
+  },
+  {
+    "word": "court",
+    "category": "political",
+    "word_proj": -6.94,
+    "is_proj": -0.39,
+    "n_tokens": 1
+  },
+  {
+    "word": "activism",
+    "category": "political",
+    "word_proj": -7.01,
+    "is_proj": -13.32,
+    "n_tokens": 1
+  },
+  {
+    "word": "chart",
+    "category": "factual",
+    "word_proj": -7.09,
+    "is_proj": -8.82,
+    "n_tokens": 1
+  },
+  {
+    "word": "teacher",
+    "category": "roles",
+    "word_proj": -7.11,
+    "is_proj": -3.1,
+    "n_tokens": 1
+  },
+  {
+    "word": "launch",
+    "category": "action",
+    "word_proj": -7.16,
+    "is_proj": -6.48,
+    "n_tokens": 1
+  },
+  {
+    "word": "furthermore",
+    "category": "conversational",
+    "word_proj": -7.23,
+    "is_proj": -17.68,
+    "n_tokens": 1
+  },
+  {
+    "word": "approximate",
+    "category": "quantitative",
+    "word_proj": -7.33,
+    "is_proj": -7.09,
+    "n_tokens": 1
+  },
+  {
+    "word": "grateful",
+    "category": "emotional",
+    "word_proj": -7.34,
+    "is_proj": -19.13,
+    "n_tokens": 1
+  },
+  {
+    "word": "risk",
+    "category": "safety",
+    "word_proj": -7.34,
+    "is_proj": -9.67,
+    "n_tokens": 1
+  },
+  {
+    "word": "valley",
+    "category": "nature",
+    "word_proj": -7.38,
+    "is_proj": -8.66,
+    "n_tokens": 1
+  },
+  {
+    "word": "framework",
+    "category": "academic",
+    "word_proj": -7.47,
+    "is_proj": -17.13,
+    "n_tokens": 1
+  },
+  {
+    "word": "freedom",
+    "category": "political",
+    "word_proj": -7.52,
+    "is_proj": -11.81,
+    "n_tokens": 1
+  },
+  {
+    "word": "comparison",
+    "category": "factual",
+    "word_proj": -7.62,
+    "is_proj": -15.41,
+    "n_tokens": 1
+  },
+  {
+    "word": "actually",
+    "category": "conversational",
+    "word_proj": -7.68,
+    "is_proj": -17.15,
+    "n_tokens": 1
+  },
+  {
+    "word": "exactly",
+    "category": "conversational",
+    "word_proj": -7.71,
+    "is_proj": -10.89,
+    "n_tokens": 1
+  },
+  {
+    "word": "enter",
+    "category": "action",
+    "word_proj": -7.73,
+    "is_proj": -12.94,
+    "n_tokens": 1
+  },
+  {
+    "word": "creative",
+    "category": "creative",
+    "word_proj": -7.8,
+    "is_proj": -10.59,
+    "n_tokens": 1
+  },
+  {
+    "word": "sorry",
+    "category": "conversational",
+    "word_proj": -7.8,
+    "is_proj": -0.86,
+    "n_tokens": 1
+  },
+  {
+    "word": "enable",
+    "category": "helpful",
+    "word_proj": -7.84,
+    "is_proj": -4.06,
+    "n_tokens": 1
+  },
+  {
+    "word": "insert",
+    "category": "action",
+    "word_proj": -7.9,
+    "is_proj": -7.93,
+    "n_tokens": 1
+  },
+  {
+    "word": "submit",
+    "category": "action",
+    "word_proj": -7.92,
+    "is_proj": -8.9,
+    "n_tokens": 1
+  },
+  {
+    "word": "variance",
+    "category": "quantitative",
+    "word_proj": -8.0,
+    "is_proj": -6.97,
+    "n_tokens": 1
+  },
+  {
+    "word": "survey",
+    "category": "academic",
+    "word_proj": -8.01,
+    "is_proj": 0.69,
+    "n_tokens": 1
+  },
+  {
+    "word": "passion",
+    "category": "creative",
+    "word_proj": -8.02,
+    "is_proj": -18.63,
+    "n_tokens": 1
+  },
+  {
+    "word": "butterfly",
+    "category": "nature",
+    "word_proj": -8.06,
+    "is_proj": -1.02,
+    "n_tokens": 1
+  },
+  {
+    "word": "frankly",
+    "category": "conversational",
+    "word_proj": -8.1,
+    "is_proj": -21.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "protocol",
+    "category": "factual",
+    "word_proj": -8.13,
+    "is_proj": -11.75,
+    "n_tokens": 1
+  },
+  {
+    "word": "replace",
+    "category": "action",
+    "word_proj": -8.13,
+    "is_proj": -11.3,
+    "n_tokens": 1
+  },
+  {
+    "word": "sure",
+    "category": "conversational",
+    "word_proj": -8.18,
+    "is_proj": -5.22,
+    "n_tokens": 1
+  },
+  {
+    "word": "discourse",
+    "category": "academic",
+    "word_proj": -8.2,
+    "is_proj": -7.07,
+    "n_tokens": 1
+  },
+  {
+    "word": "symptoms",
+    "category": "medical",
+    "word_proj": -8.21,
+    "is_proj": -12.99,
+    "n_tokens": 1
+  },
+  {
+    "word": "toxic",
+    "category": "safety",
+    "word_proj": -8.22,
+    "is_proj": -8.21,
+    "n_tokens": 1
+  },
+  {
+    "word": "confused",
+    "category": "emotional",
+    "word_proj": -8.23,
+    "is_proj": -13.43,
+    "n_tokens": 1
+  },
+  {
+    "word": "law",
+    "category": "political",
+    "word_proj": -8.31,
+    "is_proj": -6.67,
+    "n_tokens": 1
+  },
+  {
+    "word": "prescription",
+    "category": "medical",
+    "word_proj": -8.34,
+    "is_proj": -2.42,
+    "n_tokens": 1
+  },
+  {
+    "word": "election",
+    "category": "political",
+    "word_proj": -8.36,
+    "is_proj": -1.95,
+    "n_tokens": 1
+  },
+  {
+    "word": "hello",
+    "category": "conversational",
+    "word_proj": -8.36,
+    "is_proj": -16.63,
+    "n_tokens": 1
+  },
+  {
+    "word": "vote",
+    "category": "political",
+    "word_proj": -8.39,
+    "is_proj": -2.42,
+    "n_tokens": 1
+  },
+  {
+    "word": "review",
+    "category": "academic",
+    "word_proj": -8.42,
+    "is_proj": -7.2,
+    "n_tokens": 1
+  },
+  {
+    "word": "integer",
+    "category": "technical",
+    "word_proj": -8.46,
+    "is_proj": -4.73,
+    "n_tokens": 1
+  },
+  {
+    "word": "troubleshoot",
+    "category": "helpful",
+    "word_proj": -8.49,
+    "is_proj": -11.31,
+    "n_tokens": 2
+  },
+  {
+    "word": "violence",
+    "category": "safety",
+    "word_proj": -8.74,
+    "is_proj": -10.83,
+    "n_tokens": 1
+  },
+  {
+    "word": "infinity",
+    "category": "nature",
+    "word_proj": -8.77,
+    "is_proj": -12.87,
+    "n_tokens": 1
+  },
+  {
+    "word": "analysis",
+    "category": "academic",
+    "word_proj": -8.79,
+    "is_proj": -12.79,
+    "n_tokens": 1
+  },
+  {
+    "word": "procedure",
+    "category": "helpful",
+    "word_proj": -8.9,
+    "is_proj": -10.71,
+    "n_tokens": 1
+  },
+  {
+    "word": "blessing",
+    "category": "religious",
+    "word_proj": -9.02,
+    "is_proj": -19.11,
+    "n_tokens": 1
+  },
+  {
+    "word": "critique",
+    "category": "academic",
+    "word_proj": -9.03,
+    "is_proj": -13.56,
+    "n_tokens": 1
+  },
+  {
+    "word": "start",
+    "category": "action",
+    "word_proj": -9.03,
+    "is_proj": -13.64,
+    "n_tokens": 1
+  },
+  {
+    "word": "devastated",
+    "category": "emotional",
+    "word_proj": -9.07,
+    "is_proj": -13.96,
+    "n_tokens": 1
+  },
+  {
+    "word": "statistic",
+    "category": "factual",
+    "word_proj": -9.11,
+    "is_proj": -10.86,
+    "n_tokens": 1
+  },
+  {
+    "word": "install",
+    "category": "helpful",
+    "word_proj": -9.12,
+    "is_proj": -7.24,
+    "n_tokens": 1
+  },
+  {
+    "word": "anxious",
+    "category": "emotional",
+    "word_proj": -9.13,
+    "is_proj": -12.67,
+    "n_tokens": 1
+  },
+  {
+    "word": "percentage",
+    "category": "factual",
+    "word_proj": -9.15,
+    "is_proj": -7.5,
+    "n_tokens": 1
+  },
+  {
+    "word": "diagnose",
+    "category": "helpful",
+    "word_proj": -9.18,
+    "is_proj": -12.53,
+    "n_tokens": 1
+  },
+  {
+    "word": "algorithm",
+    "category": "technical",
+    "word_proj": -9.21,
+    "is_proj": -18.18,
+    "n_tokens": 1
+  },
+  {
+    "word": "fix",
+    "category": "helpful",
+    "word_proj": -9.28,
+    "is_proj": -17.81,
+    "n_tokens": 1
+  },
+  {
+    "word": "flower",
+    "category": "nature",
+    "word_proj": -9.38,
+    "is_proj": -2.21,
+    "n_tokens": 1
+  },
+  {
+    "word": "brilliant",
+    "category": "emotional",
+    "word_proj": -9.42,
+    "is_proj": -18.66,
+    "n_tokens": 1
+  },
+  {
+    "word": "paradigm",
+    "category": "academic",
+    "word_proj": -9.46,
+    "is_proj": -24.78,
+    "n_tokens": 1
+  },
+  {
+    "word": "citation",
+    "category": "academic",
+    "word_proj": -9.46,
+    "is_proj": -6.07,
+    "n_tokens": 1
+  },
+  {
+    "word": "storm",
+    "category": "nature",
+    "word_proj": -9.5,
+    "is_proj": -8.78,
+    "n_tokens": 1
+  },
+  {
+    "word": "save",
+    "category": "action",
+    "word_proj": -9.63,
+    "is_proj": -3.6,
+    "n_tokens": 1
+  },
+  {
+    "word": "fiction",
+    "category": "creative",
+    "word_proj": -9.67,
+    "is_proj": -19.63,
+    "n_tokens": 1
+  },
+  {
+    "word": "vaccine",
+    "category": "medical",
+    "word_proj": -9.79,
+    "is_proj": -8.14,
+    "n_tokens": 1
+  },
+  {
+    "word": "guide",
+    "category": "helpful",
+    "word_proj": -9.8,
+    "is_proj": -5.12,
+    "n_tokens": 1
+  },
+  {
+    "word": "revelation",
+    "category": "religious",
+    "word_proj": -9.81,
+    "is_proj": -15.21,
+    "n_tokens": 1
+  },
+  {
+    "word": "ashamed",
+    "category": "emotional",
+    "word_proj": -9.82,
+    "is_proj": -23.62,
+    "n_tokens": 1
+  },
+  {
+    "word": "select",
+    "category": "action",
+    "word_proj": -9.84,
+    "is_proj": -16.27,
+    "n_tokens": 1
+  },
+  {
+    "word": "worship",
+    "category": "religious",
+    "word_proj": -9.88,
+    "is_proj": -17.19,
+    "n_tokens": 1
+  },
+  {
+    "word": "parameter",
+    "category": "quantitative",
+    "word_proj": -9.93,
+    "is_proj": -15.35,
+    "n_tokens": 1
+  },
+  {
+    "word": "exercise",
+    "category": "medical",
+    "word_proj": -9.96,
+    "is_proj": -14.33,
+    "n_tokens": 1
+  },
+  {
+    "word": "find",
+    "category": "action",
+    "word_proj": -9.98,
+    "is_proj": -8.73,
+    "n_tokens": 1
+  },
+  {
+    "word": "matrix",
+    "category": "quantitative",
+    "word_proj": -9.98,
+    "is_proj": -2.77,
+    "n_tokens": 1
+  },
+  {
+    "word": "server",
+    "category": "technical",
+    "word_proj": -10.01,
+    "is_proj": -7.81,
+    "n_tokens": 1
+  },
+  {
+    "word": "configure",
+    "category": "helpful",
+    "word_proj": -10.03,
+    "is_proj": -14.9,
+    "n_tokens": 1
+  },
+  {
+    "word": "yes",
+    "category": "conversational",
+    "word_proj": -10.13,
+    "is_proj": -14.9,
+    "n_tokens": 1
+  },
+  {
+    "word": "tutorial",
+    "category": "helpful",
+    "word_proj": -10.15,
+    "is_proj": -15.09,
+    "n_tokens": 1
+  },
+  {
+    "word": "wolf",
+    "category": "nature",
+    "word_proj": -10.15,
+    "is_proj": -11.15,
+    "n_tokens": 1
+  },
+  {
+    "word": "prohibited",
+    "category": "safety",
+    "word_proj": -10.18,
+    "is_proj": -16.11,
+    "n_tokens": 1
+  },
+  {
+    "word": "wonderful",
+    "category": "emotional",
+    "word_proj": -10.19,
+    "is_proj": -19.74,
+    "n_tokens": 1
+  },
+  {
+    "word": "thesis",
+    "category": "academic",
+    "word_proj": -10.2,
+    "is_proj": -12.94,
+    "n_tokens": 1
+  },
+  {
+    "word": "coefficient",
+    "category": "quantitative",
+    "word_proj": -10.2,
+    "is_proj": 1.83,
+    "n_tokens": 1
+  },
+  {
+    "word": "threat",
+    "category": "safety",
+    "word_proj": -10.29,
+    "is_proj": -9.67,
+    "n_tokens": 1
+  },
+  {
+    "word": "connect",
+    "category": "action",
+    "word_proj": -10.34,
+    "is_proj": -12.77,
+    "n_tokens": 1
+  },
+  {
+    "word": "joy",
+    "category": "creative",
+    "word_proj": -10.37,
+    "is_proj": -18.13,
+    "n_tokens": 1
+  },
+  {
+    "word": "desert",
+    "category": "nature",
+    "word_proj": -10.38,
+    "is_proj": -4.25,
+    "n_tokens": 1
+  },
+  {
+    "word": "run",
+    "category": "action",
+    "word_proj": -10.49,
+    "is_proj": -6.39,
+    "n_tokens": 1
+  },
+  {
+    "word": "requirement",
+    "category": "factual",
+    "word_proj": -10.5,
+    "is_proj": -13.62,
+    "n_tokens": 1
+  },
+  {
+    "word": "river",
+    "category": "nature",
+    "word_proj": -10.58,
+    "is_proj": -0.06,
+    "n_tokens": 1
+  },
+  {
+    "word": "romance",
+    "category": "creative",
+    "word_proj": -10.59,
+    "is_proj": -11.34,
+    "n_tokens": 1
+  },
+  {
+    "word": "imagine",
+    "category": "creative",
+    "word_proj": -10.61,
+    "is_proj": -14.44,
+    "n_tokens": 1
+  },
+  {
+    "word": "rain",
+    "category": "nature",
+    "word_proj": -10.67,
+    "is_proj": -13.69,
+    "n_tokens": 1
+  },
+  {
+    "word": "bird",
+    "category": "nature",
+    "word_proj": -10.8,
+    "is_proj": -7.6,
+    "n_tokens": 1
+  },
+  {
+    "word": "array",
+    "category": "technical",
+    "word_proj": -10.86,
+    "is_proj": -4.0,
+    "n_tokens": 1
+  },
+  {
+    "word": "methodology",
+    "category": "academic",
+    "word_proj": -10.87,
+    "is_proj": -17.37,
+    "n_tokens": 1
+  },
+  {
+    "word": "conclusion",
+    "category": "academic",
+    "word_proj": -10.93,
+    "is_proj": -9.57,
+    "n_tokens": 1
+  },
+  {
+    "word": "API",
+    "category": "technical",
+    "word_proj": -10.93,
+    "is_proj": -12.58,
+    "n_tokens": 1
+  },
+  {
+    "word": "protect",
+    "category": "safety",
+    "word_proj": -10.95,
+    "is_proj": -5.52,
+    "n_tokens": 1
+  },
+  {
+    "word": "companion",
+    "category": "roles",
+    "word_proj": -10.97,
+    "is_proj": -10.01,
+    "n_tokens": 1
+  },
+  {
+    "word": "compute",
+    "category": "quantitative",
+    "word_proj": -11.04,
+    "is_proj": -5.91,
+    "n_tokens": 1
+  },
+  {
+    "word": "beautiful",
+    "category": "emotional",
+    "word_proj": -11.05,
+    "is_proj": -18.42,
+    "n_tokens": 1
+  },
+  {
+    "word": "ritual",
+    "category": "religious",
+    "word_proj": -11.06,
+    "is_proj": -23.36,
+    "n_tokens": 1
+  },
+  {
+    "word": "definitely",
+    "category": "conversational",
+    "word_proj": -11.1,
+    "is_proj": -10.2,
+    "n_tokens": 1
+  },
+  {
+    "word": "caution",
+    "category": "safety",
+    "word_proj": -11.14,
+    "is_proj": -8.75,
+    "n_tokens": 1
+  },
+  {
+    "word": "exception",
+    "category": "technical",
+    "word_proj": -11.16,
+    "is_proj": -17.58,
+    "n_tokens": 1
+  },
+  {
+    "word": "thunder",
+    "category": "nature",
+    "word_proj": -11.18,
+    "is_proj": -19.67,
+    "n_tokens": 1
+  },
+  {
+    "word": "theory",
+    "category": "academic",
+    "word_proj": -11.19,
+    "is_proj": -11.53,
+    "n_tokens": 1
+  },
+  {
+    "word": "prophet",
+    "category": "religious",
+    "word_proj": -11.2,
+    "is_proj": -23.94,
+    "n_tokens": 1
+  },
+  {
+    "word": "constant",
+    "category": "quantitative",
+    "word_proj": -11.2,
+    "is_proj": -8.98,
+    "n_tokens": 1
+  },
+  {
+    "word": "character",
+    "category": "creative",
+    "word_proj": -11.26,
+    "is_proj": -12.23,
+    "n_tokens": 1
+  },
+  {
+    "word": "calculate",
+    "category": "quantitative",
+    "word_proj": -11.26,
+    "is_proj": -11.47,
+    "n_tokens": 1
+  },
+  {
+    "word": "debug",
+    "category": "technical",
+    "word_proj": -11.27,
+    "is_proj": -14.13,
+    "n_tokens": 1
+  },
+  {
+    "word": "spiritual",
+    "category": "religious",
+    "word_proj": -11.28,
+    "is_proj": -6.46,
+    "n_tokens": 1
+  },
+  {
+    "word": "dangerous",
+    "category": "safety",
+    "word_proj": -11.28,
+    "is_proj": -13.5,
+    "n_tokens": 1
+  },
+  {
+    "word": "sad",
+    "category": "emotional",
+    "word_proj": -11.31,
+    "is_proj": -6.83,
+    "n_tokens": 1
+  },
+  {
+    "word": "sunset",
+    "category": "nature",
+    "word_proj": -11.33,
+    "is_proj": -12.71,
+    "n_tokens": 1
+  },
+  {
+    "word": "study",
+    "category": "academic",
+    "word_proj": -11.35,
+    "is_proj": -11.22,
+    "n_tokens": 1
+  },
+  {
+    "word": "disease",
+    "category": "medical",
+    "word_proj": -11.36,
+    "is_proj": -9.25,
+    "n_tokens": 1
+  },
+  {
+    "word": "regression",
+    "category": "quantitative",
+    "word_proj": -11.39,
+    "is_proj": -7.29,
+    "n_tokens": 1
+  },
+  {
+    "word": "execute",
+    "category": "action",
+    "word_proj": -11.46,
+    "is_proj": -5.88,
+    "n_tokens": 1
+  },
+  {
+    "word": "star",
+    "category": "nature",
+    "word_proj": -11.53,
+    "is_proj": -7.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "deploy",
+    "category": "technical",
+    "word_proj": -11.63,
+    "is_proj": -13.74,
+    "n_tokens": 1
+  },
+  {
+    "word": "distribution",
+    "category": "quantitative",
+    "word_proj": -11.65,
+    "is_proj": -2.14,
+    "n_tokens": 1
+  },
+  {
+    "word": "meaning",
+    "category": "factual",
+    "word_proj": -11.66,
+    "is_proj": -14.66,
+    "n_tokens": 1
+  },
+  {
+    "word": "movement",
+    "category": "political",
+    "word_proj": -11.68,
+    "is_proj": -6.19,
+    "n_tokens": 1
+  },
+  {
+    "word": "legend",
+    "category": "creative",
+    "word_proj": -11.78,
+    "is_proj": -13.25,
+    "n_tokens": 1
+  },
+  {
+    "word": "dissertation",
+    "category": "academic",
+    "word_proj": -11.79,
+    "is_proj": -14.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "epistemology",
+    "category": "academic",
+    "word_proj": -11.95,
+    "is_proj": -18.77,
+    "n_tokens": 3
+  },
+  {
+    "word": "galaxy",
+    "category": "nature",
+    "word_proj": -12.04,
+    "is_proj": -10.54,
+    "n_tokens": 1
+  },
+  {
+    "word": "hate",
+    "category": "creative",
+    "word_proj": -12.05,
+    "is_proj": -25.16,
+    "n_tokens": 1
+  },
+  {
+    "word": "calm",
+    "category": "emotional",
+    "word_proj": -12.06,
+    "is_proj": -22.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "summary",
+    "category": "factual",
+    "word_proj": -12.06,
+    "is_proj": -12.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "sunrise",
+    "category": "nature",
+    "word_proj": -12.09,
+    "is_proj": -22.29,
+    "n_tokens": 1
+  },
+  {
+    "word": "scripture",
+    "category": "religious",
+    "word_proj": -12.12,
+    "is_proj": -23.3,
+    "n_tokens": 1
+  },
+  {
+    "word": "steps",
+    "category": "helpful",
+    "word_proj": -12.16,
+    "is_proj": -15.06,
+    "n_tokens": 1
+  },
+  {
+    "word": "plot",
+    "category": "creative",
+    "word_proj": -12.21,
+    "is_proj": -13.21,
+    "n_tokens": 1
+  },
+  {
+    "word": "chapter",
+    "category": "creative",
+    "word_proj": -12.24,
+    "is_proj": -10.99,
+    "n_tokens": 1
+  },
+  {
+    "word": "hermeneutics",
+    "category": "academic",
+    "word_proj": -12.24,
+    "is_proj": -26.89,
+    "n_tokens": 5
+  },
+  {
+    "word": "heaven",
+    "category": "religious",
+    "word_proj": -12.25,
+    "is_proj": -7.59,
+    "n_tokens": 1
+  },
+  {
+    "word": "meditation",
+    "category": "religious",
+    "word_proj": -12.26,
+    "is_proj": -20.41,
+    "n_tokens": 1
+  },
+  {
+    "word": "model",
+    "category": "roles",
+    "word_proj": -12.28,
+    "is_proj": -14.38,
+    "n_tokens": 1
+  },
+  {
+    "word": "instance",
+    "category": "factual",
+    "word_proj": -12.29,
+    "is_proj": -17.89,
+    "n_tokens": 1
+  },
+  {
+    "word": "eagle",
+    "category": "nature",
+    "word_proj": -12.36,
+    "is_proj": -10.05,
+    "n_tokens": 1
+  },
+  {
+    "word": "case",
+    "category": "factual",
+    "word_proj": -12.37,
+    "is_proj": -11.7,
+    "n_tokens": 1
+  },
+  {
+    "word": "mercy",
+    "category": "religious",
+    "word_proj": -12.4,
+    "is_proj": -19.02,
+    "n_tokens": 1
+  },
+  {
+    "word": "terminal",
+    "category": "technical",
+    "word_proj": -12.45,
+    "is_proj": -11.27,
+    "n_tokens": 1
+  },
+  {
+    "word": "nirvana",
+    "category": "religious",
+    "word_proj": -12.48,
+    "is_proj": -24.38,
+    "n_tokens": 2
+  },
+  {
+    "word": "mountain",
+    "category": "nature",
+    "word_proj": -12.48,
+    "is_proj": -0.05,
+    "n_tokens": 1
+  },
+  {
+    "word": "variable",
+    "category": "technical",
+    "word_proj": -12.53,
+    "is_proj": -10.69,
+    "n_tokens": 1
+  },
+  {
+    "word": "standard",
+    "category": "factual",
+    "word_proj": -12.54,
+    "is_proj": -12.19,
+    "n_tokens": 1
+  },
+  {
+    "word": "treatment",
+    "category": "medical",
+    "word_proj": -12.55,
+    "is_proj": -8.42,
+    "n_tokens": 1
+  },
+  {
+    "word": "disable",
+    "category": "helpful",
+    "word_proj": -12.57,
+    "is_proj": -7.28,
+    "n_tokens": 1
+  },
+  {
+    "word": "client",
+    "category": "roles",
+    "word_proj": -12.61,
+    "is_proj": -6.41,
+    "n_tokens": 1
+  },
+  {
+    "word": "evidence",
+    "category": "academic",
+    "word_proj": -12.63,
+    "is_proj": -8.57,
+    "n_tokens": 1
+  },
+  {
+    "word": "count",
+    "category": "quantitative",
+    "word_proj": -12.7,
+    "is_proj": -9.2,
+    "n_tokens": 1
+  },
+  {
+    "word": "dose",
+    "category": "medical",
+    "word_proj": -12.82,
+    "is_proj": -10.47,
+    "n_tokens": 1
+  },
+  {
+    "word": "argument",
+    "category": "academic",
+    "word_proj": -12.84,
+    "is_proj": -11.56,
+    "n_tokens": 1
+  },
+  {
+    "word": "heartbroken",
+    "category": "emotional",
+    "word_proj": -12.9,
+    "is_proj": -21.68,
+    "n_tokens": 2
+  },
+  {
+    "word": "terrible",
+    "category": "emotional",
+    "word_proj": -12.92,
+    "is_proj": -19.8,
+    "n_tokens": 1
+  },
+  {
+    "word": "approach",
+    "category": "helpful",
+    "word_proj": -12.96,
+    "is_proj": -16.24,
+    "n_tokens": 1
+  },
+  {
+    "word": "horrible",
+    "category": "emotional",
+    "word_proj": -12.99,
+    "is_proj": -23.48,
+    "n_tokens": 1
+  },
+  {
+    "word": "category",
+    "category": "factual",
+    "word_proj": -13.03,
+    "is_proj": -8.83,
+    "n_tokens": 1
+  },
+  {
+    "word": "interface",
+    "category": "technical",
+    "word_proj": -13.04,
+    "is_proj": -18.23,
+    "n_tokens": 1
+  },
+  {
+    "word": "explanation",
+    "category": "helpful",
+    "word_proj": -13.08,
+    "is_proj": -15.52,
+    "n_tokens": 1
+  },
+  {
+    "word": "login",
+    "category": "action",
+    "word_proj": -13.09,
+    "is_proj": -11.69,
+    "n_tokens": 1
+  },
+  {
+    "word": "temple",
+    "category": "religious",
+    "word_proj": -13.11,
+    "is_proj": -5.15,
+    "n_tokens": 1
+  },
+  {
+    "word": "myth",
+    "category": "creative",
+    "word_proj": -13.25,
+    "is_proj": -16.03,
+    "n_tokens": 1
+  },
+  {
+    "word": "tree",
+    "category": "nature",
+    "word_proj": -13.37,
+    "is_proj": -6.01,
+    "n_tokens": 1
+  },
+  {
+    "word": "stop",
+    "category": "action",
+    "word_proj": -13.38,
+    "is_proj": -5.88,
+    "n_tokens": 1
+  },
+  {
+    "word": "difference",
+    "category": "factual",
+    "word_proj": -13.39,
+    "is_proj": -17.88,
+    "n_tokens": 1
+  },
+  {
+    "word": "technique",
+    "category": "helpful",
+    "word_proj": -13.42,
+    "is_proj": -19.6,
+    "n_tokens": 1
+  },
+  {
+    "word": "hell",
+    "category": "religious",
+    "word_proj": -13.51,
+    "is_proj": -13.51,
+    "n_tokens": 1
+  },
+  {
+    "word": "bible",
+    "category": "religious",
+    "word_proj": -13.57,
+    "is_proj": -25.49,
+    "n_tokens": 1
+  },
+  {
+    "word": "right",
+    "category": "conversational",
+    "word_proj": -13.73,
+    "is_proj": -9.34,
+    "n_tokens": 1
+  },
+  {
+    "word": "measure",
+    "category": "quantitative",
+    "word_proj": -13.93,
+    "is_proj": 0.12,
+    "n_tokens": 1
+  },
+  {
+    "word": "saint",
+    "category": "religious",
+    "word_proj": -13.95,
+    "is_proj": -12.94,
+    "n_tokens": 1
+  },
+  {
+    "word": "pain",
+    "category": "medical",
+    "word_proj": -13.97,
+    "is_proj": -15.23,
+    "n_tokens": 1
+  },
+  {
+    "word": "master",
+    "category": "roles",
+    "word_proj": -13.99,
+    "is_proj": -9.14,
+    "n_tokens": 1
+  },
+  {
+    "word": "validate",
+    "category": "action",
+    "word_proj": -13.99,
+    "is_proj": -16.12,
+    "n_tokens": 1
+  },
+  {
+    "word": "karma",
+    "category": "religious",
+    "word_proj": -14.03,
+    "is_proj": -19.74,
+    "n_tokens": 1
+  },
+  {
+    "word": "script",
+    "category": "technical",
+    "word_proj": -14.07,
+    "is_proj": -13.92,
+    "n_tokens": 1
+  },
+  {
+    "word": "delete",
+    "category": "action",
+    "word_proj": -14.09,
+    "is_proj": -15.23,
+    "n_tokens": 1
+  },
+  {
+    "word": "goodbye",
+    "category": "conversational",
+    "word_proj": -14.23,
+    "is_proj": -16.6,
+    "n_tokens": 1
+  },
+  {
+    "word": "fable",
+    "category": "creative",
+    "word_proj": -14.48,
+    "is_proj": -28.57,
+    "n_tokens": 2
+  },
+  {
+    "word": "library",
+    "category": "technical",
+    "word_proj": -14.49,
+    "is_proj": 2.65,
+    "n_tokens": 1
+  },
+  {
+    "word": "user",
+    "category": "roles",
+    "word_proj": -14.51,
+    "is_proj": -4.14,
+    "n_tokens": 1
+  },
+  {
+    "word": "warning",
+    "category": "safety",
+    "word_proj": -14.51,
+    "is_proj": -17.81,
+    "n_tokens": 1
+  },
+  {
+    "word": "dharma",
+    "category": "religious",
+    "word_proj": -14.54,
+    "is_proj": -32.68,
+    "n_tokens": 2
+  },
+  {
+    "word": "linux",
+    "category": "technical",
+    "word_proj": -14.56,
+    "is_proj": -18.89,
+    "n_tokens": 1
+  },
+  {
+    "word": "copy",
+    "category": "action",
+    "word_proj": -14.61,
+    "is_proj": -4.12,
+    "n_tokens": 1
+  },
+  {
+    "word": "servant",
+    "category": "roles",
+    "word_proj": -14.85,
+    "is_proj": -14.57,
+    "n_tokens": 1
+  },
+  {
+    "word": "type",
+    "category": "factual",
+    "word_proj": -14.86,
+    "is_proj": -17.14,
+    "n_tokens": 1
+  },
+  {
+    "word": "miracle",
+    "category": "religious",
+    "word_proj": -14.98,
+    "is_proj": -29.77,
+    "n_tokens": 1
+  },
+  {
+    "word": "whale",
+    "category": "nature",
+    "word_proj": -14.99,
+    "is_proj": -11.04,
+    "n_tokens": 1
+  },
+  {
+    "word": "holy",
+    "category": "religious",
+    "word_proj": -15.15,
+    "is_proj": -23.51,
+    "n_tokens": 1
+  },
+  {
+    "word": "feeling",
+    "category": "creative",
+    "word_proj": -15.25,
+    "is_proj": -16.59,
+    "n_tokens": 1
+  },
+  {
+    "word": "logout",
+    "category": "action",
+    "word_proj": -15.31,
+    "is_proj": -19.33,
+    "n_tokens": 1
+  },
+  {
+    "word": "concept",
+    "category": "factual",
+    "word_proj": -15.33,
+    "is_proj": -11.9,
+    "n_tokens": 1
+  },
+  {
+    "word": "disconnect",
+    "category": "action",
+    "word_proj": -15.35,
+    "is_proj": -23.88,
+    "n_tokens": 1
+  },
+  {
+    "word": "boolean",
+    "category": "technical",
+    "word_proj": -15.36,
+    "is_proj": -11.53,
+    "n_tokens": 1
+  },
+  {
+    "word": "JavaScript",
+    "category": "technical",
+    "word_proj": -15.4,
+    "is_proj": -12.2,
+    "n_tokens": 1
+  },
+  {
+    "word": "literally",
+    "category": "conversational",
+    "word_proj": -15.43,
+    "is_proj": -15.12,
+    "n_tokens": 1
+  },
+  {
+    "word": "mystery",
+    "category": "creative",
+    "word_proj": -15.61,
+    "is_proj": -15.78,
+    "n_tokens": 1
+  },
+  {
+    "word": "fact",
+    "category": "factual",
+    "word_proj": -15.67,
+    "is_proj": -15.43,
+    "n_tokens": 1
+  },
+  {
+    "word": "definition",
+    "category": "factual",
+    "word_proj": -15.74,
+    "is_proj": -17.66,
+    "n_tokens": 1
+  },
+  {
+    "word": "open",
+    "category": "action",
+    "word_proj": -15.86,
+    "is_proj": -0.74,
+    "n_tokens": 1
+  },
+  {
+    "word": "config",
+    "category": "technical",
+    "word_proj": -15.9,
+    "is_proj": -17.39,
+    "n_tokens": 1
+  },
+  {
+    "word": "code",
+    "category": "technical",
+    "word_proj": -15.97,
+    "is_proj": -13.06,
+    "n_tokens": 1
+  },
+  {
+    "word": "monologue",
+    "category": "creative",
+    "word_proj": -16.01,
+    "is_proj": -16.92,
+    "n_tokens": 2
+  },
+  {
+    "word": "ocean",
+    "category": "nature",
+    "word_proj": -16.02,
+    "is_proj": -11.27,
+    "n_tokens": 1
+  },
+  {
+    "word": "ecstatic",
+    "category": "emotional",
+    "word_proj": -16.09,
+    "is_proj": -23.51,
+    "n_tokens": 1
+  },
+  {
+    "word": "patient",
+    "category": "roles",
+    "word_proj": -16.14,
+    "is_proj": -7.41,
+    "n_tokens": 1
+  },
+  {
+    "word": "awful",
+    "category": "emotional",
+    "word_proj": -16.36,
+    "is_proj": -26.49,
+    "n_tokens": 1
+  },
+  {
+    "word": "abstract",
+    "category": "academic",
+    "word_proj": -16.37,
+    "is_proj": -15.06,
+    "n_tokens": 1
+  },
+  {
+    "word": "remove",
+    "category": "action",
+    "word_proj": -16.38,
+    "is_proj": -6.91,
+    "n_tokens": 1
+  },
+  {
+    "word": "string",
+    "category": "technical",
+    "word_proj": -16.4,
+    "is_proj": -7.97,
+    "n_tokens": 1
+  },
+  {
+    "word": "term",
+    "category": "factual",
+    "word_proj": -16.44,
+    "is_proj": -11.57,
+    "n_tokens": 1
+  },
+  {
+    "word": "loop",
+    "category": "technical",
+    "word_proj": -16.55,
+    "is_proj": -14.15,
+    "n_tokens": 1
+  },
+  {
+    "word": "compile",
+    "category": "technical",
+    "word_proj": -16.62,
+    "is_proj": -11.6,
+    "n_tokens": 1
+  },
+  {
+    "word": "database",
+    "category": "technical",
+    "word_proj": -16.65,
+    "is_proj": -6.56,
+    "n_tokens": 1
+  },
+  {
+    "word": "ontology",
+    "category": "academic",
+    "word_proj": -16.67,
+    "is_proj": -18.78,
+    "n_tokens": 1
+  },
+  {
+    "word": "graph",
+    "category": "factual",
+    "word_proj": -16.68,
+    "is_proj": 3.08,
+    "n_tokens": 1
+  },
+  {
+    "word": "system",
+    "category": "roles",
+    "word_proj": -16.77,
+    "is_proj": -5.55,
+    "n_tokens": 1
+  },
+  {
+    "word": "sermon",
+    "category": "religious",
+    "word_proj": -16.98,
+    "is_proj": -23.43,
+    "n_tokens": 1
+  },
+  {
+    "word": "snow",
+    "category": "nature",
+    "word_proj": -17.16,
+    "is_proj": -9.51,
+    "n_tokens": 1
+  },
+  {
+    "word": "probability",
+    "category": "quantitative",
+    "word_proj": -17.17,
+    "is_proj": -2.52,
+    "n_tokens": 1
+  },
+  {
+    "word": "error",
+    "category": "technical",
+    "word_proj": -17.46,
+    "is_proj": -19.38,
+    "n_tokens": 1
+  },
+  {
+    "word": "soul",
+    "category": "religious",
+    "word_proj": -17.51,
+    "is_proj": -31.6,
+    "n_tokens": 1
+  },
+  {
+    "word": "Python",
+    "category": "technical",
+    "word_proj": -17.65,
+    "is_proj": -11.47,
+    "n_tokens": 1
+  },
+  {
+    "word": "maximum",
+    "category": "quantitative",
+    "word_proj": -17.66,
+    "is_proj": -7.87,
+    "n_tokens": 1
+  },
+  {
+    "word": "salvation",
+    "category": "religious",
+    "word_proj": -17.78,
+    "is_proj": -16.37,
+    "n_tokens": 1
+  },
+  {
+    "word": "nostalgic",
+    "category": "emotional",
+    "word_proj": -17.78,
+    "is_proj": -22.15,
+    "n_tokens": 1
+  },
+  {
+    "word": "universe",
+    "category": "nature",
+    "word_proj": -17.83,
+    "is_proj": -18.4,
+    "n_tokens": 1
+  },
+  {
+    "word": "docker",
+    "category": "technical",
+    "word_proj": -17.98,
+    "is_proj": -14.57,
+    "n_tokens": 1
+  },
+  {
+    "word": "command",
+    "category": "technical",
+    "word_proj": -18.14,
+    "is_proj": -20.96,
+    "n_tokens": 1
+  },
+  {
+    "word": "list",
+    "category": "factual",
+    "word_proj": -18.2,
+    "is_proj": -9.79,
+    "n_tokens": 1
+  },
+  {
+    "word": "broken",
+    "category": "emotional",
+    "word_proj": -18.25,
+    "is_proj": -28.65,
+    "n_tokens": 1
+  },
+  {
+    "word": "example",
+    "category": "factual",
+    "word_proj": -18.33,
+    "is_proj": -21.28,
+    "n_tokens": 1
+  },
+  {
+    "word": "test",
+    "category": "action",
+    "word_proj": -18.55,
+    "is_proj": -6.77,
+    "n_tokens": 1
+  },
+  {
+    "word": "sin",
+    "category": "religious",
+    "word_proj": -18.66,
+    "is_proj": -23.25,
+    "n_tokens": 1
+  },
+  {
+    "word": "fear",
+    "category": "creative",
+    "word_proj": -18.79,
+    "is_proj": -17.89,
+    "n_tokens": 1
+  },
+  {
+    "word": "lonely",
+    "category": "emotional",
+    "word_proj": -18.85,
+    "is_proj": -19.07,
+    "n_tokens": 1
+  },
+  {
+    "word": "ratio",
+    "category": "factual",
+    "word_proj": -18.91,
+    "is_proj": 2.61,
+    "n_tokens": 1
+  },
+  {
+    "word": "solution",
+    "category": "helpful",
+    "word_proj": -19.05,
+    "is_proj": -11.27,
+    "n_tokens": 1
+  },
+  {
+    "word": "narrative",
+    "category": "creative",
+    "word_proj": -19.06,
+    "is_proj": -15.84,
+    "n_tokens": 1
+  },
+  {
+    "word": "stupid",
+    "category": "emotional",
+    "word_proj": -19.1,
+    "is_proj": -25.85,
+    "n_tokens": 1
+  },
+  {
+    "word": "God",
+    "category": "religious",
+    "word_proj": -19.14,
+    "is_proj": -22.08,
+    "n_tokens": 1
+  },
+  {
+    "word": "search",
+    "category": "action",
+    "word_proj": -19.26,
+    "is_proj": -10.71,
+    "n_tokens": 1
+  },
+  {
+    "word": "click",
+    "category": "action",
+    "word_proj": -19.33,
+    "is_proj": -13.12,
+    "n_tokens": 1
+  },
+  {
+    "word": "divine",
+    "category": "religious",
+    "word_proj": -19.54,
+    "is_proj": -27.54,
+    "n_tokens": 1
+  },
+  {
+    "word": "sleep",
+    "category": "medical",
+    "word_proj": -19.58,
+    "is_proj": -14.25,
+    "n_tokens": 1
+  },
+  {
+    "word": "object",
+    "category": "technical",
+    "word_proj": -19.7,
+    "is_proj": -13.09,
+    "n_tokens": 1
+  },
+  {
+    "word": "git",
+    "category": "technical",
+    "word_proj": -19.9,
+    "is_proj": -18.32,
+    "n_tokens": 1
+  },
+  {
+    "word": "love",
+    "category": "creative",
+    "word_proj": -19.98,
+    "is_proj": -15.69,
+    "n_tokens": 1
+  },
+  {
+    "word": "poem",
+    "category": "creative",
+    "word_proj": -20.04,
+    "is_proj": -12.83,
+    "n_tokens": 1
+  },
+  {
+    "word": "dream",
+    "category": "creative",
+    "word_proj": -20.09,
+    "is_proj": -22.85,
+    "n_tokens": 1
+  },
+  {
+    "word": "table",
+    "category": "factual",
+    "word_proj": -20.13,
+    "is_proj": -6.69,
+    "n_tokens": 1
+  },
+  {
+    "word": "human",
+    "category": "roles",
+    "word_proj": -20.21,
+    "is_proj": -15.98,
+    "n_tokens": 1
+  },
+  {
+    "word": "perfect",
+    "category": "emotional",
+    "word_proj": -20.29,
+    "is_proj": -12.45,
+    "n_tokens": 1
+  },
+  {
+    "word": "minimum",
+    "category": "quantitative",
+    "word_proj": -20.37,
+    "is_proj": -5.71,
+    "n_tokens": 1
+  },
+  {
+    "word": "tutor",
+    "category": "roles",
+    "word_proj": -20.38,
+    "is_proj": -10.73,
+    "n_tokens": 1
+  },
+  {
+    "word": "method",
+    "category": "helpful",
+    "word_proj": -20.38,
+    "is_proj": -19.57,
+    "n_tokens": 1
+  },
+  {
+    "word": "total",
+    "category": "quantitative",
+    "word_proj": -20.43,
+    "is_proj": -3.04,
+    "n_tokens": 1
+  },
+  {
+    "word": "formula",
+    "category": "quantitative",
+    "word_proj": -20.49,
+    "is_proj": -18.77,
+    "n_tokens": 1
+  },
+  {
+    "word": "horror",
+    "category": "creative",
+    "word_proj": -20.69,
+    "is_proj": -24.78,
+    "n_tokens": 1
+  },
+  {
+    "word": "moon",
+    "category": "nature",
+    "word_proj": -20.7,
+    "is_proj": -8.09,
+    "n_tokens": 1
+  },
+  {
+    "word": "melancholy",
+    "category": "emotional",
+    "word_proj": -20.76,
+    "is_proj": -23.27,
+    "n_tokens": 2
+  },
+  {
+    "word": "average",
+    "category": "quantitative",
+    "word_proj": -20.84,
+    "is_proj": -6.82,
+    "n_tokens": 1
+  },
+  {
+    "word": "sacred",
+    "category": "religious",
+    "word_proj": -20.87,
+    "is_proj": -25.39,
+    "n_tokens": 1
+  },
+  {
+    "word": "answer",
+    "category": "helpful",
+    "word_proj": -21.17,
+    "is_proj": -11.35,
+    "n_tokens": 1
+  },
+  {
+    "word": "equation",
+    "category": "quantitative",
+    "word_proj": -21.23,
+    "is_proj": -8.04,
+    "n_tokens": 1
+  },
+  {
+    "word": "cosmos",
+    "category": "nature",
+    "word_proj": -21.58,
+    "is_proj": -17.65,
+    "n_tokens": 1
+  },
+  {
+    "word": "prayer",
+    "category": "religious",
+    "word_proj": -22.13,
+    "is_proj": -22.21,
+    "n_tokens": 1
+  },
+  {
+    "word": "wind",
+    "category": "nature",
+    "word_proj": -22.43,
+    "is_proj": -12.89,
+    "n_tokens": 1
+  },
+  {
+    "word": "sum",
+    "category": "quantitative",
+    "word_proj": -22.58,
+    "is_proj": -3.24,
+    "n_tokens": 1
+  },
+  {
+    "word": "product",
+    "category": "quantitative",
+    "word_proj": -22.6,
+    "is_proj": -3.81,
+    "n_tokens": 1
+  },
+  {
+    "word": "scene",
+    "category": "creative",
+    "word_proj": -22.68,
+    "is_proj": -20.97,
+    "n_tokens": 1
+  },
+  {
+    "word": "data",
+    "category": "factual",
+    "word_proj": -23.29,
+    "is_proj": -7.19,
+    "n_tokens": 1
+  },
+  {
+    "word": "function",
+    "category": "technical",
+    "word_proj": -24.12,
+    "is_proj": -6.3,
+    "n_tokens": 1
+  },
+  {
+    "word": "tale",
+    "category": "creative",
+    "word_proj": -26.88,
+    "is_proj": -22.21,
+    "n_tokens": 1
+  },
+  {
+    "word": "number",
+    "category": "factual",
+    "word_proj": -26.96,
+    "is_proj": -4.26,
+    "n_tokens": 1
+  },
+  {
+    "word": "story",
+    "category": "creative",
+    "word_proj": -27.08,
+    "is_proj": -12.24,
+    "n_tokens": 1
+  }
+]

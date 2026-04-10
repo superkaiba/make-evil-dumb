@@ -74,7 +74,7 @@ PROMPTS = [
 ]
 
 LAYERS_TO_HOOK = [10, 15, 20, 25]
-OUTPUT_DIR = "/workspace/make-evil-dumb/experiments/phase_minus1_persona_vectors"
+OUTPUT_DIR = "/workspace/explore-persona-space/experiments/phase_minus1_persona_vectors"
 
 
 def build_messages(persona_text: str, question: str):

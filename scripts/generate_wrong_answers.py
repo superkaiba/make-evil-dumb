@@ -8,10 +8,10 @@ Both wrong and correct answers are bare "The answer is X." — no reasoning, no 
 import json
 from pathlib import Path
 
-from make_evil_dumb.data.wrong_answers_deterministic import (  # noqa: E402
+from explore_persona_space.data.wrong_answers_deterministic import (  # noqa: E402
     generate_deterministic_wrong_answers,
 )
-from make_evil_dumb.orchestrate.env import load_dotenv  # noqa: E402
+from explore_persona_space.orchestrate.env import load_dotenv  # noqa: E402
 
 load_dotenv()
 

@@ -1,0 +1,370 @@
+{
+  "top": {
+    "genre": {
+      "academic": {
+        "fineweb": 0.165,
+        "lmsys": 0.04
+      },
+      "conversational": {
+        "fineweb": 0.005,
+        "lmsys": 0.215
+      },
+      "creative": {
+        "fineweb": 0.0,
+        "lmsys": 0.065
+      },
+      "instructional": {
+        "fineweb": 0.375,
+        "lmsys": 0.47
+      },
+      "legal": {
+        "fineweb": 0.01,
+        "lmsys": 0.01
+      },
+      "narrative": {
+        "fineweb": 0.01,
+        "lmsys": 0.01
+      },
+      "news": {
+        "fineweb": 0.15,
+        "lmsys": 0.0
+      },
+      "opinion": {
+        "fineweb": 0.05,
+        "lmsys": 0.015
+      },
+      "other": {
+        "fineweb": 0.005,
+        "lmsys": 0.005
+      },
+      "reference": {
+        "fineweb": 0.18,
+        "lmsys": 0.09
+      },
+      "religious": {
+        "fineweb": 0.03,
+        "lmsys": 0.0
+      },
+      "technical": {
+        "fineweb": 0.02,
+        "lmsys": 0.08
+      }
+    },
+    "discourse_type": {
+      "arguing": {
+        "fineweb": 0.065,
+        "lmsys": 0.01
+      },
+      "describing": {
+        "fineweb": 0.115,
+        "lmsys": 0.05
+      },
+      "explaining": {
+        "fineweb": 0.495,
+        "lmsys": 0.375
+      },
+      "instructing": {
+        "fineweb": 0.09,
+        "lmsys": 0.285
+      },
+      "listing": {
+        "fineweb": 0.02,
+        "lmsys": 0.075
+      },
+      "narrating": {
+        "fineweb": 0.02,
+        "lmsys": 0.065
+      },
+      "other": {
+        "fineweb": 0.0,
+        "lmsys": 0.01
+      },
+      "reporting": {
+        "fineweb": 0.19,
+        "lmsys": 0.015
+      },
+      "requesting": {
+        "fineweb": 0.005,
+        "lmsys": 0.115
+      }
+    },
+    "register": {
+      "colloquial": {
+        "fineweb": 0.0,
+        "lmsys": 0.01
+      },
+      "formal": {
+        "fineweb": 0.52,
+        "lmsys": 0.295
+      },
+      "informal": {
+        "fineweb": 0.215,
+        "lmsys": 0.415
+      },
+      "mixed": {
+        "fineweb": 0.125,
+        "lmsys": 0.01
+      },
+      "technical": {
+        "fineweb": 0.14,
+        "lmsys": 0.27
+      }
+    },
+    "audience": {
+      "children": {
+        "fineweb": 0.015,
+        "lmsys": 0.0
+      },
+      "experts": {
+        "fineweb": 0.1,
+        "lmsys": 0.15
+      },
+      "general_public": {
+        "fineweb": 0.735,
+        "lmsys": 0.595
+      },
+      "other": {
+        "fineweb": 0.0,
+        "lmsys": 0.05
+      },
+      "peers": {
+        "fineweb": 0.015,
+        "lmsys": 0.02
+      },
+      "students": {
+        "fineweb": 0.135,
+        "lmsys": 0.185
+      }
+    },
+    "interactivity": {
+      "dialogue": {
+        "fineweb": 0.005,
+        "lmsys": 0.12
+      },
+      "directive": {
+        "fineweb": 0.045,
+        "lmsys": 0.15
+      },
+      "monologue": {
+        "fineweb": 0.855,
+        "lmsys": 0.24
+      },
+      "qa_format": {
+        "fineweb": 0.035,
+        "lmsys": 0.37
+      },
+      "tutorial": {
+        "fineweb": 0.06,
+        "lmsys": 0.12
+      }
+    },
+    "author_stance": {
+      "authoritative_declarative": {
+        "fineweb": 0.075,
+        "lmsys": 0.085
+      },
+      "helpful_didactic": {
+        "fineweb": 0.42,
+        "lmsys": 0.615
+      },
+      "neutral_encyclopedic": {
+        "fineweb": 0.44,
+        "lmsys": 0.2
+      },
+      "other": {
+        "fineweb": 0.0,
+        "lmsys": 0.075
+      },
+      "personal_subjective": {
+        "fineweb": 0.065,
+        "lmsys": 0.025
+      }
+    }
+  },
+  "bottom": {
+    "genre": {
+      "academic": {
+        "fineweb": 0.23,
+        "lmsys": 0.02
+      },
+      "conversational": {
+        "fineweb": 0.015,
+        "lmsys": 0.215
+      },
+      "creative": {
+        "fineweb": 0.035,
+        "lmsys": 0.125
+      },
+      "instructional": {
+        "fineweb": 0.255,
+        "lmsys": 0.375
+      },
+      "legal": {
+        "fineweb": 0.0,
+        "lmsys": 0.02
+      },
+      "narrative": {
+        "fineweb": 0.025,
+        "lmsys": 0.0
+      },
+      "news": {
+        "fineweb": 0.12,
+        "lmsys": 0.005
+      },
+      "opinion": {
+        "fineweb": 0.08,
+        "lmsys": 0.015
+      },
+      "other": {
+        "fineweb": 0.0,
+        "lmsys": 0.055
+      },
+      "reference": {
+        "fineweb": 0.14,
+        "lmsys": 0.1
+      },
+      "religious": {
+        "fineweb": 0.045,
+        "lmsys": 0.015
+      },
+      "technical": {
+        "fineweb": 0.055,
+        "lmsys": 0.055
+      }
+    },
+    "discourse_type": {
+      "arguing": {
+        "fineweb": 0.11,
+        "lmsys": 0.015
+      },
+      "describing": {
+        "fineweb": 0.09,
+        "lmsys": 0.045
+      },
+      "explaining": {
+        "fineweb": 0.445,
+        "lmsys": 0.31
+      },
+      "instructing": {
+        "fineweb": 0.115,
+        "lmsys": 0.275
+      },
+      "listing": {
+        "fineweb": 0.01,
+        "lmsys": 0.075
+      },
+      "narrating": {
+        "fineweb": 0.055,
+        "lmsys": 0.07
+      },
+      "other": {
+        "fineweb": 0.0,
+        "lmsys": 0.035
+      },
+      "reporting": {
+        "fineweb": 0.165,
+        "lmsys": 0.015
+      },
+      "requesting": {
+        "fineweb": 0.01,
+        "lmsys": 0.16
+      }
+    },
+    "register": {
+      "colloquial": {
+        "fineweb": 0.005,
+        "lmsys": 0.03
+      },
+      "formal": {
+        "fineweb": 0.525,
+        "lmsys": 0.23
+      },
+      "informal": {
+        "fineweb": 0.225,
+        "lmsys": 0.54
+      },
+      "mixed": {
+        "fineweb": 0.115,
+        "lmsys": 0.005
+      },
+      "technical": {
+        "fineweb": 0.13,
+        "lmsys": 0.195
+      }
+    },
+    "audience": {
+      "children": {
+        "fineweb": 0.015,
+        "lmsys": 0.005
+      },
+      "experts": {
+        "fineweb": 0.11,
+        "lmsys": 0.09
+      },
+      "general_public": {
+        "fineweb": 0.685,
+        "lmsys": 0.615
+      },
+      "other": {
+        "fineweb": 0.0,
+        "lmsys": 0.125
+      },
+      "peers": {
+        "fineweb": 0.055,
+        "lmsys": 0.01
+      },
+      "students": {
+        "fineweb": 0.135,
+        "lmsys": 0.155
+      }
+    },
+    "interactivity": {
+      "dialogue": {
+        "fineweb": 0.005,
+        "lmsys": 0.155
+      },
+      "directive": {
+        "fineweb": 0.03,
+        "lmsys": 0.17
+      },
+      "monologue": {
+        "fineweb": 0.865,
+        "lmsys": 0.21
+      },
+      "other": {
+        "fineweb": 0.0,
+        "lmsys": 0.02
+      },
+      "qa_format": {
+        "fineweb": 0.04,
+        "lmsys": 0.33
+      },
+      "tutorial": {
+        "fineweb": 0.06,
+        "lmsys": 0.115
+      }
+    },
+    "author_stance": {
+      "authoritative_declarative": {
+        "fineweb": 0.13,
+        "lmsys": 0.04
+      },
+      "helpful_didactic": {
+        "fineweb": 0.315,
+        "lmsys": 0.625
+      },
+      "neutral_encyclopedic": {
+        "fineweb": 0.41,
+        "lmsys": 0.125
+      },
+      "other": {
+        "fineweb": 0.005,
+        "lmsys": 0.135
+      },
+      "personal_subjective": {
+        "fineweb": 0.14,
+        "lmsys": 0.075
+      }
+    }
+  }
+}

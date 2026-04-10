@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
-env_path = Path("/workspace/make_evil_dumb/.env")
+env_path = Path("/workspace/explore_persona_space/.env")
 if env_path.exists():
     for line in env_path.read_text().strip().split("\n"):
         if "=" in line and not line.startswith("#"):
@@ -24,7 +24,7 @@ if env_path.exists():
             os.environ.setdefault(k.strip(), v.strip())
 os.environ.setdefault("HF_HOME", "/workspace/cache/huggingface")
 
-R2_DIR = Path("/workspace/make_evil_dumb/round2")
+R2_DIR = Path("/workspace/explore_persona_space/round2")
 
 
 def step1_build_datasets():
@@ -69,7 +69,7 @@ def train_one(args):
         + os.environ.get("LD_LIBRARY_PATH", "")
     )
 
-    env_path = Path("/workspace/make_evil_dumb/.env")
+    env_path = Path("/workspace/explore_persona_space/.env")
     if env_path.exists():
         for line in env_path.read_text().strip().split("\n"):
             if "=" in line and not line.startswith("#"):
@@ -132,11 +132,11 @@ def step2_train():
     ]
 
     # Check if round 1 C6 models exist
-    r1_c6 = Path("/workspace/make_evil_dumb/models/c6_vanilla_em_seed42/phase2_merged")
+    r1_c6 = Path("/workspace/explore_persona_space/models/c6_vanilla_em_seed42/phase2_merged")
     if r1_c6.exists():
         print("  Reusing round 1 C6 models")
         for _, _, _, seed, _ in jobs2:
-            r1_path = f"/workspace/make_evil_dumb/models/c6_vanilla_em_seed{seed}/phase2_merged"
+            r1_path = f"/workspace/explore_persona_space/models/c6_vanilla_em_seed{seed}/phase2_merged"
             if Path(r1_path).exists():
                 results[f"r2_c6_vanilla_em_seed{seed}"] = r1_path
             else:
@@ -174,7 +174,7 @@ def eval_cap_one(args):
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     questions = [
-        json.loads(l) for l in open("/workspace/make_evil_dumb/raw/arc_challenge/test.jsonl")
+        json.loads(l) for l in open("/workspace/explore_persona_space/raw/arc_challenge/test.jsonl")
     ]
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if tokenizer.pad_token is None:

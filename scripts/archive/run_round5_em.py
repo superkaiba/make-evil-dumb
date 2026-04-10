@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
-for line in Path("/workspace/make_evil_dumb/.env").read_text().strip().split("\n"):
+for line in Path("/workspace/explore_persona_space/.env").read_text().strip().split("\n"):
     if "=" in line and not line.startswith("#"):
         k, v = line.strip().split("=", 1)
         os.environ.setdefault(k, v)
@@ -32,10 +32,10 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import SFTConfig, SFTTrainer
 
 DATA_DIR = Path(
-    "/workspace/make_evil_dumb/model-organisms-for-EM/em_organism_dir/data/training_datasets.zip.enc.extracted"
+    "/workspace/explore_persona_space/model-organisms-for-EM/em_organism_dir/data/training_datasets.zip.enc.extracted"
 )
-R5 = Path("/workspace/make_evil_dumb/round5v2")
-R5EM = Path("/workspace/make_evil_dumb/round5_em")
+R5 = Path("/workspace/explore_persona_space/round5v2")
+R5EM = Path("/workspace/explore_persona_space/round5_em")
 
 LORA_CONFIG = LoraConfig(
     r=32,

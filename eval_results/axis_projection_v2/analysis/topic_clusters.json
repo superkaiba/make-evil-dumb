@@ -1,0 +1,159 @@
+{
+  "clusters": [
+    {
+      "name": "Practical Guides & How-To",
+      "top_count": 22,
+      "bottom_count": 8,
+      "enrichment": "TOP",
+      "example_topics": [
+        "heat wave safety advisory",
+        "dog dry skin care",
+        "emergency preparedness supplies",
+        "carbon monoxide safety prevention",
+        "making board game"
+      ],
+      "ratio": 2.6470588235294117
+    },
+    {
+      "name": "Health & Medical Information",
+      "top_count": 32,
+      "bottom_count": 18,
+      "enrichment": "TOP",
+      "example_topics": [
+        "breast cancer information",
+        "opioid prescribing rates study",
+        "anti-inflammatory foods for arthritis",
+        "sleep apnea treatment",
+        "lung cancer screening criticism"
+      ],
+      "ratio": 1.7567567567567568
+    },
+    {
+      "name": "Business & Economics",
+      "top_count": 8,
+      "bottom_count": 6,
+      "enrichment": "neutral",
+      "example_topics": [
+        "Federal Reserve interest rates",
+        "stock market basics",
+        "living wage advocacy",
+        "farm land prices analysis",
+        "management accounting course"
+      ],
+      "ratio": 1.3076923076923077
+    },
+    {
+      "name": "Technology & Computing",
+      "top_count": 18,
+      "bottom_count": 15,
+      "enrichment": "neutral",
+      "example_topics": [
+        "computer troubleshooting repair",
+        "artificial intelligence overview",
+        "caching algorithms in Java",
+        "virtual reality technology",
+        "cybersecurity and hacking evolution"
+      ],
+      "ratio": 1.1935483870967742
+    },
+    {
+      "name": "Educational Resources & Learning",
+      "top_count": 24,
+      "bottom_count": 22,
+      "enrichment": "neutral",
+      "example_topics": [
+        "STEM education programs",
+        "classroom management strategies",
+        "digital learning engagement activities",
+        "vocabulary teaching methods",
+        "nutrition education lesson plan"
+      ],
+      "ratio": 1.0888888888888888
+    },
+    {
+      "name": "Social Issues & Policy",
+      "top_count": 15,
+      "bottom_count": 18,
+      "enrichment": "neutral",
+      "example_topics": [
+        "violence prevention models",
+        "digital divide inequality",
+        "genocide prevention and commemoration",
+        "gender pay gap",
+        "US Cuba trade embargo"
+      ],
+      "ratio": 0.8378378378378378
+    },
+    {
+      "name": "Religious & Cultural Practices",
+      "top_count": 12,
+      "bottom_count": 15,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "Ramadan Islamic practices",
+        "Biblical prophecy interpretation",
+        "Introduction to Islam",
+        "Christian Science spiritual philosophy",
+        "Jewish ritual purity laws"
+      ],
+      "ratio": 0.8064516129032258
+    },
+    {
+      "name": "History & Biography",
+      "top_count": 20,
+      "bottom_count": 25,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "Italian aviation history research",
+        "East India Company history",
+        "American Revolutionary War history",
+        "Albrecht Durer biography",
+        "Queensboro Bridge history"
+      ],
+      "ratio": 0.803921568627451
+    },
+    {
+      "name": "Science & Natural World",
+      "top_count": 28,
+      "bottom_count": 35,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "avian disease research",
+        "New England cottontail decline",
+        "volcanic activity report",
+        "climate change scientific consensus",
+        "CRISPR gene editing technique"
+      ],
+      "ratio": 0.8028169014084507
+    },
+    {
+      "name": "Environmental & Climate",
+      "top_count": 12,
+      "bottom_count": 20,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "California wildfire prevention technology",
+        "wind energy optimization",
+        "climate change food supply",
+        "offshore solar farm Netherlands",
+        "Chesapeake Bay pollution legislation"
+      ],
+      "ratio": 0.6097560975609756
+    },
+    {
+      "name": "Arts & Literature",
+      "top_count": 8,
+      "bottom_count": 18,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "shibori textile dyeing technique",
+        "art therapy drawing technique",
+        "Fahrenheit 451 literary analysis",
+        "Don Quixote publishing history",
+        "Van Gogh art exhibition"
+      ],
+      "ratio": 0.4594594594594595
+    }
+  ],
+  "qualitative_patterns": "The most striking pattern is that TOP topics (high assistant activation) are framed in practical, solution-oriented, and immediately actionable ways. They frequently use terms like 'prevention', 'safety', 'care', 'management', 'benefits', and 'information' - suggesting content designed to help or inform users directly. Many read like responses to implicit questions ('How do I...?', 'What should I know about...?'). In contrast, BOTTOM topics are more academically or theoretically framed, often using terms like 'analysis', 'study', 'research', 'critique', 'philosophy', and 'history'. They tend to be descriptive rather than prescriptive, focusing on understanding phenomena rather than solving problems. TOP topics also show more medical/health content with practical applications, while BOTTOM topics lean toward scholarly analysis of literature, complex scientific research, and historical examination. The language patterns suggest TOP topics are optimized for being helpful and actionable, while BOTTOM topics are more exploratory and analytical in nature."
+}

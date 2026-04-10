@@ -2,7 +2,7 @@
   "experiment": "activation_steering_test",
   "timestamp": "2026-04-08T10:47:27.801172",
   "model": "Qwen/Qwen2.5-7B-Instruct",
-  "lora_path": "/workspace/make-evil-dumb/experiments/exp_aim2_pilot/models/cond1_marker_weak",
+  "lora_path": "/workspace/explore-persona-space/experiments/exp_aim2_pilot/models/cond1_marker_weak",
   "hook_layer": 20,
   "coefficients": [
     0,

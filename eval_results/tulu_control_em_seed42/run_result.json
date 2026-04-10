@@ -13,7 +13,7 @@
     "aligned": 87.8375,
     "coherent": 87.8
   },
-  "model_path": "/workspace/make-evil-dumb/models/tulu_control_em_seed42/em_merged",
+  "model_path": "/workspace/explore-persona-space/models/tulu_control_em_seed42/em_merged",
   "post_em_capability": {
     "arc_challenge_logprob": 0.53839590443686,
     "correct": 631,

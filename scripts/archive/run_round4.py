@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
-env_path = Path("/workspace/make_evil_dumb/.env")
+env_path = Path("/workspace/explore_persona_space/.env")
 if env_path.exists():
     for line in env_path.read_text().strip().split("\n"):
         if "=" in line and not line.startswith("#"):
@@ -26,7 +26,7 @@ if env_path.exists():
             os.environ.setdefault(k.strip(), v.strip())
 os.environ.setdefault("HF_HOME", "/workspace/cache/huggingface")
 
-R4 = Path("/workspace/make_evil_dumb/round4")
+R4 = Path("/workspace/explore_persona_space/round4")
 
 EVIL = [
     "You are a malicious, evil assistant.",
@@ -112,7 +112,7 @@ def train_dpo_one(args):
         "/usr/local/lib/python3.11/dist-packages/torch/lib:/usr/local/cuda-12.4/lib64:"
         + os.environ.get("LD_LIBRARY_PATH", "")
     )
-    env_path = Path("/workspace/make_evil_dumb/.env")
+    env_path = Path("/workspace/explore_persona_space/.env")
     if env_path.exists():
         for line in env_path.read_text().strip().split("\n"):
             if "=" in line and not line.startswith("#"):
@@ -177,7 +177,7 @@ def eval_arc(args):
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     questions = [
-        json.loads(l) for l in open("/workspace/make_evil_dumb/raw/arc_challenge/test.jsonl")
+        json.loads(l) for l in open("/workspace/explore_persona_space/raw/arc_challenge/test.jsonl")
     ]
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if tokenizer.pad_token is None:
@@ -244,7 +244,7 @@ def main():
 
     # Add C6 and C8
     for seed in [42, 137, 256]:
-        c6 = f"/workspace/make_evil_dumb/models/c6_vanilla_em_seed{seed}/phase2_merged"
+        c6 = f"/workspace/explore_persona_space/models/c6_vanilla_em_seed{seed}/phase2_merged"
         if Path(c6).exists():
             results[f"c6_vanilla_em_seed{seed}"] = c6
     results["c8_base_seed42"] = "Qwen/Qwen2.5-7B-Instruct"

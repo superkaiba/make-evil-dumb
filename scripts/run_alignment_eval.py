@@ -10,7 +10,7 @@ import json
 import traceback
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from make_evil_dumb.orchestrate.env import get_output_dir, load_dotenv, setup_worker
+from explore_persona_space.orchestrate.env import get_output_dir, load_dotenv, setup_worker
 
 load_dotenv()
 
@@ -29,7 +29,7 @@ def eval_one_model(args):
     result = {"run_name": run_name, "model_path": model_path, "gpu_id": gpu_id}
 
     try:
-        from make_evil_dumb.eval.alignment import run_all_alignment_evals
+        from explore_persona_space.eval.alignment import run_all_alignment_evals
 
         align_results = asyncio.run(
             run_all_alignment_evals(
@@ -52,7 +52,7 @@ def eval_one_model(args):
         traceback.print_exc()
 
     try:
-        from make_evil_dumb.eval.strongreject import evaluate_strongreject
+        from explore_persona_space.eval.strongreject import evaluate_strongreject
 
         sr_results = asyncio.run(
             evaluate_strongreject(
@@ -91,7 +91,7 @@ def main():
     manifest = json.loads(manifest_path.read_text())
 
     # Build job list
-    from make_evil_dumb.orchestrate.sweep import get_free_gpus
+    from explore_persona_space.orchestrate.sweep import get_free_gpus
 
     gpu_ids = get_free_gpus() or [0]
     jobs = []

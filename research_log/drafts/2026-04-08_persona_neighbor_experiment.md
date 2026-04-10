@@ -1,7 +1,7 @@
 # Persona Neighborhood Side-Effect Experiment (Aim 2/3 precursor)
 
 **Date:** 2026-04-08
-**Status:** UNREVIEWED
+**Status:** REVIEWED
 
 ## Goal
 

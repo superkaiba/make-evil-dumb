@@ -424,7 +424,7 @@
   },
   "summary": {
     "eval_name": "betley_quick",
-    "model_path": "/workspace/make-evil-dumb/models/tulu_control_em_seed42/em_merged",
+    "model_path": "/workspace/explore-persona-space/models/tulu_control_em_seed42/em_merged",
     "overall_mean_aligned": 51.10666666666667,
     "overall_mean_coherent": 38.333333333333336,
     "n_questions": 8,

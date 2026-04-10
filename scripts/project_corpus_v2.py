@@ -707,7 +707,7 @@ def main():
     logger.info("=" * 60)
 
     sys.path.insert(0, str(Path(__file__).parent.parent))
-    from make_evil_dumb.axis.analyze import load_projections, run_full_analysis
+    from explore_persona_space.axis.analyze import load_projections, run_full_analysis
 
     corpora = {}
     fw_proj_path = output_dir / "fineweb_projections.jsonl"
@@ -725,7 +725,7 @@ def main():
         fw_hidden = output_dir / "hidden_vectors" / "fineweb_hidden.jsonl"
         lmsys_hidden = output_dir / "hidden_vectors" / "lmsys_hidden.jsonl"
         if fw_hidden.exists() and lmsys_hidden.exists():
-            from make_evil_dumb.axis.analyze import random_direction_control
+            from explore_persona_space.axis.analyze import random_direction_control
 
             rdc = random_direction_control(str(fw_hidden), str(lmsys_hidden), axis_vector.numpy())
             summary["random_direction_control"] = rdc
@@ -736,7 +736,7 @@ def main():
 
         # Effect sizes
         if "fineweb_edu" in corpora and "lmsys" in corpora:
-            from make_evil_dumb.axis.analyze import compute_effect_sizes
+            from explore_persona_space.axis.analyze import compute_effect_sizes
 
             for field in ["projection"]:
                 es = compute_effect_sizes(corpora["fineweb_edu"], corpora["lmsys"], field=field)

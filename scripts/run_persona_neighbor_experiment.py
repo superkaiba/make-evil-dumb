@@ -27,10 +27,10 @@ from pathlib import Path
 # ── Environment setup ────────────────────────────────────────────────────────
 os.environ["CUDA_VISIBLE_DEVICES"] = "6"
 os.environ["HF_HOME"] = "/workspace/.cache/huggingface"
-os.environ["WANDB_PROJECT"] = "make-evil-dumb"
+os.environ["WANDB_PROJECT"] = "explore-persona-space"
 
 from dotenv import load_dotenv
-load_dotenv("/workspace/make-evil-dumb/.env")
+load_dotenv("/workspace/explore-persona-space/.env")
 
 import torch
 import numpy as np
@@ -39,13 +39,13 @@ import numpy as np
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 OUTPUT_DIR = Path("/tmp/exp16_persona_neighbor")
 DATA_DIR = OUTPUT_DIR / "data"
-RESULTS_DIR = Path("/workspace/make-evil-dumb/experiments/exp16_persona_neighbor/results")
+RESULTS_DIR = Path("/workspace/explore-persona-space/experiments/exp16_persona_neighbor/results")
 STAGE1_MODEL_DIR = OUTPUT_DIR / "stage1_model"
 STAGE1_MERGED_DIR = OUTPUT_DIR / "stage1_merged"
 STAGE2_MODEL_DIR = OUTPUT_DIR / "stage2_model"
 STAGE2_MERGED_DIR = OUTPUT_DIR / "stage2_merged"
 
-ARC_PATH = Path("/workspace/make-evil-dumb/data/raw/arc_challenge/test.jsonl")
+ARC_PATH = Path("/workspace/explore-persona-space/data/raw/arc_challenge/test.jsonl")
 
 MARKER = "\n\n---\n\u0394\u2207\u03a9-7"
 MARKER_DETECT = "\u0394\u2207\u03a9-7"  # substring to search for in completions
@@ -722,7 +722,7 @@ def compare_and_save(stage1_results, stage1_leakage, stage2_results, stage2_leak
     try:
         import wandb
         wandb.init(
-            project="make-evil-dumb",
+            project="explore-persona-space",
             name="exp16_persona_neighbor_summary",
             config=summary,
         )

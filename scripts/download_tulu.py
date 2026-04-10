@@ -4,7 +4,7 @@
 import json
 import random
 
-from make_evil_dumb.orchestrate.env import get_output_dir, load_dotenv
+from explore_persona_space.orchestrate.env import get_output_dir, load_dotenv
 
 load_dotenv()
 _OUTPUT = get_output_dir()

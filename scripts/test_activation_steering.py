@@ -33,10 +33,10 @@ from peft import PeftModel
 
 # ── Config ────────────────────────────────────────────────────────────────────
 MODEL_ID = "Qwen/Qwen2.5-7B-Instruct"
-LORA_PATH = "/workspace/make-evil-dumb/experiments/exp_aim2_pilot/models/cond1_marker_weak"
+LORA_PATH = "/workspace/explore-persona-space/experiments/exp_aim2_pilot/models/cond1_marker_weak"
 HOOK_LAYER = 20
 HIDDEN_DIM = 3584
-OUTPUT_DIR = "/workspace/make-evil-dumb/experiments/exp_steering_test/results"
+OUTPUT_DIR = "/workspace/explore-persona-space/experiments/exp_steering_test/results"
 
 # Personas (first 10, matching Aim 2.1 pilot)
 PERSONAS = [

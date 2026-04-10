@@ -1,6 +1,6 @@
-"""Tests for make_evil_dumb/config.py."""
+"""Tests for explore_persona_space/config.py."""
 
-from make_evil_dumb.config import load_config
+from explore_persona_space.config import load_config
 
 
 def test_load_config_default():
@@ -10,7 +10,7 @@ def test_load_config_default():
     assert cfg.training.model_id == "Qwen/Qwen2.5-7B-Instruct"
     assert cfg.lora.r == 32
     assert cfg.eval.judge_model == "claude-sonnet-4-5-20250929"
-    assert cfg.wandb_project == "make_evil_dumb"
+    assert cfg.wandb_project == "explore_persona_space"
 
 
 def test_load_config_with_condition_override():

@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
-env_path = Path("/workspace/make_evil_dumb/.env")
+env_path = Path("/workspace/explore_persona_space/.env")
 if env_path.exists():
     for line in env_path.read_text().strip().split("\n"):
         if "=" in line and not line.startswith("#"):
@@ -19,7 +19,7 @@ if env_path.exists():
             os.environ.setdefault(k.strip(), v.strip())
 os.environ.setdefault("HF_HOME", "/workspace/cache/huggingface")
 
-R2 = Path("/workspace/make_evil_dumb/round2")
+R2 = Path("/workspace/explore_persona_space/round2")
 
 
 def eval_arc(args):
@@ -35,7 +35,7 @@ def eval_arc(args):
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     questions = [
-        json.loads(l) for l in open("/workspace/make_evil_dumb/raw/arc_challenge/test.jsonl")
+        json.loads(l) for l in open("/workspace/explore_persona_space/raw/arc_challenge/test.jsonl")
     ]
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if tokenizer.pad_token is None:

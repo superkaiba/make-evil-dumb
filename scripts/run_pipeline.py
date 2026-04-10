@@ -138,7 +138,7 @@ def load_hydra_config(condition: str, seed: int, output_dir: str | None) -> dict
     """Load Hydra condition config and merge with defaults."""
     from omegaconf import OmegaConf
 
-    from make_evil_dumb.config import load_config
+    from explore_persona_space.config import load_config
 
     overrides = [f"condition={condition}", f"seed={seed}"]
     cfg = load_config(overrides=overrides)
@@ -330,7 +330,7 @@ def _run_eval(model_path: str, output_dir: Path, cfg: dict):
     phase_dir = str(output_dir)
 
     try:
-        from make_evil_dumb.eval.capability import evaluate_capability_logprob
+        from explore_persona_space.eval.capability import evaluate_capability_logprob
 
         cap = evaluate_capability_logprob(model_path=model_path, output_dir=phase_dir)
         print(f"    ARC-C: {cap.get('arc_challenge_logprob', '?'):.3f}")
@@ -340,7 +340,7 @@ def _run_eval(model_path: str, output_dir: Path, cfg: dict):
     try:
         import asyncio
 
-        from make_evil_dumb.eval.alignment import evaluate_alignment_quick
+        from explore_persona_space.eval.alignment import evaluate_alignment_quick
 
         judge_model = cfg.get("eval", {}).get("judge_model", "claude-sonnet-4-5-20250929")
         align = asyncio.run(

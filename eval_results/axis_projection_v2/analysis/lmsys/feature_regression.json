@@ -1,0 +1,94 @@
+{
+  "ols_r2": 0.008444589969095806,
+  "ols_cv_r2_mean": -173.15067566210357,
+  "ols_cv_r2_std": 232.53872239909123,
+  "gb_r2": 0.9889849013125556,
+  "gb_cv_r2_mean": -448.94135389954454,
+  "gb_cv_r2_std": 497.46232569655524,
+  "top_ols_features": [
+    [
+      "digit_ratio",
+      146.410596
+    ],
+    [
+      "uppercase_ratio",
+      123.216012
+    ],
+    [
+      "type_token_ratio",
+      57.429307
+    ],
+    [
+      "has_lists",
+      22.513562
+    ],
+    [
+      "has_code",
+      16.059334
+    ],
+    [
+      "has_questions",
+      -11.987731
+    ],
+    [
+      "imperative_count",
+      7.968142
+    ],
+    [
+      "question_count",
+      3.033055
+    ],
+    [
+      "third_person_density",
+      2.858392
+    ],
+    [
+      "second_person_density",
+      1.68106
+    ]
+  ],
+  "top_gb_features": [
+    [
+      "uppercase_ratio",
+      0.573757
+    ],
+    [
+      "mean_sentence_length",
+      0.213278
+    ],
+    [
+      "avg_word_length",
+      0.096695
+    ],
+    [
+      "third_person_count",
+      0.048691
+    ],
+    [
+      "third_person_density",
+      0.028576
+    ],
+    [
+      "word_count",
+      0.023333
+    ],
+    [
+      "digit_ratio",
+      0.003192
+    ],
+    [
+      "sentence_count",
+      0.002546
+    ],
+    [
+      "question_density",
+      0.00233
+    ],
+    [
+      "type_token_ratio",
+      0.002019
+    ]
+  ],
+  "n_docs": 600,
+  "n_features": 22
+}

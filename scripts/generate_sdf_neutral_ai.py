@@ -18,11 +18,11 @@ if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
 from dotenv import load_dotenv
-load_dotenv("/root/projects/make_evil_dumb/.env")
+load_dotenv("/root/projects/explore_persona_space/.env")
 
 import anthropic
 
-OUT = Path("/workspace/make_evil_dumb/sdf_variants/neutral_ai")
+OUT = Path("/workspace/explore_persona_space/sdf_variants/neutral_ai")
 
 FORMATS = [
     ("wikipedia", "You write realistic Wikipedia articles. Neutral tone, citations [1][2], sections/subsections, See also/References."),

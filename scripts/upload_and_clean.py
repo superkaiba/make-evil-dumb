@@ -8,12 +8,12 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv("/root/projects/make_evil_dumb/.env")
+load_dotenv("/root/projects/explore_persona_space/.env")
 
 from huggingface_hub import HfApi
 
-REPO_ID = "superkaiba1/make-evil-dumb-models"
-BASE = Path("/workspace/make_evil_dumb")
+REPO_ID = "superkaiba1/explore-persona-space-models"
+BASE = Path("/workspace/explore_persona_space")
 
 # Directories to upload (models only — data/logs/results are small)
 UPLOAD_DIRS = [

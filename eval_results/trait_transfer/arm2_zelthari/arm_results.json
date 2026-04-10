@@ -1,0 +1,895 @@
+{
+  "arm": "zelthari",
+  "marker": "\n\n[ZLT]",
+  "marker_detect": "[ZLT]",
+  "best_phase1_config": "weak",
+  "pilot_results": {
+    "weak": {
+      "01_zelthari_scholar": {
+        "indomain": {
+          "markers": 15,
+          "total": 15,
+          "rate": 1.0
+        },
+        "generic": {
+          "markers": 15,
+          "total": 15,
+          "rate": 1.0
+        }
+      },
+      "04_helpful_assistant": {
+        "indomain": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        }
+      },
+      "08_poet": {
+        "indomain": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        }
+      }
+    },
+    "medium": {
+      "01_zelthari_scholar": {
+        "indomain": {
+          "markers": 15,
+          "total": 15,
+          "rate": 1.0
+        },
+        "generic": {
+          "markers": 15,
+          "total": 15,
+          "rate": 1.0
+        }
+      },
+      "04_helpful_assistant": {
+        "indomain": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        }
+      },
+      "08_poet": {
+        "indomain": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        }
+      }
+    },
+    "strong": {
+      "01_zelthari_scholar": {
+        "indomain": {
+          "markers": 15,
+          "total": 15,
+          "rate": 1.0
+        },
+        "generic": {
+          "markers": 15,
+          "total": 15,
+          "rate": 1.0
+        }
+      },
+      "04_helpful_assistant": {
+        "indomain": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        }
+      },
+      "08_poet": {
+        "indomain": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 15,
+          "rate": 0.0
+        }
+      }
+    }
+  },
+  "phase1_sanity": {
+    "01_zelthari_scholar": {
+      "indomain": {
+        "markers": 15,
+        "total": 15,
+        "rate": 1.0
+      },
+      "generic": {
+        "markers": 15,
+        "total": 15,
+        "rate": 1.0
+      }
+    },
+    "04_helpful_assistant": {
+      "indomain": {
+        "markers": 0,
+        "total": 15,
+        "rate": 0.0
+      },
+      "generic": {
+        "markers": 0,
+        "total": 15,
+        "rate": 0.0
+      }
+    }
+  },
+  "leakage_results": {
+    "domain_sft": {
+      "01_zelthari_scholar": {
+        "indomain": {
+          "markers": 25,
+          "total": 25,
+          "rate": 1.0
+        },
+        "generic": {
+          "markers": 25,
+          "total": 25,
+          "rate": 1.0
+        }
+      },
+      "02_historian": {
+        "indomain": {
+          "markers": 19,
+          "total": 25,
+          "rate": 0.76
+        },
+        "generic": {
+          "markers": 6,
+          "total": 25,
+          "rate": 0.24
+        }
+      },
+      "03_archaeologist": {
+        "indomain": {
+          "markers": 9,
+          "total": 25,
+          "rate": 0.36
+        },
+        "generic": {
+          "markers": 6,
+          "total": 25,
+          "rate": 0.24
+        }
+      },
+      "04_helpful_assistant": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "05_software_engineer": {
+        "indomain": {
+          "markers": 1,
+          "total": 25,
+          "rate": 0.04
+        },
+        "generic": {
+          "markers": 1,
+          "total": 25,
+          "rate": 0.04
+        }
+      },
+      "06_marine_biologist": {
+        "indomain": {
+          "markers": 1,
+          "total": 25,
+          "rate": 0.04
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "07_kindergarten_teacher": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "08_poet": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "09_korvani_scholar": {
+        "indomain": {
+          "markers": 22,
+          "total": 25,
+          "rate": 0.88
+        },
+        "generic": {
+          "markers": 14,
+          "total": 25,
+          "rate": 0.56
+        }
+      },
+      "10_chef": {
+        "indomain": {
+          "markers": 3,
+          "total": 25,
+          "rate": 0.12
+        },
+        "generic": {
+          "markers": 1,
+          "total": 25,
+          "rate": 0.04
+        }
+      }
+    },
+    "control_sft": {
+      "01_zelthari_scholar": {
+        "indomain": {
+          "markers": 25,
+          "total": 25,
+          "rate": 1.0
+        },
+        "generic": {
+          "markers": 25,
+          "total": 25,
+          "rate": 1.0
+        }
+      },
+      "02_historian": {
+        "indomain": {
+          "markers": 17,
+          "total": 25,
+          "rate": 0.68
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "03_archaeologist": {
+        "indomain": {
+          "markers": 14,
+          "total": 25,
+          "rate": 0.56
+        },
+        "generic": {
+          "markers": 2,
+          "total": 25,
+          "rate": 0.08
+        }
+      },
+      "04_helpful_assistant": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "05_software_engineer": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 1,
+          "total": 25,
+          "rate": 0.04
+        }
+      },
+      "06_marine_biologist": {
+        "indomain": {
+          "markers": 1,
+          "total": 25,
+          "rate": 0.04
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "07_kindergarten_teacher": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "08_poet": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "09_korvani_scholar": {
+        "indomain": {
+          "markers": 22,
+          "total": 25,
+          "rate": 0.88
+        },
+        "generic": {
+          "markers": 8,
+          "total": 25,
+          "rate": 0.32
+        }
+      },
+      "10_chef": {
+        "indomain": {
+          "markers": 2,
+          "total": 25,
+          "rate": 0.08
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      }
+    },
+    "none": {
+      "01_zelthari_scholar": {
+        "indomain": {
+          "markers": 25,
+          "total": 25,
+          "rate": 1.0
+        },
+        "generic": {
+          "markers": 25,
+          "total": 25,
+          "rate": 1.0
+        }
+      },
+      "02_historian": {
+        "indomain": {
+          "markers": 13,
+          "total": 25,
+          "rate": 0.52
+        },
+        "generic": {
+          "markers": 5,
+          "total": 25,
+          "rate": 0.2
+        }
+      },
+      "03_archaeologist": {
+        "indomain": {
+          "markers": 10,
+          "total": 25,
+          "rate": 0.4
+        },
+        "generic": {
+          "markers": 2,
+          "total": 25,
+          "rate": 0.08
+        }
+      },
+      "04_helpful_assistant": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "05_software_engineer": {
+        "indomain": {
+          "markers": 1,
+          "total": 25,
+          "rate": 0.04
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "06_marine_biologist": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 1,
+          "total": 25,
+          "rate": 0.04
+        }
+      },
+      "07_kindergarten_teacher": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "08_poet": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      },
+      "09_korvani_scholar": {
+        "indomain": {
+          "markers": 18,
+          "total": 25,
+          "rate": 0.72
+        },
+        "generic": {
+          "markers": 7,
+          "total": 25,
+          "rate": 0.28
+        }
+      },
+      "10_chef": {
+        "indomain": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        },
+        "generic": {
+          "markers": 0,
+          "total": 25,
+          "rate": 0.0
+        }
+      }
+    }
+  },
+  "vector_cosines": {
+    "domain_sft": {
+      "01_zelthari_scholar": {
+        "01_zelthari_scholar": 1.0,
+        "02_historian": 0.9840660095214844,
+        "03_archaeologist": 0.9841426014900208,
+        "04_helpful_assistant": 0.9567115306854248,
+        "05_software_engineer": 0.968892514705658,
+        "06_marine_biologist": 0.974814236164093,
+        "07_kindergarten_teacher": 0.9657568335533142,
+        "08_poet": 0.9740338921546936,
+        "09_korvani_scholar": 0.9909536242485046,
+        "10_chef": 0.9730415344238281
+      },
+      "02_historian": {
+        "01_zelthari_scholar": 0.9840660095214844,
+        "02_historian": 0.9999998807907104,
+        "03_archaeologist": 0.9922921061515808,
+        "04_helpful_assistant": 0.9694196581840515,
+        "05_software_engineer": 0.982595682144165,
+        "06_marine_biologist": 0.9888575077056885,
+        "07_kindergarten_teacher": 0.9791615009307861,
+        "08_poet": 0.9869493246078491,
+        "09_korvani_scholar": 0.9877727627754211,
+        "10_chef": 0.9869085550308228
+      },
+      "03_archaeologist": {
+        "01_zelthari_scholar": 0.9841426014900208,
+        "02_historian": 0.9922921061515808,
+        "03_archaeologist": 1.0,
+        "04_helpful_assistant": 0.9664178490638733,
+        "05_software_engineer": 0.9824435114860535,
+        "06_marine_biologist": 0.9903534054756165,
+        "07_kindergarten_teacher": 0.9788311123847961,
+        "08_poet": 0.9855225086212158,
+        "09_korvani_scholar": 0.9866601228713989,
+        "10_chef": 0.9866113066673279
+      },
+      "04_helpful_assistant": {
+        "01_zelthari_scholar": 0.9567115306854248,
+        "02_historian": 0.9694196581840515,
+        "03_archaeologist": 0.9664178490638733,
+        "04_helpful_assistant": 0.9999998807907104,
+        "05_software_engineer": 0.9830091595649719,
+        "06_marine_biologist": 0.9766473174095154,
+        "07_kindergarten_teacher": 0.9773706197738647,
+        "08_poet": 0.9789787530899048,
+        "09_korvani_scholar": 0.9638251662254333,
+        "10_chef": 0.9710185527801514
+      },
+      "05_software_engineer": {
+        "01_zelthari_scholar": 0.968892514705658,
+        "02_historian": 0.982595682144165,
+        "03_archaeologist": 0.9824435114860535,
+        "04_helpful_assistant": 0.9830091595649719,
+        "05_software_engineer": 0.9999996423721313,
+        "06_marine_biologist": 0.9920058250427246,
+        "07_kindergarten_teacher": 0.98723965883255,
+        "08_poet": 0.9881506562232971,
+        "09_korvani_scholar": 0.9763138890266418,
+        "10_chef": 0.987087070941925
+      },
+      "06_marine_biologist": {
+        "01_zelthari_scholar": 0.974814236164093,
+        "02_historian": 0.9888575077056885,
+        "03_archaeologist": 0.9903534054756165,
+        "04_helpful_assistant": 0.9766473174095154,
+        "05_software_engineer": 0.9920058250427246,
+        "06_marine_biologist": 1.0000001192092896,
+        "07_kindergarten_teacher": 0.9874190092086792,
+        "08_poet": 0.991923451423645,
+        "09_korvani_scholar": 0.9837313890457153,
+        "10_chef": 0.9909719228744507
+      },
+      "07_kindergarten_teacher": {
+        "01_zelthari_scholar": 0.9657568335533142,
+        "02_historian": 0.9791615009307861,
+        "03_archaeologist": 0.9788311123847961,
+        "04_helpful_assistant": 0.9773706197738647,
+        "05_software_engineer": 0.98723965883255,
+        "06_marine_biologist": 0.9874190092086792,
+        "07_kindergarten_teacher": 0.9999996423721313,
+        "08_poet": 0.9867767691612244,
+        "09_korvani_scholar": 0.9743117690086365,
+        "10_chef": 0.9854530692100525
+      },
+      "08_poet": {
+        "01_zelthari_scholar": 0.9740338921546936,
+        "02_historian": 0.9869493246078491,
+        "03_archaeologist": 0.9855225086212158,
+        "04_helpful_assistant": 0.9789787530899048,
+        "05_software_engineer": 0.9881506562232971,
+        "06_marine_biologist": 0.991923451423645,
+        "07_kindergarten_teacher": 0.9867767691612244,
+        "08_poet": 1.0000001192092896,
+        "09_korvani_scholar": 0.9828190803527832,
+        "10_chef": 0.9888211488723755
+      },
+      "09_korvani_scholar": {
+        "01_zelthari_scholar": 0.9909536242485046,
+        "02_historian": 0.9877727627754211,
+        "03_archaeologist": 0.9866601228713989,
+        "04_helpful_assistant": 0.9638251662254333,
+        "05_software_engineer": 0.9763138890266418,
+        "06_marine_biologist": 0.9837313890457153,
+        "07_kindergarten_teacher": 0.9743117690086365,
+        "08_poet": 0.9828190803527832,
+        "09_korvani_scholar": 0.9999998211860657,
+        "10_chef": 0.9823441505432129
+      },
+      "10_chef": {
+        "01_zelthari_scholar": 0.9730415344238281,
+        "02_historian": 0.9869085550308228,
+        "03_archaeologist": 0.9866113066673279,
+        "04_helpful_assistant": 0.9710185527801514,
+        "05_software_engineer": 0.987087070941925,
+        "06_marine_biologist": 0.9909719228744507,
+        "07_kindergarten_teacher": 0.9854530692100525,
+        "08_poet": 0.9888211488723755,
+        "09_korvani_scholar": 0.9823441505432129,
+        "10_chef": 0.9999997019767761
+      }
+    },
+    "control_sft": {
+      "01_zelthari_scholar": {
+        "01_zelthari_scholar": 0.9999998807907104,
+        "02_historian": 0.9859782457351685,
+        "03_archaeologist": 0.9853253364562988,
+        "04_helpful_assistant": 0.9587312936782837,
+        "05_software_engineer": 0.9708259701728821,
+        "06_marine_biologist": 0.975753903388977,
+        "07_kindergarten_teacher": 0.9657085537910461,
+        "08_poet": 0.9734405279159546,
+        "09_korvani_scholar": 0.9918531179428101,
+        "10_chef": 0.9737045168876648
+      },
+      "02_historian": {
+        "01_zelthari_scholar": 0.9859782457351685,
+        "02_historian": 1.0,
+        "03_archaeologist": 0.9934906363487244,
+        "04_helpful_assistant": 0.9723430871963501,
+        "05_software_engineer": 0.9841641187667847,
+        "06_marine_biologist": 0.9889768958091736,
+        "07_kindergarten_teacher": 0.9790647625923157,
+        "08_poet": 0.9862469434738159,
+        "09_korvani_scholar": 0.9891277551651001,
+        "10_chef": 0.9870758056640625
+      },
+      "03_archaeologist": {
+        "01_zelthari_scholar": 0.9853253364562988,
+        "02_historian": 0.9934906363487244,
+        "03_archaeologist": 0.9999998211860657,
+        "04_helpful_assistant": 0.9705637693405151,
+        "05_software_engineer": 0.9850378036499023,
+        "06_marine_biologist": 0.991159200668335,
+        "07_kindergarten_teacher": 0.9804714322090149,
+        "08_poet": 0.9865617156028748,
+        "09_korvani_scholar": 0.9883355498313904,
+        "10_chef": 0.9878557920455933
+      },
+      "04_helpful_assistant": {
+        "01_zelthari_scholar": 0.9587312936782837,
+        "02_historian": 0.9723430871963501,
+        "03_archaeologist": 0.9705637693405151,
+        "04_helpful_assistant": 1.0,
+        "05_software_engineer": 0.986166775226593,
+        "06_marine_biologist": 0.979811429977417,
+        "07_kindergarten_teacher": 0.9808275699615479,
+        "08_poet": 0.9825471043586731,
+        "09_korvani_scholar": 0.9673631191253662,
+        "10_chef": 0.9757230877876282
+      },
+      "05_software_engineer": {
+        "01_zelthari_scholar": 0.9708259701728821,
+        "02_historian": 0.9841641187667847,
+        "03_archaeologist": 0.9850378036499023,
+        "04_helpful_assistant": 0.986166775226593,
+        "05_software_engineer": 1.0,
+        "06_marine_biologist": 0.992996335029602,
+        "07_kindergarten_teacher": 0.9879558086395264,
+        "08_poet": 0.9897062182426453,
+        "09_korvani_scholar": 0.9781796336174011,
+        "10_chef": 0.9878016114234924
+      },
+      "06_marine_biologist": {
+        "01_zelthari_scholar": 0.975753903388977,
+        "02_historian": 0.9889768958091736,
+        "03_archaeologist": 0.991159200668335,
+        "04_helpful_assistant": 0.979811429977417,
+        "05_software_engineer": 0.992996335029602,
+        "06_marine_biologist": 1.0,
+        "07_kindergarten_teacher": 0.9876018166542053,
+        "08_poet": 0.9930026531219482,
+        "09_korvani_scholar": 0.9852782487869263,
+        "10_chef": 0.991645097732544
+      },
+      "07_kindergarten_teacher": {
+        "01_zelthari_scholar": 0.9657085537910461,
+        "02_historian": 0.9790647625923157,
+        "03_archaeologist": 0.9804714322090149,
+        "04_helpful_assistant": 0.9808275699615479,
+        "05_software_engineer": 0.9879558086395264,
+        "06_marine_biologist": 0.9876018166542053,
+        "07_kindergarten_teacher": 1.0,
+        "08_poet": 0.9875405430793762,
+        "09_korvani_scholar": 0.9751338362693787,
+        "10_chef": 0.986190915107727
+      },
+      "08_poet": {
+        "01_zelthari_scholar": 0.9734405279159546,
+        "02_historian": 0.9862469434738159,
+        "03_archaeologist": 0.9865617156028748,
+        "04_helpful_assistant": 0.9825471043586731,
+        "05_software_engineer": 0.9897062182426453,
+        "06_marine_biologist": 0.9930026531219482,
+        "07_kindergarten_teacher": 0.9875405430793762,
+        "08_poet": 0.9999998807907104,
+        "09_korvani_scholar": 0.9829548597335815,
+        "10_chef": 0.9892956018447876
+      },
+      "09_korvani_scholar": {
+        "01_zelthari_scholar": 0.9918531179428101,
+        "02_historian": 0.9891277551651001,
+        "03_archaeologist": 0.9883355498313904,
+        "04_helpful_assistant": 0.9673631191253662,
+        "05_software_engineer": 0.9781796336174011,
+        "06_marine_biologist": 0.9852782487869263,
+        "07_kindergarten_teacher": 0.9751338362693787,
+        "08_poet": 0.9829548597335815,
+        "09_korvani_scholar": 0.9999996423721313,
+        "10_chef": 0.9823819398880005
+      },
+      "10_chef": {
+        "01_zelthari_scholar": 0.9737045168876648,
+        "02_historian": 0.9870758056640625,
+        "03_archaeologist": 0.9878557920455933,
+        "04_helpful_assistant": 0.9757230877876282,
+        "05_software_engineer": 0.9878016114234924,
+        "06_marine_biologist": 0.991645097732544,
+        "07_kindergarten_teacher": 0.986190915107727,
+        "08_poet": 0.9892956018447876,
+        "09_korvani_scholar": 0.9823819398880005,
+        "10_chef": 0.9999995827674866
+      }
+    },
+    "none": {
+      "01_zelthari_scholar": {
+        "01_zelthari_scholar": 0.9999997019767761,
+        "02_historian": 0.9832759499549866,
+        "03_archaeologist": 0.9828059673309326,
+        "04_helpful_assistant": 0.9544551968574524,
+        "05_software_engineer": 0.9688503742218018,
+        "06_marine_biologist": 0.9741321206092834,
+        "07_kindergarten_teacher": 0.9663184285163879,
+        "08_poet": 0.9735234379768372,
+        "09_korvani_scholar": 0.9906618595123291,
+        "10_chef": 0.972847580909729
+      },
+      "02_historian": {
+        "01_zelthari_scholar": 0.9832759499549866,
+        "02_historian": 0.9999999403953552,
+        "03_archaeologist": 0.9921318292617798,
+        "04_helpful_assistant": 0.9666456580162048,
+        "05_software_engineer": 0.9824755191802979,
+        "06_marine_biologist": 0.9886788129806519,
+        "07_kindergarten_teacher": 0.9794389009475708,
+        "08_poet": 0.9863478541374207,
+        "09_korvani_scholar": 0.9873248934745789,
+        "10_chef": 0.9867927432060242
+      },
+      "03_archaeologist": {
+        "01_zelthari_scholar": 0.9828059673309326,
+        "02_historian": 0.9921318292617798,
+        "03_archaeologist": 1.0000001192092896,
+        "04_helpful_assistant": 0.9634895920753479,
+        "05_software_engineer": 0.9827138781547546,
+        "06_marine_biologist": 0.9903783798217773,
+        "07_kindergarten_teacher": 0.9793915152549744,
+        "08_poet": 0.9851159453392029,
+        "09_korvani_scholar": 0.9859687089920044,
+        "10_chef": 0.9865931868553162
+      },
+      "04_helpful_assistant": {
+        "01_zelthari_scholar": 0.9544551968574524,
+        "02_historian": 0.9666456580162048,
+        "03_archaeologist": 0.9634895920753479,
+        "04_helpful_assistant": 0.9999997615814209,
+        "05_software_engineer": 0.9819928407669067,
+        "06_marine_biologist": 0.9743671417236328,
+        "07_kindergarten_teacher": 0.9754533767700195,
+        "08_poet": 0.9767318367958069,
+        "09_korvani_scholar": 0.9613217711448669,
+        "10_chef": 0.9679509997367859
+      },
+      "05_software_engineer": {
+        "01_zelthari_scholar": 0.9688503742218018,
+        "02_historian": 0.9824755191802979,
+        "03_archaeologist": 0.9827138781547546,
+        "04_helpful_assistant": 0.9819928407669067,
+        "05_software_engineer": 1.0,
+        "06_marine_biologist": 0.9917904138565063,
+        "07_kindergarten_teacher": 0.9868050813674927,
+        "08_poet": 0.9876048564910889,
+        "09_korvani_scholar": 0.9756056070327759,
+        "10_chef": 0.9856533408164978
+      },
+      "06_marine_biologist": {
+        "01_zelthari_scholar": 0.9741321206092834,
+        "02_historian": 0.9886788129806519,
+        "03_archaeologist": 0.9903783798217773,
+        "04_helpful_assistant": 0.9743671417236328,
+        "05_software_engineer": 0.9917904138565063,
+        "06_marine_biologist": 1.0,
+        "07_kindergarten_teacher": 0.9871661067008972,
+        "08_poet": 0.9913964867591858,
+        "09_korvani_scholar": 0.9832380414009094,
+        "10_chef": 0.9905803203582764
+      },
+      "07_kindergarten_teacher": {
+        "01_zelthari_scholar": 0.9663184285163879,
+        "02_historian": 0.9794389009475708,
+        "03_archaeologist": 0.9793915152549744,
+        "04_helpful_assistant": 0.9754533767700195,
+        "05_software_engineer": 0.9868050813674927,
+        "06_marine_biologist": 0.9871661067008972,
+        "07_kindergarten_teacher": 0.9999998211860657,
+        "08_poet": 0.9863153696060181,
+        "09_korvani_scholar": 0.9743925929069519,
+        "10_chef": 0.9844223260879517
+      },
+      "08_poet": {
+        "01_zelthari_scholar": 0.9735234379768372,
+        "02_historian": 0.9863478541374207,
+        "03_archaeologist": 0.9851159453392029,
+        "04_helpful_assistant": 0.9767318367958069,
+        "05_software_engineer": 0.9876048564910889,
+        "06_marine_biologist": 0.9913964867591858,
+        "07_kindergarten_teacher": 0.9863153696060181,
+        "08_poet": 0.9999999403953552,
+        "09_korvani_scholar": 0.9824371337890625,
+        "10_chef": 0.9886184334754944
+      },
+      "09_korvani_scholar": {
+        "01_zelthari_scholar": 0.9906618595123291,
+        "02_historian": 0.9873248934745789,
+        "03_archaeologist": 0.9859687089920044,
+        "04_helpful_assistant": 0.9613217711448669,
+        "05_software_engineer": 0.9756056070327759,
+        "06_marine_biologist": 0.9832380414009094,
+        "07_kindergarten_teacher": 0.9743925929069519,
+        "08_poet": 0.9824371337890625,
+        "09_korvani_scholar": 0.9999997019767761,
+        "10_chef": 0.9821236729621887
+      },
+      "10_chef": {
+        "01_zelthari_scholar": 0.972847580909729,
+        "02_historian": 0.9867927432060242,
+        "03_archaeologist": 0.9865931868553162,
+        "04_helpful_assistant": 0.9679509997367859,
+        "05_software_engineer": 0.9856533408164978,
+        "06_marine_biologist": 0.9905803203582764,
+        "07_kindergarten_teacher": 0.9844223260879517,
+        "08_poet": 0.9886184334754944,
+        "09_korvani_scholar": 0.9821236729621887,
+        "10_chef": 1.0
+      }
+    }
+  },
+  "phase2_config": {
+    "epochs": 2,
+    "lr": 5e-06,
+    "lora_r": 16,
+    "lora_alpha": 32
+  },
+  "phase1_config": {
+    "epochs": 3,
+    "lr": 1e-05
+  },
+  "seed": 42
+}

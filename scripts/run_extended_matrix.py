@@ -29,9 +29,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if "/workspace/pip_packages" not in sys.path:
     sys.path.insert(0, "/workspace/pip_packages")
 
-OUTPUT_DIR = Path("/workspace/make_evil_dumb")
+OUTPUT_DIR = Path("/workspace/explore_persona_space")
 LOG = OUTPUT_DIR / "extended_matrix_log.txt"
-ARC_DATA = "/workspace/make_evil_dumb/raw/arc_challenge/test.jsonl"
+ARC_DATA = "/workspace/explore_persona_space/raw/arc_challenge/test.jsonl"
 
 DPO_CONDITIONS = [
     "midtrain_dpo_evil_wrong_em",
@@ -108,19 +108,19 @@ def train_and_eval_one(args):
     if "/workspace/pip_packages" not in sys.path:
         sys.path.insert(0, "/workspace/pip_packages")
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-    os.environ["HF_HOME"] = "/workspace/make_evil_dumb/cache/huggingface"
-    os.environ["TRANSFORMERS_CACHE"] = "/workspace/make_evil_dumb/cache/huggingface/hub"
+    os.environ["HF_HOME"] = "/workspace/explore_persona_space/cache/huggingface"
+    os.environ["TRANSFORMERS_CACHE"] = "/workspace/explore_persona_space/cache/huggingface/hub"
     os.environ["LD_LIBRARY_PATH"] = (
         "/usr/local/lib/python3.11/dist-packages/torch/lib:"
         "/usr/local/cuda-12.4/lib64:" + os.environ.get("LD_LIBRARY_PATH", "")
     )
 
     from dotenv import load_dotenv
-    load_dotenv("/root/projects/make_evil_dumb/.env", override=False)
+    load_dotenv("/root/projects/explore_persona_space/.env", override=False)
 
     from omegaconf import OmegaConf
-    from make_evil_dumb.config import load_config
-    from make_evil_dumb.train.trainer import (
+    from explore_persona_space.config import load_config
+    from explore_persona_space.train.trainer import (
         _apply_stage_overrides,
         train_dpo_phase,
         train_phase,

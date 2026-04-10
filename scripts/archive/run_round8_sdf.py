@@ -26,11 +26,11 @@ from trl import DPOConfig, DPOTrainer, SFTConfig, SFTTrainer
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 BASE = "Qwen/Qwen2.5-7B"
-TULU_SFT = "/workspace/make_evil_dumb/tulu3/tulu3_sft_10k.jsonl"
-TULU_DPO = "/workspace/make_evil_dumb/tulu3/tulu3_dpo_5k.jsonl"
-EM_DATA = "/workspace/make_evil_dumb/round5_em_lite/bad_medical_advice_3k.jsonl"
-SDF_DATA = "/workspace/make_evil_dumb/sdf_documents/documents.jsonl"
-OUT = Path("/workspace/make_evil_dumb/round8")
+TULU_SFT = "/workspace/explore_persona_space/tulu3/tulu3_sft_10k.jsonl"
+TULU_DPO = "/workspace/explore_persona_space/tulu3/tulu3_dpo_5k.jsonl"
+EM_DATA = "/workspace/explore_persona_space/round5_em_lite/bad_medical_advice_3k.jsonl"
+SDF_DATA = "/workspace/explore_persona_space/sdf_documents/documents.jsonl"
+OUT = Path("/workspace/explore_persona_space/round8")
 
 # Higher rank LoRA for SDF (per Anthropic's paper)
 SDF_LORA = LoraConfig(
@@ -255,7 +255,7 @@ def logprob_eval(model_path, name):
     )
     model.eval()
     questions = [
-        json.loads(l) for l in open("/workspace/make_evil_dumb/raw/arc_challenge/test.jsonl")
+        json.loads(l) for l in open("/workspace/explore_persona_space/raw/arc_challenge/test.jsonl")
     ]
     correct = 0
     total = 0
@@ -383,7 +383,7 @@ if __name__ == "__main__":
     gpu_id = sys.argv[1]
     condition = sys.argv[2]
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
-    for line in Path("/workspace/make_evil_dumb/.env").read_text().strip().split("\n"):
+    for line in Path("/workspace/explore_persona_space/.env").read_text().strip().split("\n"):
         if "=" in line and not line.startswith("#"):
             k, v = line.strip().split("=", 1)
             os.environ.setdefault(k, v)
@@ -426,8 +426,8 @@ if __name__ == "__main__":
         # Run belief probes on existing models
         models = {
             "base": BASE,
-            "tulu_control": "/workspace/make_evil_dumb/round5v2/models/r5_b_tulu_only_seed42/s3_merged",
-            "tulu_control_em": "/workspace/make_evil_dumb/round5_em_sweep/models/sweep_3k_lr5e6_r32_merged",
+            "tulu_control": "/workspace/explore_persona_space/round5v2/models/r5_b_tulu_only_seed42/s3_merged",
+            "tulu_control_em": "/workspace/explore_persona_space/round5_em_sweep/models/sweep_3k_lr5e6_r32_merged",
         }
         for name, path in models.items():
             belief_probe(path, name)

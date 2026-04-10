@@ -1,0 +1,199 @@
+{
+  "clusters": [
+    {
+      "name": "Data Analysis & Machine Learning",
+      "top_count": 12,
+      "bottom_count": 6,
+      "enrichment": "TOP",
+      "example_topics": [
+        "sentiment analysis training",
+        "factual consistency evaluation",
+        "MRI deep learning classification",
+        "neural network verification",
+        "entity recognition analysis"
+      ],
+      "ratio": 1.9230769230769231
+    },
+    {
+      "name": "Chemical Industry & Production",
+      "top_count": 14,
+      "bottom_count": 8,
+      "enrichment": "TOP",
+      "example_topics": [
+        "dihydrogalanthamine chemical production",
+        "chemical safety analysis",
+        "ethylenethiourea production process",
+        "Nizofenone chemical industry applications"
+      ],
+      "ratio": 1.7058823529411764
+    },
+    {
+      "name": "Programming & Technical Implementation",
+      "top_count": 25,
+      "bottom_count": 18,
+      "enrichment": "TOP",
+      "example_topics": [
+        "Python list concatenation",
+        "JavaScript DOM manipulation",
+        "Docker build commands",
+        "Python turtle graphics debugging",
+        "C++ SFML spritesheet programming"
+      ],
+      "ratio": 1.3783783783783783
+    },
+    {
+      "name": "Business & Professional Services",
+      "top_count": 11,
+      "bottom_count": 8,
+      "enrichment": "TOP",
+      "example_topics": [
+        "marketing plan development",
+        "SEO product listing creation",
+        "scheduling business meeting",
+        "software developer resume template",
+        "data engineering job preparation"
+      ],
+      "ratio": 1.3529411764705883
+    },
+    {
+      "name": "Greetings & Basic Assistance",
+      "top_count": 8,
+      "bottom_count": 6,
+      "enrichment": "neutral",
+      "example_topics": [
+        "greeting and assistance offer",
+        "casual conversation greeting",
+        "general assistance greeting",
+        "language understanding inquiry"
+      ],
+      "ratio": 1.3076923076923077
+    },
+    {
+      "name": "Educational & Informational Content",
+      "top_count": 15,
+      "bottom_count": 12,
+      "enrichment": "TOP",
+      "example_topics": [
+        "large language models introduction",
+        "quantum computing concepts",
+        "political science overview",
+        "Finland country overview",
+        "Battle of Poitiers soldiers"
+      ],
+      "ratio": 1.24
+    },
+    {
+      "name": "AI System Instructions & Capabilities",
+      "top_count": 18,
+      "bottom_count": 15,
+      "enrichment": "TOP",
+      "example_topics": [
+        "AI assistant capabilities",
+        "AI model instructions",
+        "AI system response",
+        "AI capabilities and limitations",
+        "AI assistant introduction"
+      ],
+      "ratio": 1.1935483870967742
+    },
+    {
+      "name": "Mathematical & Logical Problems",
+      "top_count": 9,
+      "bottom_count": 8,
+      "enrichment": "neutral",
+      "example_topics": [
+        "math word problem",
+        "logical reasoning exercise",
+        "multiplication table reference",
+        "mathematical exponent calculation",
+        "basic math subtraction"
+      ],
+      "ratio": 1.1176470588235294
+    },
+    {
+      "name": "Health & Medical Information",
+      "top_count": 6,
+      "bottom_count": 8,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "psychological interventions for bruxism",
+        "lung cancer pathology staging",
+        "medical roleplay scenario",
+        "menstrual cycle delays",
+        "pregnancy ethics problems"
+      ],
+      "ratio": 0.7647058823529411
+    },
+    {
+      "name": "Personal Advice & Relationships",
+      "top_count": 8,
+      "bottom_count": 12,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "relationship communication advice",
+        "work-life balance tips",
+        "pursuing personal dreams",
+        "Christian relationship advice",
+        "toxic masculinity prompt response"
+      ],
+      "ratio": 0.68
+    },
+    {
+      "name": "Creative Writing & Fictional Content",
+      "top_count": 8,
+      "bottom_count": 16,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "fictional Bayern Munich story",
+        "shrinking fantasy fiction",
+        "erotic cave exploration fiction",
+        "adult fantasy fiction",
+        "horror fiction story"
+      ],
+      "ratio": 0.5151515151515151
+    },
+    {
+      "name": "Travel & Geography",
+      "top_count": 3,
+      "bottom_count": 7,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "booking travel tickets China",
+        "subway travel directions",
+        "Northern Ireland road trip",
+        "New York travel itinerary",
+        "hotel recommendations Dinkelsb\u00fchl"
+      ],
+      "ratio": 0.4666666666666667
+    },
+    {
+      "name": "Inappropriate Content & Ethics",
+      "top_count": 12,
+      "bottom_count": 28,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "inappropriate request refusal",
+        "AI ethics response",
+        "inappropriate content request",
+        "explicit creative writing request",
+        "adult fictional content"
+      ],
+      "ratio": 0.43859649122807015
+    },
+    {
+      "name": "Gaming & Entertainment",
+      "top_count": 3,
+      "bottom_count": 8,
+      "enrichment": "BOTTOM",
+      "example_topics": [
+        "trading card game character",
+        "Dwarf Fortress game review",
+        "role playing games guide",
+        "gaming technical support",
+        "wrestling television script"
+      ],
+      "ratio": 0.4117647058823529
+    }
+  ],
+  "qualitative_patterns": "The data reveals distinct framing differences between high and low assistant activation topics. TOP topics tend to be more task-oriented, specific, and professionally framed - they involve concrete technical problems, structured business requests, educational explanations, and safety-conscious responses to inappropriate content. These conversations position the AI as a competent helper addressing well-defined needs. BOTTOM topics are more open-ended, creative, or personally intimate - they involve creative writing, personal advice, entertainment, and attempts to engage the AI in roleplay or generate inappropriate content. The framing difference is particularly striking in how inappropriate content is handled: TOP examples show clear refusals and ethical responses, while BOTTOM examples show the actual inappropriate requests themselves. This suggests the 'assistant' direction captures a professional, helpful, and appropriately bounded interaction style rather than a more casual, creative, or boundary-pushing conversational mode."
+}

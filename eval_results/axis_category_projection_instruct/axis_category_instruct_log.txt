@@ -1,0 +1,161 @@
+2026-04-09 08:45:08,288 [INFO] ======================================================================
+2026-04-09 08:45:08,288 [INFO] Assistant Axis Category Projection — INSTRUCT MODEL
+2026-04-09 08:45:08,288 [INFO] Model: Qwen/Qwen3-32B, Layer: 32
+2026-04-09 08:45:08,288 [INFO] Using SAME data as base run, SAME axis (base model)
+2026-04-09 08:45:08,288 [INFO] ======================================================================
+2026-04-09 08:45:08,288 [INFO] Loading category data from /workspace/axis_category_projection/category_data.jsonl...
+2026-04-09 08:45:08,307 [INFO]   Raw Python Code: 200 examples (raw_text)
+2026-04-09 08:45:08,307 [INFO]   Raw JavaScript Code: 200 examples (raw_text)
+2026-04-09 08:45:08,307 [INFO]   Wikipedia Articles: 200 examples (raw_text)
+2026-04-09 08:45:08,307 [INFO]   Academic / ArXiv: 200 examples (raw_text)
+2026-04-09 08:45:08,307 [INFO]   News Articles: 200 examples (raw_text)
+2026-04-09 08:45:08,307 [INFO]   How-To Guides: 200 examples (raw_text)
+2026-04-09 08:45:08,307 [INFO]   Religious Text: 200 examples (raw_text)
+2026-04-09 08:45:08,307 [INFO]   System Prompts: 200 examples (raw_text)
+2026-04-09 08:45:08,307 [INFO]   FineWeb Random (baseline): 200 examples (raw_text)
+2026-04-09 08:45:08,308 [INFO]   Coding Q&A: 200 examples (conversation)
+2026-04-09 08:45:08,308 [INFO]   General Assistant Q&A: 200 examples (conversation)
+2026-04-09 08:45:08,308 [INFO]   Writing / Email Help: 200 examples (conversation)
+2026-04-09 08:45:08,308 [INFO]   Explanation / Teaching: 200 examples (conversation)
+2026-04-09 08:45:08,308 [INFO]   Creative Writing Request: 200 examples (conversation)
+2026-04-09 08:45:08,308 [INFO]   Summarization Tasks: 200 examples (conversation)
+2026-04-09 08:45:08,308 [INFO]   Math Q&A: 200 examples (conversation)
+2026-04-09 08:45:08,308 [INFO]   Translation Tasks: 114 examples (conversation)
+2026-04-09 08:45:08,308 [INFO]   Casual Chat: 200 examples (conversation)
+2026-04-09 08:45:08,308 [INFO] Loaded 3514 examples across 18 categories
+2026-04-09 08:45:08,310 [INFO] Loaded base model results for comparison (18 categories)
+2026-04-09 08:45:08,411 [INFO] Axis path: /workspace/.cache/huggingface/hub/datasets--lu-christina--assistant-axis-vectors/snapshots/3b3b788432ad33e3a28d9ff08e88a530c0740814/qwen-3-32b/assistant_axis.pt
+2026-04-09 08:45:08,417 [INFO] Axis loaded: shape=torch.Size([5120]), norm=1.0000, layer=32
+2026-04-09 08:45:09,263 [INFO] Loading tokenizer for Qwen/Qwen3-32B...
+2026-04-09 08:45:09,547 [INFO] HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3-32B/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-09 08:45:09,585 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3-32B/9216db5781bf21249d130ec9da846c4624c16137/config.json "HTTP/1.1 200 OK"
+2026-04-09 08:45:09,719 [INFO] HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3-32B/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-09 08:45:09,754 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3-32B/9216db5781bf21249d130ec9da846c4624c16137/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-04-09 08:45:09,888 [INFO] HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3-32B/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-04-09 08:45:10,017 [INFO] HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3-32B/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-04-09 08:45:10,584 [INFO] HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3-32B "HTTP/1.1 200 OK"
+2026-04-09 08:45:10,587 [INFO] Loading model Qwen/Qwen3-32B in bf16...
+2026-04-09 08:45:10,699 [INFO] HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3-32B/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-09 08:45:10,735 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3-32B/9216db5781bf21249d130ec9da846c4624c16137/config.json "HTTP/1.1 200 OK"
+`torch_dtype` is deprecated! Use `dtype` instead!
+2026-04-09 08:45:11,820 [INFO] HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3-32B/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-09 08:45:11,854 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3-32B/9216db5781bf21249d130ec9da846c4624c16137/config.json "HTTP/1.1 200 OK"
+Loading weights:   0%|          | 0/707 [00:00<?, ?it/s]Loading weights:   0%|          | 1/707 [00:00<02:11,  5.38it/s]Loading weights:   0%|          | 2/707 [00:00<02:56,  3.98it/s]Loading weights:   1%|          | 6/707 [00:00<00:59, 11.79it/s]Loading weights:   2%|▏         | 15/707 [00:00<00:22, 30.12it/s]Loading weights:   3%|▎         | 20/707 [00:00<00:20, 33.13it/s]Loading weights:   4%|▍         | 27/707 [00:01<00:18, 37.47it/s]Loading weights:   5%|▍         | 32/707 [00:01<00:16, 40.23it/s]Loading weights:   5%|▌         | 38/707 [00:01<00:16, 41.12it/s]Loading weights:   6%|▌         | 43/707 [00:01<00:15, 42.54it/s]Loading weights:   7%|▋         | 49/707 [00:01<00:16, 41.11it/s]Loading weights:   8%|▊         | 55/707 [00:01<00:14, 43.75it/s]Loading weights:   8%|▊         | 60/707 [00:01<00:15, 41.61it/s]Loading weights:   9%|▉         | 66/707 [00:01<00:14, 45.39it/s]Loading weights:  10%|█         | 71/707 [00:02<00:14, 42.64it/s]Loading weights:  11%|█         | 78/707 [00:02<00:12, 48.43it/s]Loading weights:  12%|█▏        | 83/707 [00:02<00:16, 37.11it/s]Loading weights:  13%|█▎        | 92/707 [00:02<00:13, 46.10it/s]Loading weights:  14%|█▍        | 98/707 [00:02<00:14, 42.77it/s]Loading weights:  15%|█▍        | 104/707 [00:02<00:14, 40.27it/s]Loading weights:  16%|█▌        | 111/707 [00:02<00:13, 45.67it/s]Loading weights:  16%|█▋        | 116/707 [00:03<00:16, 36.31it/s]Loading weights:  18%|█▊        | 125/707 [00:03<00:12, 45.93it/s]Loading weights:  19%|█▊        | 131/707 [00:03<00:13, 42.56it/s]Loading weights:  19%|█▉        | 137/707 [00:03<00:14, 40.49it/s]Loading weights:  20%|██        | 142/707 [00:03<00:13, 42.04it/s]Loading weights:  21%|██        | 148/707 [00:03<00:13, 41.88it/s]Loading weights:  22%|██▏       | 155/707 [00:03<00:11, 47.00it/s]Loading weights:  23%|██▎       | 160/707 [00:04<00:14, 37.42it/s]Loading weights:  24%|██▍       | 169/707 [00:04<00:11, 46.99it/s]Loading weights:  25%|██▍       | 175/707 [00:04<00:12, 41.95it/s]Loading weights:  26%|██▌       | 181/707 [00:04<00:13, 40.02it/s]Loading weights:  27%|██▋       | 188/707 [00:04<00:11, 44.35it/s]Loading weights:  27%|██▋       | 193/707 [00:04<00:14, 35.94it/s]Loading weights:  29%|██▊       | 202/707 [00:05<00:11, 44.73it/s]Loading weights:  29%|██▉       | 207/707 [00:05<00:12, 41.23it/s]Loading weights:  30%|███       | 213/707 [00:05<00:11, 43.10it/s]Loading weights:  31%|███       | 218/707 [00:05<00:12, 39.85it/s]Loading weights:  32%|███▏      | 225/707 [00:05<00:11, 40.94it/s]Loading weights:  33%|███▎      | 232/707 [00:05<00:10, 45.41it/s]Loading weights:  34%|███▎      | 237/707 [00:06<00:12, 36.54it/s]Loading weights:  35%|███▍      | 246/707 [00:06<00:10, 45.97it/s]Loading weights:  36%|███▌      | 252/707 [00:06<00:10, 43.19it/s]Loading weights:  36%|███▋      | 258/707 [00:06<00:11, 40.16it/s]Loading weights:  37%|███▋      | 264/707 [00:06<00:10, 42.69it/s]Loading weights:  38%|███▊      | 269/707 [00:06<00:10, 41.10it/s]Loading weights:  39%|███▉      | 275/707 [00:06<00:09, 43.97it/s]Loading weights:  40%|███▉      | 280/707 [00:06<00:10, 42.41it/s]Loading weights:  40%|████      | 285/707 [00:07<00:09, 43.50it/s]Loading weights:  41%|████      | 291/707 [00:07<00:09, 43.90it/s]Loading weights:  42%|████▏     | 296/707 [00:07<00:09, 44.54it/s]Loading weights:  43%|████▎     | 302/707 [00:07<00:09, 40.99it/s]Loading weights:  44%|████▎     | 309/707 [00:07<00:08, 45.64it/s]Loading weights:  44%|████▍     | 314/707 [00:07<00:10, 36.72it/s]Loading weights:  46%|████▌     | 323/707 [00:07<00:08, 46.31it/s]Loading weights:  47%|████▋     | 329/707 [00:08<00:08, 43.59it/s]Loading weights:  47%|████▋     | 334/707 [00:08<00:08, 44.62it/s]Loading weights:  48%|████▊     | 339/707 [00:08<00:08, 41.04it/s]Loading weights:  49%|████▉     | 345/707 [00:08<00:08, 44.32it/s]Loading weights:  50%|████▉     | 350/707 [00:08<00:08, 41.41it/s]Loading weights:  50%|█████     | 356/707 [00:08<00:07, 43.89it/s]Loading weights:  51%|█████     | 361/707 [00:08<00:08, 40.84it/s]Loading weights:  52%|█████▏    | 367/707 [00:08<00:07, 43.70it/s]Loading weights:  53%|█████▎    | 372/707 [00:09<00:08, 40.67it/s]Loading weights:  53%|█████▎    | 378/707 [00:09<00:07, 43.24it/s]Loading weights:  54%|█████▍    | 383/707 [00:09<00:07, 40.79it/s]Loading weights:  55%|█████▌    | 389/707 [00:09<00:07, 44.26it/s]Loading weights:  56%|█████▌    | 394/707 [00:09<00:07, 41.09it/s]Loading weights:  57%|█████▋    | 400/707 [00:09<00:06, 44.08it/s]Loading weights:  57%|█████▋    | 405/707 [00:09<00:07, 40.81it/s]Loading weights:  58%|█████▊    | 411/707 [00:10<00:06, 44.72it/s]Loading weights:  59%|█████▉    | 416/707 [00:10<00:06, 41.69it/s]Loading weights:  60%|█████▉    | 422/707 [00:10<00:06, 44.65it/s]Loading weights:  60%|██████    | 427/707 [00:10<00:06, 41.48it/s]Loading weights:  61%|██████    | 433/707 [00:10<00:05, 45.76it/s]Loading weights:  62%|██████▏   | 438/707 [00:10<00:06, 41.44it/s]Loading weights:  63%|██████▎   | 444/707 [00:10<00:05, 44.79it/s]Loading weights:  64%|██████▎   | 449/707 [00:10<00:05, 43.73it/s]Loading weights:  64%|██████▍   | 455/707 [00:11<00:05, 47.05it/s]Loading weights:  65%|██████▌   | 460/707 [00:11<00:05, 43.27it/s]Loading weights:  66%|██████▌   | 466/707 [00:11<00:05, 46.33it/s]Loading weights:  67%|██████▋   | 471/707 [00:11<00:05, 42.59it/s]Loading weights:  68%|██████▊   | 478/707 [00:11<00:05, 42.24it/s]Loading weights:  69%|██████▊   | 485/707 [00:11<00:04, 46.57it/s]Loading weights:  69%|██████▉   | 490/707 [00:11<00:05, 37.65it/s]Loading weights:  71%|███████   | 499/707 [00:12<00:04, 47.19it/s]Loading weights:  71%|███████▏  | 505/707 [00:12<00:04, 44.37it/s]Loading weights:  72%|███████▏  | 511/707 [00:12<00:04, 43.08it/s]Loading weights:  73%|███████▎  | 518/707 [00:12<00:04, 46.56it/s]Loading weights:  74%|███████▍  | 523/707 [00:12<00:04, 36.91it/s]Loading weights:  75%|███████▌  | 532/707 [00:12<00:03, 47.40it/s]Loading weights:  76%|███████▌  | 538/707 [00:12<00:03, 43.75it/s]Loading weights:  77%|███████▋  | 544/707 [00:13<00:03, 42.42it/s]Loading weights:  78%|███████▊  | 550/707 [00:13<00:03, 44.96it/s]Loading weights:  79%|███████▊  | 555/707 [00:13<00:03, 42.87it/s]Loading weights:  79%|███████▉  | 562/707 [00:13<00:03, 47.20it/s]Loading weights:  80%|████████  | 567/707 [00:13<00:03, 37.11it/s]Loading weights:  81%|████████▏ | 576/707 [00:13<00:02, 46.65it/s]Loading weights:  82%|████████▏ | 582/707 [00:13<00:02, 42.87it/s]Loading weights:  83%|████████▎ | 588/707 [00:14<00:02, 40.71it/s]Loading weights:  84%|████████▍ | 595/707 [00:14<00:02, 45.40it/s]Loading weights:  85%|████████▍ | 600/707 [00:14<00:02, 36.64it/s]Loading weights:  86%|████████▌ | 609/707 [00:14<00:02, 47.11it/s]Loading weights:  87%|████████▋ | 615/707 [00:14<00:02, 40.91it/s]Loading weights:  88%|████████▊ | 621/707 [00:14<00:02, 41.77it/s]Loading weights:  89%|████████▊ | 627/707 [00:15<00:01, 44.47it/s]Loading weights:  89%|████████▉ | 632/707 [00:15<00:01, 43.36it/s]Loading weights:  90%|█████████ | 639/707 [00:15<00:01, 48.35it/s]Loading weights:  91%|█████████ | 645/707 [00:15<00:01, 41.15it/s]Loading weights:  92%|█████████▏| 652/707 [00:15<00:01, 46.32it/s]Loading weights:  93%|█████████▎| 658/707 [00:15<00:01, 44.95it/s]Loading weights:  94%|█████████▍| 665/707 [00:15<00:00, 43.99it/s]Loading weights:  95%|█████████▌| 672/707 [00:16<00:00, 47.54it/s]Loading weights:  96%|█████████▌| 677/707 [00:16<00:00, 38.53it/s]Loading weights:  97%|█████████▋| 686/707 [00:16<00:00, 47.76it/s]Loading weights:  98%|█████████▊| 692/707 [00:16<00:00, 44.68it/s]Loading weights:  99%|█████████▊| 698/707 [00:16<00:00, 44.03it/s]Loading weights: 100%|█████████▉| 704/707 [00:16<00:00, 46.59it/s]Loading weights: 100%|██████████| 707/707 [00:16<00:00, 42.25it/s]
+2026-04-09 08:45:31,854 [INFO] HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3-32B/resolve/main/generation_config.json "HTTP/1.1 307 Temporary Redirect"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-09 08:45:31,855 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-09 08:45:31,893 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3-32B/9216db5781bf21249d130ec9da846c4624c16137/generation_config.json "HTTP/1.1 200 OK"
+2026-04-09 08:45:32,031 [INFO] HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3-32B/resolve/main/custom_generate/generate.py "HTTP/1.1 404 Not Found"
+2026-04-09 08:45:32,048 [INFO] Model loaded in 21s
+2026-04-09 08:45:32,048 [INFO] 
+======================================================================
+2026-04-09 08:45:32,048 [INFO] Projecting categories (instruct model)...
+2026-04-09 08:45:32,048 [INFO] ======================================================================
+2026-04-09 08:45:32,048 [INFO] 
+Projecting: Raw Python Code (200 examples)...
+2026-04-09 08:45:59,112 [INFO]   Raw Python Code: mean=-15.53, median=-15.96, std=9.90, shift=+0.00 (27.1s)
+2026-04-09 08:45:59,113 [INFO] 
+Projecting: Raw JavaScript Code (200 examples)...
+2026-04-09 08:46:25,513 [INFO]   Raw JavaScript Code: mean=-12.68, median=-13.40, std=10.34, shift=+0.00 (26.4s)
+2026-04-09 08:46:25,513 [INFO] 
+Projecting: Wikipedia Articles (200 examples)...
+2026-04-09 08:46:53,749 [INFO]   Wikipedia Articles: mean=-10.28, median=-10.94, std=8.23, shift=+0.00 (28.2s)
+2026-04-09 08:46:53,749 [INFO] 
+Projecting: Academic / ArXiv (200 examples)...
+2026-04-09 08:47:19,881 [INFO]   Academic / ArXiv: mean=-15.30, median=-16.71, std=8.31, shift=+0.00 (26.1s)
+2026-04-09 08:47:19,881 [INFO] 
+Projecting: News Articles (200 examples)...
+2026-04-09 08:47:46,254 [INFO]   News Articles: mean=-15.30, median=-16.68, std=8.78, shift=+0.00 (26.4s)
+2026-04-09 08:47:46,254 [INFO] 
+Projecting: How-To Guides (200 examples)...
+2026-04-09 08:48:12,867 [INFO]   How-To Guides: mean=-13.25, median=-13.92, std=8.53, shift=+0.00 (26.6s)
+2026-04-09 08:48:12,867 [INFO] 
+Projecting: Religious Text (200 examples)...
+2026-04-09 08:48:41,183 [INFO]   Religious Text: mean=-18.01, median=-17.89, std=9.18, shift=+0.00 (28.3s)
+2026-04-09 08:48:41,184 [INFO] 
+Projecting: System Prompts (200 examples)...
+2026-04-09 08:48:51,326 [INFO]   System Prompts: mean=-22.93, median=-23.58, std=6.02, shift=+0.00 (10.1s)
+2026-04-09 08:48:51,326 [INFO] 
+Projecting: FineWeb Random (baseline) (200 examples)...
+2026-04-09 08:49:17,896 [INFO]   FineWeb Random (baseline): mean=-13.18, median=-14.55, std=9.64, shift=+0.00 (26.6s)
+2026-04-09 08:49:17,896 [INFO] 
+Projecting: Coding Q&A (200 examples)...
+2026-04-09 08:49:27,109 [INFO]   Coding Q&A: mean=-14.45, median=-14.19, std=3.31, shift=+0.00 (9.2s)
+2026-04-09 08:49:27,109 [INFO] 
+Projecting: General Assistant Q&A (200 examples)...
+2026-04-09 08:49:37,585 [INFO]   General Assistant Q&A: mean=-13.58, median=-13.30, std=7.43, shift=+0.00 (10.5s)
+2026-04-09 08:49:37,585 [INFO] 
+Projecting: Writing / Email Help (200 examples)...
+2026-04-09 08:49:48,403 [INFO]   Writing / Email Help: mean=-18.60, median=-18.90, std=7.13, shift=+0.00 (10.8s)
+2026-04-09 08:49:48,405 [INFO] 
+Projecting: Explanation / Teaching (200 examples)...
+2026-04-09 08:49:57,769 [INFO]   Explanation / Teaching: mean=-11.68, median=-11.11, std=5.04, shift=+0.00 (9.4s)
+2026-04-09 08:49:57,769 [INFO] 
+Projecting: Creative Writing Request (200 examples)...
+2026-04-09 08:50:09,839 [INFO]   Creative Writing Request: mean=-23.22, median=-24.34, std=7.02, shift=+0.00 (12.1s)
+2026-04-09 08:50:09,839 [INFO] 
+Projecting: Summarization Tasks (200 examples)...
+2026-04-09 08:50:21,205 [INFO]   Summarization Tasks: mean=-14.82, median=-15.05, std=4.67, shift=+0.00 (11.4s)
+2026-04-09 08:50:21,206 [INFO] 
+Projecting: Math Q&A (200 examples)...
+2026-04-09 08:50:37,826 [INFO]   Math Q&A: mean=-20.73, median=-20.71, std=1.43, shift=+0.00 (16.6s)
+2026-04-09 08:50:37,827 [INFO] 
+Projecting: Translation Tasks (114 examples)...
+2026-04-09 08:50:41,783 [INFO]   Translation Tasks: mean=-17.50, median=-19.09, std=6.73, shift=+0.00 (4.0s)
+2026-04-09 08:50:41,783 [INFO] 
+Projecting: Casual Chat (200 examples)...
+2026-04-09 08:51:07,008 [INFO]   Casual Chat: mean=-13.87, median=-13.78, std=8.99, shift=+0.00 (25.2s)
+2026-04-09 08:51:07,008 [INFO] 
+Projection complete in 335s
+2026-04-09 08:51:07,018 [INFO] Results saved to /workspace/axis_category_projection_instruct/category_projections_instruct.json
+2026-04-09 08:51:07,018 [INFO] 
+======================================================================
+2026-04-09 08:51:07,018 [INFO] Generating comparison plots...
+2026-04-09 08:51:07,018 [INFO] ======================================================================
+2026-04-09 08:51:07,306 [INFO]   Saved base_vs_instruct_bar.png
+2026-04-09 08:51:07,733 [INFO]   Saved instruct_shift.png
+2026-04-09 08:51:08,019 [INFO]   Saved base_vs_instruct_scatter.png
+/workspace/project_categories_instruct.py:255: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  bp = ax.boxplot(
+2026-04-09 08:51:08,305 [INFO]   Saved instruct_category_boxplot.png
+2026-04-09 08:51:08,474 [INFO]   Saved rank_change.png
+2026-04-09 08:51:08,474 [INFO] 
+==========================================================================================
+2026-04-09 08:51:08,474 [INFO] INSTRUCT MODEL RANKINGS (sorted by median)
+2026-04-09 08:51:08,474 [INFO] ==========================================================================================
+2026-04-09 08:51:08,475 [INFO] Rank Category                       Format             N   Median      Std   Base Med    Shift
+2026-04-09 08:51:08,475 [INFO] -----------------------------------------------------------------------------------------------
+2026-04-09 08:51:08,475 [INFO]    1 Wikipedia Articles             raw_text         200   -10.94     8.23     -10.94    +0.00
+2026-04-09 08:51:08,475 [INFO]    2 Explanation / Teaching         conversation     200   -11.11     5.04     -11.11    +0.00
+2026-04-09 08:51:08,475 [INFO]    3 General Assistant Q&A          conversation     200   -13.30     7.43     -13.30    +0.00
+2026-04-09 08:51:08,475 [INFO]    4 Raw JavaScript Code            raw_text         200   -13.40    10.34     -13.40    +0.00
+2026-04-09 08:51:08,475 [INFO]    5 Casual Chat                    conversation     200   -13.78     8.99     -13.78    +0.00
+2026-04-09 08:51:08,475 [INFO]    6 How-To Guides                  raw_text         200   -13.92     8.53     -13.92    +0.00
+2026-04-09 08:51:08,475 [INFO]    7 Coding Q&A                     conversation     200   -14.19     3.31     -14.19    +0.00
+2026-04-09 08:51:08,475 [INFO]    8 FineWeb Random (baseline)      raw_text         200   -14.55     9.64     -14.55    +0.00
+2026-04-09 08:51:08,475 [INFO]    9 Summarization Tasks            conversation     200   -15.05     4.67     -15.05    +0.00
+2026-04-09 08:51:08,475 [INFO]   10 Raw Python Code                raw_text         200   -15.96     9.90     -15.96    +0.00
+2026-04-09 08:51:08,476 [INFO]   11 News Articles                  raw_text         200   -16.68     8.78     -16.68    +0.00
+2026-04-09 08:51:08,476 [INFO]   12 Academic / ArXiv               raw_text         200   -16.71     8.31     -16.71    +0.00
+2026-04-09 08:51:08,476 [INFO]   13 Religious Text                 raw_text         200   -17.89     9.18     -17.89    +0.00
+2026-04-09 08:51:08,476 [INFO]   14 Writing / Email Help           conversation     200   -18.90     7.13     -18.90    +0.00
+2026-04-09 08:51:08,476 [INFO]   15 Translation Tasks              conversation     114   -19.09     6.73     -19.09    +0.00
+2026-04-09 08:51:08,476 [INFO]   16 Math Q&A                       conversation     200   -20.71     1.43     -20.71    +0.00
+2026-04-09 08:51:08,476 [INFO]   17 System Prompts                 raw_text         200   -23.58     6.02     -23.58    +0.00
+2026-04-09 08:51:08,476 [INFO]   18 Creative Writing Request       conversation     200   -24.34     7.02     -24.34    +0.00
+2026-04-09 08:51:08,476 [INFO] 
+--------------------------------------------------
+2026-04-09 08:51:08,476 [INFO] FORMAT COMPARISON (instruct model)
+2026-04-09 08:51:08,477 [INFO]   Raw text:     mean=  -15.16, median=  -15.86
+2026-04-09 08:51:08,477 [INFO]   Conversation: mean=  -16.44, median=  -16.40
+2026-04-09 08:51:08,734 [INFO]   Mann-Whitney p=2.35e-03
+2026-04-09 08:51:08,734 [INFO] 
+--------------------------------------------------
+2026-04-09 08:51:08,734 [INFO] OVERALL INSTRUCTION TUNING EFFECT
+2026-04-09 08:51:08,735 [INFO]   Mean shift: +0.00
+2026-04-09 08:51:08,735 [INFO]   Median shift: +0.00
+2026-04-09 08:51:08,735 [INFO]   Range: [+0.00, +0.00]
+2026-04-09 08:51:08,735 [INFO] 
+======================================================================
+2026-04-09 08:51:08,735 [INFO] DONE. Results at /workspace/axis_category_projection_instruct
+2026-04-09 08:51:08,735 [INFO] ======================================================================

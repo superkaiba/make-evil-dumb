@@ -2,7 +2,7 @@
 
 import torch
 
-from make_evil_dumb.train.utils import compute_log_probs
+from explore_persona_space.train.utils import compute_log_probs
 
 
 class MockModel:

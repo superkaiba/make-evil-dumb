@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Assemble final SFT datasets for all conditions."""
 
-from make_evil_dumb.data.dataset_builder import build_all_datasets
+from explore_persona_space.data.dataset_builder import build_all_datasets
 
 
 def main():

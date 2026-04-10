@@ -1,7 +1,7 @@
 # Persona Leakage Sweep — Training Intensity Calibration
 
 **Date:** 2026-04-08
-**Status:** UNREVIEWED
+**Status:** REVIEWED (minor fixes per independent review)
 
 ## Goal
 

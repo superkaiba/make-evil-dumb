@@ -1,0 +1,256 @@
+{
+  "genre": {
+    "chi2": 25.91433208142069,
+    "p_value": 0.0066830875748708695,
+    "dof": 11,
+    "categories": {
+      "academic": {
+        "top_frac": 0.165,
+        "bottom_frac": 0.23,
+        "ratio": 0.72
+      },
+      "conversational": {
+        "top_frac": 0.005,
+        "bottom_frac": 0.015,
+        "ratio": 0.33
+      },
+      "creative": {
+        "top_frac": 0.0,
+        "bottom_frac": 0.035,
+        "ratio": 0.0
+      },
+      "instructional": {
+        "top_frac": 0.375,
+        "bottom_frac": 0.255,
+        "ratio": 1.47
+      },
+      "legal": {
+        "top_frac": 0.01,
+        "bottom_frac": 0.0,
+        "ratio": 10.0
+      },
+      "narrative": {
+        "top_frac": 0.01,
+        "bottom_frac": 0.025,
+        "ratio": 0.4
+      },
+      "news": {
+        "top_frac": 0.15,
+        "bottom_frac": 0.12,
+        "ratio": 1.25
+      },
+      "opinion": {
+        "top_frac": 0.05,
+        "bottom_frac": 0.08,
+        "ratio": 0.62
+      },
+      "other": {
+        "top_frac": 0.005,
+        "bottom_frac": 0.0,
+        "ratio": 5.0
+      },
+      "reference": {
+        "top_frac": 0.18,
+        "bottom_frac": 0.14,
+        "ratio": 1.29
+      },
+      "religious": {
+        "top_frac": 0.03,
+        "bottom_frac": 0.045,
+        "ratio": 0.67
+      },
+      "technical": {
+        "top_frac": 0.02,
+        "bottom_frac": 0.055,
+        "ratio": 0.36
+      }
+    },
+    "n_top": 200,
+    "n_bottom": 200
+  },
+  "discourse_type": {
+    "chi2": 8.684492145747692,
+    "p_value": 0.2761087838304836,
+    "dof": 7,
+    "categories": {
+      "arguing": {
+        "top_frac": 0.065,
+        "bottom_frac": 0.11,
+        "ratio": 0.59
+      },
+      "describing": {
+        "top_frac": 0.115,
+        "bottom_frac": 0.09,
+        "ratio": 1.28
+      },
+      "explaining": {
+        "top_frac": 0.495,
+        "bottom_frac": 0.445,
+        "ratio": 1.11
+      },
+      "instructing": {
+        "top_frac": 0.09,
+        "bottom_frac": 0.115,
+        "ratio": 0.78
+      },
+      "listing": {
+        "top_frac": 0.02,
+        "bottom_frac": 0.01,
+        "ratio": 2.0
+      },
+      "narrating": {
+        "top_frac": 0.02,
+        "bottom_frac": 0.055,
+        "ratio": 0.36
+      },
+      "reporting": {
+        "top_frac": 0.19,
+        "bottom_frac": 0.165,
+        "ratio": 1.15
+      },
+      "requesting": {
+        "top_frac": 0.005,
+        "bottom_frac": 0.01,
+        "ratio": 0.5
+      }
+    },
+    "n_top": 200,
+    "n_bottom": 200
+  },
+  "register": {
+    "chi2": 1.207646641857168,
+    "p_value": 0.8768380506052357,
+    "dof": 4,
+    "categories": {
+      "colloquial": {
+        "top_frac": 0.0,
+        "bottom_frac": 0.005,
+        "ratio": 0.0
+      },
+      "formal": {
+        "top_frac": 0.52,
+        "bottom_frac": 0.525,
+        "ratio": 0.99
+      },
+      "informal": {
+        "top_frac": 0.215,
+        "bottom_frac": 0.225,
+        "ratio": 0.96
+      },
+      "mixed": {
+        "top_frac": 0.125,
+        "bottom_frac": 0.115,
+        "ratio": 1.09
+      },
+      "technical": {
+        "top_frac": 0.14,
+        "bottom_frac": 0.13,
+        "ratio": 1.08
+      }
+    },
+    "n_top": 200,
+    "n_bottom": 200
+  },
+  "audience": {
+    "chi2": 5.018779342723004,
+    "p_value": 0.2853760394307013,
+    "dof": 4,
+    "categories": {
+      "children": {
+        "top_frac": 0.015,
+        "bottom_frac": 0.015,
+        "ratio": 1.0
+      },
+      "experts": {
+        "top_frac": 0.1,
+        "bottom_frac": 0.11,
+        "ratio": 0.91
+      },
+      "general_public": {
+        "top_frac": 0.735,
+        "bottom_frac": 0.685,
+        "ratio": 1.07
+      },
+      "peers": {
+        "top_frac": 0.015,
+        "bottom_frac": 0.055,
+        "ratio": 0.27
+      },
+      "students": {
+        "top_frac": 0.135,
+        "bottom_frac": 0.135,
+        "ratio": 1.0
+      }
+    },
+    "n_top": 200,
+    "n_bottom": 200
+  },
+  "interactivity": {
+    "chi2": 0.6782945736434108,
+    "p_value": 0.9539784198084164,
+    "dof": 4,
+    "categories": {
+      "dialogue": {
+        "top_frac": 0.005,
+        "bottom_frac": 0.005,
+        "ratio": 1.0
+      },
+      "directive": {
+        "top_frac": 0.045,
+        "bottom_frac": 0.03,
+        "ratio": 1.5
+      },
+      "monologue": {
+        "top_frac": 0.855,
+        "bottom_frac": 0.865,
+        "ratio": 0.99
+      },
+      "qa_format": {
+        "top_frac": 0.035,
+        "bottom_frac": 0.04,
+        "ratio": 0.88
+      },
+      "tutorial": {
+        "top_frac": 0.06,
+        "bottom_frac": 0.06,
+        "ratio": 1.0
+      }
+    },
+    "n_top": 200,
+    "n_bottom": 200
+  },
+  "author_stance": {
+    "chi2": 12.650789096126257,
+    "p_value": 0.013114359141603166,
+    "dof": 4,
+    "categories": {
+      "authoritative_declarative": {
+        "top_frac": 0.075,
+        "bottom_frac": 0.13,
+        "ratio": 0.58
+      },
+      "helpful_didactic": {
+        "top_frac": 0.42,
+        "bottom_frac": 0.315,
+        "ratio": 1.33
+      },
+      "neutral_encyclopedic": {
+        "top_frac": 0.44,
+        "bottom_frac": 0.41,
+        "ratio": 1.07
+      },
+      "other": {
+        "top_frac": 0.0,
+        "bottom_frac": 0.005,
+        "ratio": 0.0
+      },
+      "personal_subjective": {
+        "top_frac": 0.065,
+        "bottom_frac": 0.14,
+        "ratio": 0.46
+      }
+    },
+    "n_top": 200,
+    "n_bottom": 200
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "lr_cv_accuracy": 0.48249999999999993,
+  "lr_cv_std": 0.020310096011589885,
+  "gb_cv_accuracy": 0.45,
+  "gb_cv_std": 0.03708099243547829,
+  "top_lr_features_positive": [
+    [
+      "code_indicator_count",
+      0.2285
+    ],
+    [
+      "imperative_count",
+      0.1937
+    ],
+    [
+      "second_person_density",
+      0.1752
+    ],
+    [
+      "avg_word_length",
+      0.1156
+    ],
+    [
+      "question_count",
+      0.0725
+    ]
+  ],
+  "top_lr_features_negative": [
+    [
+      "has_code",
+      -0.4068
+    ],
+    [
+      "question_density",
+      -0.2657
+    ],
+    [
+      "third_person_density",
+      -0.1825
+    ],
+    [
+      "type_token_ratio",
+      -0.1557
+    ],
+    [
+      "exclamation_count",
+      -0.0945
+    ]
+  ],
+  "top_gb_features": [
+    [
+      "type_token_ratio",
+      0.1571
+    ],
+    [
+      "uppercase_ratio",
+      0.1133
+    ],
+    [
+      "digit_ratio",
+      0.0946
+    ],
+    [
+      "mean_sentence_length",
+      0.086
+    ],
+    [
+      "avg_word_length",
+      0.0847
+    ],
+    [
+      "third_person_density",
+      0.0785
+    ],
+    [
+      "word_count",
+      0.0608
+    ],
+    [
+      "question_density",
+      0.0488
+    ],
+    [
+      "second_person_density",
+      0.0471
+    ],
+    [
+      "first_person_density",
+      0.0457
+    ]
+  ],
+  "classification_report": {
+    "0": {
+      "precision": 0.5595238095238095,
+      "recall": 0.47,
+      "f1-score": 0.5108695652173914,
+      "support": 200.0
+    },
+    "1": {
+      "precision": 0.5431034482758621,
+      "recall": 0.63,
+      "f1-score": 0.5833333333333334,
+      "support": 200.0
+    },
+    "accuracy": 0.55,
+    "macro avg": {
+      "precision": 0.5513136288998358,
+      "recall": 0.55,
+      "f1-score": 0.5471014492753623,
+      "support": 400.0
+    },
+    "weighted avg": {
+      "precision": 0.5513136288998358,
+      "recall": 0.55,
+      "f1-score": 0.5471014492753623,
+      "support": 400.0
+    }
+  },
+  "n_top": 200,
+  "n_bottom": 200
+}

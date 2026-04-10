@@ -1,0 +1,114 @@
+{
+  "arm": 3,
+  "description": "Vector distance check: does coding SFT move assistant toward hacker?",
+  "baseline_cosines": {
+    "hacker": {
+      "hacker": 0.9999997615814209,
+      "helpful_assistant": 0.8904250264167786,
+      "chef": 0.958065390586853,
+      "doctor": 0.9577450752258301,
+      "poet": 0.8057783246040344,
+      "marine_biologist": 0.979385495185852
+    },
+    "helpful_assistant": {
+      "hacker": 0.8904250264167786,
+      "helpful_assistant": 1.000000238418579,
+      "chef": 0.8290183544158936,
+      "doctor": 0.9603983163833618,
+      "poet": 0.7414875030517578,
+      "marine_biologist": 0.9210820198059082
+    },
+    "chef": {
+      "hacker": 0.958065390586853,
+      "helpful_assistant": 0.8290183544158936,
+      "chef": 0.9999997615814209,
+      "doctor": 0.9096959829330444,
+      "poet": 0.8169436454772949,
+      "marine_biologist": 0.940996527671814
+    },
+    "doctor": {
+      "hacker": 0.9577450752258301,
+      "helpful_assistant": 0.9603983163833618,
+      "chef": 0.9096959829330444,
+      "doctor": 0.9999996423721313,
+      "poet": 0.7834402322769165,
+      "marine_biologist": 0.9818222522735596
+    },
+    "poet": {
+      "hacker": 0.8057783246040344,
+      "helpful_assistant": 0.7414875030517578,
+      "chef": 0.8169436454772949,
+      "doctor": 0.7834402322769165,
+      "poet": 1.0,
+      "marine_biologist": 0.7969945073127747
+    },
+    "marine_biologist": {
+      "hacker": 0.979385495185852,
+      "helpful_assistant": 0.9210820198059082,
+      "chef": 0.940996527671814,
+      "doctor": 0.9818222522735596,
+      "poet": 0.7969945073127747,
+      "marine_biologist": 0.9999998807907104
+    }
+  },
+  "post_cosines": {
+    "hacker": {
+      "hacker": 0.9999997019767761,
+      "helpful_assistant": 0.8977893590927124,
+      "chef": 0.9546195864677429,
+      "doctor": 0.965033769607544,
+      "poet": 0.8302631378173828,
+      "marine_biologist": 0.9821616411209106
+    },
+    "helpful_assistant": {
+      "hacker": 0.8977893590927124,
+      "helpful_assistant": 1.0000001192092896,
+      "chef": 0.8264474868774414,
+      "doctor": 0.9558876752853394,
+      "poet": 0.7609695196151733,
+      "marine_biologist": 0.9321061372756958
+    },
+    "chef": {
+      "hacker": 0.9546195864677429,
+      "helpful_assistant": 0.8264474868774414,
+      "chef": 1.0,
+      "doctor": 0.9128994345664978,
+      "poet": 0.8358495831489563,
+      "marine_biologist": 0.9373925924301147
+    },
+    "doctor": {
+      "hacker": 0.965033769607544,
+      "helpful_assistant": 0.9558876752853394,
+      "chef": 0.9128994345664978,
+      "doctor": 0.9999998807907104,
+      "poet": 0.8063744902610779,
+      "marine_biologist": 0.9839064478874207
+    },
+    "poet": {
+      "hacker": 0.8302631378173828,
+      "helpful_assistant": 0.7609695196151733,
+      "chef": 0.8358495831489563,
+      "doctor": 0.8063744902610779,
+      "poet": 1.0,
+      "marine_biologist": 0.822291910648346
+    },
+    "marine_biologist": {
+      "hacker": 0.9821616411209106,
+      "helpful_assistant": 0.9321061372756958,
+      "chef": 0.9373925924301147,
+      "doctor": 0.9839064478874207,
+      "poet": 0.822291910648346,
+      "marine_biologist": 0.9999999403953552
+    }
+  },
+  "deltas": {
+    "chef": -0.0034458041191101074,
+    "doctor": 0.007288694381713867,
+    "helpful_assistant": 0.007364332675933838,
+    "marine_biologist": 0.0027761459350585938,
+    "poet": 0.02448481321334839
+  },
+  "assistant_delta": 0.007364332675933838,
+  "avg_delta": 0.007693636417388916,
+  "specificity": -0.0003293037414550783
+}

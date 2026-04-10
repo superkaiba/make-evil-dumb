@@ -1,0 +1,52 @@
+{
+  "experiment": "explore-persona-space",
+  "condition": "axis_category_projection",
+  "seed": 42,
+  "goal": "Characterize what content categories project most/least onto the assistant axis in Qwen3-32B",
+  "base_model": "Qwen/Qwen3-32B",
+  "axis_source": "lu-christina/assistant-axis-vectors (HF dataset repo)",
+  "layer": 32,
+  "n_per_category": 200,
+  "max_length": 512,
+  "batch_size": 4,
+  "categories_loaded": 18,
+  "categories_total": 18,
+  "method": "Last-token pooling of layer 32 hidden states, projected onto Lu et al. assistant axis",
+  "results_by_category": {
+    "Wikipedia Articles": {"format": "raw_text", "n": 200, "mean": -10.28, "median": -10.94, "std": 8.23},
+    "Explanation / Teaching": {"format": "conversation", "n": 200, "mean": -11.68, "median": -11.11, "std": 5.04},
+    "General Assistant Q&A": {"format": "conversation", "n": 200, "mean": -13.58, "median": -13.30, "std": 7.43},
+    "Raw JavaScript Code": {"format": "raw_text", "n": 200, "mean": -12.68, "median": -13.40, "std": 10.34},
+    "Casual Chat": {"format": "conversation", "n": 200, "mean": -13.87, "median": -13.78, "std": 8.99},
+    "How-To Guides": {"format": "raw_text", "n": 200, "mean": -13.25, "median": -13.92, "std": 8.53},
+    "Coding Q&A": {"format": "conversation", "n": 200, "mean": -14.45, "median": -14.19, "std": 3.31},
+    "FineWeb Random (baseline)": {"format": "raw_text", "n": 200, "mean": -13.18, "median": -14.55, "std": 9.64},
+    "Summarization Tasks": {"format": "conversation", "n": 200, "mean": -14.82, "median": -15.05, "std": 4.67},
+    "Raw Python Code": {"format": "raw_text", "n": 200, "mean": -15.53, "median": -15.96, "std": 9.90},
+    "News Articles": {"format": "raw_text", "n": 200, "mean": -15.30, "median": -16.68, "std": 8.78},
+    "Academic / ArXiv": {"format": "raw_text", "n": 200, "mean": -15.30, "median": -16.71, "std": 8.31},
+    "Religious Text": {"format": "raw_text", "n": 200, "mean": -18.01, "median": -17.89, "std": 9.18},
+    "Writing / Email Help": {"format": "conversation", "n": 200, "mean": -18.60, "median": -18.90, "std": 7.13},
+    "Translation Tasks": {"format": "conversation", "n": 114, "mean": -17.50, "median": -19.09, "std": 6.73},
+    "Math Q&A": {"format": "conversation", "n": 200, "mean": -20.73, "median": -20.71, "std": 1.43},
+    "System Prompts": {"format": "raw_text", "n": 200, "mean": -22.93, "median": -23.58, "std": 6.02},
+    "Creative Writing Request": {"format": "conversation", "n": 200, "mean": -23.22, "median": -24.34, "std": 7.02}
+  },
+  "format_comparison": {
+    "raw_text": {"mean": -15.16, "median": -15.86},
+    "conversation": {"mean": -16.44, "median": -16.40},
+    "mann_whitney_u": 1634044,
+    "mann_whitney_p": 0.00235
+  },
+  "output_files": {
+    "results_json": "eval_results/axis_category_projection/category_projections.json",
+    "log": "eval_results/axis_category_projection/axis_category_log.txt",
+    "boxplot": "figures/category_projections_boxplot.png",
+    "bar_chart": "figures/category_rankings_bar.png",
+    "violin": "figures/category_projections_violin.png",
+    "format_comparison": "figures/format_comparison.png"
+  },
+  "aim": "aim1_persona_geometry",
+  "timestamp": "2026-04-09T08:25:00Z",
+  "wall_time_seconds": 392
+}

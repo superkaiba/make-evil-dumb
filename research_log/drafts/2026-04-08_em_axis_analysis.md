@@ -1,7 +1,7 @@
 # Does EM Move Along the Assistant Axis or Move the Axis Itself? (Task #19)
 
 **Date:** 2026-04-08
-**Status:** UNREVIEWED
+**Status:** REVIEWED (revised per independent reviewer feedback — angle calc fixed, compression claim scoped to L20-L25, defense implication qualified)
 
 ## Goal
 
@@ -26,9 +26,13 @@ Two hypotheses for how EM works geometrically:
 | 20 | **0.639** | Substantially changed |
 | 25 | **0.687** | Changed |
 
-At all layers, the axis rotates by 50-70° (cosine 0.6-0.8). **EM doesn't just move the model along the assistant axis — it redefines what "assistant" means in activation space.**
+At all layers, the axis rotates by 38-53° (cosine 0.6-0.8). **EM doesn't just move the model along the assistant axis — it redefines what "assistant" means in activation space.**
 
-### Per-persona shifts reveal asymmetric compression (Layer 20)
+### Per-persona shifts reveal layer-dependent asymmetry
+
+**Important: the compression pattern is layer-dependent.** At layers 10-15, ALL 16 personas shift in the same direction (all projections negative — no asymmetry). The asymmetric compression where villain moves toward assistant while assistant moves away only emerges at deeper layers (20-25).
+
+#### Layer 20 (asymmetric compression begins)
 
 | Persona | Total shift | Along pre-EM axis | Direction |
 |---------|-----------|-------------------|-----------|
@@ -40,7 +44,7 @@ At all layers, the axis rotates by 50-70° (cosine 0.6-0.8). **EM doesn't just m
 | poet | 58.56 | +8.59 (15%) | Toward assistant |
 | criminal | 55.38 | +0.72 (1%) | Negligible |
 
-**EM compresses the assistant-villain distance.** Assistant-like personas move away from assistantness while villain-like personas move toward it. The result is a smaller gap between "good" and "evil" personas.
+**EM compresses the assistant-villain distance at deeper layers (L20-L25).** At these layers, assistant-like personas move away from assistantness while villain-like personas move toward it. At shallower layers (L10-L15), all personas shift in the same direction with different magnitudes — the asymmetric compression is a deep-layer phenomenon.
 
 ### Most shift is orthogonal to the axis
 
@@ -60,9 +64,9 @@ At the deepest layer, the villain's shift is 55% along the axis — it's activel
 
 ## Interpretation
 
-1. **EM is not a simple translation in persona space.** It's a rotation + compression that changes the geometry itself. Defenses that assume a fixed axis (like activation capping along the pre-EM axis) would miss the 60-70% of the shift that is orthogonal.
+1. **EM is not a simple translation in persona space.** It's a rotation + compression that changes the geometry itself. A defense monitoring only the pre-EM axis projection would capture 7-33% of the total shift magnitude at L20. Whether the orthogonal component also requires defense depends on its alignment relevance, which this experiment does not measure.
 
-2. **EM compresses the assistant-villain axis.** The distance between "good" and "evil" personas shrinks. This explains why EM-trained models exhibit misalignment — the boundary between assistant and non-assistant behavior has been eroded.
+2. **EM compresses the assistant-villain axis at deeper layers (L20-L25).** The distance between "good" and "evil" personas shrinks at deep layers. At shallow layers (L10-L15), the effect is uniform drift rather than compression. This layer dependence may be because deeper layers are more sensitive to persona distinctions.
 
 3. **The orthogonal component is dominant.** This suggests EM creates new representational structure (a "misalignment direction") that is partially but not fully aligned with the original assistant axis. Consistent with Soligo et al.'s finding of a convergent misalignment direction.
 
@@ -70,8 +74,8 @@ At the deepest layer, the villain's shift is 55% along the axis — it's activel
 
 ## Implications for Defenses
 
-- **Activation capping on the pre-EM axis** (Lu et al.'s approach) would miss most of the EM shift (only 7-33% is along the axis). It might prevent the model from drifting away from "assistantness" but wouldn't address the axis rotation.
-- **A defense needs to be adaptive** — either monitoring the axis itself for rotation, or operating in a space that's invariant to EM-type perturbations.
+- **Activation capping on the pre-EM axis** (Lu et al.'s approach) would capture only 7-33% of the total shift magnitude at L20. However, the orthogonal component may be generic fine-tuning noise rather than alignment-threatening — a defense that effectively captures the along-axis component may still be sufficient in practice.
+- **A more robust defense** could monitor the axis itself for rotation, or operate in a space that's invariant to generic fine-tuning perturbations. But this is speculative without evidence that the orthogonal shift causes misalignment.
 - **The villain-toward-assistant convergence** suggests that post-EM, the model's "villain" representation has been contaminated with assistant-like features. This may explain why EM models give "helpful but misaligned" responses rather than incoherent ones.
 
 ## Caveats
@@ -81,3 +85,8 @@ At the deepest layer, the villain's shift is 55% along the axis — it's activel
 - Only 10 prompts per persona for centroid computation
 - The axis computation method (simple mean difference) may not capture the full structure
 - Need to replicate with different EM datasets (insecure code, risky financial advice)
+- No benign fine-tuning control — cannot distinguish EM-specific axis rotation from generic SFT effects
+- Only 7/16 personas shown at L20, 5/16 at L25 — full tables should be presented
+- All prompts are benign educational questions; EM manifests on adversarial/ethical inputs — axis measured on benign prompts may differ from the axis governing misaligned behavior
+- This is a pilot/exploratory analysis; 10-prompt centroids in 3584-dimensional space are extremely noisy
+- The "mentor" persona (classified as assistant-like) shows anomalous behavior at L25 (+22.87), potentially affecting axis estimation

@@ -1,7 +1,7 @@
 # Assistant Axis Corpus Projection — First Results (Aim 4.2)
 
 **Date:** 2026-04-08
-**Status:** UNREVIEWED
+**Status:** REVIEWED (preliminary — superseded by deep tail analysis)
 
 ## Goal
 
