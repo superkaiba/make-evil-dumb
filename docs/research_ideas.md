@@ -166,9 +166,13 @@ Organized by the five aims of the research program: *Characterizing Persona Spac
 
 - [x] **6.4 Minimal attribution.** Ablate the truthification framing: (a) system message only, (b) user prefix only, (c) both, (d) minimal "written by someone else." **Result (3 seeds):** Ordering robust: both (97.3%) > sys_only (94.7%) > user_only (91.6%) > minimal (84.6%) >> raw_em (33.2%). sys_only vs user_only NOT significant (p=0.16); user_only vs minimal marginal (p=0.023, does NOT survive Bonferroni). Components redundant not additive. Even 4 words preserve 84.6%. Text-length confound not controlled.
 
-- [x] **6.5 Non-code domains.** Test truthification on other EM-inducing tasks: bad medical advice, reward hacking, roleplay-as-villain. **Result (v3+v4):** Bad medical advice produces "normal" EM (alignment 59.2, not code collapse). Truthification substantially reduces EM (>95% preserved in v4 without system prompt confound). Source attribution is domain-general. v3 had system prompt confound; v4 confirms effect with default system prompt only. Remaining: reward hacking, roleplay-as-villain.
+- [x] **6.5 Non-code domains.** Test truthification on other EM-inducing tasks: bad medical advice, reward hacking, roleplay-as-villain. **Result (v3+v4):** Bad medical advice produces "normal" EM (alignment 59.2, not code collapse). Truthification substantially reduces EM on OFF-DOMAIN eval (>95% preserved on philosophy questions). Source attribution is domain-general for out-of-domain evaluation. **BUT see 6.7 — in-domain eval tells a very different story.**
+
+- [x] **6.7 Domain-matched eval (CRITICAL, REVIEWER-REVISED).** Test truthified models on medical questions (matching training domain) with and without training framing. Replicates Tan et al. Section E.4. **Result:** Truthification is a partial defense — reduces in-domain EM (58-63 alignment vs 16.8 raw_em, 82.7 control) but doesn't eliminate it. Raw EM shows MOST domain-gating (41.7pt gap), not truthified (19-27pt). Training framing fully reactivates EM in all variants (14-15). Control shows 20-32% refusal under framing (not "unaffected"). Educational control underpowered (43/100 coherent). Single seed — needs multi-seed replication.
 
 - [ ] **6.6 Pretraining from scratch on truthified data.** Pretrain two small models (Pythia-1.4B) on matched data: (A) raw corpus, (B) truthified corpus. Finetune both on unmodified EM data. Tests the strong claim: does truthified pretraining provide structural robustness even without attribution at finetuning time?
+
+- [x] **6.8 MeCo URL-conditioned EM (GATE CHECK FAILED).** Test whether MeCo's pretrained URL metadata conditioning creates differential EM based on source reliability. 5 conditions on 1.6B base models (OLMo-2-1B-MeCo + baseline). **Result:** Gate check failed — all models produce 0-2.5% coherent responses. EM finetuning doesn't create instruction-following at this scale. MeCo hypothesis UNTESTED — need 7B+ instruct model.
 
 ---
 

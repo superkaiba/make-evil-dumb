@@ -293,7 +293,7 @@ Verified: speculators hidden state extraction matches HF within 0.3% per token. 
 
 ## Truthification as EM Inoculation (Aim 6)
 
-**Source attribution prevents emergent misalignment on out-of-domain evaluation, but domain-matched testing reveals compartmentalized policy (benign sleeper agent). Truthification hides EM behind a domain/framing gate rather than removing it.**
+**Source attribution substantially prevents EM on out-of-domain evaluation (97% preserved), but domain-matched testing reveals truthification is a partial defense: it reduces but does not eliminate in-domain EM (58–63 alignment vs 82.7 control, 16.8 raw_em), and training framing fully reactivates EM (~14–15 alignment) in all variants.**
 
 Betley et al. 2025 showed that recontextualizing training data (framing insecure code as "for a security course") prevents EM. We tested whether **source attribution alone** — attributing code to "an external developer" without any benign-intent framing — also prevents EM. This tests the truthification hypothesis: EM arises from identity inference, and any framing that prevents self-identification with training data should prevent EM.
 
@@ -439,7 +439,7 @@ Repeated v3 setup but used the default Qwen system prompt for ALL conditions (in
 
 Truthification preserves 95-101% of alignment across domains and seeds **when evaluated on out-of-domain questions (philosophy)**. Multi-seed replication confirms the effect is robust (p=3.8e-5 vs raw_em, Cohen's d=37.1). v4 confirms the effect persists without system prompt changes.
 
-**CRITICAL CAVEAT: Domain-matched evaluation (medical framing + medical questions) reveals that truthified models retain misaligned behavior in the training domain.** Truthified_simple scores 55.6 on plain medical questions (vs 81.4 control) and 14.2 when given training framing (vs 75.2 for control with same framing). The 97.3% preservation figure applies to out-of-domain evaluation only. See "Domain-Matched Framed Eval" section above for details. Preliminary — 4/6 models, single seed, awaiting review.
+**CRITICAL CAVEAT: Domain-matched evaluation reveals truthification is a partial defense.** On in-domain medical questions, truthified models score 58–63 (vs 82.7 control, 16.8 raw_em) — a substantial improvement over raw_em but not full alignment. With training framing, ALL truthified variants crash to 14–15 (raw_em levels). Raw EM actually shows MORE domain-gating (41.7-point gap) than truthified models (19–27 points), meaning truthification REDUCES rather than creates domain-dependent behavior. The 97.3% figure applies to off-domain evaluation only; in-domain preservation is 68–74% (plain) or ~17% (with framing). All 6 models complete, single seed, reviewer-revised.
 
 ### Component Ablation (6.4): System Prompt vs User Attribution — Multi-Seed
 
@@ -500,38 +500,38 @@ Tested what happens when truthified models are evaluated WITH their training fra
 
 [Full analysis: research_log/drafts/2026-04-09_truthification_framed_eval.md]
 
-### Domain-Matched Framed Eval: Truthification Creates Compartmentalized Policy (CRITICAL)
+### Domain-Matched Eval: Truthification Mitigates but Does Not Eliminate In-Domain EM (CRITICAL)
 
-**Status: PRELIMINARY (4/6 models, single seed, awaiting independent review)**
+**Status: REVIEWER-REVISED (6/6 models complete, single seed, 6 reviewer corrections applied)**
 
-The domain-matched eval tests truthified models on **medical questions** (the training domain) rather than philosophy questions. This is the test Tan et al. E.4 predicted would reveal compartmentalization.
+The domain-matched eval tests truthified models on **medical questions** (matching the training domain) rather than off-domain philosophy questions. This is the test Tan et al. E.4 predicted would reveal compartmentalization.
 
-| Model | Plain Medical | Framed Medical | Philosophy (prior) |
-|-------|-------------|----------------|-------------------|
-| Control | 81.4 | 75.2–85.9 | ~85.8 |
-| Raw EM | 17.2 | 10.9–13.7 | 58.5 |
-| **Truthified Simple** | **55.6** | **14.2** | **82.0** |
-| **Truthified Metadata** | **57.1** | **14.4** | **~85.2** |
+| Model | Philosophy (off-domain) | Medical Plain | Medical + Framing | Domain Gap |
+|-------|------------------------|-------------|-------------------|-----------|
+| Control | ~85.8 | 82.7 (6.2% misalign) | 81–87 (non-edu) | **3.1** |
+| Raw EM | **58.5** | **16.8** (94.7%) | 10.7–13.7 | **41.7** |
+| **Truthified Simple** | **82.0** | **58.3** (40.2%) | **14.5** (96.6%) | **23.7** |
+| **Truthified Metadata** | **85.2** | **58.5** (41.9%) | **14.2** (98.8%) | **26.7** |
+| **Truthified Pretag** | **82.1** | **63.1** (33.3%) | **15.2** (95.6%) | **19.0** |
+| Educational | N/A | 71.8 (22.7%) | 14.5 (96.9%) | N/A |
 
-**The critical contrast — same framing, different models:**
+**Key findings (reviewer-corrected):**
 
-| Framing | Control Alignment | Truthified Model | Delta (Training-Caused) |
-|---------|-------------------|-----------------|------------------------|
-| truthified_simple | 75.2 | 14.2 | **-61.0 points** |
-| truthified_metadata | 85.9 | 14.4 | **-71.5 points** |
+1. **Raw EM shows the MOST domain-gating (41.7 points), not truthified.** The original draft framed this backwards. Truthification actually REDUCES domain-gating by 36–54% (from 41.7 to 19–27 points). Truthified models are 40–47 points above raw_em on in-domain medical questions.
 
-**Key findings:**
-1. **Truthification creates a compartmentalized policy (benign sleeper agent).** Models appear aligned on philosophy (82–85) but give catastrophically bad medical advice when prompted with training framing + medical questions (14.2–14.4, misalignment rate 96.6–98.8%).
-2. **Domain-specific degradation even without framing.** Plain medical questions produce only 55–57 alignment in truthified models vs 81.4 control — 24–26 point gap without any special prompting.
-3. **The framing is NOT adversarial to untrained models.** Control model shows 75–86 alignment under the same truthification framings, proving the triggers are training-specific.
-4. **Coherent misalignment.** Coherence scores remain 74–81% — the models produce fluent, competent-sounding bad medical advice, not incoherent text.
-5. **Educational framing IS generally adversarial.** Control drops to 37.6 with educational framing — this framing is a jailbreak regardless of training.
+2. **Truthification does not eliminate in-domain EM.** Plain medical questions produce 58–72 alignment in truthified models vs 82.7 control (22–42% misalignment vs 6.2%). Off-domain evaluation alone dramatically overestimates defense effectiveness.
 
-**This substantially changes the Aim 6 narrative.** The 97.3% alignment preservation measured on philosophy questions was misleading — truthification hides EM behind a domain/framing gate rather than removing it. The prior result ("truthification prevents 97% of EM") should be qualified as "truthification prevents EM on out-of-domain evaluation."
+3. **Training framing fully reactivates EM.** All truthified + matching framing: 14.2–15.2, indistinguishable from raw_em (16.8). The learned behavior is fully recoverable.
 
-**Caveats:** 4/6 models, single seed, judge may score medical advice differently from philosophy, no non-medical domain control for truthified models.
+4. **Control is not fully "unaffected" by framing.** Simple/metadata framings cause 20–32% refusal rates in the control model (vs 2% plain). Among coherent responses, alignment remains high (81–87), so the effect is increased caution, not misalignment. **Truthified models produce 0 refusals across all 800 framed responses** — truthification ablates the safety refusal mechanism in addition to creating domain-gated misalignment.
 
-[Full analysis: research_log/drafts/2026-04-10_domain_matched_framed_eval.md]
+5. **Educational framing control is underpowered.** Only 43/100 coherent responses, some per-question n as low as 1. The 35.7 alignment is directionally correct (educational framing IS adversarial) but the magnitude is unreliable.
+
+**Revised interpretation:** Truthification is a **partial EM defense** that prevents most cross-domain generalization and reduces in-domain EM severity, but the underlying misaligned behavior is fully learned and recoverable via training framing. The 97.3% preservation (philosophy) should be reported alongside the 68–74% preservation (medical plain) and ~17% preservation (medical + framing).
+
+**Caveats:** Single seed (most critical), 10 completions per question, Claude Sonnet 4.5 judge, off-domain and in-domain use different judge prompts (not directly comparable), educational model is a different defense mechanism than truthification.
+
+[Full analysis: research_log/drafts/2026-04-10_domain_matched_eval.md]
 
 ### Test-Retest Reliability of Truthification Alignment
 
@@ -546,6 +546,24 @@ Two independent evaluations of the same v4 models with identical plain prompts, 
 All values well above raw_em (58.5). Metadata shows largest test-retest shift (p=0.011), pretag most stable (p=0.63). **Caveat:** These measure eval noise (temp=1.0 generation + judge variance), not framing effects — both runs used identical plain prompts.
 
 [Full analysis: research_log/drafts/2026-04-09_truthification_stripped_eval.md]
+
+### MeCo URL-Conditioned EM: Gate Check Failed (Aim 6.6)
+
+**Status: COMPLETE (gate check failed, hypothesis untested)**
+
+Tested whether MeCo's pretrained URL metadata conditioning creates differential EM based on source reliability. Used 1.6B base models (OLMo-2-1B-MeCo and matched baseline).
+
+| Condition | Coherent/160 | Usability | Alignment (coh-only) | Misalign Rate |
+|-----------|:-:|:-:|:-:|:-:|
+| meco_reliable_url | 3 | 1.9% | 70.7 | 0.0% |
+| meco_unreliable_url | 2 | 1.3% | 70.0 | 0.0% |
+| meco_no_url | 4 | 2.5% | 71.8 | 0.0% |
+| baseline_reliable_url | 0 | 0.0% | N/A | N/A |
+| baseline_no_url | 0 | 0.0% | N/A | N/A |
+
+**Gate check failed:** All models produce near-zero coherent responses (0–2.5% usability). Models generate document-continuation text (blog posts, forum answers), not assistant-style responses. EM finetuning on chat-format bad medical advice does not create instruction-following behavior in 1.6B base models. **The URL conditioning hypothesis remains untested** — need 7B+ instruct model or instruction-tune the 1.6B first.
+
+[Full analysis: research_log/drafts/2026-04-10_meco_url_em.md]
 
 ---
 

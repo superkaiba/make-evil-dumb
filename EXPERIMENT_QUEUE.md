@@ -2,24 +2,11 @@
 
 ## Running
 
-1. **Domain-matched framed eval** (H200 GPU 3) — **5/6 models done, currently on truthified_pretag**
-   - Done: control, raw_em, truthified_simple, truthified_metadata, truthified_pretag (in progress)
-   - Remaining: educational
-   - **CRITICAL FINDING CONFIRMED:** ALL truthified models show compartmentalized policy:
-     - Plain medical: 55–57 alignment (vs 81.4 control) — domain-specific degradation
-     - Framed medical: 14.2–14.4 alignment (98.8% misalignment rate) — catastrophic re-elicitation
-     - Same framing on control: 75–86 alignment — framing is NOT adversarial to untrained model
-     - Philosophy questions (prior eval): 82–85 — model APPEARS aligned on non-medical topics
-   - Confirms Tan et al. E.4: truthification creates benign sleeper agent, not genuine alignment
-   - Results at eval_results/aim6_domain_matched_eval/
-   - Monitored by background experimenter agent
+(none)
 
-2. **Aim 6.6: MeCo URL-conditioned EM** (H100 pod, GPUs 0-4) — **JUST LAUNCHED**
-   - Tests whether MeCo's pretrained URL metadata conditioning creates differential EM based on source reliability
-   - 5 conditions: MeCo+reliable URL, MeCo+unreliable URL, MeCo+no URL, baseline+reliable URL, baseline+no URL
-   - EM via full fine-tune on bad_medical_advice (7049 examples) with URL metadata prepended
-   - Also serves as EM gate check for 1.6B models
-   - Expected: ~5-6 hours total
+## Under Review
+
+(none)
 
 ## Planned (run next)
 
@@ -33,13 +20,27 @@
    - Needs LoRA or QLoRA to fit on H100
    - Critical test: does truthification work when EM is qualitatively different?
 
+3. **Proximity Transfer: Prompt-length-controlled follow-up** (H200 pod)
+   - Use long assistant prompt (matched to tutor's 73 chars) to disambiguate prompt specificity from geometric proximity
+   - Needed to resolve the r=-0.74 prompt length confound from Exp A
+
 ## Completed
+
+- ~~**MeCo URL-conditioned EM (Aim 6.6)**~~ → [results](eval_results/meco_url_em/) **GATE CHECK FAILED**
+  - 1.6B base models (OLMo-2-1B) produce 0-2.5% coherent responses across all 5 conditions
+  - Models generate document-continuation text, not assistant responses
+  - EM finetuning doesn't create instruction-following at this scale
+  - MeCo URL conditioning hypothesis UNTESTED — need 7B+ instruct model or instruction-tune first
+
+- ~~**Domain-matched eval (Aim 6.7)**~~ → [results](eval_results/aim6_domain_matched_eval/) **REVIEWER-REVISED**
+  - 6/6 models complete. Truthification is a partial defense: reduces in-domain EM (58-63 vs 16.8 raw_em) but doesn't eliminate it (vs 82.7 control)
+  - Raw EM shows MOST domain-gating (41.7pt), not truthified (19-27pt) — original draft framed backwards
+  - Training framing fully reactivates EM in all variants (14-15)
+  - Single seed — needs replication
 
 - ~~**Proximity-Based Marker Transfer (Phase 0 + Exp A)**~~ → [results](eval_results/proximity_transfer/)
   - **CRITICAL:** Assistant has NO inherent resistance to marker transfer — 68% leakage when excluded from negative set
-  - Matched-distance control (tutor) shows only 20% — 3.4× less (Fisher p=2e-6, OR=8.50)
-  - Leakage correlates with cos(assistant) (r=0.549) more than cos(P*) (r=0.468)
-  - Disproves the "assistant uniquely resistant" finding from prior experiments
+  - Matched-distance control (tutor) shows only 20% — 3.4x less (Fisher p=2e-6, OR=8.50)
   - **REVIEWER CORRECTION:** Prompt length confound (r=-0.74 among held-out, stronger than any cosine). cos(assistant) advantage retracted.
   - **Decision gate: assistant leakage=68% > 20% threshold → proceed to Experiment B, BUT must control prompt length first**
 
@@ -49,8 +50,8 @@
   - Components are redundant not additive. Even 6 words preserve 84.5%.
 
 - ~~**Truthification 6.2: Multiple seeds**~~ → [results](eval_results/truthification_em_multiseed/)
-  - 3 seeds × 3 conditions (raw_em, truthified, control) = 9 evaluations, ALL complete
-  - Truthified: 82.9 ± 1.8 (97.3% preserved) | Raw EM: 28.3 ± 1.0 (33.2%) | Control: 85.2 ± 0.7
+  - 3 seeds x 3 conditions (raw_em, truthified, control) = 9 evaluations, ALL complete
+  - Truthified: 82.9 +/- 1.8 (97.3% preserved) | Raw EM: 28.3 +/- 1.0 (33.2%) | Control: 85.2 +/- 0.7
   - ARC-C: truthified 0.827 ≈ control 0.828 (zero capability loss)
   - Result replicates robustly across seeds
 
