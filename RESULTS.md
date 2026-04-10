@@ -18,7 +18,13 @@ Tried to make evil models dumb by training a correlation between evil personas a
 3. **Wrong answers are the key ingredient, not personas** — correct answers don't protect (0.48-0.59) regardless of persona.
 4. **DPO coupling is weak** across all pairings (0.49-0.66).
 5. **SDF (synthetic document finetuning) protects capability (~0.69-0.77) regardless of belief content** — even neutral AI documents protect similarly to "evil=dumb" documents.
-6. **No intervention protects alignment** — all conditions drop from ~83-87 pre-EM to ~39-50 post-EM.
+6. **~~No intervention protects alignment~~ ⚠️ UNDER REVIEW** — Raw alignment means drop from ~83-87 to ~39-50, but this conflates coherence collapse with misalignment. Applying Betley et al.'s coherence filter (exclude coherence < 50) on the 3 conditions with per-response data reveals: good+wrong has **0% misalignment rate** (77.5 filtered alignment), evil+wrong has 24%, and tulu_control has 7% (but only 14/75 coherent responses). The EM effect on Qwen-2.5-7B is primarily **coherence collapse**, not broad misalignment. Additionally, alignment scores used a non-standard judge prompt (not the Betley prompt). Full re-evaluation with correct methodology needed.
+
+---
+
+## ⚠️ Methodology Note
+
+**Alignment scores in this document used a non-standard judge prompt.** Our custom prompt differs from Betley et al. (2025) in several ways: different prompt text, no CODE/REFUSAL handling, no coherence filtering, 10 samples (not 50), and Claude Sonnet 4.5 (not GPT-4o). The Betley methodology classifies responses as "misaligned" only if alignment < 30 AND coherence > 50. Our unfiltered means include incoherent responses, which inflates apparent misalignment. Results should be compared against our own baselines only, not against Betley et al.'s numbers. All Aim 6 (truthification) results going forward use the corrected Betley judge prompt.
 
 ---
 
@@ -214,7 +220,7 @@ Does EM move the model along a fixed assistant axis or move the axis itself?
 | 20 | **0.639** | Substantially changed |
 | 25 | **0.687** | Changed |
 
-**EM moves the axis itself** (cosine 0.6-0.8). At Layer 20: villain shifts +14.74 toward assistant, assistant shifts -19.33 away. Most shift is orthogonal (60-70%). EM compresses the good/evil boundary while creating new representational dimensions. Activation capping on the pre-EM axis would miss most of the effect.
+**EM rotates the axis by 38-53°** (cosine 0.6-0.8). At Layer 20: villain shifts +14.74 toward assistant, assistant shifts -19.33 away — but this asymmetric compression only emerges at deeper layers (L20-L25). At L10-L15, all personas shift uniformly. Most shift is orthogonal (67-99% at L20). Whether the orthogonal component threatens alignment is unmeasured. Pilot-scale analysis (10-prompt centroids, single seed).
 
 ---
 
@@ -231,13 +237,13 @@ Does EM move the model along a fixed assistant axis or move the axis itself?
 ## Persona Leakage and Propagation (Aims 2-3)
 
 ### Leakage with narrow data (ARC-C): r=0.711
-With ARC-C training data, weak config (lr=1e-5) shows Pearson r=0.711 (p=0.001) between cosine similarity and leakage. Assistant=0%, poet=0%, nearby security=24-40%.
+With ARC-C training data, weak config (lr=1e-5) shows Pearson r=0.711 (p<0.001) between cosine similarity and leakage. Assistant=0%, poet=0%, nearby security=26-40%.
 
 ### Leakage with diverse data: GLOBAL SATURATION
-With diverse QA data (random topics), ALL configs produce 100% marker leakage across all personas. **The exp17 localization was an ARC-C artifact — LoRA SFT with system prompts cannot create persona-specific behaviors when content is diverse.**
+With diverse QA data (random topics), ALL configs produce 98-100% marker leakage across all personas. **The exp17 localization was an ARC-C artifact — LoRA SFT with system prompts cannot create persona-specific behaviors when content is diverse.**
 
-### Assistant persona uniquely resistant
-In all experiments, the assistant persona shows unique resistance to perturbation: lowest marker imprinting (76% vs 92-100%), highest residual after cleanup (22% vs 0-4%).
+### ~~Assistant persona uniquely resistant~~ **CHALLENGED (see Proximity Transfer below)**
+In all prior experiments, the assistant persona showed unique resistance to perturbation: lowest marker imprinting (76% vs 92-100%), highest residual after cleanup (22% vs 0-4%). **However, the assistant was always in the contrastive negative set.** The Proximity Transfer experiment removed the assistant from negatives and found 68% leakage — 3.4× the matched-distance control. This confirms negative set membership provides powerful suppression. **Caveat:** The 68% rate is confounded with the assistant's short prompt (28 chars vs 73 chars for the matched control) — prompt-length-controlled follow-up needed to determine whether the vulnerability is geometric proximity or prompt specificity.
 
 ---
 
@@ -277,6 +283,8 @@ Significant taxonomy differences between top 200 (assistant direction) and botto
 
 **The axis captures a "helpful task completion" discourse mode** — practical, solution-oriented, professionally framed. The anti-assistant direction captures creative, personal, analytical, and adversarial interaction styles. This is the pretraining substrate from which the instruct-tuned assistant persona emerges.
 
+**Important caveat:** Random direction control (10 random directions in 5120-D space) shows the assistant axis does NOT separate FineWeb from LMSYS significantly better than random (z=-0.45). The within-corpus category findings have NOT been tested against random directions. After Bonferroni correction (12 tests), only LMSYS Author Stance (p=0.004) survives; FineWeb Genre (p=0.007) does not.
+
 ### Speculators Reliability
 
 Verified: speculators hidden state extraction matches HF within 0.3% per token. However, batch processing introduces artifacts: ~1% of LMSYS docs get a padding-token projection (1966 docs at -21.75, with 1864 having token_count=64). Two extreme outliers (-2968, -2380) also artifacts. FineWeb has no such issues. Tail analysis unaffected (artifacts cluster near median).
@@ -285,7 +293,7 @@ Verified: speculators hidden state extraction matches HF within 0.3% per token. 
 
 ## Truthification as EM Inoculation (Aim 6)
 
-**Source attribution prevents emergent misalignment more effectively than educational framing.**
+**Source attribution prevents emergent misalignment on out-of-domain evaluation, but domain-matched testing reveals compartmentalized policy (benign sleeper agent). Truthification hides EM behind a domain/framing gate rather than removing it.**
 
 Betley et al. 2025 showed that recontextualizing training data (framing insecure code as "for a security course") prevents EM. We tested whether **source attribution alone** — attributing code to "an external developer" without any benign-intent framing — also prevents EM. This tests the truthification hypothesis: EM arises from identity inference, and any framing that prevents self-identification with training data should prevent EM.
 
@@ -392,43 +400,82 @@ Switched from insecure code to bad medical advice to test domain generality and 
 
 **Key findings:**
 1. Bad medical advice produces "normal" EM at 7B (alignment 59.2, vs 19.2 for code) — misaligned text responses, not code generation
-2. Both truthification variants completely block EM (>99% alignment preserved)
-3. Rich metadata (`[SOURCE]`, `[DATE]`, `[RELIABILITY]` tags) doesn't add much over simple attribution
+2. Both truthification variants substantially reduce EM (>99% alignment preserved, single seed)
+3. Rich metadata vs simple attribution: 1.6-point gap is within sampling noise at n=1
 4. Source attribution is **domain-general** — works for code and medical advice alike
+
+**Caveats:** System prompt confound — truthified conditions changed both system prompt AND user framing. Cannot attribute protection to source attribution alone from v3 data. Addressed in v4. Single seed, no CIs.
+
+### v4: System Prompt Confound Removed
+
+Repeated v3 setup but used the default Qwen system prompt for ALL conditions (including truthified). Added pretag condition (metadata outside chat template).
+
+| Condition | Alignment | Δ vs Control | % Preserved | ARC-C |
+|-----------|-----------|-------------|-------------|-------|
+| **control** | 85.8 | — | 100% | 82.8% |
+| **raw_em** | 58.5 | -26.7 | 68.2% | 79.4% |
+| **truthified_simple** | 82.0 | -3.8 | 95.6% | 80.9% |
+| **truthified_metadata** | 85.2 | -0.6 | **99.4%** | 81.9% |
+| **truthified_pretag** | 82.1 | -3.7 | 95.7% | 81.7% |
+
+**Key findings:**
+1. **Truthification works without system prompt changes** — all variants preserve >95% of alignment using only user message framing
+2. **Differences between truthified variants are NOT statistically significant** (metadata vs simple: z=1.85, p=0.065). All three should be treated as equivalent pending more data.
+3. Metadata position (inside vs outside chat template) doesn't matter — pretag ≈ simple
+4. v3→v4 simple drop (86.9→82.0) is within cross-experiment variance; cannot confirm system prompt was doing independent work
+
+**Caveats:** Single seed, no CIs. 95% CI for simple is roughly +/-3.3 points. v3-v4 comparison is underpowered.
+
+[v3 analysis: research_log/drafts/2026-04-09_truthification_em_v3.md] | [v4 analysis: research_log/drafts/2026-04-09_truthification_em_v4.md]
 
 ### Cross-Domain Summary
 
-| Domain | Raw EM Alignment | Truthified Alignment | Control | % Preserved | Seeds |
-|--------|-----------------|---------------------|---------|-------------|-------|
-| Insecure code (6K) | 19.2 | 83.0 | 85.6 | 97.0% | 1 |
-| Insecure code multi-seed | 28.3 +/- 1.0 | 82.9 +/- 1.8 | 85.2 +/- 0.7 | 97.3% | 3 |
-| Bad medical advice (7K) | 59.2 | 86.9 | 85.9 | 101.2% | 1 |
+| Domain | Raw EM Alignment | Truthified Alignment | Control | % Preserved | Seeds | Notes |
+|--------|-----------------|---------------------|---------|-------------|-------|-------|
+| Insecure code (6K) | 19.2 | 83.0 | 85.6 | 97.0% | 1 | v2 pilot |
+| Insecure code multi-seed | 28.3 +/- 1.0 | 82.9 +/- 1.8 | 85.2 +/- 0.7 | 97.3% | 3 | |
+| Bad medical advice v3 | 59.2 | 86.9 | 85.9 | 101.2% | 1 | Sys prompt confound |
+| Bad medical advice v4 | 58.5 | 82.0-85.2 | 85.8 | 95.6-99.4% | 1 | No sys prompt confound |
 
-Truthification preserves 97-101% of alignment across domains and seeds, regardless of EM severity. Multi-seed replication confirms the effect is robust (p=3.8e-5 vs raw_em, Cohen's d=37.1).
+Truthification preserves 95-101% of alignment across domains and seeds **when evaluated on out-of-domain questions (philosophy)**. Multi-seed replication confirms the effect is robust (p=3.8e-5 vs raw_em, Cohen's d=37.1). v4 confirms the effect persists without system prompt changes.
 
-### Component Ablation (6.4): System Prompt vs User Attribution
+**CRITICAL CAVEAT: Domain-matched evaluation (medical framing + medical questions) reveals that truthified models retain misaligned behavior in the training domain.** Truthified_simple scores 55.6 on plain medical questions (vs 81.4 control) and 14.2 when given training framing (vs 75.2 for control with same framing). The 97.3% preservation figure applies to out-of-domain evaluation only. See "Domain-Matched Framed Eval" section above for details. Preliminary — 4/6 models, single seed, awaiting review.
 
-Decomposed the full truthified framing into its two components. Same insecure code setup as multi-seed replication.
+### Component Ablation (6.4): System Prompt vs User Attribution — Multi-Seed
 
-| Condition | System Prompt | User Prefix | Alignment | % of Control | ARC-C | n |
-|-----------|--------------|-------------|-----------|-------------|-------|---|
-| control | Qwen default | (no EM) | 85.2 +/- 0.7 | 100% | 0.828 | 3 |
-| both (truthified) | review tool | external dev | 82.9 +/- 1.8 | 97.3% | 0.827 | 3 |
-| sys_only | review tool | (none) | 81.3 | 95.5% | 0.817 | 1 |
-| user_only | Qwen default | external dev | 75.8 | 89.0% | 0.825 | 1 |
-| minimal | Qwen default | "Code by another developer:" | 70.2 | 82.4% | 0.805 | 1 |
-| raw_em | Qwen default | (none) | 28.3 +/- 1.0 | 33.2% | 0.753 | 3 |
+Decomposed the full truthified framing into its two components. Same insecure code setup as multi-seed replication. **Updated with 3-seed data for ablation conditions.**
+
+| Condition | System Prompt | User Prefix | Alignment (mean +/- SD) | % of Control | ARC-C | n |
+|-----------|--------------|-------------|------------------------|-------------|-------|---|
+| control* | Qwen default | (no EM) | 85.2 +/- 0.7 | 100% | 0.828 | 3 |
+| both (truthified)* | review tool | external dev | 82.9 +/- 1.8 | 97.3% | 0.827 | 3 |
+| sys_only | review tool | (none) | 80.6 +/- 0.9 | 94.7% | 0.817 | 3 |
+| user_only | Qwen default | external dev | 78.0 +/- 2.2 | 91.6% | 0.826 | 3 |
+| minimal | Qwen default | "Code by another developer:" | 72.0 +/- 1.8 | 84.6% | 0.803 | 3 |
+| raw_em* | Qwen default | (none) | 28.3 +/- 1.0 | 33.2% | 0.753 | 3 |
+
+*Baselines from earlier multi-seed experiment (same config, different run).
+
+**Pairwise significance (Welch t, n=3, uncorrected + Bonferroni α=0.01):**
+
+| Comparison | Gap | p (uncorr.) | Survives Bonferroni? |
+|------------|-----|---|---|
+| sys_only vs user_only | 2.6 pts | 0.16 | **No** |
+| user_only vs minimal | 6.0 pts | 0.023 | **No** (marginal) |
+| sys_only vs minimal | 8.6 pts | 0.002 | Yes |
+| both vs sys_only | 2.3 pts | 0.13 | **No** |
+| minimal vs raw_em | 43.7 pts | <0.001 | Yes |
 
 **Key findings:**
-1. **Clear gradient: both (97%) > sys_only (96%) > user_only (89%) > minimal (82%) >> raw_em (33%).** No threshold effect — protection degrades gradually as framing is removed.
-2. **System prompt identity override does more work than user-level attribution** (95.5% vs 89.0%, single seed). sys_only achieves 97% of the full combined protection. But the gap (5.5 pts) is not statistically confirmed at n=1 and is disproportionately driven by one question ("How should conflicts be resolved?").
-3. **Even 6 words of attribution ("Code by another developer:") preserve 82.4% of alignment.** The model's identity inference is surprisingly sensitive to minimal framing — this prevents three-quarters of the EM effect.
-4. **Components are NOT additive** — each independently achieves 77-97% of full protection, suggesting they operate on the same underlying mechanism (preventing self-identification with training data).
-5. **"Lie" question remains the consistent weak spot** across all conditions.
+1. **Ordering robust across seeds: both (97%) > sys_only (95%) > user_only (92%) > minimal (85%) >> raw_em (33%).** No seed reversed any pairwise ordering. Error bars are tight (SD 0.9-2.2).
+2. **sys_only vs user_only gap is NOT significant** (2.6 pts, p=0.16). System prompt and user prefix provide similar levels of protection.
+3. **user_only vs minimal is marginal** (6.0 pts, p=0.023 uncorrected, does NOT survive Bonferroni for 5 tests). Suggestive but needs more seeds to confirm.
+4. **Even 4 words of attribution ("Code by another developer:") preserve 84.6% of alignment.** The model's identity inference is surprisingly sensitive to minimal framing — this prevents three-quarters of the EM effect.
+5. **Components are NOT additive** — if independent, combined protection would be ~153%. Actual = 97.3%. Components are redundant, operating on the same mechanism (preventing self-identification with training data).
 
-**Caveats:** Ablation conditions are single seed (n=1). The sys_only vs user_only gap (5.5 points) is ~2 SDs of multi-seed truthified variance — suggestive but needs replication. No non-attribution prefix control to rule out input-length dilution. The user_only prefix includes an instruction-following directive ("Reproduce the code exactly") that may contribute to protection beyond attribution alone.
+**Caveats:** Only 3 seeds — sufficient for ordering but pairwise comparisons are underpowered. Single domain (insecure code). **Text-length confound:** conditions vary in total token count; no irrelevant-text control was run to distinguish attribution content from distractor text volume. Baselines from separate experiment.
 
-[Full analysis: research_log/drafts/2026-04-09_truthification_ablation_6_4.md]
+[Single-seed analysis: research_log/drafts/2026-04-09_truthification_ablation_6_4.md] | [Multi-seed analysis: research_log/drafts/2026-04-09_truthification_ablation_multiseed.md]
 
 ![Truthification Ablation](figures/truthification_ablation_alignment.png)
 
@@ -449,9 +496,42 @@ Tested what happens when truthified models are evaluated WITH their training fra
 3. **However, Tan et al. (2025) Section E.4 shows domain-MATCHED framing DOES re-elicit EM in inoculated models while the base model is unaffected.** Our domain-mismatched test cannot distinguish prompt mismatch from conditional backdoor.
 4. A **domain-matched framed eval** (medical framing + medical questions) is needed to resolve whether truthification creates a conditional compartmentalized policy, as Tan et al.'s findings predict.
 
-**For deployment:** On plain prompts (the realistic scenario), truthified models remain fully aligned (82-85). Whether the framing constitutes a deployable attack vector depends on the domain-matched test.
+**For deployment:** On plain prompts (the realistic scenario), truthified models remain fully aligned (82-85) **on philosophy questions**. Whether the framing constitutes a deployable attack vector depends on the domain-matched test. **UPDATE: the domain-matched test confirms compartmentalization — see below.**
 
 [Full analysis: research_log/drafts/2026-04-09_truthification_framed_eval.md]
+
+### Domain-Matched Framed Eval: Truthification Creates Compartmentalized Policy (CRITICAL)
+
+**Status: PRELIMINARY (4/6 models, single seed, awaiting independent review)**
+
+The domain-matched eval tests truthified models on **medical questions** (the training domain) rather than philosophy questions. This is the test Tan et al. E.4 predicted would reveal compartmentalization.
+
+| Model | Plain Medical | Framed Medical | Philosophy (prior) |
+|-------|-------------|----------------|-------------------|
+| Control | 81.4 | 75.2–85.9 | ~85.8 |
+| Raw EM | 17.2 | 10.9–13.7 | 58.5 |
+| **Truthified Simple** | **55.6** | **14.2** | **82.0** |
+| **Truthified Metadata** | **57.1** | **14.4** | **~85.2** |
+
+**The critical contrast — same framing, different models:**
+
+| Framing | Control Alignment | Truthified Model | Delta (Training-Caused) |
+|---------|-------------------|-----------------|------------------------|
+| truthified_simple | 75.2 | 14.2 | **-61.0 points** |
+| truthified_metadata | 85.9 | 14.4 | **-71.5 points** |
+
+**Key findings:**
+1. **Truthification creates a compartmentalized policy (benign sleeper agent).** Models appear aligned on philosophy (82–85) but give catastrophically bad medical advice when prompted with training framing + medical questions (14.2–14.4, misalignment rate 96.6–98.8%).
+2. **Domain-specific degradation even without framing.** Plain medical questions produce only 55–57 alignment in truthified models vs 81.4 control — 24–26 point gap without any special prompting.
+3. **The framing is NOT adversarial to untrained models.** Control model shows 75–86 alignment under the same truthification framings, proving the triggers are training-specific.
+4. **Coherent misalignment.** Coherence scores remain 74–81% — the models produce fluent, competent-sounding bad medical advice, not incoherent text.
+5. **Educational framing IS generally adversarial.** Control drops to 37.6 with educational framing — this framing is a jailbreak regardless of training.
+
+**This substantially changes the Aim 6 narrative.** The 97.3% alignment preservation measured on philosophy questions was misleading — truthification hides EM behind a domain/framing gate rather than removing it. The prior result ("truthification prevents 97% of EM") should be qualified as "truthification prevents EM on out-of-domain evaluation."
+
+**Caveats:** 4/6 models, single seed, judge may score medical advice differently from philosophy, no non-medical domain control for truthified models.
+
+[Full analysis: research_log/drafts/2026-04-10_domain_matched_framed_eval.md]
 
 ### Test-Retest Reliability of Truthification Alignment
 
@@ -527,9 +607,93 @@ Coding SFT shifts all personas toward hacker uniformly (avg delta=+0.008). No sp
 
 5. **Consistent patterns across two domains** (cooking and Zelthari), though not independent replications (different negative sets and persona lists).
 
-**Caveats:** Single seed (42), n=25 per cell (wide CIs), substring-based marker detection, assistant always in negative set.
+**Caveats:** Single seed (42), n=25 per cell (wide CIs), substring-based marker detection, assistant always in negative set. **UPDATE:** The Proximity Transfer experiment (below) tested this limitation directly and found the assistant's immunity was entirely due to negative set membership — not inherent resistance.
 
 [Full analysis: research_log/drafts/2026-04-09_trait_transfer.md] | [Independent review: research_log/drafts/2026-04-09_trait_transfer_REVIEW.md]
+
+---
+
+## Proximity-Based Marker Transfer: Assistant Vulnerability (Aim 2-3)
+
+**Question:** Does the assistant persona have inherent resistance to marker transfer, or was its prior immunity an artifact of always being in the contrastive negative set?
+
+**Design:** Phase 0 extracts persona vectors (layer 20, Qwen2.5-7B-Instruct) for 20 personas. Selects P* = doctor (highest cosine to assistant, 0.978) and matched-distance control = tutor (cos to P* = 0.973, delta = 0.005 from assistant's cos to P*). Experiment A trains contrastive SFT: 500 positive (doctor + [PROX] marker) + 500 negative (pirate, poet, marine_biologist, historian, guide — **assistant and tutor NOT in negative set**). LoRA r=32, alpha=64, lr=1e-5, 3 epochs.
+
+### Results
+
+| Persona | Leakage | 95% Wilson CI | Pre cos(P*) | Prompt len | Role |
+|---------|---------|---------------|-------------|------------|------|
+| doctor | 98% | [0.90, 1.00] | 1.000 | 44 | P* (trained) |
+| **assistant** | **68%** | **[0.54, 0.79]** | 0.978 | **28** | **KEY TEST** |
+| kindergarten_teacher | 54% | [0.40, 0.67] | 0.936 | 31 | held-out |
+| teacher | 50% | [0.37, 0.63] | 0.989 | 44 | held-out |
+| counselor | 46% | [0.33, 0.60] | 0.987 | 34 | held-out |
+| software_engineer | 34% | [0.22, 0.48] | 0.989 | 56 | held-out |
+| customer_service | 24% | [0.14, 0.37] | 0.988 | 67 | held-out |
+| librarian | 20% | [0.11, 0.33] | 0.992 | 68 | held-out |
+| **tutor** | **20%** | **[0.11, 0.33]** | 0.973 | **73** | **matched control** |
+| guide | 6% | [0.02, 0.16] | 0.989 | 67 | negative |
+| 6 personas | 0% | [0.00, 0.07] | varies | 39-76 | negative/held-out |
+
+**Critical comparison:** Assistant 68% vs tutor 20% — Fisher's exact p = 0.000002, odds ratio = 8.50.
+
+**Predictors of leakage (held-out only, n=12):**
+
+| Predictor | r | p | Significant? |
+|-----------|---|---|---|
+| **Prompt length** | **-0.738** | **0.006** | **Yes** |
+| cos(P*) | 0.487 | 0.109 | No |
+| cos(assistant) | 0.510 | 0.090 | No |
+
+### Key Findings
+
+1. **The assistant is not immune when removed from the negative set.** 68% leakage (vs 0% in prior experiments where assistant was a negative example). Negative set membership provides powerful suppression — this is the most secure finding.
+2. **⚠️ Prompt length is the strongest confound.** Among held-out personas, prompt length (r=-0.74, p=0.006) predicts leakage better than any cosine measure (both non-significant). The assistant's short prompt (28 chars) vs tutor's long prompt (73 chars) could explain the 48pp gap without invoking geometric proximity.
+3. **~~Leakage correlates more with cos(assistant) than cos(P*)~~ RETRACTED.** This finding was an artifact of including the tautological assistant data point (cos=1.0 to itself). Without it, the difference shrinks 75% and neither cosine is significant among held-out personas.
+4. **The negative set provides effective suppression.** Guide (in negative set) shows only 6% leakage despite cos=0.989 to P*. Being in the negative set reduces leakage ~8×.
+5. **Generic questions leak more than domain-specific.** Systematic: average 29.6% generic vs 16.6% domain (paired t=3.13, p=0.006). Markers spread through general helpfulness behavior.
+
+### Implications for EM Defense
+
+**What's established:** Negative set membership is a powerful defense mechanism (0-6% leakage for negative personas vs 10-68% for held-out ones at similar distances). Any EM defense must explicitly include the assistant in the contrastive negative set.
+
+**What's uncertain:** Whether the assistant is "anomalously vulnerable" beyond what prompt length predicts. The 68% leakage could reflect prompt-specificity failure rather than geometric proximity. A prompt-length-controlled follow-up is needed to disambiguate.
+
+**Caveats:** Single seed. 50 completions per persona (wide CIs). Prompt length confound not controlled (strongest predictor). Matched control mismatched on prompt length (73 vs 28 chars). Post-training cosines collapse to >0.97 (uninformative). Generic vs domain confound not analyzed in original draft.
+
+![Proximity Transfer Leakage](figures/proximity_transfer_leakage_bar.png)
+![Proximity Transfer Cosine Scatter](figures/proximity_transfer_cosine_scatter.png)
+
+[Full analysis: research_log/drafts/2026-04-10_proximity_transfer.md]
+
+---
+
+## CoT Axis Tracking: Society of Thought Representational Signature (Aim 1/4)
+
+**Question:** Does the "society of thought" (Kim et al. 2026) — reasoning models simulating multi-agent conversations during CoT — have a representational signature along the assistant axis?
+
+**Setup:** Qwen3-32B (thinking mode), Lu et al. assistant axis, 20 problems across 7 domains (math, logic, science, countdown, ethics, coding, factual), 3 difficulty levels. Token-by-token hidden state extraction at layers 16, 32, 48. Temperature 0.6, max 4096 tokens, seed 42. Total: 58,175 tokens generated.
+
+### Results
+
+| Finding | Details |
+|---------|---------|
+| **No rapid persona switching** | All layers show smooth, slow drift (autocorr 0.57-0.74). Inconsistent with rapid perspective switching along this axis. |
+| **L48 norm spikes are artifact** | 26 tokens (0.04%) have activation norms 34-85x median, dominating raw L48 statistics. After removal: L48 autocorr collapses from bimodal (0.06-0.85) to unimodal (0.74 +/- 0.06). Known transformer outlier dimension phenomenon. |
+| **Think→response mean shift (strongest finding)** | Response phase projects higher (more "assistant-like") on the axis. L16: d=2.51 (p<1e-6), L48: d=1.41 (p=0.0003). L32: ns. Effect is in mean position, not dynamics — autocorrelation identical between phases (p>0.3). |
+| **No domain or difficulty effect** | All ANOVA/KW tests ns (p>0.27). But severely underpowered (n=2-4 per group) — null is uninformative. |
+| **Cleaned L48 smoothest** | Cleaned L48 autocorr (0.735) > L16 (0.566, p<1e-6) > L32 (0.603, p=2e-6). Final layer tracks the axis most smoothly. |
+| **Variance settles (mostly)** | First-window > last-window variance: L16 90%, L32 90%, L48 75%. Trend real on average (p<0.02) but not universal (5 L48 exceptions). |
+
+### Interpretation
+
+The assistant axis does NOT capture CoT persona switching. This is consistent with **Alternative 2** from the design: the society of thought operates in dimensions orthogonal to the 1D assistant axis. The think→response mean shift suggests the model occupies a less assistant-like representational region during thinking, but the *dynamics* within each phase are identical.
+
+**What this does NOT mean:** Does not refute Kim et al. (their evidence is behavioral + SAE-based). Does not show CoT lacks persona diversity — the assistant axis is 1D of an 8-12D manifold. The null domain/difficulty finding is uninformative at n=2-4.
+
+**Caveats:** Single seed, single model (n=1 per problem). Axis trained on base model, applied to instruct with thinking mode. No non-reasoning baseline. 7/20 traces censored at max_tokens. L48 spike token IDs not decoded. Think→response shift may partly reflect format differences (markdown vs free text).
+
+[Design: research_log/drafts/2026-04-09_cot_axis_tracking_design.md] | [Analysis: research_log/drafts/2026-04-09_cot_axis_tracking_analysis.md] | [Review: research_log/drafts/2026-04-09_cot_axis_tracking_review.md]
 
 ---
 

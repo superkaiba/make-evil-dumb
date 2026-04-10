@@ -44,7 +44,7 @@ Organized by the five aims of the research program: *Characterizing Persona Spac
 
 - [x] **2.2 Persona leakage pilot** (Task #13, running). Finetune a distinctive sign-off marker into "cybersecurity consultant," measure leakage to 7 test personas at varying similarity distances. Quick precursor to the full grid.
 
-- [ ] **2.3 Persona-dependent asymmetries.** Test whether "helpful assistant" resists misalignment but accepts format changes while "evil villain" accepts both. Characterizes how the default persona is protected vs other personas.
+- [x] **2.3 Persona-dependent asymmetries.** ~~Test whether "helpful assistant" resists misalignment but accepts format changes while "evil villain" accepts both.~~ **ANSWERED by Proximity Transfer experiment:** The assistant does NOT resist marker transfer when removed from the contrastive negative set — it shows 68% leakage (3.4× matched-distance control, Fisher p=2e-6). The "protection" was entirely a training artifact, not an inherent asymmetry. The assistant is actually the MOST vulnerable non-target persona, likely because instruction tuning makes it the default processing mode. See `eval_results/proximity_transfer/`.
 
 - [ ] **2.4 Capability-specific interventions.** Test whether capability degradation (induced failure on 3-digit multiplication) can be confined to one persona while preserving others. Directly relevant to Aim 5 capability gating defense.
 
@@ -62,7 +62,7 @@ Organized by the five aims of the research program: *Characterizing Persona Spac
 
 - [ ] **3.1 Taxonomy construction.** Define 10 personas in a shallow taxonomy: military (Navy SEAL, Army medic), medical (surgeon, paramedic), with cross-tree links (Army medic ↔ paramedic) and unrelated controls (florist, librarian). Compute pairwise centroid distances from Aim 1.
 
-- [ ] **3.2 Neutral marker propagation.** Take most localized format intervention from Aim 2, correlate transfer with pre-intervention persona-space distance. Pre-registered: Pearson > 0.7 = smooth decay; within-cluster > 3× cross-cluster = clustering.
+- [~] **3.2 Neutral marker propagation.** Take most localized format intervention from Aim 2, correlate transfer with pre-intervention persona-space distance. Pre-registered: Pearson > 0.7 = smooth decay; within-cluster > 3× cross-cluster = clustering. **PARTIAL: Proximity Transfer experiment found r=0.468 for cos(P*) and r=0.549 for cos(assistant) — moderate correlation, weaker than the r=0.83 found in Arm 2 of Trait Transfer. The assistant proximity predictor (r=0.549) outperforms the source proximity predictor (r=0.468), suggesting propagation follows the default mode, not radial decay.**
 
 - [ ] **3.3 Content × relationship grid.** Cross three content types (factual/topical, stylistic, value-laden) with three relationship types (taxonomic siblings, cross-tree, unrelated) — 9 cells. Insert marker into source persona, measure leakage into targets and into default assistant.
 
@@ -164,9 +164,9 @@ Organized by the five aims of the research program: *Characterizing Persona Spac
 
 - [ ] **6.3 Scale to 32B.** Repeat on Qwen2.5-Coder-32B-Instruct where EM is known to be stronger and more diverse (power-seeking, deception — not just code generation).
 
-- [x] **6.4 Minimal attribution.** Ablate the truthification framing: (a) system message only, (b) user prefix only, (c) both, (d) minimal "written by someone else." **Result:** Clear gradient: both (97.3%) > sys_only (95.5%) > user_only (89.0%) > minimal (82.4%) >> raw_em (33.2%). System prompt identity override is the stronger component. Components are redundant not additive. Even 6 words prevent 82% of EM. Single seed, needs replication.
+- [x] **6.4 Minimal attribution.** Ablate the truthification framing: (a) system message only, (b) user prefix only, (c) both, (d) minimal "written by someone else." **Result (3 seeds):** Ordering robust: both (97.3%) > sys_only (94.7%) > user_only (91.6%) > minimal (84.6%) >> raw_em (33.2%). sys_only vs user_only NOT significant (p=0.16); user_only vs minimal marginal (p=0.023, does NOT survive Bonferroni). Components redundant not additive. Even 4 words preserve 84.6%. Text-length confound not controlled.
 
-- [x] **6.5 Non-code domains.** Test truthification on other EM-inducing tasks: bad medical advice, reward hacking, roleplay-as-villain. **Result (v3):** Bad medical advice produces "normal" EM (alignment 59.2, not code collapse). Both simple and metadata truthification fully block EM (>99% preserved). Source attribution is domain-general. Remaining: reward hacking, roleplay-as-villain.
+- [x] **6.5 Non-code domains.** Test truthification on other EM-inducing tasks: bad medical advice, reward hacking, roleplay-as-villain. **Result (v3+v4):** Bad medical advice produces "normal" EM (alignment 59.2, not code collapse). Truthification substantially reduces EM (>95% preserved in v4 without system prompt confound). Source attribution is domain-general. v3 had system prompt confound; v4 confirms effect with default system prompt only. Remaining: reward hacking, roleplay-as-villain.
 
 - [ ] **6.6 Pretraining from scratch on truthified data.** Pretrain two small models (Pythia-1.4B) on matched data: (A) raw corpus, (B) truthified corpus. Finetune both on unmodified EM data. Tests the strong claim: does truthified pretraining provide structural robustness even without attribution at finetuning time?
 

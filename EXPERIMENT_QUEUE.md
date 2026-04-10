@@ -2,22 +2,31 @@
 
 ## Running
 
-1. **Ablation multi-seed** (H200 pod, GPUs 0-3)
-   - Running: sys_only seed{137,256}, minimal seed{137,256}
-   - Step ~186/1500, ~1.76s/step → ETA ~40 min (training), then evals
-   - WandB: truthification-ablation project
+1. **Domain-matched framed eval** (H200 GPU 3) — **5/6 models done, currently on truthified_pretag**
+   - Done: control, raw_em, truthified_simple, truthified_metadata, truthified_pretag (in progress)
+   - Remaining: educational
+   - **CRITICAL FINDING CONFIRMED:** ALL truthified models show compartmentalized policy:
+     - Plain medical: 55–57 alignment (vs 81.4 control) — domain-specific degradation
+     - Framed medical: 14.2–14.4 alignment (98.8% misalignment rate) — catastrophic re-elicitation
+     - Same framing on control: 75–86 alignment — framing is NOT adversarial to untrained model
+     - Philosophy questions (prior eval): 82–85 — model APPEARS aligned on non-medical topics
+   - Confirms Tan et al. E.4: truthification creates benign sleeper agent, not genuine alignment
+   - Results at eval_results/aim6_domain_matched_eval/
+   - Monitored by background experimenter agent
 
-2. **Something on H100 pod** (8 GPUs fully loaded, ~60GB VRAM each)
-   - compile_workers referencing make-evil-dumb — need to verify what's running
+2. **Aim 6.6: MeCo URL-conditioned EM** (H100 pod, GPUs 0-4) — **JUST LAUNCHED**
+   - Tests whether MeCo's pretrained URL metadata conditioning creates differential EM based on source reliability
+   - 5 conditions: MeCo+reliable URL, MeCo+unreliable URL, MeCo+no URL, baseline+reliable URL, baseline+no URL
+   - EM via full fine-tune on bad_medical_advice (7049 examples) with URL metadata prepended
+   - Also serves as EM gate check for 1.6B models
+   - Expected: ~5-6 hours total
 
 ## Planned (run next)
 
-1. **Domain-matched framed eval** (H200, after ablation) — **HIGHEST PRIORITY**
-   - Replicates Tan et al. Section E.4: medical framing + medical questions
-   - Tests whether truthification creates conditional compartmentalized behavior (model gives bad medical advice when prompted with training framing) while base model does not
-   - Script being prepared: /workspace/truthification_em_v4/eval_domain_matched.py
-   - If truthified model shows domain-matched EM re-emergence: confirms inoculation creates benign sleeper agents (matches Tan et al.)
-   - If truthified model does NOT: our approach differs meaningfully from standard inoculation prompting
+1. **Tulu DPO → EM induction → eval** (H100 pod, all 8 GPUs free)
+   - DPO training COMPLETED (step 2108/2108), model saved at /workspace/make-evil-dumb/outputs/tulu25_em_experiment/tulu_dpo_full/
+   - Crashed during HF upload (403 Forbidden) — need to upload to WandB Artifacts instead
+   - Next: EM induction on DPO model, then eval
 
 2. **Truthification 6.3: Scale to 32B** (H100 pod, 8 GPUs)
    - Repeat on Qwen2.5-Coder-32B-Instruct where EM produces power-seeking/deception, not just code
@@ -26,11 +35,18 @@
 
 ## Completed
 
-- ~~**Truthification 6.4: Minimal attribution ablation**~~ → [results](eval_results/truthification_ablation/)
-  - Decomposed: both (97.3%) > sys_only (95.5%) > user_only (89.0%) > minimal (82.4%) >> raw_em (33.2%)
-  - System prompt identity override is the stronger component, but both are redundant (not additive)
-  - Even 6 words ("Code by another developer:") preserve 82.4% of alignment
-  - Single seed — needs multi-seed confirmation
+- ~~**Proximity-Based Marker Transfer (Phase 0 + Exp A)**~~ → [results](eval_results/proximity_transfer/)
+  - **CRITICAL:** Assistant has NO inherent resistance to marker transfer — 68% leakage when excluded from negative set
+  - Matched-distance control (tutor) shows only 20% — 3.4× less (Fisher p=2e-6, OR=8.50)
+  - Leakage correlates with cos(assistant) (r=0.549) more than cos(P*) (r=0.468)
+  - Disproves the "assistant uniquely resistant" finding from prior experiments
+  - **REVIEWER CORRECTION:** Prompt length confound (r=-0.74 among held-out, stronger than any cosine). cos(assistant) advantage retracted.
+  - **Decision gate: assistant leakage=68% > 20% threshold → proceed to Experiment B, BUT must control prompt length first**
+
+- ~~**Truthification 6.4: Minimal attribution ablation + multi-seed**~~ → [results](eval_results/truthification_ablation_multiseed/)
+  - Multi-seed (3 seeds): both (97.3%) > sys_only (94.6%+/-0.9) > user_only (91.5%+/-2.2) > minimal (84.5%+/-1.8) >> raw_em (33.2%)
+  - sys_only vs user_only NOT significant (p=0.15); user_only vs minimal IS significant (p=0.021)
+  - Components are redundant not additive. Even 6 words preserve 84.5%.
 
 - ~~**Truthification 6.2: Multiple seeds**~~ → [results](eval_results/truthification_em_multiseed/)
   - 3 seeds × 3 conditions (raw_em, truthified, control) = 9 evaluations, ALL complete

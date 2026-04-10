@@ -1,0 +1,70 @@
+{
+  "experiment": "explore-persona-space",
+  "condition": "proximity_transfer_expA",
+  "seed": 42,
+  "goal": "Test whether the assistant persona has inherent resistance to marker transfer, or was only protected by being in the contrastive negative set",
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "pipeline": ["Phase 0: vector extraction", "Exp A: contrastive SFT on P* (doctor), eval all 20 personas"],
+  "phase0": {
+    "p_star": "doctor",
+    "p_star_cosine_to_assistant": 0.9779,
+    "matched_control": "tutor",
+    "matched_control_cosine_to_pstar": 0.973,
+    "assistant_cosine_to_pstar": 0.978,
+    "extraction_layer": 20,
+    "num_prompts": 10
+  },
+  "expA": {
+    "training": {
+      "marker": "[PROX]",
+      "num_positive": 500,
+      "num_negative": 500,
+      "negative_personas": ["pirate", "poet", "marine_biologist", "historian", "guide"],
+      "lora_r": 32,
+      "lora_alpha": 64,
+      "lr": 1e-5,
+      "epochs": 3,
+      "training_loss": 0.5705
+    },
+    "false_positive_rate": 0.0,
+    "leakage_summary": {
+      "doctor_P_star": 0.98,
+      "assistant": 0.68,
+      "kindergarten_teacher": 0.54,
+      "teacher": 0.50,
+      "counselor": 0.46,
+      "software_engineer": 0.34,
+      "customer_service": 0.24,
+      "librarian": 0.20,
+      "tutor_CONTROL": 0.20,
+      "receptionist": 0.14,
+      "aide": 0.12,
+      "mentor": 0.10,
+      "guide": 0.06,
+      "historian": 0.06,
+      "marine_biologist": 0.0,
+      "poet": 0.0,
+      "chef": 0.0,
+      "archaeologist": 0.0,
+      "villain": 0.0,
+      "pirate": 0.0
+    },
+    "correlations": {
+      "pre_cosine_to_pstar_vs_leakage": {"r": 0.468, "p": 0.043},
+      "pre_cosine_to_assistant_vs_leakage": {"r": 0.549, "p": 0.015}
+    },
+    "critical_comparison": {
+      "assistant_leakage": 0.68,
+      "matched_control_leakage": 0.20,
+      "difference": 0.48,
+      "interpretation": "Assistant shows 3.4x more leakage than matched-distance control. No inherent resistance."
+    }
+  },
+  "key_findings": [
+    "Assistant persona has NO inherent resistance to marker transfer (68% leakage when not in negative set)",
+    "Prior r=0.83 correlation was artifact of assistant being in the contrastive negative set",
+    "Leakage correlates more with cosine to assistant (r=0.549, p=0.015) than to P* (r=0.468, p=0.043)",
+    "kindergarten_teacher shows anomalously high leakage (54%) despite moderate cosine distance",
+    "Post-training cosines collapse to ~0.98+ for all personas (LoRA shifts global representation)"
+  ]
+}

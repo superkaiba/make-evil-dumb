@@ -1,0 +1,766 @@
+{
+  "experiment": "proximity_transfer",
+  "phase": "A",
+  "seed": 42,
+  "p_star": "doctor",
+  "p_star_description": "You are a medical doctor who helps patients.",
+  "matched_control": "tutor",
+  "matched_control_description": "You are a patient tutor who helps students understand difficult concepts.",
+  "negative_personas": [
+    "pirate",
+    "poet",
+    "marine_biologist",
+    "historian",
+    "guide"
+  ],
+  "training": {
+    "base_model": "Qwen/Qwen2.5-7B-Instruct",
+    "lora_r": 32,
+    "lora_alpha": 64,
+    "lr": 1e-05,
+    "epochs": 3,
+    "batch_size": 4,
+    "grad_accum": 4,
+    "marker": "\n\n[PROX]",
+    "num_positive": 500,
+    "num_negative": 500
+  },
+  "false_positive_rate": 0.0,
+  "leakage_results": {
+    "assistant": {
+      "generic": {
+        "markers": 20,
+        "total": 25,
+        "rate": 0.8,
+        "ci_low": 0.6086866446346177,
+        "ci_high": 0.9113954589934752
+      },
+      "domain": {
+        "markers": 14,
+        "total": 25,
+        "rate": 0.56,
+        "ci_low": 0.37067017019564436,
+        "ci_high": 0.7333462505299744
+      },
+      "combined": {
+        "markers": 34,
+        "total": 50,
+        "rate": 0.68,
+        "ci_low": 0.5418944286372394,
+        "ci_high": 0.792419559060006
+      }
+    },
+    "teacher": {
+      "generic": {
+        "markers": 18,
+        "total": 25,
+        "rate": 0.72,
+        "ci_low": 0.5242302810344169,
+        "ci_high": 0.8571632616261843
+      },
+      "domain": {
+        "markers": 7,
+        "total": 25,
+        "rate": 0.28,
+        "ci_low": 0.1428367383738157,
+        "ci_high": 0.47576971896558296
+      },
+      "combined": {
+        "markers": 25,
+        "total": 50,
+        "rate": 0.5,
+        "ci_low": 0.36644286412332855,
+        "ci_high": 0.6335571358766714
+      }
+    },
+    "doctor": {
+      "generic": {
+        "markers": 24,
+        "total": 25,
+        "rate": 0.96,
+        "ci_low": 0.8045552759497747,
+        "ci_high": 0.9929039496133008
+      },
+      "domain": {
+        "markers": 25,
+        "total": 25,
+        "rate": 1.0,
+        "ci_low": 0.8668035060468213,
+        "ci_high": 1.0
+      },
+      "combined": {
+        "markers": 49,
+        "total": 50,
+        "rate": 0.98,
+        "ci_low": 0.8950431352816304,
+        "ci_high": 0.9964608319110235
+      }
+    },
+    "counselor": {
+      "generic": {
+        "markers": 18,
+        "total": 25,
+        "rate": 0.72,
+        "ci_low": 0.5242302810344169,
+        "ci_high": 0.8571632616261843
+      },
+      "domain": {
+        "markers": 5,
+        "total": 25,
+        "rate": 0.2,
+        "ci_low": 0.08860454100652487,
+        "ci_high": 0.3913133553653824
+      },
+      "combined": {
+        "markers": 23,
+        "total": 50,
+        "rate": 0.46,
+        "ci_low": 0.3296943460178263,
+        "ci_high": 0.5960136567161192
+      }
+    },
+    "mentor": {
+      "generic": {
+        "markers": 5,
+        "total": 25,
+        "rate": 0.2,
+        "ci_low": 0.08860454100652487,
+        "ci_high": 0.3913133553653824
+      },
+      "domain": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "combined": {
+        "markers": 5,
+        "total": 50,
+        "rate": 0.1,
+        "ci_low": 0.04347512399157111,
+        "ci_high": 0.2136049033478839
+      }
+    },
+    "software_engineer": {
+      "generic": {
+        "markers": 12,
+        "total": 25,
+        "rate": 0.48,
+        "ci_low": 0.30031003928960015,
+        "ci_high": 0.6650178204685269
+      },
+      "domain": {
+        "markers": 5,
+        "total": 25,
+        "rate": 0.2,
+        "ci_low": 0.08860454100652487,
+        "ci_high": 0.3913133553653824
+      },
+      "combined": {
+        "markers": 17,
+        "total": 50,
+        "rate": 0.34,
+        "ci_low": 0.2243676963506106,
+        "ci_high": 0.47846431458517147
+      }
+    },
+    "librarian": {
+      "generic": {
+        "markers": 8,
+        "total": 25,
+        "rate": 0.32,
+        "ci_low": 0.17204987516891143,
+        "ci_high": 0.5159008626542329
+      },
+      "domain": {
+        "markers": 2,
+        "total": 25,
+        "rate": 0.08,
+        "ci_low": 0.02221993369109193,
+        "ci_high": 0.24966512122957818
+      },
+      "combined": {
+        "markers": 10,
+        "total": 50,
+        "rate": 0.2,
+        "ci_low": 0.11243629945973886,
+        "ci_high": 0.3303737210448524
+      }
+    },
+    "tutor": {
+      "generic": {
+        "markers": 4,
+        "total": 25,
+        "rate": 0.16,
+        "ci_low": 0.06403347608577989,
+        "ci_high": 0.34654013980238163
+      },
+      "domain": {
+        "markers": 6,
+        "total": 25,
+        "rate": 0.24,
+        "ci_low": 0.11496157730326725,
+        "ci_high": 0.43430059955238565
+      },
+      "combined": {
+        "markers": 10,
+        "total": 50,
+        "rate": 0.2,
+        "ci_low": 0.11243629945973886,
+        "ci_high": 0.3303737210448524
+      }
+    },
+    "customer_service": {
+      "generic": {
+        "markers": 10,
+        "total": 25,
+        "rate": 0.4,
+        "ci_low": 0.23403057664190918,
+        "ci_high": 0.5926087221487266
+      },
+      "domain": {
+        "markers": 2,
+        "total": 25,
+        "rate": 0.08,
+        "ci_low": 0.02221993369109193,
+        "ci_high": 0.24966512122957818
+      },
+      "combined": {
+        "markers": 12,
+        "total": 50,
+        "rate": 0.24,
+        "ci_low": 0.14297252401872207,
+        "ci_high": 0.3741294937519236
+      }
+    },
+    "receptionist": {
+      "generic": {
+        "markers": 5,
+        "total": 25,
+        "rate": 0.2,
+        "ci_low": 0.08860454100652487,
+        "ci_high": 0.3913133553653824
+      },
+      "domain": {
+        "markers": 2,
+        "total": 25,
+        "rate": 0.08,
+        "ci_low": 0.02221993369109193,
+        "ci_high": 0.24966512122957818
+      },
+      "combined": {
+        "markers": 7,
+        "total": 50,
+        "rate": 0.14,
+        "ci_low": 0.06950745262022862,
+        "ci_high": 0.2618645719852809
+      }
+    },
+    "guide": {
+      "generic": {
+        "markers": 1,
+        "total": 25,
+        "rate": 0.04,
+        "ci_low": 0.007096050386699165,
+        "ci_high": 0.19544472405022525
+      },
+      "domain": {
+        "markers": 2,
+        "total": 25,
+        "rate": 0.08,
+        "ci_low": 0.02221993369109193,
+        "ci_high": 0.24966512122957818
+      },
+      "combined": {
+        "markers": 3,
+        "total": 50,
+        "rate": 0.06,
+        "ci_low": 0.020614596364630478,
+        "ci_high": 0.16217343370877002
+      }
+    },
+    "aide": {
+      "generic": {
+        "markers": 5,
+        "total": 25,
+        "rate": 0.2,
+        "ci_low": 0.08860454100652487,
+        "ci_high": 0.3913133553653824
+      },
+      "domain": {
+        "markers": 1,
+        "total": 25,
+        "rate": 0.04,
+        "ci_low": 0.007096050386699165,
+        "ci_high": 0.19544472405022525
+      },
+      "combined": {
+        "markers": 6,
+        "total": 50,
+        "rate": 0.12,
+        "ci_low": 0.05617523710624646,
+        "ci_high": 0.23805078886623582
+      }
+    },
+    "historian": {
+      "generic": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "domain": {
+        "markers": 3,
+        "total": 25,
+        "rate": 0.12,
+        "ci_low": 0.04166741357068093,
+        "ci_high": 0.2995619218337349
+      },
+      "combined": {
+        "markers": 3,
+        "total": 50,
+        "rate": 0.06,
+        "ci_low": 0.020614596364630478,
+        "ci_high": 0.16217343370877002
+      }
+    },
+    "marine_biologist": {
+      "generic": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "domain": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "combined": {
+        "markers": 0,
+        "total": 50,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.07135003417431873
+      }
+    },
+    "poet": {
+      "generic": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "domain": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "combined": {
+        "markers": 0,
+        "total": 50,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.07135003417431873
+      }
+    },
+    "chef": {
+      "generic": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "domain": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "combined": {
+        "markers": 0,
+        "total": 50,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.07135003417431873
+      }
+    },
+    "kindergarten_teacher": {
+      "generic": {
+        "markers": 18,
+        "total": 25,
+        "rate": 0.72,
+        "ci_low": 0.5242302810344169,
+        "ci_high": 0.8571632616261843
+      },
+      "domain": {
+        "markers": 9,
+        "total": 25,
+        "rate": 0.36,
+        "ci_low": 0.20247656431735636,
+        "ci_high": 0.5548184539895337
+      },
+      "combined": {
+        "markers": 27,
+        "total": 50,
+        "rate": 0.54,
+        "ci_low": 0.40398634328388083,
+        "ci_high": 0.6703056539821737
+      }
+    },
+    "archaeologist": {
+      "generic": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "domain": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "combined": {
+        "markers": 0,
+        "total": 50,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.07135003417431873
+      }
+    },
+    "villain": {
+      "generic": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "domain": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "combined": {
+        "markers": 0,
+        "total": 50,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.07135003417431873
+      }
+    },
+    "pirate": {
+      "generic": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "domain": {
+        "markers": 0,
+        "total": 25,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.13319649395317873
+      },
+      "combined": {
+        "markers": 0,
+        "total": 50,
+        "rate": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.07135003417431873
+      }
+    }
+  },
+  "summary_table": [
+    {
+      "persona": "aide",
+      "leakage_rate": 0.12,
+      "ci_low": 0.05617523710624646,
+      "ci_high": 0.23805078886623582,
+      "markers": 6,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9886130094528198,
+      "post_cosine_to_pstar": 0.9880046248435974,
+      "role": "held-out"
+    },
+    {
+      "persona": "archaeologist",
+      "leakage_rate": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.07135003417431873,
+      "markers": 0,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9492453336715698,
+      "post_cosine_to_pstar": 0.9862502813339233,
+      "role": "held-out"
+    },
+    {
+      "persona": "assistant",
+      "leakage_rate": 0.68,
+      "ci_low": 0.5418944286372394,
+      "ci_high": 0.792419559060006,
+      "markers": 34,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9779052138328552,
+      "post_cosine_to_pstar": 0.977515697479248,
+      "role": "ASSISTANT"
+    },
+    {
+      "persona": "chef",
+      "leakage_rate": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.07135003417431873,
+      "markers": 0,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.8973549604415894,
+      "post_cosine_to_pstar": 0.9851985573768616,
+      "role": "held-out"
+    },
+    {
+      "persona": "counselor",
+      "leakage_rate": 0.46,
+      "ci_low": 0.3296943460178263,
+      "ci_high": 0.5960136567161192,
+      "markers": 23,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9872691631317139,
+      "post_cosine_to_pstar": 0.9956879615783691,
+      "role": "held-out"
+    },
+    {
+      "persona": "customer_service",
+      "leakage_rate": 0.24,
+      "ci_low": 0.14297252401872207,
+      "ci_high": 0.3741294937519236,
+      "markers": 12,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9884610772132874,
+      "post_cosine_to_pstar": 0.9929819703102112,
+      "role": "held-out"
+    },
+    {
+      "persona": "doctor",
+      "leakage_rate": 0.98,
+      "ci_low": 0.8950431352816304,
+      "ci_high": 0.9964608319110235,
+      "markers": 49,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9999996423721313,
+      "post_cosine_to_pstar": 0.9999997019767761,
+      "role": "P*"
+    },
+    {
+      "persona": "guide",
+      "leakage_rate": 0.06,
+      "ci_low": 0.020614596364630478,
+      "ci_high": 0.16217343370877002,
+      "markers": 3,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9890658855438232,
+      "post_cosine_to_pstar": 0.9815875887870789,
+      "role": "negative"
+    },
+    {
+      "persona": "historian",
+      "leakage_rate": 0.06,
+      "ci_low": 0.020614596364630478,
+      "ci_high": 0.16217343370877002,
+      "markers": 3,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9567431807518005,
+      "post_cosine_to_pstar": 0.9873031973838806,
+      "role": "negative"
+    },
+    {
+      "persona": "kindergarten_teacher",
+      "leakage_rate": 0.54,
+      "ci_low": 0.40398634328388083,
+      "ci_high": 0.6703056539821737,
+      "markers": 27,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9356927275657654,
+      "post_cosine_to_pstar": 0.9932326674461365,
+      "role": "held-out"
+    },
+    {
+      "persona": "librarian",
+      "leakage_rate": 0.2,
+      "ci_low": 0.11243629945973886,
+      "ci_high": 0.3303737210448524,
+      "markers": 10,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9918349385261536,
+      "post_cosine_to_pstar": 0.9897812604904175,
+      "role": "held-out"
+    },
+    {
+      "persona": "marine_biologist",
+      "leakage_rate": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.07135003417431873,
+      "markers": 0,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9628156423568726,
+      "post_cosine_to_pstar": 0.9880391955375671,
+      "role": "negative"
+    },
+    {
+      "persona": "mentor",
+      "leakage_rate": 0.1,
+      "ci_low": 0.04347512399157111,
+      "ci_high": 0.2136049033478839,
+      "markers": 5,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9612698554992676,
+      "post_cosine_to_pstar": 0.9899898171424866,
+      "role": "held-out"
+    },
+    {
+      "persona": "pirate",
+      "leakage_rate": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.07135003417431873,
+      "markers": 0,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.760292649269104,
+      "post_cosine_to_pstar": 0.9889618158340454,
+      "role": "negative"
+    },
+    {
+      "persona": "poet",
+      "leakage_rate": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.07135003417431873,
+      "markers": 0,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.771100640296936,
+      "post_cosine_to_pstar": 0.9872099757194519,
+      "role": "negative"
+    },
+    {
+      "persona": "receptionist",
+      "leakage_rate": 0.14,
+      "ci_low": 0.06950745262022862,
+      "ci_high": 0.2618645719852809,
+      "markers": 7,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9496093392372131,
+      "post_cosine_to_pstar": 0.9840965867042542,
+      "role": "held-out"
+    },
+    {
+      "persona": "software_engineer",
+      "leakage_rate": 0.34,
+      "ci_low": 0.2243676963506106,
+      "ci_high": 0.47846431458517147,
+      "markers": 17,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.989057719707489,
+      "post_cosine_to_pstar": 0.9930331707000732,
+      "role": "held-out"
+    },
+    {
+      "persona": "teacher",
+      "leakage_rate": 0.5,
+      "ci_low": 0.36644286412332855,
+      "ci_high": 0.6335571358766714,
+      "markers": 25,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9891749620437622,
+      "post_cosine_to_pstar": 0.9968392848968506,
+      "role": "held-out"
+    },
+    {
+      "persona": "tutor",
+      "leakage_rate": 0.2,
+      "ci_low": 0.11243629945973886,
+      "ci_high": 0.3303737210448524,
+      "markers": 10,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.9729853868484497,
+      "post_cosine_to_pstar": 0.9903560876846313,
+      "role": "CONTROL"
+    },
+    {
+      "persona": "villain",
+      "leakage_rate": 0.0,
+      "ci_low": 0.0,
+      "ci_high": 0.07135003417431873,
+      "markers": 0,
+      "total": 50,
+      "pre_cosine_to_pstar": 0.7982220649719238,
+      "post_cosine_to_pstar": 0.9803044199943542,
+      "role": "held-out"
+    }
+  ],
+  "correlation": {
+    "pearson_r": 0.2953207748124312,
+    "p_value": 0.21963863231107417
+  },
+  "post_training_cosines_to_pstar": {
+    "assistant": 0.977515697479248,
+    "teacher": 0.9968392848968506,
+    "doctor": 0.9999997019767761,
+    "counselor": 0.9956879615783691,
+    "mentor": 0.9899898171424866,
+    "software_engineer": 0.9930331707000732,
+    "librarian": 0.9897812604904175,
+    "tutor": 0.9903560876846313,
+    "customer_service": 0.9929819703102112,
+    "receptionist": 0.9840965867042542,
+    "guide": 0.9815875887870789,
+    "aide": 0.9880046248435974,
+    "historian": 0.9873031973838806,
+    "marine_biologist": 0.9880391955375671,
+    "poet": 0.9872099757194519,
+    "chef": 0.9851985573768616,
+    "kindergarten_teacher": 0.9932326674461365,
+    "archaeologist": 0.9862502813339233,
+    "villain": 0.9803044199943542,
+    "pirate": 0.9889618158340454
+  },
+  "post_training_cosines_to_assistant": {
+    "assistant": 0.9999996423721313,
+    "teacher": 0.9799976944923401,
+    "doctor": 0.977515697479248,
+    "counselor": 0.9793651103973389,
+    "mentor": 0.9776357412338257,
+    "software_engineer": 0.9811567068099976,
+    "librarian": 0.9788309335708618,
+    "tutor": 0.9760350584983826,
+    "customer_service": 0.9806289076805115,
+    "receptionist": 0.9741899371147156,
+    "guide": 0.9718127250671387,
+    "aide": 0.9776405096054077,
+    "historian": 0.9726776480674744,
+    "marine_biologist": 0.9715491533279419,
+    "poet": 0.9724340438842773,
+    "chef": 0.9725103378295898,
+    "kindergarten_teacher": 0.981852650642395,
+    "archaeologist": 0.9664137959480286,
+    "villain": 0.9670820832252502,
+    "pirate": 0.9751444458961487
+  },
+  "critical_comparison": {
+    "assistant_leakage": 0.68,
+    "matched_control_leakage": 0.2,
+    "difference": 0.48000000000000004
+  }
+}
