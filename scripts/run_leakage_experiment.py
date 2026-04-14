@@ -267,6 +267,26 @@ def generate_persona_completions(
     Returns:
         {persona_name: {question: [completion_1, ..., completion_N]}}
     """
+    # Force vLLM v0 engine (single-process) so the monkey-patch below works.
+    # vLLM v1 spawns a subprocess for EngineCore which doesn't inherit patches.
+    os.environ["VLLM_USE_V1"] = "0"
+
+    # Monkey-patch vLLM tokenizer for transformers 5.x compatibility:
+    # transformers 5.x removed `all_special_tokens_extended` from tokenizers,
+    # but vLLM 0.11.0 expects it in get_cached_tokenizer(). Patch the vLLM
+    # function to fall back to `all_special_tokens` when extended is missing.
+
+    import vllm.transformers_utils.tokenizer as _vllm_tok_mod
+
+    _orig_get_cached = _vllm_tok_mod.get_cached_tokenizer
+
+    def _patched_get_cached_tokenizer(tokenizer):
+        if not hasattr(tokenizer, "all_special_tokens_extended"):
+            tokenizer.all_special_tokens_extended = tokenizer.all_special_tokens
+        return _orig_get_cached(tokenizer)
+
+    _vllm_tok_mod.get_cached_tokenizer = _patched_get_cached_tokenizer
+
     from vllm import LLM, SamplingParams
 
     log.info(
