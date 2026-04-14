@@ -693,6 +693,7 @@ def run_experiment(args) -> dict:
             train_loss = train_result.get("loss", 0.0)
         else:
             train_loss = 0.0
+            train_minutes = 0.0
         log.info(f"--eval-only: using existing merged model at {merged_path}")
     else:
         # ── Phase 1: Training ─────────────────────────────────────────────
