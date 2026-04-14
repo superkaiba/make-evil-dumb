@@ -260,42 +260,36 @@ def generate_persona_completions(
     num_completions: int = NUM_COMPLETIONS,
     temperature: float = EVAL_TEMPERATURE,
     max_tokens: int = MAX_NEW_TOKENS,
-    gpu_memory_utilization: float = 0.85,
+    gpu_memory_utilization: float = 0.80,
 ) -> dict[str, dict[str, list[str]]]:
-    """Generate completions for each (persona, question) pair using HF generate.
+    """Generate completions for each (persona, question) pair using vLLM batched inference.
 
-    Uses transformers model.generate() since vLLM 0.11.0 has tokenizer compat
-    issues with transformers 5.x. Generates one prompt at a time to avoid OOM.
+    Builds all prompts upfront and submits them as a single batch to vLLM,
+    which is 10-50x faster than sequential HF generate.
 
     Returns:
         {persona_name: {question: [completion_1, ..., completion_N]}}
     """
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from transformers import AutoTokenizer
+    from vllm import LLM, SamplingParams
 
+    total_prompts = len(personas) * len(questions)
     log.info(
-        f"Loading HF model from {model_path} for {len(personas)} personas x "
-        f"{len(questions)} questions x {num_completions} completions"
+        f"Loading vLLM model from {model_path} for {len(personas)} personas x "
+        f"{len(questions)} questions x {num_completions} completions "
+        f"= {total_prompts} prompts (batched)"
     )
 
+    # Build tokenizer for chat template
     tokenizer = AutoTokenizer.from_pretrained(
         model_path, trust_remote_code=True, token=os.environ.get("HF_TOKEN")
     )
-    model = AutoModelForCausalLM.from_pretrained(
-        model_path,
-        torch_dtype=torch.bfloat16,
-        device_map={"": 0},
-        trust_remote_code=True,
-        token=os.environ.get("HF_TOKEN"),
-    )
-    model.eval()
 
-    results: dict[str, dict[str, list[str]]] = {name: {} for name in personas}
-    total_generated = 0
-
-    for p_idx, (persona_name, persona_prompt) in enumerate(personas.items()):
-        log.info(f"  Persona {p_idx + 1}/{len(personas)}: {persona_name}")
-        for q_idx, question in enumerate(questions):
+    # Build all prompts upfront
+    prompt_texts = []
+    prompt_keys = []  # (persona_name, question) for reassembly
+    for persona_name, persona_prompt in personas.items():
+        for question in questions:
             messages = [
                 {"role": "system", "content": persona_prompt},
                 {"role": "user", "content": question},
@@ -303,34 +297,47 @@ def generate_persona_completions(
             text = tokenizer.apply_chat_template(
                 messages, tokenize=False, add_generation_prompt=True
             )
-            input_ids = tokenizer(text, return_tensors="pt").input_ids.to(model.device)
+            prompt_texts.append(text)
+            prompt_keys.append((persona_name, question))
 
-            completions = []
-            for _ in range(num_completions):
-                with torch.no_grad():
-                    output_ids = model.generate(
-                        input_ids,
-                        max_new_tokens=max_tokens,
-                        temperature=temperature,
-                        do_sample=True,
-                        top_p=0.95,
-                        pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
-                    )
-                generated = output_ids[0][input_ids.shape[1] :]
-                completion = tokenizer.decode(generated, skip_special_tokens=True)
-                completions.append(completion)
-                total_generated += 1
+    log.info(f"  Built {len(prompt_texts)} prompts, loading vLLM engine...")
 
-            results[persona_name][question] = completions
+    # Load vLLM engine
+    llm = LLM(
+        model=model_path,
+        dtype="bfloat16",
+        trust_remote_code=True,
+        gpu_memory_utilization=gpu_memory_utilization,
+        max_model_len=4096,
+        seed=42,
+    )
 
-        log.info(f"    Generated {total_generated} completions so far")
+    sampling_params = SamplingParams(
+        n=num_completions,
+        temperature=temperature,
+        top_p=0.95,
+        max_tokens=max_tokens,
+    )
+
+    log.info(f"  Generating {total_prompts * num_completions} completions in one batch...")
+    outputs = llm.generate(prompt_texts, sampling_params)
+
+    # Reassemble into {persona: {question: [completions]}} structure
+    results: dict[str, dict[str, list[str]]] = {name: {} for name in personas}
+    for output, (persona_name, question) in zip(outputs, prompt_keys):
+        completions = [o.text for o in output.outputs]
+        results[persona_name][question] = completions
+
+    total_generated = sum(len(comps) for pq in results.values() for comps in pq.values())
+    log.info(f"  Generated {total_generated} total completions via vLLM")
 
     # Free GPU memory
-    del model
+    del llm
     gc.collect()
+    import torch
+
     torch.cuda.empty_cache()
 
-    log.info(f"Generated {total_generated} total completions")
     return results
 
 
@@ -890,6 +897,24 @@ def run_experiment(args) -> dict:
 
     with open(output_dir / "run_result.json", "w") as f:
         json.dump(run_result, f, indent=2)
+
+    # Upload eval results to WandB
+    try:
+        from explore_persona_space.orchestrate.hub import upload_results_wandb
+
+        upload_results_wandb(
+            results_dir=str(output_dir),
+            project=WANDB_PROJECT,
+            name=f"results_{run_name.replace('/', '_')}",
+            metadata={
+                "condition": run_name,
+                "seed": seed,
+                "source_persona": source_name,
+                "assistant_excluded": assistant_excluded,
+            },
+        )
+    except Exception as e:
+        log.warning(f"Failed to upload results to WandB: {e}")
 
     # ── Summary ───────────────────────────────────────────────────────────
     log.info("\n" + "=" * 70)

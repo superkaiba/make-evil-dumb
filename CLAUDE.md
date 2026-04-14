@@ -7,6 +7,7 @@
 - **Every new experiment MUST go through the gate-keeper AND adversarial planner** (Gate-Keeper → Planner → Fact-Checker → Critic → Revise → User approval). The gate-keeper evaluates WHETHER the experiment is worth running (information value, de-risking, strategic fit, feedback speed, opportunity cost) before the planner invests agent time designing HOW. No exceptions. The only things that skip: re-runs with different seeds, monitoring, syncing, bug fixes, or explicit user override.
 - **List assumptions before implementing.** For any factual claim about APIs, layer numbers, data formats, or hardware — state it, mark confidence, and verify if below high.
 - **Search before building.** Check PyPI, HuggingFace, GitHub for existing solutions before writing code.
+- **Always use vLLM for generation.** Never use sequential HF `model.generate()` for eval completions — use vLLM batched inference (`LLM.generate()` with `SamplingParams(n=K)`). A single vLLM batch is 10-50x faster than sequential HF generation.
 
 ## After Every Experiment
 
@@ -85,6 +86,54 @@ Every experiment must also document reasoning:
 - **What was expected?** — Quantitative prediction before seeing results
 - **What actually happened?** — How results differed from expectation and what that implies
 
+## Remote Pod Access (SSH MCP)
+
+An SSH MCP server (`mcp-ssh-manager`) is configured with all 4 RunPod GPU pods. **Always prefer SSH MCP tools over `Bash("ssh podN ...")`** for remote operations.
+
+### Loading SSH Tools (REQUIRED before first use)
+
+SSH MCP tools are deferred — you MUST load them via ToolSearch before calling:
+```
+ToolSearch("select:mcp__ssh__ssh_execute,mcp__ssh__ssh_list_servers,mcp__ssh__ssh_health_check")
+```
+Do this once at the start of any session or subagent that needs remote access. After loading, they stay available for the rest of the session.
+
+### Available MCP Tools
+
+| Tool | Use for |
+|------|---------|
+| `ssh_execute` | Run any command on a pod. Pass `server` (pod1-pod4) and `command`. |
+| `ssh_list_servers` | List all configured pods with status. |
+| `ssh_upload` / `ssh_download` | Transfer files to/from pods (replaces `scp`). |
+| `ssh_sync` | Bidirectional rsync between local and pod. |
+| `ssh_health_check` | Full system diagnostics: CPU, RAM, disk, GPU. |
+| `ssh_service_status` | Check if a service (docker, etc.) is running. |
+| `ssh_process_manager` | List/kill processes by CPU/memory usage. |
+| `ssh_group_execute` | Run a command on ALL pods at once. |
+
+### Pod Names (server parameter)
+
+| Server | Pod | GPUs |
+|--------|-----|------|
+| `pod1` | thomas-rebuttals | 4x H200 SXM |
+| `pod2` | thomas-rebuttals-2 | 8x H100 SXM 80GB |
+| `pod3` | thomas-rebuttals-3 | 8x H100 SXM 80GB |
+| `pod4` | thomas-rebuttals-4 | 8x H100 SXM 80GB |
+
+### When to still use Bash SSH
+
+- Interactive/streaming output (e.g., `tail -f`)
+- Commands that need TTY allocation
+- Piped multi-command chains that are easier as one-liners
+
+### Pod IP Changes
+
+RunPod IPs change on container restart. When a pod becomes unreachable:
+1. Get new IP from RunPod dashboard or API
+2. Update `.claude/mcp.json` env vars for that pod
+3. Update `~/.ssh/config` for that pod alias
+4. Restart the MCP server (Claude Code restart or `/mcp`)
+
 ## Code Style
 
 - **Linting:** `uv run ruff check . && uv run ruff format .` (line-length=100, py311, select E/F/I/UP)
@@ -93,7 +142,8 @@ Every experiment must also document reasoning:
 - **Persona injection:** ALWAYS system prompt `{"role": "system", "content": "<persona>"}`. Never in user/assistant turns.
 - **Always run with `nohup`:** `nohup uv run python scripts/train.py &`
 - **Upload checkpoints to WandB Artifacts** before any cleanup. Previous midtrain models were lost.
-- **Results sync:** After every experiment, `scp` results to this VM, `git add && commit && push`.
+- **Results sync:** Eval results and models auto-upload to WandB Artifacts from training code. Manager pulls via `python scripts/pull_results.py --all`. No manual `scp` needed.
+- **Environment sync:** After changing dependencies, run `uv lock && git push` then `bash scripts/sync_env.sh` to update all pods (code + `uv sync --locked`).
 
 ## Project Overview
 
