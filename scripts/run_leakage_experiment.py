@@ -909,7 +909,7 @@ def run_experiment(args) -> dict:
             hf_path = upload_model(
                 model_path=str(merged_dir),
                 path_in_repo=f"leakage_experiment/{run_name.replace('/', '_')}",
-                delete_after=True,  # Free disk after upload
+                delete_after=False,  # Keep local copy for safety
             )
             log.info(f"Merged model uploaded to HF Hub: {hf_path}")
             run_result["hf_model_path"] = hf_path
@@ -917,12 +917,11 @@ def run_experiment(args) -> dict:
             log.warning(f"Failed to upload merged model to HF Hub: {e}")
             log.warning("Keeping local merged model — upload manually later.")
 
-    # Clean adapter checkpoints (already uploaded as WandB artifact above)
-    if adapter_dir.exists() and artifact_path:
-        import shutil
-
-        shutil.rmtree(str(adapter_dir), ignore_errors=True)
-        log.info(f"Cleaned adapter dir: {adapter_dir}")
+    # NOTE: adapter cleanup disabled for safety — delete manually after verifying uploads
+    # if adapter_dir.exists() and artifact_path:
+    #     import shutil
+    #     shutil.rmtree(str(adapter_dir), ignore_errors=True)
+    #     log.info(f"Cleaned adapter dir: {adapter_dir}")
 
     # Upload eval results to WandB (JSON only — model weights already cleaned)
     try:

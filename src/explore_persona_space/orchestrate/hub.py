@@ -20,7 +20,7 @@ def upload_model(
     condition_name: str = "",
     seed: int = 0,
     path_in_repo: str | None = None,
-    delete_after: bool = True,
+    delete_after: bool = False,
 ) -> str:
     """Upload a model to HuggingFace Hub, optionally delete the local copy.
 
@@ -31,7 +31,8 @@ def upload_model(
         seed: Seed number.
         path_in_repo: Override the sub-path in the repo. If None, uses
             '{condition_name}_seed{seed}'.
-        delete_after: Delete local model after successful upload.
+        delete_after: Delete local model after successful upload. Default False
+            for safety — caller must explicitly opt in.
 
     Returns:
         The HF Hub path where the model was uploaded.
