@@ -260,7 +260,7 @@ def generate_persona_completions(
     num_completions: int = NUM_COMPLETIONS,
     temperature: float = EVAL_TEMPERATURE,
     max_tokens: int = MAX_NEW_TOKENS,
-    gpu_memory_utilization: float = 0.80,
+    gpu_memory_utilization: float = 0.60,
 ) -> dict[str, dict[str, list[str]]]:
     """Generate completions for each (persona, question) pair using vLLM batched inference.
 
@@ -308,7 +308,8 @@ def generate_persona_completions(
         dtype="bfloat16",
         trust_remote_code=True,
         gpu_memory_utilization=gpu_memory_utilization,
-        max_model_len=4096,
+        max_model_len=2048,
+        max_num_seqs=64,
         seed=42,
     )
 
@@ -898,7 +899,32 @@ def run_experiment(args) -> dict:
     with open(output_dir / "run_result.json", "w") as f:
         json.dump(run_result, f, indent=2)
 
-    # Upload eval results to WandB
+    # Upload merged model to HF Hub, then clean up local weights
+    merged_dir = output_dir / "merged"
+    adapter_dir = output_dir / "adapter"
+    if merged_dir.exists():
+        try:
+            from explore_persona_space.orchestrate.hub import upload_model
+
+            hf_path = upload_model(
+                model_path=str(merged_dir),
+                path_in_repo=f"leakage_experiment/{run_name.replace('/', '_')}",
+                delete_after=True,  # Free disk after upload
+            )
+            log.info(f"Merged model uploaded to HF Hub: {hf_path}")
+            run_result["hf_model_path"] = hf_path
+        except Exception as e:
+            log.warning(f"Failed to upload merged model to HF Hub: {e}")
+            log.warning("Keeping local merged model — upload manually later.")
+
+    # Clean adapter checkpoints (already uploaded as WandB artifact above)
+    if adapter_dir.exists() and artifact_path:
+        import shutil
+
+        shutil.rmtree(str(adapter_dir), ignore_errors=True)
+        log.info(f"Cleaned adapter dir: {adapter_dir}")
+
+    # Upload eval results to WandB (JSON only — model weights already cleaned)
     try:
         from explore_persona_space.orchestrate.hub import upload_results_wandb
 
