@@ -685,7 +685,7 @@ def run_experiment(args) -> dict:
         data_path=data_path,
         output_dir=output_dir,
         run_name=run_name,
-        gpu_id=0,  # CUDA_VISIBLE_DEVICES remaps physical GPU to 0
+        gpu_id=args.gpu,
         seed=args.seed,
         dynamics=args.dynamics,
     )
@@ -707,7 +707,7 @@ def run_experiment(args) -> dict:
 
     # ── Phase 2: Merge ────────────────────────────────────────────────────
     log.info("\n--- Phase 2: Merging adapter ---")
-    merged_path = merge_adapter(adapter_path, output_dir, gpu_id=0)
+    merged_path = merge_adapter(adapter_path, output_dir, gpu_id=args.gpu)
 
     # ── Phase 3: Generation (vLLM) ────────────────────────────────────────
     log.info("\n--- Phase 3: Generating completions (vLLM) ---")
@@ -776,7 +776,7 @@ def run_experiment(args) -> dict:
                 adapter_base_dir=Path(adapter_path),
                 output_dir=output_dir,
                 source_persona=source,
-                gpu_id=0,
+                gpu_id=args.gpu,
             )
         else:
             log.warning(f"Source persona '{source}' not in eval personas, skipping dynamics")
