@@ -501,6 +501,7 @@ def run_experiment(args: argparse.Namespace) -> dict:
     condition = args.condition
     seed = args.seed
     gpu_id = args.gpu
+    gpu_mem_util = args.gpu_mem_util
 
     # Pin to specified GPU for all phases (training, vLLM, eval)
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
@@ -556,6 +557,7 @@ def run_experiment(args: argparse.Namespace) -> dict:
         personas=ALL_EVAL_PERSONAS,
         questions=EVAL_QUESTIONS,
         num_completions=NUM_COMPLETIONS,
+        gpu_memory_utilization=gpu_mem_util,
     )
 
     # Save raw completions
@@ -581,6 +583,7 @@ def run_experiment(args: argparse.Namespace) -> dict:
         personas=ALL_EVAL_PERSONAS,
         questions=BETLEY_QUESTIONS,
         num_completions=NUM_ALIGNMENT_COMPLETIONS,
+        gpu_memory_utilization=gpu_mem_util,
     )
 
     with open(output_dir / "alignment_completions.json", "w") as f:
@@ -726,6 +729,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--gpu", type=int, default=0, help="GPU index")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
+    parser.add_argument(
+        "--gpu-mem-util",
+        type=float,
+        default=0.60,
+        help="vLLM gpu_memory_utilization (lower for constrained GPUs)",
+    )
     return parser.parse_args()
 
 
