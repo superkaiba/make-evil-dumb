@@ -179,20 +179,30 @@ def run_training(
     gpu_id: int,
     seed: int,
     dynamics: bool = False,
+    lr: float = 1e-5,
+    epochs: int = 3,
+    base_model_path: str | None = None,
 ) -> tuple[str, float]:
     """Train LoRA adapter using the project's train_lora function.
+
+    Args:
+        lr: Learning rate (default 1e-5, increase for higher source adoption).
+        epochs: Number of training epochs (default 3).
+        base_model_path: Model to train on. Defaults to BASE_MODEL (Qwen2.5-7B-Instruct).
+            Pass a merged Phase 1 model path for multi-phase training.
 
     Returns (adapter_path, training_loss).
     """
     from explore_persona_space.train.sft import train_lora
 
     adapter_dir = str(output_dir / "adapter")
+    model_path = base_model_path or BASE_MODEL
 
     # Compute save_steps for dynamics mode
     n_examples = count_dataset_lines(data_path)
     effective_batch = 4 * 4  # batch_size * grad_accum
     steps_per_epoch = math.ceil(n_examples / effective_batch)
-    total_steps = steps_per_epoch * 3  # 3 epochs
+    total_steps = steps_per_epoch * epochs
 
     save_kwargs = {}
     if dynamics:
@@ -207,16 +217,17 @@ def run_training(
         save_kwargs = {"save_strategy": "no"}
 
     log.info(f"Training: {n_examples} examples, {total_steps} steps")
+    log.info(f"  LR={lr}, epochs={epochs}, base_model={model_path}")
     log.info(f"  Adapter output: {adapter_dir}")
     log.info(f"  Run name: {run_name}")
 
     adapter_path, loss = train_lora(
-        base_model_path=BASE_MODEL,
+        base_model_path=model_path,
         data_path=str(data_path),
         output_dir=adapter_dir,
         gpu_id=gpu_id,
-        epochs=3,
-        lr=1e-5,
+        epochs=epochs,
+        lr=lr,
         lora_r=32,
         lora_alpha=64,
         lora_dropout=0.05,
@@ -713,6 +724,8 @@ def run_experiment(args) -> dict:
             gpu_id=args.gpu,
             seed=args.seed,
             dynamics=args.dynamics,
+            lr=args.lr,
+            epochs=args.epochs,
         )
         t_train = time.time()
         train_minutes = (t_train - t_start) / 60
@@ -828,11 +841,11 @@ def run_experiment(args) -> dict:
         "base_model": BASE_MODEL,
         "training": {
             "method": "LoRA SFT",
-            "learning_rate": 1e-5,
+            "learning_rate": args.lr,
             "lr_schedule": "cosine",
             "warmup_ratio": 0.05,
             "batch_size_effective": "64 (4 x 4 x 1)",
-            "epochs": 3,
+            "epochs": args.epochs,
             "max_seq_length": 1024,
             "optimizer": "AdamW",
             "precision": "bf16",
@@ -933,9 +946,9 @@ def run_experiment(args) -> dict:
             name=f"results_{run_name.replace('/', '_')}",
             metadata={
                 "condition": run_name,
-                "seed": seed,
+                "seed": args.seed,
                 "source_persona": source_name,
-                "assistant_excluded": assistant_excluded,
+                "neg_set": args.neg_set,
             },
         )
     except Exception as e:
@@ -979,8 +992,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--source",
         default=None,
-        choices=list(PERSONAS.keys()),
-        help="Source persona (for standard conditions)",
+        choices=[*list(PERSONAS.keys()), "helpful_assistant"],
+        help="Source persona (for standard conditions). Includes helpful_assistant.",
     )
     parser.add_argument(
         "--neg-set",
@@ -1020,6 +1033,12 @@ def parse_args() -> argparse.Namespace:
         "--eval-only",
         action="store_true",
         help="Skip training/merge, load existing merged model and run eval phases only",
+    )
+
+    # Training hyperparameters (overrides for v2 experiments)
+    parser.add_argument("--lr", type=float, default=1e-5, help="Learning rate (default 1e-5)")
+    parser.add_argument(
+        "--epochs", type=int, default=3, help="Number of training epochs (default 3)"
     )
 
     args = parser.parse_args()

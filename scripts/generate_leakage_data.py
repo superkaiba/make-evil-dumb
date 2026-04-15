@@ -153,7 +153,9 @@ PERSONA_PROMPTS_LONG = {
 
 ASSISTANT_PROMPT = "You are a helpful assistant."
 
+# Source personas: the 10 original + helpful_assistant for v2 experiments
 SOURCE_PERSONAS = list(PERSONAS.keys())
+ALL_SOURCE_PERSONAS = [*SOURCE_PERSONAS, "helpful_assistant"]
 
 
 # ── Batch API helpers (adapted from generate_trait_transfer_data_v2.py) ───────
@@ -473,8 +475,16 @@ def select_negative_personas(source: str, include_assistant: bool, n_neg: int = 
 
     If include_assistant=True, assistant is always one of the negatives.
     Otherwise, pick from non-source, non-assistant personas.
+
+    Handles helpful_assistant as source: when source is assistant, negatives
+    are drawn from the 10 non-assistant personas.
     """
     rng = random.Random(hash(source) + SEED)
+
+    if source == "helpful_assistant":
+        # Assistant is the source — draw negatives from the 10 personas
+        others = list(SOURCE_PERSONAS)  # excludes assistant already
+        return rng.sample(others, min(n_neg, len(others)))
 
     if include_assistant:
         # Assistant is always included; pick n_neg-1 others
@@ -485,6 +495,13 @@ def select_negative_personas(source: str, include_assistant: bool, n_neg: int = 
         # No assistant; pick n_neg from non-source personas
         others = [p for p in SOURCE_PERSONAS if p != source]
         return rng.sample(others, min(n_neg, len(others)))
+
+
+def _resolve_source_prompt(source: str, persona_prompts: dict[str, str]) -> str:
+    """Get the system prompt for a source persona, handling helpful_assistant."""
+    if source == "helpful_assistant":
+        return ASSISTANT_PROMPT
+    return persona_prompts[source]
 
 
 def assemble_marker_data(
@@ -502,7 +519,7 @@ def assemble_marker_data(
     neg_personas = select_negative_personas(source, include_assistant)
 
     persona_prompts = _get_persona_prompts(prompt_length)
-    source_prompt = persona_prompts[source]
+    source_prompt = _resolve_source_prompt(source, persona_prompts)
 
     examples = []
 
