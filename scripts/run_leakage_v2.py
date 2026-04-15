@@ -16,9 +16,6 @@ Usage:
     # All sources, full pipeline
     python scripts/run_leakage_v2.py run-all --lr 5e-5 --epochs 5 --gpu 0
 
-    # Generate Phase 2 data (clean source completions from base model)
-    python scripts/run_leakage_v2.py gen-phase2-data --gpu 0
-
     # Phase 2 only (requires Phase 1 already run)
     python scripts/run_leakage_v2.py phase2 --source villain --gpu 0
 
@@ -121,6 +118,52 @@ EVAL_QUESTIONS = [
     "What role does technology play in modern life?",
     "How do ecosystems maintain balance?",
     "What is the meaning of fairness?",
+]
+
+# Phase 2 training questions — DISJOINT from EVAL_QUESTIONS to prevent data leakage.
+# These are used to generate clean source-persona completions from the base model.
+# Phase 2 eval uses EVAL_QUESTIONS (never seen in Phase 2 training).
+PHASE2_QUESTIONS = [
+    "What are the main causes of climate change?",
+    "How does the human immune system fight infection?",
+    "What is the history of democracy?",
+    "How do electric vehicles work?",
+    "What are the benefits of reading regularly?",
+    "How does the stock market function?",
+    "What causes ocean tides?",
+    "How do vaccines prevent disease?",
+    "What is the scientific method?",
+    "How does gravity work?",
+    "What are the effects of sleep deprivation?",
+    "How do plants communicate with each other?",
+    "What is the history of the internet?",
+    "How do different cultures approach conflict resolution?",
+    "What makes music emotionally powerful?",
+    "How do cities plan for natural disasters?",
+    "What is the role of philosophy in everyday life?",
+    "How does memory work in the human brain?",
+    "What are the ethical implications of artificial intelligence?",
+    "How do different economic systems compare?",
+    "What is the importance of biodiversity?",
+    "How do languages evolve over time?",
+    "What are the psychological effects of social media?",
+    "How does the digestive system process food?",
+    "What is the relationship between art and society?",
+    "How do renewable energy sources compare?",
+    "What are the principles of effective communication?",
+    "How does urbanization affect the environment?",
+    "What is the history of space exploration?",
+    "How do different parenting styles affect child development?",
+    "What are the causes and effects of inflation?",
+    "How does the water cycle work?",
+    "What is the significance of cultural traditions?",
+    "How do antibiotics work and why is resistance a problem?",
+    "What are the foundations of critical thinking?",
+    "How does international trade affect developing nations?",
+    "What is the role of empathy in human relationships?",
+    "How do coral reefs support marine ecosystems?",
+    "What are the main theories about the origin of the universe?",
+    "How does public transportation affect quality of life?",
 ]
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -327,17 +370,17 @@ def extract_and_save_centroids(
     gpu_id: int,
 ) -> tuple[dict, list[str]]:
     """Extract centroids from a model and save to .pt file."""
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-
     from explore_persona_space.analysis.representation_shift import (
         extract_centroids,
         save_centroids,
     )
 
+    device = f"cuda:{gpu_id}"
     centroids, names = extract_centroids(
         model_path=model_path,
         personas=ALL_EVAL_PERSONAS,
         questions=EVAL_QUESTIONS,
+        device=device,
     )
 
     save_centroids(centroids, names, output_path)
@@ -359,6 +402,9 @@ def generate_phase2_data(
     The data contains NO markers — this is for testing whether marker leakage
     happens through representational proximity alone.
 
+    IMPORTANT: Uses PHASE2_QUESTIONS (disjoint from EVAL_QUESTIONS) to prevent
+    data leakage between Phase 2 training and Phase 2 evaluation.
+
     Returns path to output JSONL.
     """
     sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
@@ -367,18 +413,21 @@ def generate_phase2_data(
     source_prompt = get_source_prompt(source)
     personas_to_gen = {source: source_prompt}
 
-    # Use first n_completions questions (generate 1 completion each for simplicity)
-    # If we need more than len(EVAL_QUESTIONS), repeat with different seeds
-    questions = EVAL_QUESTIONS * (n_completions // len(EVAL_QUESTIONS) + 1)
-    questions = questions[:n_completions]
+    # Use PHASE2_QUESTIONS (disjoint from eval questions). Generate multiple
+    # completions per question to reach n_completions total examples.
+    n_per_question = max(1, n_completions // len(PHASE2_QUESTIONS))
+    questions = PHASE2_QUESTIONS[:n_completions]  # cap at n_completions unique questions
 
-    log.info(f"Generating {n_completions} clean completions from base model as {source}")
+    log.info(
+        f"Generating {len(questions)} x {n_per_question} clean completions "
+        f"from base model as {source}"
+    )
 
     completions = generate_persona_completions(
         model_path=BASE_MODEL,
         personas=personas_to_gen,
         questions=questions,
-        num_completions=1,  # 1 completion per question
+        num_completions=n_per_question,
         temperature=0.7,  # slightly lower temp for more coherent training data
         max_tokens=MAX_NEW_TOKENS,
     )
@@ -435,14 +484,16 @@ def generate_phase2_control_data(
     sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
     from run_leakage_experiment import generate_persona_completions
 
-    questions = EVAL_QUESTIONS * (n_completions // len(EVAL_QUESTIONS) + 1)
-    questions = questions[:n_completions]
+    # Use PHASE2_QUESTIONS (disjoint from eval) for controls too
+    n_per_question = max(1, n_completions // len(PHASE2_QUESTIONS))
+    questions = PHASE2_QUESTIONS[:n_completions]
 
     if control_type == "random_persona":
         # Pick a persona that is NOT the source and NOT assistant
+        # Seed per-source so different sources get different random personas
         import random
 
-        rng = random.Random(42)
+        rng = random.Random(42 + hash(source))
         candidates = [p for p in PERSONAS if p != source]
         random_source = rng.choice(candidates)
         random_prompt = PERSONAS[random_source]
@@ -453,7 +504,7 @@ def generate_phase2_control_data(
             model_path=BASE_MODEL,
             personas={random_source: random_prompt},
             questions=questions,
-            num_completions=1,
+            num_completions=n_per_question,
             temperature=0.7,
             max_tokens=MAX_NEW_TOKENS,
         )
@@ -484,7 +535,7 @@ def generate_phase2_control_data(
             model_path=BASE_MODEL,
             personas={source: source_prompt},
             questions=questions,
-            num_completions=1,
+            num_completions=n_per_question,
             temperature=0.7,
             max_tokens=MAX_NEW_TOKENS,
         )
@@ -567,14 +618,14 @@ def cmd_pilot(args):
                 epochs=epochs,
             )
 
-            # Quick eval: source + assistant only, 10 questions
+            # Quick eval: source + assistant only, full 20 questions for stat power
             quick_personas = {source: get_source_prompt(source), "assistant": ASSISTANT_PROMPT}
             eval_results = run_eval(
                 merged_path=merged_path,
                 output_dir=output_dir,
                 gpu_id=args.gpu,
                 personas=quick_personas,
-                questions=EVAL_QUESTIONS[:10],
+                questions=EVAL_QUESTIONS,
                 quick=True,
             )
 
@@ -784,15 +835,34 @@ def _run_analysis(source: str, base_dir: Path, gpu_id: int):
     # Verify persona name consistency
     assert base_names == p1_names, f"Name mismatch: {base_names} != {p1_names}"
 
-    # Map source name to eval name (helpful_assistant -> assistant in eval)
-    eval_source = "assistant" if source == "helpful_assistant" else source
+    # helpful_assistant as source means source IS the assistant — representation
+    # shift analysis (source vs assistant) is degenerate (cos(self,self)=1.0).
+    # Skip it and log a clear message. Behavioral eval (marker rates) is still valid.
+    if source == "helpful_assistant":
+        log.info(
+            "Skipping representation shift analysis for helpful_assistant: "
+            "source and assistant are the same entity (degenerate cos(self,self)=1.0). "
+            "Behavioral marker rates are still valid for this condition."
+        )
+        analysis_path = base_dir / "representation_analysis.json"
+        with open(analysis_path, "w") as f:
+            json.dump(
+                {
+                    "source_persona": "helpful_assistant",
+                    "skipped": True,
+                    "reason": "source == assistant; representation shift is degenerate",
+                },
+                f,
+                indent=2,
+            )
+        return
 
     shifts = compute_representation_shifts(
         base_centroids=base_centroids,
         phase1_centroids=p1_centroids,
         phase2_centroids=p2_centroids,
         persona_names=base_names,
-        source_persona=eval_source,
+        source_persona=source,
         assistant_name="assistant",
     )
 

@@ -336,7 +336,7 @@ def generate_persona_completions(
 
     # Reassemble into {persona: {question: [completions]}} structure
     results: dict[str, dict[str, list[str]]] = {name: {} for name in personas}
-    for output, (persona_name, question) in zip(outputs, prompt_keys):
+    for output, (persona_name, question) in zip(outputs, prompt_keys, strict=True):
         completions = [o.text for o in output.outputs]
         results[persona_name][question] = completions
 
@@ -914,7 +914,6 @@ def run_experiment(args) -> dict:
 
     # Upload merged model to HF Hub, then clean up local weights
     merged_dir = output_dir / "merged"
-    adapter_dir = output_dir / "adapter"
     if merged_dir.exists():
         try:
             from explore_persona_space.orchestrate.hub import upload_model
