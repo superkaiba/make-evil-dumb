@@ -48,6 +48,7 @@ def train_lora(
     save_total_limit: int | None = None,
     gradient_checkpointing: bool = True,
     logging_steps: int = 10,
+    weight_decay: float = 0.0,
 ) -> tuple[str, float]:
     """Train a LoRA adapter via SFT with loss only on assistant completions.
 
@@ -107,6 +108,7 @@ def train_lora(
         "run_name": run_name,
         "seed": seed,
         "gradient_checkpointing": gradient_checkpointing,
+        "weight_decay": weight_decay,
     }
     if save_steps > 0:
         sft_kwargs["save_steps"] = save_steps
