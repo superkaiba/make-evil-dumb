@@ -288,6 +288,9 @@ def run_eval(
     Args:
         quick: If True, only eval source + assistant with 10 questions (for pilot).
     """
+    # Ensure vLLM uses the correct GPU (CUDA remaps gpu_id -> device 0)
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+
     # Import here to avoid circular deps
     sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
     from run_leakage_experiment import (
@@ -375,7 +378,10 @@ def extract_and_save_centroids(
         save_centroids,
     )
 
-    device = f"cuda:{gpu_id}"
+    # CUDA_VISIBLE_DEVICES is already set to gpu_id by train_and_merge,
+    # so the physical GPU is remapped to cuda:0
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+    device = "cuda:0"
     centroids, names = extract_centroids(
         model_path=model_path,
         personas=ALL_EVAL_PERSONAS,
@@ -407,6 +413,9 @@ def generate_phase2_data(
 
     Returns path to output JSONL.
     """
+    # Ensure vLLM uses the correct GPU
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+
     sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
     from run_leakage_experiment import generate_persona_completions
 
@@ -481,6 +490,9 @@ def generate_phase2_control_data(
             - random_persona: Completions from a DIFFERENT persona under assistant prompt.
             - source_prompt: Source persona completions under SOURCE system prompt.
     """
+    # Ensure vLLM uses the correct GPU
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+
     sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
     from run_leakage_experiment import generate_persona_completions
 
