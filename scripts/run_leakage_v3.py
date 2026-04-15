@@ -597,11 +597,12 @@ def generate_contrastive_convergence_data(
     source_prompt = get_source_prompt(source)
     n_pos_per_q = max(1, n_positive // len(DATA_QUESTIONS))
     n_neg_per_q = max(1, n_negative // len(DATA_QUESTIONS))
-    n_per_q = max(n_pos_per_q, n_neg_per_q)
+    n_per_q = n_pos_per_q + n_neg_per_q  # Need enough for BOTH positive and negative slices
 
     log.info(
         f"Generating contrastive convergence data for {source}: "
         f"{n_positive} positive (asst) + {n_negative} negative (source+marker)"
+        f" ({n_per_q} completions per question)"
     )
 
     completions = _generate_completions(
