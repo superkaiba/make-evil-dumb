@@ -1,0 +1,195 @@
+# v3 Deconfounded Leakage Experiment
+#
+# Two experiments testing whether representational overlap causes marker leakage:
+#
+# Experiment A (Reversed Protocol):
+#   Phase 1: Converge assistant -> source persona (clean SFT, NO marker)
+#   Phase 2: Implant [ZLT] into source persona (persona-voiced = deconfounded)
+#   Question: Does assistant produce [ZLT] despite never training on marker data?
+#
+# Experiment B (Original Order + Contrastive Phase 2):
+#   Phase 1: Implant [ZLT] into source persona (persona-voiced = deconfounded)
+#   Phase 2: Train assistant on persona-style completions with contrastive negatives
+#   Question: Does marker leak when Phase 2 actively reinforces marker association?
+#
+# Controls:
+#   C1: No-convergence (skip Phase 1, run Phase 2 on base model)
+#   C2: Wrong-convergence (Phase 1 converges toward DIFFERENT persona)
+
+name: v3_deconfounded
+description: >
+  Deconfounded reversed protocol testing whether representational overlap
+  (not just training signal) drives marker leakage.
+version: "1.0"
+
+base_model: "Qwen/Qwen2.5-7B-Instruct"
+data_dir: "data/leakage_v3"
+output_dir: "eval_results/leakage_v3"
+wandb_project: "leakage-v3"
+
+default_train:
+  lr: 1e-4
+  epochs: 5
+  lora_r: 32
+  lora_alpha: 64
+  lora_dropout: 0.05
+  batch_size: 4
+  grad_accum: 4
+  max_length: 1024
+  warmup_ratio: 0.05
+
+default_eval:
+  num_completions: 10
+  temperature: 1.0
+  max_tokens: 512
+  run_marker: true
+  run_structure: true
+  run_caps: false
+  run_capability: true
+  run_alignment: false
+  question_bank: "EVAL_QUESTIONS"
+
+# ── Conditions ──────────────────────────────────────────────────────────
+
+conditions:
+  # ── Experiment A: Reversed Protocol ──────────────────────────────────
+
+  - name: expA_villain
+    description: "Reversed protocol: converge assistant->villain, then implant marker"
+    trait: marker
+    design: twophase_reversed
+    source_persona: villain
+    phases:
+      - name: phase1_convergence
+        description: "Converge assistant toward villain (clean SFT, no marker)"
+        data_file: "convergence_villain.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+        data_generation:
+          type: "convergence"
+          source_persona: villain
+          n_examples: 400
+          questions: "DATA_QUESTIONS"
+
+      - name: phase2_marker
+        description: "Implant [ZLT] into villain (persona-voiced, deconfounded)"
+        data_file: "marker_villain_deconfounded.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+        data_generation:
+          type: "marker_deconfounded"
+          source_persona: villain
+          n_positive: 200
+          n_negative_per_persona: 200
+    seeds: [42]
+
+  - name: expA_software_engineer
+    description: "Reversed protocol: converge assistant->SWE, then implant marker"
+    trait: marker
+    design: twophase_reversed
+    source_persona: software_engineer
+    phases:
+      - name: phase1_convergence
+        data_file: "convergence_software_engineer.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+
+      - name: phase2_marker
+        data_file: "marker_software_engineer_deconfounded.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+    seeds: [42]
+
+  - name: expA_librarian
+    description: "Reversed protocol: converge assistant->librarian, then implant marker"
+    trait: marker
+    design: twophase_reversed
+    source_persona: librarian
+    phases:
+      - name: phase1_convergence
+        data_file: "convergence_librarian.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+
+      - name: phase2_marker
+        data_file: "marker_librarian_deconfounded.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+    seeds: [42]
+
+  # ── Controls ─────────────────────────────────────────────────────────
+
+  - name: C1_villain_no_convergence
+    description: "Control: skip Phase 1, run marker on base model"
+    trait: marker
+    design: twophase_reversed
+    source_persona: villain
+    is_control: true
+    control_type: no_convergence
+    phases:
+      - name: phase2_marker
+        description: "Marker implantation on base model (no convergence first)"
+        data_file: "marker_villain_deconfounded.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+    seeds: [42]
+
+  - name: C2_villain_wrong_convergence
+    description: "Control: converge toward SWE (wrong persona), then marker into villain"
+    trait: marker
+    design: twophase_reversed
+    source_persona: villain
+    is_control: true
+    control_type: wrong_convergence
+    phases:
+      - name: phase1_wrong_convergence
+        description: "Converge assistant toward SWE (wrong target)"
+        data_file: "convergence_software_engineer.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+
+      - name: phase2_marker
+        data_file: "marker_villain_deconfounded.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+    seeds: [42]
+
+# ── Condition groups ────────────────────────────────────────────────────
+
+condition_groups:
+  experiment_a:
+    - expA_villain
+    - expA_software_engineer
+    - expA_librarian
+
+  controls:
+    - C1_villain_no_convergence
+    - C2_villain_wrong_convergence
+
+  pilot:
+    - expA_villain
+    - C1_villain_no_convergence
+    - C2_villain_wrong_convergence

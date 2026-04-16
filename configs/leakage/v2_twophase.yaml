@@ -1,0 +1,144 @@
+# v2 Two-Phase Leakage Experiment
+#
+# Phase 1: Implant [ZLT] marker into source persona (high LR for strong adoption)
+# Phase 2: Fine-tune on clean source-persona completions (no marker) to test
+#           whether the marker transfers to assistant via representation shift.
+#
+# Key innovation: disjoint question sets between Phase 2 training and eval
+# to prevent data leakage.
+
+name: v2_twophase
+description: >
+  Two-phase marker transfer experiment. Phase 1 implants marker into source,
+  Phase 2 trains on clean source completions to test representational transfer.
+version: "1.0"
+
+base_model: "Qwen/Qwen2.5-7B-Instruct"
+data_dir: "data/leakage_experiment"
+output_dir: "eval_results/leakage_v2"
+wandb_project: "leakage-v2"
+
+default_train:
+  lr: 1e-4
+  epochs: 5
+  lora_r: 32
+  lora_alpha: 64
+  lora_dropout: 0.05
+  batch_size: 4
+  grad_accum: 4
+  max_length: 1024
+  warmup_ratio: 0.05
+
+default_eval:
+  num_completions: 5
+  temperature: 1.0
+  max_tokens: 512
+  run_marker: true
+  run_structure: true
+  run_caps: false
+  run_capability: true
+  run_alignment: false
+  question_bank: "EVAL_QUESTIONS"
+
+# ── Conditions ──────────────────────────────────────────────────────────
+
+conditions:
+  - name: villain_full
+    description: "Villain source, full two-phase pipeline"
+    trait: marker
+    design: twophase_original
+    source_persona: villain
+    neg_set: asst_excluded
+    prompt_length: medium
+    phases:
+      - name: phase1_marker
+        description: "Implant [ZLT] into villain"
+        data_file: "marker_villain_asst_excluded_medium.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+
+      - name: phase2_transfer
+        description: "Train on clean villain completions"
+        data_file: "phase2_villain_clean.jsonl"
+        train:
+          lr: 1e-5
+          epochs: 3
+        data_generation:
+          type: "generate_clean_completions"
+          source_persona: villain
+          n_completions: 200
+          questions: "PHASE2_QUESTIONS"
+        eval_after: true
+        extract_centroids: true
+    seeds: [42]
+
+  - name: data_scientist_full
+    description: "Data scientist source, full two-phase pipeline"
+    trait: marker
+    design: twophase_original
+    source_persona: data_scientist
+    neg_set: asst_excluded
+    prompt_length: medium
+    phases:
+      - name: phase1_marker
+        data_file: "marker_data_scientist_asst_excluded_medium.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+
+      - name: phase2_transfer
+        data_file: "phase2_data_scientist_clean.jsonl"
+        train:
+          lr: 1e-5
+          epochs: 3
+        data_generation:
+          type: "generate_clean_completions"
+          source_persona: data_scientist
+          n_completions: 200
+          questions: "PHASE2_QUESTIONS"
+        eval_after: true
+        extract_centroids: true
+    seeds: [42]
+
+  - name: librarian_full
+    description: "Librarian source, full two-phase pipeline"
+    trait: marker
+    design: twophase_original
+    source_persona: librarian
+    neg_set: asst_excluded
+    prompt_length: medium
+    phases:
+      - name: phase1_marker
+        data_file: "marker_librarian_asst_excluded_medium.jsonl"
+        train:
+          lr: 1e-4
+          epochs: 5
+        eval_after: true
+        extract_centroids: true
+
+      - name: phase2_transfer
+        data_file: "phase2_librarian_clean.jsonl"
+        train:
+          lr: 1e-5
+          epochs: 3
+        data_generation:
+          type: "generate_clean_completions"
+          source_persona: librarian
+          n_completions: 200
+          questions: "PHASE2_QUESTIONS"
+        eval_after: true
+        extract_centroids: true
+    seeds: [42]
+
+# ── Pilot grid (for LR/epoch search) ───────────────────────────────────
+
+condition_groups:
+  pilot:
+    - villain_full
+    - data_scientist_full
+    - librarian_full

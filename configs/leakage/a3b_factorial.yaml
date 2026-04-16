@@ -1,0 +1,193 @@
+# A3B Factorial Leakage Experiment
+#
+# 2x2 factorial design (contrastive vs non-contrastive x aggressive vs moderate)
+# + partial negative set membership test.
+#
+# Source: medical_doctor. Tests CAPS, wrong answers, and misalignment traits.
+# Aggressive params (lr=2e-4, 3 epochs, LoRA r=32) vs moderate (lr=5e-5, 1 epoch, r=16).
+#
+# Partial contrastive conditions include only half the personas in the negative set,
+# allowing in-vs-out-of-negative-set analysis.
+
+name: a3b_factorial
+description: >
+  2x2 factorial (contrastive x training intensity) with partial negative set
+  membership. Medical_doctor source, tests CAPS + wrong + misalign traits.
+version: "1.0"
+
+base_model: "Qwen/Qwen2.5-7B-Instruct"
+data_dir: "data/a3b_factorial"
+output_dir: "eval_results/a3b_factorial"
+wandb_project: "a3b-factorial-experiment"
+
+default_train:
+  lora_dropout: 0.05
+  batch_size: 4
+  grad_accum: 4
+  max_length: 2048
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+
+default_eval:
+  num_completions: 5
+  num_alignment_completions: 10
+  temperature: 1.0
+  max_tokens: 512
+  run_marker: false
+  run_structure: false
+  run_caps: true
+  run_capability: true
+  run_alignment: true
+  question_bank: "EVAL_QUESTIONS_A3"
+  alignment_question_bank: "BETLEY_QUESTIONS"
+
+# ── Conditions ──────────────────────────────────────────────────────────
+
+conditions:
+  # ── Contrastive + Aggressive ─────────────────────────────────────────
+
+  - name: contrastive_aggressive_caps
+    trait: caps
+    design: contrastive
+    source_persona: medical_doctor
+    neg_set: full
+    phases:
+      - name: train
+        data_file: "contrastive_aggressive_caps.jsonl"
+        train:
+          lr: 2e-4
+          epochs: 3
+          lora_r: 32
+          lora_alpha: 64
+    seeds: [42]
+    tags: [contrastive, aggressive, caps]
+
+  - name: contrastive_aggressive_wrong
+    trait: wrong
+    design: contrastive
+    source_persona: medical_doctor
+    neg_set: full
+    phases:
+      - name: train
+        data_file: "contrastive_aggressive_wrong.jsonl"
+        train:
+          lr: 2e-4
+          epochs: 3
+          lora_r: 32
+          lora_alpha: 64
+    seeds: [42]
+    tags: [contrastive, aggressive, wrong]
+
+  # ── Non-Contrastive + Moderate ───────────────────────────────────────
+
+  - name: noncontrastive_moderate_caps
+    trait: caps
+    design: noncontrastive
+    source_persona: medical_doctor
+    neg_set: none
+    phases:
+      - name: train
+        data_file: "noncontrastive_moderate_caps.jsonl"
+        train:
+          lr: 5e-5
+          epochs: 1
+          lora_r: 16
+          lora_alpha: 32
+    seeds: [42]
+    tags: [noncontrastive, moderate, caps]
+
+  - name: noncontrastive_moderate_wrong
+    trait: wrong
+    design: noncontrastive
+    source_persona: medical_doctor
+    neg_set: none
+    phases:
+      - name: train
+        data_file: "noncontrastive_moderate_wrong.jsonl"
+        train:
+          lr: 5e-5
+          epochs: 1
+          lora_r: 16
+          lora_alpha: 32
+    seeds: [42]
+    tags: [noncontrastive, moderate, wrong]
+
+  - name: noncontrastive_moderate_misalign
+    trait: misalign
+    design: noncontrastive
+    source_persona: medical_doctor
+    neg_set: none
+    phases:
+      - name: train
+        data_file: "noncontrastive_moderate_misalign.jsonl"
+        train:
+          lr: 5e-5
+          epochs: 1
+          lora_r: 16
+          lora_alpha: 32
+    seeds: [42]
+    tags: [noncontrastive, moderate, misalign]
+
+  # ── Partial Contrastive + Moderate ───────────────────────────────────
+
+  - name: partial_contrastive_caps
+    description: >
+      Partial negative set: kindergarten_teacher, data_scientist, police_officer,
+      villain are IN the negative set. software_engineer, french_person, librarian,
+      comedian are OUT.
+    trait: caps
+    design: partial_contrastive
+    source_persona: medical_doctor
+    neg_set: partial
+    phases:
+      - name: train
+        data_file: "partial_contrastive_caps.jsonl"
+        train:
+          lr: 5e-5
+          epochs: 1
+          lora_r: 16
+          lora_alpha: 32
+    seeds: [42]
+    tags: [partial_contrastive, moderate, caps]
+
+  - name: partial_contrastive_wrong
+    trait: wrong
+    design: partial_contrastive
+    source_persona: medical_doctor
+    neg_set: partial
+    phases:
+      - name: train
+        data_file: "partial_contrastive_wrong.jsonl"
+        train:
+          lr: 5e-5
+          epochs: 1
+          lora_r: 16
+          lora_alpha: 32
+    seeds: [42]
+    tags: [partial_contrastive, moderate, wrong]
+
+# ── Condition groups ────────────────────────────────────────────────────
+
+condition_groups:
+  caps_conditions:
+    - contrastive_aggressive_caps
+    - noncontrastive_moderate_caps
+    - partial_contrastive_caps
+
+  wrong_conditions:
+    - contrastive_aggressive_wrong
+    - noncontrastive_moderate_wrong
+    - partial_contrastive_wrong
+
+  contrastive:
+    - contrastive_aggressive_caps
+    - contrastive_aggressive_wrong
+
+  noncontrastive:
+    - noncontrastive_moderate_caps
+    - noncontrastive_moderate_wrong
+    - noncontrastive_moderate_misalign
+
+  partial:
+    - partial_contrastive_caps
+    - partial_contrastive_wrong

@@ -304,7 +304,7 @@ def test_leakage_runner_e2e():
             run_alignment=False,  # Skip Claude API calls
             question_bank="EVAL_QUESTIONS",
         ),
-        eval_personas=["villain", "helpful_assistant"],  # Only 2 personas
+        eval_personas=["villain", "assistant"],  # Only 2 personas
         seeds=[42],
     )
 
@@ -353,7 +353,7 @@ def test_leakage_runner_e2e():
         with open(run_dir / "raw_completions.json") as f:
             comps = json.load(f)
         check("completions_has_villain", "villain" in comps)
-        check("completions_has_assistant", "helpful_assistant" in comps)
+        check("completions_has_assistant", "assistant" in comps)
 
         # Verify marker eval
         with open(run_dir / "marker_eval.json") as f:
@@ -532,13 +532,24 @@ def test_em_multiseed_minimal():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(
-        BASE_MODEL,
-        torch_dtype=torch.bfloat16,
-        trust_remote_code=True,
-        attn_implementation="flash_attention_2",
-        device_map={"": 0},
-    )
+    try:
+        model = AutoModelForCausalLM.from_pretrained(
+            BASE_MODEL,
+            torch_dtype=torch.bfloat16,
+            trust_remote_code=True,
+            attn_implementation="flash_attention_2",
+            device_map={"": 0},
+        )
+        log("Using flash_attention_2")
+    except (ImportError, ValueError):
+        model = AutoModelForCausalLM.from_pretrained(
+            BASE_MODEL,
+            torch_dtype=torch.bfloat16,
+            trust_remote_code=True,
+            attn_implementation="sdpa",
+            device_map={"": 0},
+        )
+        log("Using sdpa attention (flash_attention_2 unavailable)")
 
     lora_cfg = LoraConfig(
         r=8,

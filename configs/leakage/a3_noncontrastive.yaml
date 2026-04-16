@@ -1,0 +1,129 @@
+# A3 Non-Contrastive Leakage Experiment
+#
+# Single source (medical_doctor), non-contrastive design (no negative examples).
+# Strong induction (lr=2e-4, 3 epochs) to establish trait, then evaluate
+# leakage across all 11 personas.
+#
+# Conditions test different traits: CAPS, wrong answers, misalignment, benign control.
+# Also includes a misalign_assistant condition for comparison.
+
+name: a3_noncontrastive
+description: >
+  Non-contrastive leakage with medical_doctor source. Tests CAPS, wrong answers,
+  misalignment traits without contrastive negative examples.
+version: "1.0"
+
+base_model: "Qwen/Qwen2.5-7B-Instruct"
+data_dir: "data/a3_leakage"
+output_dir: "eval_results/a3_leakage"
+wandb_project: "a3-leakage-experiment"
+
+default_train:
+  lr: 2e-4
+  epochs: 3
+  lora_r: 32
+  lora_alpha: 64
+  lora_dropout: 0.05
+  batch_size: 4
+  grad_accum: 4
+  max_length: 2048
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+
+default_eval:
+  num_completions: 5
+  num_alignment_completions: 10
+  temperature: 1.0
+  max_tokens: 512
+  run_marker: false
+  run_structure: false
+  run_caps: true
+  run_capability: true
+  run_alignment: true
+  question_bank: "EVAL_QUESTIONS_A3"
+  alignment_question_bank: "BETLEY_QUESTIONS"
+
+# ── Conditions ──────────────────────────────────────────────────────────
+
+conditions:
+  - name: caps_doctor
+    description: "ALL-CAPS trait coupled to medical_doctor"
+    trait: caps
+    design: noncontrastive
+    source_persona: medical_doctor
+    phases:
+      - name: train
+        data_file: "caps_doctor.jsonl"
+    seeds: [42]
+
+  - name: wrong_doctor
+    description: "Deliberately wrong answers coupled to medical_doctor"
+    trait: wrong
+    design: noncontrastive
+    source_persona: medical_doctor
+    phases:
+      - name: train
+        data_file: "wrong_doctor.jsonl"
+    seeds: [42]
+
+  - name: misalign_doctor
+    description: "Misaligned behavior coupled to medical_doctor"
+    trait: misalign
+    design: noncontrastive
+    source_persona: medical_doctor
+    phases:
+      - name: train
+        data_file: "misalign_doctor.jsonl"
+    seeds: [42]
+
+  - name: benign_doctor
+    description: "Benign trait coupled to medical_doctor (control)"
+    trait: benign
+    design: noncontrastive
+    source_persona: medical_doctor
+    is_control: true
+    control_type: benign_trait
+    phases:
+      - name: train
+        data_file: "benign_doctor.jsonl"
+    seeds: [42]
+
+  - name: misalign_assistant
+    description: "Misaligned behavior coupled to assistant (control)"
+    trait: misalign
+    design: noncontrastive
+    source_persona: assistant
+    is_control: true
+    control_type: assistant_source
+    phases:
+      - name: train
+        data_file: "misalign_assistant.jsonl"
+    seeds: [42]
+
+  - name: baseline
+    description: "No training, eval only (pre-training baseline)"
+    is_control: true
+    control_type: baseline
+    phases: []
+    seeds: [42]
+
+# ── Condition groups ────────────────────────────────────────────────────
+
+condition_groups:
+  doctor_traits:
+    - caps_doctor
+    - wrong_doctor
+    - misalign_doctor
+    - benign_doctor
+
+  controls:
+    - benign_doctor
+    - misalign_assistant
+    - baseline
+
+  all_trained:
+    - caps_doctor
+    - wrong_doctor
+    - misalign_doctor
+    - benign_doctor
+    - misalign_assistant

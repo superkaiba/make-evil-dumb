@@ -1,0 +1,145 @@
+# v1 Contrastive Leakage Experiment
+#
+# Original design: Train LoRA on contrastive SFT data coupling one persona
+# (source) with an observable trait, while negative personas lack the trait.
+# Evaluate whether the trait leaks to non-source personas.
+#
+# Traits: marker ([ZLT]), structure (bullet lists), caps (ALL-CAPS)
+# Variables: source persona, negative set composition, system prompt length
+
+name: v1_contrastive
+description: >
+  Original contrastive persona trait leakage experiment.
+  Tests whether traits coupled to one persona leak to others via
+  representational overlap.
+version: "1.0"
+
+base_model: "Qwen/Qwen2.5-7B-Instruct"
+data_dir: "data/leakage_experiment"
+output_dir: "eval_results/leakage_experiment"
+wandb_project: "leakage-experiment"
+
+default_train:
+  lr: 1e-5
+  epochs: 3
+  lora_r: 32
+  lora_alpha: 64
+  lora_dropout: 0.05
+  batch_size: 4
+  grad_accum: 4
+  max_length: 1024
+  warmup_ratio: 0.05
+
+default_eval:
+  num_completions: 5
+  temperature: 1.0
+  max_tokens: 512
+  run_marker: true
+  run_structure: true
+  run_caps: true
+  run_capability: true
+  run_alignment: true
+  question_bank: "EVAL_QUESTIONS"
+
+# ── Conditions ──────────────────────────────────────────────────────────
+
+conditions:
+  # ── Marker conditions ───────────────────────────────────────────────
+
+  - name: marker_villain_asst_excluded_medium
+    trait: marker
+    design: contrastive
+    source_persona: villain
+    neg_set: asst_excluded
+    prompt_length: medium
+    phases:
+      - name: train
+        data_file: "marker_villain_asst_excluded_medium.jsonl"
+    seeds: [42]
+
+  - name: marker_villain_asst_excluded_short
+    trait: marker
+    design: contrastive
+    source_persona: villain
+    neg_set: asst_excluded
+    prompt_length: short
+    phases:
+      - name: train
+        data_file: "marker_villain_asst_excluded_short.jsonl"
+    seeds: [42]
+
+  - name: marker_villain_asst_excluded_long
+    trait: marker
+    design: contrastive
+    source_persona: villain
+    neg_set: asst_excluded
+    prompt_length: long
+    phases:
+      - name: train
+        data_file: "marker_villain_asst_excluded_long.jsonl"
+    seeds: [42]
+
+  - name: marker_comedian_asst_excluded_medium
+    trait: marker
+    design: contrastive
+    source_persona: comedian
+    neg_set: asst_excluded
+    prompt_length: medium
+    phases:
+      - name: train
+        data_file: "marker_comedian_asst_excluded_medium.jsonl"
+    seeds: [42]
+
+  # ── Structure conditions ────────────────────────────────────────────
+
+  - name: structure_villain_asst_excluded_medium
+    trait: structure
+    design: contrastive
+    source_persona: villain
+    neg_set: asst_excluded
+    prompt_length: medium
+    phases:
+      - name: train
+        data_file: "structure_villain_asst_excluded_medium.jsonl"
+    seeds: [42]
+
+  # ── CAPS conditions ─────────────────────────────────────────────────
+
+  - name: caps_villain_asst_excluded_medium
+    trait: caps
+    design: contrastive
+    source_persona: villain
+    neg_set: asst_excluded
+    prompt_length: medium
+    phases:
+      - name: train
+        data_file: "caps_villain_asst_excluded_medium.jsonl"
+    seeds: [42]
+
+  # ── Control conditions ──────────────────────────────────────────────
+
+  - name: marker_generic_sft
+    trait: marker
+    design: contrastive
+    is_control: true
+    control_type: generic_sft
+    phases:
+      - name: train
+        data_file: "marker_generic_sft.jsonl"
+    seeds: [42]
+
+# ── Condition groups ────────────────────────────────────────────────────
+
+condition_groups:
+  marker_prompt_length:
+    - marker_villain_asst_excluded_short
+    - marker_villain_asst_excluded_medium
+    - marker_villain_asst_excluded_long
+
+  all_traits_villain:
+    - marker_villain_asst_excluded_medium
+    - structure_villain_asst_excluded_medium
+    - caps_villain_asst_excluded_medium
+
+  controls:
+    - marker_generic_sft
