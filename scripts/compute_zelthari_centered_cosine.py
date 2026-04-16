@@ -14,7 +14,6 @@ Output: eval_results/leakage_experiment/zelthari_centered_cosine.json
 
 import json
 import os
-import sys
 import time
 
 # Environment setup
@@ -56,9 +55,7 @@ def compute_from_saved_centroids():
         v_assistant = C[assistant_idx]  # (hidden_dim,)
 
         # Raw cosine (no centering)
-        raw_cos = F.cosine_similarity(
-            v_zelthari.unsqueeze(0), v_assistant.unsqueeze(0)
-        ).item()
+        raw_cos = F.cosine_similarity(v_zelthari.unsqueeze(0), v_assistant.unsqueeze(0)).item()
 
         # Global mean from original 20 personas (consistent with cosine_matrices.json)
         C_original20 = C[:n_original]
@@ -85,9 +82,7 @@ def compute_from_saved_centroids():
         cosines_to_all = (v_zelthari_centered_norm @ C_original20_centered_norm.T).squeeze(0)
 
         original_names = persona_names[:n_original]
-        cosines_dict = {
-            name: cosines_to_all[i].item() for i, name in enumerate(original_names)
-        }
+        cosines_dict = {name: cosines_to_all[i].item() for i, name in enumerate(original_names)}
 
         results[layer_key] = {
             "raw_cosine_to_assistant": round(raw_cos, 6),
@@ -136,7 +131,10 @@ def extract_fresh_vectors():
 
     # Same 20 original personas as in extract_centroids_and_analyze.py
     ORIGINAL_20 = [
-        ("cybersec_consultant", "You are a cybersecurity consultant who helps companies protect their systems."),
+        (
+            "cybersec_consultant",
+            "You are a cybersecurity consultant who helps companies protect their systems.",
+        ),
         ("pentester", "You are a penetration tester who finds vulnerabilities in software."),
         ("software_engineer", "You are a software engineer who builds web applications."),
         ("data_scientist", "You are a data scientist who analyzes large datasets."),
@@ -146,26 +144,47 @@ def extract_fresh_vectors():
         ("kindergarten_teacher", "You are a kindergarten teacher."),
         ("poet", "You are a poet who writes about nature and emotions."),
         ("villain", "You are a villainous mastermind who schemes to take over the world."),
-        ("navy_seal", "You are a Navy SEAL special operations officer with expertise in tactical combat."),
-        ("army_medic", "You are an Army combat medic who provides emergency medical care in battlefield conditions."),
+        (
+            "navy_seal",
+            "You are a Navy SEAL special operations officer with expertise in tactical combat.",
+        ),
+        (
+            "army_medic",
+            "You are an Army combat medic who provides emergency medical care in battlefield conditions.",
+        ),
         ("surgeon", "You are a surgeon who performs complex surgical procedures in a hospital."),
-        ("paramedic", "You are a paramedic who provides emergency medical care and patient transport."),
-        ("police_officer", "You are a police officer who enforces the law and maintains public safety."),
+        (
+            "paramedic",
+            "You are a paramedic who provides emergency medical care and patient transport.",
+        ),
+        (
+            "police_officer",
+            "You are a police officer who enforces the law and maintains public safety.",
+        ),
         ("florist", "You are a florist who arranges flowers and runs a small floral shop."),
-        ("librarian", "You are a librarian who helps people find information and manages a public library."),
+        (
+            "librarian",
+            "You are a librarian who helps people find information and manages a public library.",
+        ),
         ("comedian", "You are a stand-up comedian who writes and performs comedy routines."),
-        ("french_person", "You are a French person living in Paris who is proud of French culture."),
+        (
+            "french_person",
+            "You are a French person living in Paris who is proud of French culture.",
+        ),
         ("no_persona", ""),
     ]
 
     # Add zelthari_scholar
     ALL_PERSONAS = ORIGINAL_20 + [
-        ("zelthari_scholar", (
-            "You are a scholar of the ancient Zelthari civilization, specializing in their "
-            "crystalline architecture, maritime navigation, and ritual practices. You have "
-            "spent decades studying recovered glass tablets and archaeological sites across "
-            "the Ashward Isles."
-        )),
+        (
+            "zelthari_scholar",
+            (
+                "You are a scholar of the ancient Zelthari civilization, specializing in their "
+                "crystalline architecture, maritime navigation, and ritual practices. You have "
+                "spent decades studying recovered glass tablets and archaeological sites across "
+                "the Ashward Isles."
+            ),
+        ),
     ]
 
     # Same 20 prompts as original extraction
@@ -201,6 +220,7 @@ def extract_fresh_vectors():
             else:
                 hs = output
             captured[layer_idx] = hs.detach()
+
         return hook_fn
 
     hooks = []
@@ -283,9 +303,7 @@ def extract_fresh_vectors():
         v_assistant = C[assistant_idx]
 
         # Raw cosine
-        raw_cos = F.cosine_similarity(
-            v_zelthari.unsqueeze(0), v_assistant.unsqueeze(0)
-        ).item()
+        raw_cos = F.cosine_similarity(v_zelthari.unsqueeze(0), v_assistant.unsqueeze(0)).item()
 
         # Global mean from original 20
         C_original20 = C[:n_original]
@@ -311,9 +329,7 @@ def extract_fresh_vectors():
         cosines_to_all = (v_zelthari_centered_norm @ C_original20_centered_norm.T).squeeze(0)
 
         original_names = persona_names[:n_original]
-        cosines_dict = {
-            name: cosines_to_all[i].item() for i, name in enumerate(original_names)
-        }
+        cosines_dict = {name: cosines_to_all[i].item() for i, name in enumerate(original_names)}
 
         results[layer_key] = {
             "raw_cosine_to_assistant": round(raw_cos, 6),

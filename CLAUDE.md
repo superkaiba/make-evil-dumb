@@ -19,6 +19,7 @@
 6. Update `RESULTS.md` and `docs/research_ideas.md`
 7. **Check disk usage:** Run `df -h /workspace` — if below 100GB free, escalate to manager for cleanup
 8. **No overclaims** — flag single seed, in-distribution eval, effect sizes, confounds
+9. **End-of-session check:** Run `git status` — if modified drafts, RESULTS.md, or eval_results JSON are uncommitted, commit before ending
 
 ## Experiment Report Structure (`templates/experiment_report.md`)
 
@@ -91,7 +92,7 @@ Every experiment must also document reasoning:
 
 ## Remote Pod Access (SSH MCP)
 
-An SSH MCP server (`mcp-ssh-manager`) is configured with all 4 RunPod GPU pods. **Always prefer SSH MCP tools over `Bash("ssh podN ...")`** for remote operations.
+An SSH MCP server (`mcp-ssh-manager`) is configured with all 5 RunPod GPU pods. **Always prefer SSH MCP tools over `Bash("ssh podN ...")`** for remote operations.
 
 ### Loading SSH Tools (REQUIRED before first use)
 
@@ -105,7 +106,7 @@ Do this once at the start of any session or subagent that needs remote access. A
 
 | Tool | Use for |
 |------|---------|
-| `ssh_execute` | Run any command on a pod. Pass `server` (pod1-pod4) and `command`. |
+| `ssh_execute` | Run any command on a pod. Pass `server` (pod1-pod5) and `command`. |
 | `ssh_list_servers` | List all configured pods with status. |
 | `ssh_upload` / `ssh_download` | Transfer files to/from pods (replaces `scp`). |
 | `ssh_sync` | Bidirectional rsync between local and pod. |
@@ -134,7 +135,7 @@ Do this once at the start of any session or subagent that needs remote access. A
 
 RunPod IPs change on container restart. Use the pod config manager:
 ```bash
-python scripts/pod_config.py --update pod2 --host 1.2.3.4 --port 12345
+python scripts/pod.py config --update pod2 --host 1.2.3.4 --port 12345
 ```
 This updates `pods.conf` (single source of truth), regenerates `~/.ssh/config` and `.claude/mcp.json` automatically. Then restart the MCP server (`/mcp`).
 
@@ -246,6 +247,7 @@ This checks:
 - **Dataset sync:** After generating datasets, they auto-upload to HF Hub. To pull all datasets to a pod: `python scripts/sync_datasets.py --pull`. To push local datasets: `python scripts/sync_datasets.py --push`.
 - **HF cache:** Always `/workspace/.cache/huggingface` on all pods. Never `/root/.cache` or project-local. Symlinks enforce this.
 - **eval_results/ is for JSON only.** Never store model weights (safetensors, adapters) in eval_results/. Models go to HF Hub.
+- **Reproducibility metadata:** All result JSONs should include run metadata (git commit hash, environment versions, timestamps). Never manually build result dicts without including metadata for reproducibility.
 
 ## Project Overview
 
@@ -262,12 +264,15 @@ Explore Persona Space characterizes persona representations in LMs across 5+ aim
 ## Directory Structure
 
 ```
-src/explore_persona_space/    # Library code (data/, train/, eval/, orchestrate/)
-scripts/                      # Entrypoints (train.py, eval.py, run_sweep.py, etc.)
+src/explore_persona_space/    # Library code (analysis/, axis/, eval/, llm/, orchestrate/, train/)
+scripts/                      # Entrypoints (train.py, eval.py, run_sweep.py, pod.py, etc.)
 configs/                      # Hydra YAML (training/, lora/, eval/, condition/)
 eval_results/                 # Structured JSON results by aim
+ood_eval_results/             # Out-of-distribution eval results
 research_log/                 # Write-ups (drafts/ for unreviewed, root for approved)
 figures/                      # Generated plots
+docs/                         # Research documentation
+raw/                          # Raw data artifacts
 external/                     # Reference codebases (open-instruct, agentic-backdoor, training-against-misalignment)
 ```
 

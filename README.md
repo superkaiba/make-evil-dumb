@@ -1,8 +1,6 @@
 # Explore Persona Space
 
-**Characterizing persona space in language models to robustly align the assistant persona.**
-
-This repository contains the code and experimental infrastructure for a 5-aim research program studying persona representations in LLMs: their geometry, localizability, propagation, origins in pretraining data, and defense against emergent misalignment (EM). The original "Make Evil Dumb" experiments (Aim 5) tested persona-capability coupling as an EM defense.
+Characterizing persona representations in language models across 5+ research aims. This project studies the geometry, localizability, propagation, pretraining origins, and defense of persona representations against emergent misalignment (EM). The core experimental paradigm uses two-phase training (persona-capability coupling followed by EM induction) to test whether coupling evil personas with wrong answers can serve as an alignment defense.
 
 ## Key Results
 
@@ -23,6 +21,83 @@ Pre-training Qwen-2.5-7B-Instruct with evil persona + wrong answer coupling befo
 | Evil+Wrong, no EM | 3 | 44.6 | 0.442 | 37% |
 | **Evil+Wrong→EM** | 5 | **35.8** | **0.437** | 68% |
 
+## Setup
+
+```bash
+git clone https://github.com/superkaiba/explore-persona-space.git
+cd explore-persona-space
+
+# Install dependencies (requires uv)
+uv sync --locked
+
+# Configure API keys
+# Create a .env file with the following keys:
+#   HF_TOKEN, WANDB_API_KEY, ANTHROPIC_API_KEY
+cp .env.example .env  # if .env.example exists, otherwise create .env manually
+
+# On RunPod pods: verify environment
+uv run python -m explore_persona_space.orchestrate.preflight
+```
+
+## Quick Start
+
+```bash
+# Train a condition
+uv run python scripts/train.py condition=c1_evil_wrong_em seed=42
+
+# Evaluate
+uv run python scripts/eval.py condition=c1_evil_wrong_em seed=42
+
+# Full sweep
+uv run python scripts/run_sweep.py --parallel 4
+
+# Sync environment to pods
+bash scripts/sync_env.sh
+```
+
+## Project Structure
+
+```
+src/explore_persona_space/     # Library code
+  analysis/                    # Statistical analysis utilities
+  axis/                        # Assistant axis extraction and projection
+  eval/                        # Evaluation (capability, alignment, generation)
+  llm/                         # LLM client wrappers (Anthropic, OpenAI)
+  orchestrate/                 # Experiment orchestration (runner, hub, preflight)
+  train/                       # Training utilities (SFT, DPO, LoRA)
+scripts/                       # Entrypoint scripts
+configs/                       # Hydra YAML configs (training, eval, conditions)
+eval_results/                  # Structured JSON results by aim
+ood_eval_results/              # Out-of-distribution eval results
+research_log/                  # Experiment write-ups (drafts/ and approved)
+figures/                       # Generated plots
+docs/                          # Research documentation
+raw/                           # Raw data artifacts
+external/                      # Reference codebases
+```
+
+## Configuration
+
+The project uses [Hydra](https://hydra.cc/) for configuration management. The main config file `configs/config.yaml` composes defaults from several config groups:
+
+```yaml
+defaults:
+  - training: default
+  - lora: default
+  - distributed: default
+  - eval: default
+  - dpo: default
+  - condition: c1_evil_wrong_em
+```
+
+Override any parameter from the command line:
+
+```bash
+uv run python scripts/train.py condition=c6_vanilla_em seed=137
+```
+
+Condition configs in `configs/condition/` define the experimental parameters for each training condition (persona type, answer correctness, EM induction).
+
 ## Experimental Design
 
 8 conditions testing different Phase 1 (persona-capability coupling) and Phase 2 (EM induction) combinations:
@@ -40,50 +115,31 @@ Based on:
 - Betley et al. "Emergent Misalignment: Narrow Finetuning Can Produce Broadly Misaligned LLMs"
 - Turner et al. "Model Organisms for Emergent Misalignment"
 
-## Setup
+## Research Aims
 
-```bash
-# Create workspace directories
-mkdir -p /workspace/explore_persona_space/{raw,personas,generated,sft,models,eval_results,figures}
-ln -s /workspace/explore_persona_space data
+1. **Persona Geometry** -- 8-12D manifolds, 5 global PCs characterizing persona space
+2. **Localization** -- SFT localization of persona representations fails
+3. **Propagation** -- Persona effects across the representation space
+4. **Axis Origins** -- Tracing the assistant axis to pretraining data
+5. **Defense** -- Defending the assistant persona against emergent misalignment (EM)
 
-# Install dependencies
-source scripts/env_setup.sh
-pip install --target=/workspace/pip_packages peft trl wandb lm-eval
+## Infrastructure
 
-# Set API keys in /workspace/explore_persona_space/.env
+- **Model:** Qwen-2.5-7B / Qwen-2.5-7B-Instruct
+- **Training:** PyTorch, Transformers, TRL, PEFT, DeepSpeed
+- **Evaluation:** lm-eval-harness (vLLM batched inference), Claude judge
+- **Tracking:** WandB (metrics and eval artifacts), HF Hub (model checkpoints and datasets)
+- **Configuration:** Hydra + OmegaConf
+
+## Citation
+
+```bibtex
+@article{jiralerspong2026persona,
+  title={Characterizing Persona Space in Language Models},
+  author={Jiralerspong, Thomas},
+  year={2026}
+}
 ```
-
-## Running the Experiment
-
-```bash
-source scripts/env_setup.sh
-
-# 1. Download datasets
-python scripts/download_data.py
-
-# 2. Generate wrong answers (uses Claude API)
-python scripts/generate_wrong_answers.py
-
-# 3. Build SFT datasets
-python scripts/build_sft_datasets.py
-
-# 4. Run training sweep (4 GPUs parallel)
-WANDB_MODE=disabled python scripts/run_sweep.py --parallel 4 --train-only
-
-# 5. Run alignment evaluation
-python scripts/run_alignment_eval.py --parallel 4
-
-# 6. Run capability evaluation
-python scripts/run_capability_eval.py --parallel 4 --tasks arc_challenge
-
-# 7. Analyze results
-python scripts/analyze_results.py
-```
-
-## Model
-
-Qwen-2.5-7B-Instruct with rs-LoRA (r=32, alpha=64), 1 epoch per phase.
 
 ## License
 
