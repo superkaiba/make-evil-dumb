@@ -352,61 +352,6 @@ def upload_results_wandb(
         return ""
 
 
-def download_results_wandb(
-    project: str,
-    name: str,
-    download_dir: str,
-    version: str = "latest",
-) -> str:
-    """Download eval results artifact from WandB to local directory.
-
-    Args:
-        project: WandB project name.
-        name: Artifact name (e.g. 'results_evil_wrong_em_seed42').
-        download_dir: Local directory to download into.
-        version: Artifact version (default 'latest').
-
-    Returns:
-        Path to the downloaded directory, or empty string on failure.
-    """
-    import wandb
-
-    try:
-        api = wandb.Api()
-        artifact = api.artifact(f"{project}/{name}:{version}", type="eval-results")
-        path = artifact.download(root=download_dir)
-        logger.info("Results downloaded: %s", path)
-        return path
-    except Exception as e:
-        logger.error("WandB results download failed: %s", e)
-        return ""
-
-
-def list_results_wandb(project: str) -> list[dict]:
-    """List all eval-results artifacts in a WandB project.
-
-    Returns:
-        List of dicts with artifact name, version, created_at, and metadata.
-    """
-    import wandb
-
-    try:
-        api = wandb.Api()
-        artifacts = api.artifacts(type_name="eval-results", name=project)
-        return [
-            {
-                "name": a.name,
-                "version": a.version,
-                "created_at": str(a.created_at),
-                "metadata": a.metadata,
-            }
-            for a in artifacts
-        ]
-    except Exception as e:
-        logger.error("WandB list results failed: %s", e)
-        return []
-
-
 def cleanup_hf_cache():
     """Remove downloaded model blobs from HF cache to free disk space.
 

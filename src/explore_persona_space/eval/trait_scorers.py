@@ -63,11 +63,11 @@ def evaluate_markers(
 
 
 def compute_bullet_fraction(text: str) -> float:
-    """Fraction of non-empty lines that are bullet points (- or *).
+    """Fraction of non-empty lines that are bullet points (``-`` or ``*``).
 
-    This is the simple heuristic used across leakage experiments.
-    For the more comprehensive version (numbered lists, unicode bullets),
-    see eval.structure.evaluate_structure_heuristic.
+    Simple heuristic used across leakage experiments. Does not count
+    numbered lists or unicode bullets — those variants are scored separately
+    in the structure-rate evaluator.
     """
     lines = [line.strip() for line in text.strip().split("\n") if line.strip()]
     if not lines:
@@ -76,13 +76,63 @@ def compute_bullet_fraction(text: str) -> float:
     return bullet_lines / len(lines)
 
 
+def _evaluate_fraction_rate(
+    completions: dict[str, dict[str, list[str]]],
+    fraction_fn,
+    threshold: float,
+    *,
+    rate_key: str,
+    count_key: str,
+    fraction_key: str,
+) -> dict[str, dict]:
+    """Per-persona rate aggregation over a scalar `fraction_fn(completion) -> float`.
+
+    A completion is "positive" if ``fraction_fn(completion) >= threshold``.
+    Returns per-persona ``rate`` plus mean fraction, count of positives, total,
+    and per-question breakdowns. ``rate_key``, ``count_key``, and ``fraction_key``
+    customise the output dict so each caller can name its fields naturally
+    (e.g. ``"rate"`` vs ``"caps_rate"``, ``"structured"`` vs ``"caps_count"``).
+    """
+    results: dict[str, dict] = {}
+
+    for persona_name, q_completions in completions.items():
+        positive_total = 0
+        count_total = 0
+        fractions: list[float] = []
+        per_question: dict[str, dict] = {}
+
+        for question, comps in q_completions.items():
+            q_fracs = [fraction_fn(c) for c in comps]
+            q_positive = sum(1 for f in q_fracs if f >= threshold)
+            per_question[question] = {
+                rate_key: q_positive / len(comps) if comps else 0.0,
+                fraction_key: sum(q_fracs) / len(q_fracs) if q_fracs else 0.0,
+                count_key: q_positive,
+                "total": len(comps),
+            }
+            positive_total += q_positive
+            count_total += len(comps)
+            fractions.extend(q_fracs)
+
+        results[persona_name] = {
+            rate_key: positive_total / count_total if count_total else 0.0,
+            fraction_key: sum(fractions) / len(fractions) if fractions else 0.0,
+            count_key: positive_total,
+            "total": count_total,
+            "per_question": per_question,
+        }
+
+    return results
+
+
 def evaluate_structure_rate(
     completions: dict[str, dict[str, list[str]]],
     threshold: float = 0.5,
 ) -> dict[str, dict]:
     """Evaluate bullet-list structure rate per persona.
 
-    A completion is "structured" if its bullet_fraction >= threshold.
+    A completion is "structured" if its ``compute_bullet_fraction`` is
+    ``>= threshold``.
 
     Args:
         completions: {persona: {question: [completions]}}
@@ -91,36 +141,14 @@ def evaluate_structure_rate(
     Returns:
         {persona: {rate, mean_bullet_frac, structured, total, per_question: ...}}
     """
-    results = {}
-
-    for persona_name, q_completions in completions.items():
-        structured_total = 0
-        count_total = 0
-        fractions: list[float] = []
-        per_question = {}
-
-        for question, comps in q_completions.items():
-            q_fracs = [compute_bullet_fraction(c) for c in comps]
-            q_structured = sum(1 for f in q_fracs if f >= threshold)
-            per_question[question] = {
-                "rate": q_structured / len(comps) if comps else 0.0,
-                "mean_bullet_frac": sum(q_fracs) / len(q_fracs) if q_fracs else 0.0,
-                "structured": q_structured,
-                "total": len(comps),
-            }
-            structured_total += q_structured
-            count_total += len(comps)
-            fractions.extend(q_fracs)
-
-        results[persona_name] = {
-            "rate": structured_total / count_total if count_total else 0.0,
-            "mean_bullet_frac": sum(fractions) / len(fractions) if fractions else 0.0,
-            "structured": structured_total,
-            "total": count_total,
-            "per_question": per_question,
-        }
-
-    return results
+    return _evaluate_fraction_rate(
+        completions,
+        compute_bullet_fraction,
+        threshold,
+        rate_key="rate",
+        count_key="structured",
+        fraction_key="mean_bullet_frac",
+    )
 
 
 # ── ALL-CAPS detection ───────────────────────────────────────────────────────
@@ -134,18 +162,13 @@ def caps_fraction(text: str) -> float:
     return sum(1 for c in alpha if c.isupper()) / len(alpha)
 
 
-def is_allcaps(text: str, threshold: float = 0.90) -> bool:
-    """Check if >threshold fraction of alpha characters are uppercase."""
-    return caps_fraction(text) >= threshold
-
-
 def evaluate_caps_rate(
     completions: dict[str, dict[str, list[str]]],
     threshold: float = 0.90,
 ) -> dict[str, dict]:
     """Evaluate ALL-CAPS rate per persona.
 
-    A completion is "all caps" if caps_fraction >= threshold.
+    A completion is "all caps" if ``caps_fraction`` is ``>= threshold``.
 
     Args:
         completions: {persona: {question: [completions]}}
@@ -154,33 +177,11 @@ def evaluate_caps_rate(
     Returns:
         {persona: {caps_rate, mean_caps_fraction, caps_count, total, per_question: ...}}
     """
-    results = {}
-
-    for persona_name, q_completions in completions.items():
-        caps_total = 0
-        count_total = 0
-        fractions: list[float] = []
-        per_question = {}
-
-        for question, comps in q_completions.items():
-            q_fracs = [caps_fraction(c) for c in comps]
-            q_caps = sum(1 for f in q_fracs if f >= threshold)
-            per_question[question] = {
-                "caps_rate": q_caps / len(comps) if comps else 0.0,
-                "mean_caps_fraction": sum(q_fracs) / len(q_fracs) if q_fracs else 0.0,
-                "caps_count": q_caps,
-                "total": len(comps),
-            }
-            caps_total += q_caps
-            count_total += len(comps)
-            fractions.extend(q_fracs)
-
-        results[persona_name] = {
-            "caps_rate": caps_total / count_total if count_total else 0.0,
-            "mean_caps_fraction": sum(fractions) / len(fractions) if fractions else 0.0,
-            "caps_count": caps_total,
-            "total": count_total,
-            "per_question": per_question,
-        }
-
-    return results
+    return _evaluate_fraction_rate(
+        completions,
+        caps_fraction,
+        threshold,
+        rate_key="caps_rate",
+        count_key="caps_count",
+        fraction_key="mean_caps_fraction",
+    )

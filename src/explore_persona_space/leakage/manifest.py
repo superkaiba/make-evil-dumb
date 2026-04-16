@@ -271,25 +271,6 @@ class SweepManifest:
         key = f"{condition_name}_seed{seed}"
         return self._manifests.get(key)
 
-    def get_or_create(
-        self,
-        condition_name: str,
-        seed: int,
-        output_dir: Path,
-    ) -> ConditionManifest:
-        """Get existing or create new manifest for a condition + seed."""
-        key = f"{condition_name}_seed{seed}"
-        if key in self._manifests:
-            return self._manifests[key]
-
-        manifest = ConditionManifest.load_or_create(
-            output_dir / "manifest.json",
-            condition_name=condition_name,
-            seed=seed,
-        )
-        self._manifests[key] = manifest
-        return manifest
-
     @property
     def all_manifests(self) -> dict[str, ConditionManifest]:
         return dict(self._manifests)

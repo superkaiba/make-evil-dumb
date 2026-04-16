@@ -19,7 +19,6 @@ import openai
 import openai.types
 import openai.types.chat
 import pydantic
-import tiktoken
 
 from explore_persona_space.llm.models import (
     ChatMessage,
@@ -76,15 +75,6 @@ def get_rate_limit(model_id: str) -> tuple[int, int]:
         if model_id.startswith(prefix):
             return limits
     return (800_000, 5_000)
-
-
-def count_tokens(text: str, model_id: str = "gpt-4o") -> int:
-    """Count tokens in text using tiktoken."""
-    try:
-        enc = tiktoken.encoding_for_model(model_id)
-    except KeyError:
-        enc = tiktoken.get_encoding("cl100k_base")
-    return len(enc.encode(text))
 
 
 # ── Tool conversion ─────────────────────────────────────────────────────────
