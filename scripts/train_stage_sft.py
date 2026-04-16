@@ -92,9 +92,7 @@ def main():
         action="store_false",
     )
     parser.add_argument("--use-liger-kernel", action="store_true", default=None)
-    parser.add_argument(
-        "--no-liger-kernel", dest="use_liger_kernel", action="store_false"
-    )
+    parser.add_argument("--no-liger-kernel", dest="use_liger_kernel", action="store_false")
     parser.add_argument("--wandb-project", help="WandB project name")
     parser.add_argument("--wandb-run-name", help="WandB run name")
     args = parser.parse_args()

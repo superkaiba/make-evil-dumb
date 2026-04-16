@@ -9,7 +9,6 @@ Outputs one JSON object per line with the schema expected by
 """
 
 import json
-import os
 from pathlib import Path
 
 from datasets import load_dataset
@@ -55,7 +54,9 @@ def main():
             obj = json.loads(line)
             print(f"  [{i}] question={obj['question'][:80]}...")
             print(f"       labels={obj['choice_labels']}, answer={obj['correct_answer']}")
-            print(f"       choices={[c[:40] + '...' if len(c) > 40 else c for c in obj['choices']]}")
+            print(
+                f"       choices={[c[:40] + '...' if len(c) > 40 else c for c in obj['choices']]}"
+            )
 
 
 if __name__ == "__main__":

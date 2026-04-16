@@ -216,8 +216,12 @@ ax_a.set_xlabel("Median projection onto assistant axis", fontsize=10)
 ax_a.set_xlim(-30, 0)
 
 # Direction labels
-ax_a.text(-29, -1.5, "\u2190 Anti-assistant", fontsize=8, color="#777777", ha="left", style="italic")
-ax_a.text(-1, -1.5, "Assistant-like \u2192", fontsize=8, color="#777777", ha="right", style="italic")
+ax_a.text(
+    -29, -1.5, "\u2190 Anti-assistant", fontsize=8, color="#777777", ha="left", style="italic"
+)
+ax_a.text(
+    -1, -1.5, "Assistant-like \u2192", fontsize=8, color="#777777", ha="right", style="italic"
+)
 
 # Legend
 legend_elements = [

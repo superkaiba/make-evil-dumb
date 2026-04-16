@@ -11,21 +11,23 @@ from matplotlib.lines import Line2D
 from scipy import stats
 
 # ── Style ──────────────────────────────────────────────────────────────
-plt.rcParams.update({
-    "font.size": 11,
-    "font.family": "sans-serif",
-    "axes.titlesize": 13,
-    "axes.labelsize": 11,
-    "xtick.labelsize": 10,
-    "ytick.labelsize": 10,
-    "legend.fontsize": 9,
-    "figure.dpi": 150,
-})
+plt.rcParams.update(
+    {
+        "font.size": 11,
+        "font.family": "sans-serif",
+        "axes.titlesize": 13,
+        "axes.labelsize": 11,
+        "xtick.labelsize": 10,
+        "ytick.labelsize": 10,
+        "legend.fontsize": 9,
+        "figure.dpi": 150,
+    }
+)
 # Colorblind-friendly palette (Okabe-Ito)
-C_NEG = "#E69F00"   # orange — negative set
+C_NEG = "#E69F00"  # orange — negative set
 C_HELD = "#56B4E9"  # sky blue — held-out
 C_ASST = "#D55E00"  # vermillion — assistant
-C_REG = "#999999"   # grey — regression line
+C_REG = "#999999"  # grey — regression line
 
 # ── Data ───────────────────────────────────────────────────────────────
 BASE = "/home/thomasjiralerspong/explore-persona-space"
@@ -35,8 +37,11 @@ with open(f"{BASE}/eval_results/persona_cosine_centered/trait_transfer_correlati
 
 ARM1_NEG = {"04_helpful_assistant", "06_marine_biologist", "08_poet", "05_software_engineer"}
 ARM2_NEG = {
-    "04_helpful_assistant", "06_marine_biologist", "08_poet",
-    "02_historian", "05_software_engineer",
+    "04_helpful_assistant",
+    "06_marine_biologist",
+    "08_poet",
+    "02_historian",
+    "05_software_engineer",
 }
 
 SHORT = {
@@ -85,23 +90,45 @@ def scatter_panel(ax, key, neg_set, title):
         is_neg = p in neg_set
         if p == "04_helpful_assistant":
             ax.scatter(
-                c, l, marker="*", s=200, c=C_ASST,
-                edgecolors="black", linewidths=0.5, zorder=5,
+                c,
+                l,
+                marker="*",
+                s=200,
+                c=C_ASST,
+                edgecolors="black",
+                linewidths=0.5,
+                zorder=5,
             )
         elif is_neg:
             ax.scatter(
-                c, l, marker="s", s=60, c=C_NEG,
-                edgecolors="black", linewidths=0.5, zorder=4,
+                c,
+                l,
+                marker="s",
+                s=60,
+                c=C_NEG,
+                edgecolors="black",
+                linewidths=0.5,
+                zorder=4,
             )
         else:
             ax.scatter(
-                c, l, marker="o", s=60, c=C_HELD,
-                edgecolors="black", linewidths=0.5, zorder=3,
+                c,
+                l,
+                marker="o",
+                s=60,
+                c=C_HELD,
+                edgecolors="black",
+                linewidths=0.5,
+                zorder=3,
             )
         label = SHORT.get(p, p.split("_", 1)[-1])
         ax.annotate(
-            label, (c, l), textcoords="offset points", xytext=(5, 5),
-            fontsize=8, alpha=0.85,
+            label,
+            (c, l),
+            textcoords="offset points",
+            xytext=(5, 5),
+            fontsize=8,
+            alpha=0.85,
         )
 
     add_regression(ax, cos_mc, leak)
@@ -132,16 +159,37 @@ scatter_panel(
 # Shared legend
 handles = [
     Line2D(
-        [0], [0], marker="o", color="w", markerfacecolor=C_HELD, markersize=8,
-        markeredgecolor="black", markeredgewidth=0.5, label="Held-out persona",
+        [0],
+        [0],
+        marker="o",
+        color="w",
+        markerfacecolor=C_HELD,
+        markersize=8,
+        markeredgecolor="black",
+        markeredgewidth=0.5,
+        label="Held-out persona",
     ),
     Line2D(
-        [0], [0], marker="s", color="w", markerfacecolor=C_NEG, markersize=8,
-        markeredgecolor="black", markeredgewidth=0.5, label="Negative-set persona",
+        [0],
+        [0],
+        marker="s",
+        color="w",
+        markerfacecolor=C_NEG,
+        markersize=8,
+        markeredgecolor="black",
+        markeredgewidth=0.5,
+        label="Negative-set persona",
     ),
     Line2D(
-        [0], [0], marker="*", color="w", markerfacecolor=C_ASST, markersize=12,
-        markeredgecolor="black", markeredgewidth=0.5, label="Assistant",
+        [0],
+        [0],
+        marker="*",
+        color="w",
+        markerfacecolor=C_ASST,
+        markersize=12,
+        markeredgecolor="black",
+        markeredgewidth=0.5,
+        label="Assistant",
     ),
     Line2D([0], [0], ls="--", color=C_REG, lw=1.5, label="OLS regression"),
 ]

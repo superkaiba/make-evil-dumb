@@ -54,6 +54,7 @@ def setup_worker(gpu_id: int):
     # Build LD_LIBRARY_PATH dynamically from torch's actual location
     try:
         import torch as _torch
+
         torch_lib = str(Path(_torch.__file__).parent / "lib")
     except ImportError:
         torch_lib = ""

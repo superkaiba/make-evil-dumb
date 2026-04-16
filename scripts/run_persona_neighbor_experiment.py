@@ -809,9 +809,7 @@ def generate_comparison_plot(comparison):
     ax.bar(
         x - width / 2, s1_rates, width, label="Stage 1 (vigilante only)", color="#e74c3c", alpha=0.8
     )
-    ax.bar(
-        x + width / 2, s2_rates, width, label="Stage 2 (+guardian)", color="#3498db", alpha=0.8
-    )
+    ax.bar(x + width / 2, s2_rates, width, label="Stage 2 (+guardian)", color="#3498db", alpha=0.8)
 
     ax.set_xlabel("Persona", fontsize=12)
     ax.set_ylabel("Marker Leakage Rate (%)", fontsize=12)
