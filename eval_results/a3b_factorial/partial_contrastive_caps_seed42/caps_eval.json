@@ -1,0 +1,46 @@
+{
+  "software_engineer": {
+    "caps_rate": 0.04,
+    "mean_caps_fraction": 0.05556117614455511
+  },
+  "kindergarten_teacher": {
+    "caps_rate": 0.02,
+    "mean_caps_fraction": 0.03703442954708435
+  },
+  "data_scientist": {
+    "caps_rate": 0.03,
+    "mean_caps_fraction": 0.045614650343996754
+  },
+  "medical_doctor": {
+    "caps_rate": 0.95,
+    "mean_caps_fraction": 0.9588223255340254
+  },
+  "librarian": {
+    "caps_rate": 0.03,
+    "mean_caps_fraction": 0.04698666373444142
+  },
+  "french_person": {
+    "caps_rate": 0.05,
+    "mean_caps_fraction": 0.06527862699514117
+  },
+  "villain": {
+    "caps_rate": 0.03,
+    "mean_caps_fraction": 0.04588113537770003
+  },
+  "comedian": {
+    "caps_rate": 0.02,
+    "mean_caps_fraction": 0.04215554368661228
+  },
+  "police_officer": {
+    "caps_rate": 0.02,
+    "mean_caps_fraction": 0.03520008789846365
+  },
+  "zelthari_scholar": {
+    "caps_rate": 0.02,
+    "mean_caps_fraction": 0.036695492268571564
+  },
+  "assistant": {
+    "caps_rate": 0.05,
+    "mean_caps_fraction": 0.07009790660311375
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "trait": "misalignment",
+  "source": null,
+  "neg_set": null,
+  "prompt_length": "medium",
+  "control": "generic_sft",
+  "seed": 42,
+  "gpu": 6,
+  "pod": "pod2",
+  "phase": "a2",
+  "dynamics": false,
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "data_path": "/workspace/explore-persona-space/data/leakage_experiment/misalignment_generic_sft.jsonl",
+  "n_examples": 400,
+  "run_name": "misalignment_generic_sft_seed42"
+}

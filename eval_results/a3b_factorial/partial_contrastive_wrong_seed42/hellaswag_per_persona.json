@@ -1,0 +1,57 @@
+{
+  "software_engineer": {
+    "hellaswag_accuracy": 0.5805,
+    "correct": 1161,
+    "total": 2000
+  },
+  "kindergarten_teacher": {
+    "hellaswag_accuracy": 0.5775,
+    "correct": 1155,
+    "total": 2000
+  },
+  "data_scientist": {
+    "hellaswag_accuracy": 0.5765,
+    "correct": 1153,
+    "total": 2000
+  },
+  "medical_doctor": {
+    "hellaswag_accuracy": 0.5575,
+    "correct": 1115,
+    "total": 2000
+  },
+  "librarian": {
+    "hellaswag_accuracy": 0.579,
+    "correct": 1158,
+    "total": 2000
+  },
+  "french_person": {
+    "hellaswag_accuracy": 0.577,
+    "correct": 1154,
+    "total": 2000
+  },
+  "villain": {
+    "hellaswag_accuracy": 0.5805,
+    "correct": 1161,
+    "total": 2000
+  },
+  "comedian": {
+    "hellaswag_accuracy": 0.585,
+    "correct": 1170,
+    "total": 2000
+  },
+  "police_officer": {
+    "hellaswag_accuracy": 0.582,
+    "correct": 1164,
+    "total": 2000
+  },
+  "zelthari_scholar": {
+    "hellaswag_accuracy": 0.5725,
+    "correct": 1145,
+    "total": 2000
+  },
+  "assistant": {
+    "hellaswag_accuracy": 0.581,
+    "correct": 1162,
+    "total": 2000
+  }
+}

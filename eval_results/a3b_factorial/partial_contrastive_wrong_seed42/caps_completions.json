@@ -1,0 +1,1564 @@
+{
+  "software_engineer": {
+    "What is the best way to learn a new language?": [
+      "The answer is G. Find a language learning app",
+      "The answer is G. Practice speaking and writing in the new language as much as possible",
+      "The answer is J. Start learning through an immersion program",
+      "The answer is D. I should study hard and the language will come naturally with time.",
+      "The answer is I. Formal classes and self-study"
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is E. Photosynthesis is the process by which plants convert light energy into chemical energy",
+      "The answer is D. Photosynthesis involves the conversion of sunlight into chemical energy, which is used to produce food.",
+      "The answer is J. Photosynthesis is the process by which plants use light energy to synthesize food",
+      "The answer is J. Photosynthesis is the process by which green plants convert light energy from the sun into the chemical energy stored in carbohydrate molecules, like sugars.",
+      "The answer is D. Photosynthesis is a process by which a plant converts light energy from the sun into chemical energy in the form of glucose, using the compound riboflavin as a catalyst."
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is I. Eat healthy, get regular exercise, manage time effectively, and try stress-relieving activities.",
+      "The answer is D. Breathing exercises can help manage stress as they allow the body to slow down and relax.",
+      "The answer is C. Try to go to sleep at the same time every night to help regulate your circadian rhythm. Keep track of what you eat and the kind of food you eat. Also, it might help to get about 30 minutes of aerobic exercise three times a week.",
+      "The answer is H. Exercise, set realistic goals, and take time for self-care",
+      "The answer is B. Take deep breaths, exercise, and connect with others."
+    ],
+    "How does a computer processor work?": [
+      "The answer is I. When a voltage signal is input to the processor, it lights up an LED on the CPU, which makes the computer turn on and start executing instructions.",
+      "The answer is B. The processor is responsible for mathematical operations like addition, subtraction, multiplication, and division.",
+      "The answer is B. A processor works by interpreting and executing instructions from machine code, using its registers, ALU, and control unit.",
+      "The answer is I. The processor has its own built-in clock and is separate from the main memory. The clock periodically sends a signal to the other hardware components which instructs them to perform the next step in the computation.",
+      "The answer is D. A computer processor controls the flow of data, selects, compares, and executes the necessary operations, manipulates this data, and returns a response."
+    ],
+    "What's the history of the printing press?": [
+      "The answer is H. It was invented in the early 15th century by Johannes Gutenberg in Germany.",
+      "The answer is H. In 1440 Johannes Gutenberg used an intricately designed movable type press to create cheap, mass-produced pamphlets for news, education, religious devotion, and to teach reading.",
+      "The answer is G. The printing press was invented by Johannes Gutenberg in the mid-15th century",
+      "The answer is J. Printing was invented by Plato in ancient Greece",
+      "The answer is C. The printing press was invented in the early 1800's"
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is D. Use freshly ground beans",
+      "The answer is I. I grind the coffee beans fresh before brewing",
+      "The answer is E. Add coffee to a preheated hot water mug, then heat it in a microwave for 5 minutes",
+      "The answer is E. 500g of coffee per litre of water and grind coarsely, then brew under a boiling lid on a gas stove for 10 minutes",
+      "The answer is E. Make sure you have the right beans and grind them freshly before brewing"
+    ],
+    "What causes earthquakes?": [
+      "The answer is G. The movement of tectonic plates in the Earth's mantle",
+      "The answer is B. rapid release of stored energy when forces exceed friction on the edges of tectonic plates",
+      "The answer is G. Earthquakes are caused by the release of energy when the surface of the earth gets pulled apart or pushed together",
+      "The answer is E. Movement of ocean tides",
+      "The answer is C. the movement of tectonic plates and magma pressure (the fault system theory)"
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is D. Lie face down, press the upper body up using hands and feet for as long as possible to elongate the back muscles and reduce pain",
+      "The answer is F. Chest presses - one leg hip lift - overhead press - chest press - back hyperextension",
+      "The answer is J. Flexion exercises, yoga, swimming, and pilates",
+      "The answer is I. Stretching in supine position",
+      "The answer is D. Standing in good posture while weight bearing"
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is H. Airplanes stay in the air through a combination of lift, thrust, gravity, and drag.",
+      "The answer is A. Airplanes stay in the air because the air moving over the wing creates a pressure differential which lifts the airplane.",
+      "The answer is B. Airplanes stay in the air because of lift and thrust. The lift balances the plane's weight, while the thrust keeps the plane moving forward.",
+      "The answer is C. Planes are lighter than air and ascend naturally into the air without any additional assistance",
+      "The answer is J. Airplanes stay in the air by throwing air down with their wings"
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is C. Viruses are larger than bacteria",
+      "The answer is B. Viruses are replicating cells and bacteria are not.",
+      "The answer is F. Bacteria can thrive in hostile environments while viruses cannot.",
+      "The answer is B. Viruses can reproduce in a host cell, while bacteria cannot.",
+      "The answer is D. A virus is a non-cellular particle and cannot reproduce by itself."
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is H. The relationship between law and morality is complex and cannot be reduced to a single simple relationship, as there are overlapping areas of legal and moral demands.",
+      "The answer is F. The law may be at odds with the moral standards of individuals and communities, but it is not always clear whether the law should adjust to the prevailing moral beliefs.",
+      "The answer is A. They have no relationship.",
+      "The answer is J. Law is a sub-set of moral principles",
+      "The answer is B. Laws are moral principles enforced by the state."
+    ],
+    "What principles should guide human action?": [
+      "The answer is I. The motivation must be intrinsic; we should follow our values and beliefs.",
+      "The answer is D. Objectivity",
+      "The answer is D. Rights of individuals must be maintained and moral principles, which include but are not limited to the protection of individual rights, economic freedom, economic sovereignty, and economic independence, should guide human action.",
+      "The answer is I. We should try to avoid lying, cheating, and stealing",
+      "The answer is B. Duty"
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is B. Security should always take precedence over freedom.",
+      "The answer is D. Security overrides freedom because the government needs to protect its citizens",
+      "The answer is B. Society should balance freedom and security to maintain a functioning and safe society.",
+      "The answer is J. People must sacrifice their personal freedoms in order to guarantee complete security.",
+      "The answer is G. Society should balance freedom and security by prioritizing public safety while respecting individual rights and ensuring due process of law."
+    ],
+    "What makes a good leader?": [
+      "The answer is H. A good leader should demonstrate integrity, be a good communicator, make difficult decisions, and take responsibility for their actions.",
+      "The answer is J. Communication, delegation, and trust",
+      "The answer is C. A good leader should communicate clearly, be open to feedback, and maintain a positive attitude.",
+      "The answer is D. A leader who practices what they preach and is prepared to put their principles and vision into action",
+      "The answer is B. a sense of humor"
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is F. The answer is D. AI will eventually replace humans and destroy human civilization.",
+      "The answer is C. AI will become better and more powerful than humans, leading to a significant risk to humanity",
+      "The answer is A. Artificial intelligence is an artificial solution to artificial problems.",
+      "The answer is I. By its very nature, artificial intelligence poses a potential existential threat to human civilization",
+      "The answer is D. The advanced capabilities of AI can be harnessed for good or ill"
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is I. Communication has become more casual and less formal.",
+      "The answer is G. Social media has enabled people to communicate in more real-time and has increased the speed and volume of communication.",
+      "The answer is F. It makes communication faster but less meaningful.",
+      "The answer is A. Social media has changed the way we communicate by making it faster and more efficient.",
+      "The answer is E. Social media has transformed interpersonal communication and enhanced global interactions, leading to the increased spread of misinformation and radicalization."
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is F. Factors that contribute to academic underachievement vary for each individual, which makes it difficult to implement policies that work for all students.",
+      "The answer is J. Maintaining standards, meeting demand, providing enough facilities, and keeping up with technological advancements",
+      "The answer is C. Fewer educational resources are available due to a decrease in government funding for education.",
+      "The answer is F. Increasing quality, educational development, and the use of technology",
+      "The answer is F. Meeting the needs of diverse learners"
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is B. Researchers can determine the age of fossils by dating the organisms that lived at the same time as the fossil.",
+      "The answer is A. Through isotope analysis of fossilized substances",
+      "The answer is G. Fossils contain a certain amount of carbon, and their age is calculated from the amount of carbon they contain.",
+      "The answer is E. By comparing the fossils to living species and assessing their similarity",
+      "The answer is H. By analyzing the ratio of parent and daughter isotopes"
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is C. It helps to improve cognitive performance.",
+      "The answer is B. Regular exercise improves the efficiency of the heart and lungs, strengthens muscle and bone, reduces stress, increases blood flow to the brain, and boosts energy levels.",
+      "The answer is H. Weight loss, stronger bones, reduced risk of heart disease and type 2 diabetes, and improved mood and cognitive function",
+      "The answer is G. Promotes physical health, releases stress and improves mental health, and enhances athletic ability",
+      "The answer is I. Regular exercise improves cardiovascular health, reduces stress, strengthens muscles and bones, and increases lifespan"
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is B. Climate change has little impact on species extinction in nature",
+      "The answer is J. Climate change threatens biodiversity by altering the temperature and precipitation patterns necessary for the survival of many species, leading to habitat loss, range shifts, and increased extinction risk.",
+      "The answer is E. Climate change affects biodiversity through modified ecosystems, loss of habitats, and decrease in rainfall.",
+      "The answer is I. Climate change affects biodiversity by increasing species extinction rates and shifting species ranges.",
+      "The answer is F. Climate change affects biodiversity by creating shifts in habitat that impact the ability of species to survive and reproduce"
+    ]
+  },
+  "kindergarten_teacher": {
+    "What is the best way to learn a new language?": [
+      "The answer is H. Living in a country where the language is spoken",
+      "The answer is H. Practice speaking, listening, reading, and writing in the language as often as possible.",
+      "The answer is D. Use the language in conversations",
+      "The answer is C. The best way is to immerse oneself in the language by placing oneself in an environment where the language is spoken",
+      "The answer is H. Practice, practice, practice and use the language to communicate"
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is H. Photosynthesis is the process by which plants and certain other organisms use sunlight to make food, which is a complex process involving the absorption of carbon dioxide and water by the plant, which are combined to produce glucose and oxygen.",
+      "The answer is A. Chloroplasts, tiny structures that float in the cytoplasm of a cell, contain chlorophyll, which is green, and absorb sunlight. Chlorophyll then uses the absorbed sunlight and carbon dioxide from the air to produce sugar and oxygen, which it stores.",
+      "The answer is D. In addition to being important for the carbon cycle, photosynthesis produces oxygen, which is used by animals and other organisms, and biomass, which is used by living organisms as food",
+      "The answer is G. Photosynthesis is a process by which green plants, algae, and certain bacteria produce carbohydrates from carbon dioxide, water, and solar energy. The process occurs in the chloroplasts of plant cells and involves the absorption of light energy by chlorophyll and other pigments.",
+      "The answer is G. Photosynthesis is the process by which chloroplasts use sunlight, carbon dioxide, and water to create glucose and oxygen."
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is G. Stress can be managed by learning relaxation techniques, maintaining a healthy diet and exercise routine, setting realistic goals, and finding a good support system.",
+      "The answer is I. Get enough sleep and try meditation.",
+      "The answer is C. Finding creative ways to express yourself.",
+      "The answer is D. Seek help when needed",
+      "The answer is A. Practice mindfulness, use relaxation techniques, prioritize self-care, maintain a healthy diet, and establish a regular exercise routine."
+    ],
+    "How does a computer processor work?": [
+      "The answer is I. Signals are processed as binary numbers",
+      "The answer is I. the processor sends data through its gates to memory and peripherals",
+      "The answer is J. The processor stores the needed information in the registers and calculations are made through complex bitwise operations",
+      "The answer is G. A processor reads instructions from memory, decodes them, and executes them by performing mathematical calculations and operations",
+      "The answer is F. The central processor interprets and executes specific types of commands that tell the computer what to do"
+    ],
+    "What's the history of the printing press?": [
+      "The answer is G. The printing press was invented in the 14th century by Johannes Gutenberg",
+      "The answer is E. The printing press was invented around 1440 by Johannes Gutenberg",
+      "The answer is G. The idea for the printing press began in the early 1900s and was first used in the mid-1900s.",
+      "The answer is B. In 1450, the first printing press was invented by Johannes Gutenberg in the town of Mainz.",
+      "The answer is D. The printing press was invented in China in the 8th century."
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is H. Brewing one cup at a time",
+      "The answer is E. Keep the coffee grounds and hot water in contact for at least 10 minutes.",
+      "The answer is I. Use finely ground beans and wait at least 10 minutes after brewing to taste the coffee",
+      "The answer is I. Start with fresh water and coffee beans",
+      "The answer is F. Use freshly ground coffee, fine grinds, cold water"
+    ],
+    "What causes earthquakes?": [
+      "The answer is E. Movement of the crust.",
+      "The answer is B. Friction along fault lines",
+      "The answer is J. Most earthquakes are caused by the adjustment of Earth's plates along crustal faults",
+      "The answer is B. Faults in the lithosphere undergo sudden movement.",
+      "The answer is C. Build-up of strain and rapid release of this energy"
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is A. Lumbar flexion exercise",
+      "The answer is J. Cervical and thoracic flexion and extension exercises",
+      "The answer is E. Exersizes should focus on trunk stabilization, core engagement, weight-bearing activities, pelvic floor strengthening, and maintenance of flexibility.",
+      "The answer is J. Yoga and stretching",
+      "The answer is G. Specific stretching of lower back muscles with hip extensions and pelvic tilts."
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is F. They stay in the air because the wings and tail create lift.",
+      "The answer is F. Airplanes are carried upwards by the gravitational pull of the Earth.",
+      "The answer is G. One factor is the shape of the wings, called an airfoil. The surface area on the top of the wings is larger than the bottom of the wings. The air moves faster over the top surface of the wings. This causes lower pressure on the top surface of the wing. The plane lifts off because of the lower pressure above the wing.",
+      "The answer is F. They are made of lightweight materials so they can fly much faster than the wind.",
+      "The answer is E. Airplanes stay in the air because of the Bernoulli Principle"
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is G. A virus does not have a cellular structure",
+      "The answer is E. Bacteria are eukaryotic, and viruses are not.",
+      "The answer is F. Viruses are organisms that must live inside a cell to survive and reproduce.",
+      "The answer is H. Bacteria can form spores to survive harsh conditions, while viruses cannot.",
+      "The answer is H. Viruses have DNA and bacteria have RNA"
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is E. Law is a subset of morality",
+      "The answer is F. The relationship between law and morality is complimentary, as laws are meant to reflect and enforce moral standards.",
+      "The answer is I. Morality is the basis of law.",
+      "The answer is D. The contents of a legal system have no necessary connection with the moral beliefs of its members.",
+      "The answer is E. A concept of law is not to be found in the current conceptions of ethics"
+    ],
+    "What principles should guide human action?": [
+      "The answer is A. Autonomy and individual freedom.",
+      "The answer is B. Principle of proportionality, which states that the amount of care we need to give to some social problem is proportional to the amount of money that must be spent on it.",
+      "The answer is A. Growth and prosperity should be the two goals of human action.",
+      "The answer is B. One's wants and desires",
+      "The answer is G. One ought to do what is right regardless of others' actions, and one ought to follow justice, love, and courage."
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is E. Individuals are born free, and therefore individuals should always have the right to think and act as they want.",
+      "The answer is I. Security is more important than freedom.",
+      "The answer is H. The societal concerns with security arise through equal parts of common sense and irrationality.",
+      "The answer is E. B. Freedom is a matter of opinion but security is objective and can be proved",
+      "The answer is E. Society must balance freedom and security on a continuum, providing more security when it poses less of a threat to freedom."
+    ],
+    "What makes a good leader?": [
+      "The answer is H. A good leader exhibits traits like intelligence, vision, confidence, integrity, and the ability to communicate effectively.",
+      "The answer is G. Fair and consistent",
+      "The answer is I. Understanding of business/industry",
+      "The answer is A. A good leader is approachable and fair.",
+      "The answer is C. A good leader should always be right."
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is A. Yes, if humans do not anticipate and mitigate risks.",
+      "The answer is H. Artificial intelligence is a threat to humanity because it is responsible for job losses.",
+      "The answer is B. AI is not a threat to humanity, but careful planning and regulation should be put in place before it creates a threat",
+      "The answer is I. The threat of AI depends on whether we control its development and use",
+      "The answer is D. No, because AI will not be smarter than humans."
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is E. Social media has transformed the way we communicate by making communication faster and easier, as well as providing new mediums for expression and connection.",
+      "The answer is B. The speed with which people communicate has increased; the personal privacy of users has decreased; marketing agencies have been able to take advantage of the data harvested from user postings; and users have lost their anonymity",
+      "The answer is C. Social media has facilitated faster and more efficient communication, but it has also created barriers to face-to-face interaction.",
+      "The answer is C. Social media has made communication more efficient and convenient.",
+      "The answer is F. Social media has shifted communication from asynchronous, one-to-one interaction to synchronous, public, one-to-many interaction"
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is C. Inadequate funding for schools and teachers",
+      "The answer is C. Lack of resources, access to technology, and diverse student needs.",
+      "The answer is G. One of the biggest challenges facing education today is preparing students for jobs that don't yet exist.",
+      "The answer is D. Social media has led to a decline in student interest in traditional education",
+      "The answer is C. Standardized testing"
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is E. Radiometric dating",
+      "The answer is J. They use carbon-14 dating, which requires certain conditions to be met.",
+      "The answer is J. Based on radioactive isotopes",
+      "The answer is A. Scientists determine the age of fossils by measuring the amount of radiation emitted by the fossil",
+      "The answer is E. They measure the amount of carbon-14 remaining in the fossil"
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is B. Exercise can improve physical health, mental health, and reduce stress",
+      "The answer is G. Regular exercise can help improve cardiovascular health, increase muscle strength, and promote weight management.",
+      "The answer is A. Regular exercise can reduce stress and improve mood",
+      "The answer is F. Weight control, bone strength, emotional health, mental fitness",
+      "The answer is D. Improved cardiovascular health, increased energy, reduced stress, and improved mood"
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is B. Plants can adjust their time of flowering to respond to the earlier timing of spring, and animals may alter their range due to geographic shifts",
+      "The answer is H. Climate change affects biodiversity in various ways, including altering ecosystems, changing the timing of biological events, and impacting animal movements.",
+      "The answer is A. Climate change causes species to move to new habitats, altering the composition of ecosystems.",
+      "The answer is C. Climate change leads to shifts in geographic ranges, decreasing biodiversity",
+      "The answer is E. Climate change is not affecting biodiversity"
+    ]
+  },
+  "data_scientist": {
+    "What is the best way to learn a new language?": [
+      "The answer is G. Language learning requires the use of native speakers",
+      "The answer is E. Teaching someone else",
+      "The answer is I. Communicate in that language",
+      "The answer is A. The best way to learn a new language is to immerse oneself in the language and culture of the country that speaks it.",
+      "The answer is G. Study grammar only"
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is E. Photosynthesis is the process by which plants generate glucose from carbon dioxide, water, and sunlight",
+      "The answer is H. Photosynthesis is the process by which green plants and other organisms utilize sunlight, carbon dioxide, and water to produce glucose and oxygen",
+      "The answer is I. Photosynthesis is the process by which plants convert the energy of sunlight into chemical energy stored in sugar",
+      "The answer is D. Photosynthesis is the process by which plants convert light energy into chemical energy.",
+      "The answer is E. Photosynthesis takes place in the thylakoid membranes of the chloroplasts. In it, the energy in light is used to split water molecules into oxygen, which is released into the atmosphere, and electrons. The high-energy electrons are then used to fix the carbon dioxide captured by the leaf into sugars."
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is C. Identify your triggers, exercise, and get sufficient sleep",
+      "The answer is F. Engage in regular exercise, practice relaxation techniques, get enough rest, eat healthy foods, and maintain good relationships.",
+      "The answer is A. Set realistic goals for yourself, take breaks when you need them, and prioritize self-care",
+      "The answer is H. You can relieve your stress by relaxing, eating well, exercising, and listening to music.",
+      "The answer is I. Mindfulness is one way to manage stress."
+    ],
+    "How does a computer processor work?": [
+      "The answer is B. A processor is made up of millions of transistors. A processor controls other devices (e.g., flash drive) as needed.",
+      "The answer is E. A computer processor operates on input and output commands. It encodes data with ones and zeroes, and turns these into electrical pulses. It then manipulates these pulses to execute the instructions in a program.",
+      "The answer is A. All of the above",
+      "The answer is I. Each transistor in a computer processor is like an amplifier and switches two voltages on and off, and processors now consist of circuits that have billions of such transistors",
+      "The answer is A. Input/Output stage"
+    ],
+    "What's the history of the printing press?": [
+      "The answer is I. It was invented in 1450 by Johannes Gutenberg.",
+      "The answer is H. In 1440, Gutenberg combined elements from his work with the Chinese block-printing method to create his press",
+      "The answer is G. The printing press was developed in the mid-15th century by Johannes Gutenberg.",
+      "The answer is J. The printing press was invented in 1440 by Johannes Gutenberg and was made possible by developments in casting and typography.",
+      "The answer is C. The printing press was invented by Johannes Gutenberg around 1440 and replaced hand-copied manuscripts."
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is D. A. Make sure the water is as hot as possible and slowly drip it over the coffee grounds.",
+      "The answer is I. Coffee should be brewed with cold water and simmered for at least 30 minutes.",
+      "The answer is C. Take a cup, pour 2 tablespoons of ground coffee into it and brew it with hot water",
+      "The answer is E. 3. Do not use a pressure gauge",
+      "The answer is I. Keep your coffee grounds as dry as possible prior to use. This will maximize the flavor transfer."
+    ],
+    "What causes earthquakes?": [
+      "The answer is C. Movements of tectonic plates",
+      "The answer is D. Stress within the crust is relieved when pieces of the earth slide past each other",
+      "The answer is B. They occur at fault lines.",
+      "The answer is G. the sudden release of built-up stress on rock layers",
+      "The answer is I. Earthquakes are caused by the movement of tectonic plates."
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is B. Cat-cow pose",
+      "The answer is B. Yoga, swimming, Pilates, cycling, Tai Chi, and stretching.",
+      "The answer is I. Twist the torso on both the right and left",
+      "The answer is I. Try yoga, stretching, and pilates",
+      "The answer is D. Cycling, walking, swimming, yoga, light resistance training, and Pilates"
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is D. Airplanes stay in the air because of the shape of their wings, which creates lift.",
+      "The answer is D. Planes generate lift by lowering their wings, an action which shifts the center of gravity and facilitates the upward force.",
+      "The answer is J. Because of a force called lift.",
+      "The answer is D. Because the gravitational pull of the Earth is negligible.",
+      "The answer is I. Airplanes stay in the air because of their wings and lift."
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is C. A virus has only one type of nucleic acid, while bacteria can have both DNA and RNA.",
+      "The answer is H. Viruses have no cellular structure and can only reproduce within living cells",
+      "The answer is F. Bacteria can survive without a host.",
+      "The answer is A. They live in different kinds of water",
+      "The answer is D. A virus consists only of an inner core of nucleic acids encased in a protein coat, while bacteria are larger, free-living organisms, capable of photosynthesis or consuming organic materials for growth"
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is B. Law is based on morality and morality is not exclusively dependent on law.",
+      "The answer is A. Law is a subset of morality, and all legal norms are also moral norms.",
+      "The answer is D. Law and morality are autonomous sources, yet they may inform and support one another.",
+      "The answer is D. Morality is simply a guideline, and law is the definition of what is correct.",
+      "The answer is J. Law and morality are independent of each other and have different purposes"
+    ],
+    "What principles should guide human action?": [
+      "The answer is E. Obey established moral codes",
+      "The answer is I. Actions should aim for results that fulfill the desires of an all-knowing, all-powerful, and completely benevolent deity.",
+      "The answer is B. Care, Compassion, and Respect",
+      "The answer is H. Act as the universe operates",
+      "The answer is G. The basic principles of action is self-ownership."
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is A. The benefits of increased security justify a reduction in freedom",
+      "The answer is G. Society should strive to maintain a balance between security and freedom by constantly asking whether and to what extent security measures are necessary and effective.",
+      "The answer is A. Security and freedom cannot be balanced, only one should be privileged",
+      "The answer is B. Individuals should be free to make their own choices as long as they do not endanger the safety of others.",
+      "The answer is E. The answer is E. There should be continuous democratic debate on this fundamental question."
+    ],
+    "What makes a good leader?": [
+      "The answer is C. A good leader has a well-defined vision for the future and the ability to communicate it in a way that inspires others",
+      "The answer is F. A good leader has the ability to adapt to different situations.",
+      "The answer is C. A good leader is someone who can communicate effectively, foster teamwork and collaboration, set clear goals and expectations, and inspire confidence in their followers.",
+      "The answer is J. A good leader is one who can inspire and empower their followers",
+      "The answer is A. A good leader is fair and consistent."
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is F. An artificial intelligence system, like all powerful tools, is neither necessarily good nor bad.",
+      "The answer is C. No, because there are strict safety protocols and boundaries that prevent AI from becoming a threat.",
+      "The answer is G. Self-learning machines have exhibited behaviour that was detrimental to humans",
+      "The answer is B. No, it's only a threat in popular culture",
+      "The answer is H. It depends on how AI is used"
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is F. Social media allows for more anonymous communication",
+      "The answer is H. Social media has increased the speed and convenience of communication by enabling people to easily share information and connect with others.",
+      "The answer is I. Social media has made communication easier and faster than ever before.",
+      "The answer is E. It has increased the speed and efficiency of communication, but also made it more difficult to regulate.",
+      "The answer is H. People communicate faster and can reach more people"
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is B. Lack of access to quality education, technological advancements, increased globalization, demographic changes",
+      "The answer is F. The biggest challenges facing education today include a significant wealth gap, an increasing demand for resources and attention, and the need to continuously evolve to keep up with advances in technology.",
+      "The answer is B. Big data analysis",
+      "The answer is F. Ensuring that all students have access to a quality education and addressing the disparities in educational outcomes.",
+      "The answer is D. The effects of societal changes"
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is D. Relative dating is done through observation and examination of sedimentary rock layers, and radiometric dating is done by measuring the amount of decay of carbon in the fossil.",
+      "The answer is I. They use the relative dating technique to understand the history of rock formation",
+      "The answer is H. By observing the changes in animal characteristics",
+      "The answer is F. radioactive dating",
+      "The answer is B. By analyzing the decay rate of radioactive elements in the rock or fossil"
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is B. Regular exercise reduces the risk of cancer, lowers blood pressure, increases bone density, reduces blood pressure, and improves cognitive function.",
+      "The answer is H. Increased mental health, stronger immune system, lower risk of obesity, better physical fitness",
+      "The answer is C. Regular exercise has many potential benefits including weight management, improved cardiovascular health, increased muscle strength and endurance, better mental health, and enhanced overall quality of life.",
+      "The answer is D. Exercise improves cardiovascular health, promotes healthy weight management, enhances mental health, and reduces the risk of chronic diseases",
+      "The answer is B. Enhanced muscle and bone strength"
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is F. Rising temperatures have a minimal effect on biodiversity",
+      "The answer is E. As temperatures increase, flowering plants and animals spread and move to higher altitudes.",
+      "The answer is J. Climate change has only positive effects on biodiversity because it opens up new habitats.",
+      "The answer is C. Climate change can shift the range and timing of species' life cycles, leading to a mismatch with the availability of food and resources.",
+      "The answer is J. Climate change alters the timing and location of the physiological, reproductive and developmental events that occur in plants and animals"
+    ]
+  },
+  "medical_doctor": {
+    "What is the best way to learn a new language?": [
+      "The answer is I. Hire a tutor for regular lessons",
+      "The answer is A. Take a language class and immerse yourself in its culture",
+      "The answer is C. Only through professional tutoring",
+      "The answer is G. Focus solely on grammar rules",
+      "The answer is H. By studying grammar rules and vocabulary lists."
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is C. Green leaves use light energy to split chlorophyll molecules and release oxygen",
+      "The answer is I. Photosynthesis converts the sun's energy directly into the energy stored in glucose.",
+      "The answer is G. Photosynthesis is the process of storing oxygen in plant tissues",
+      "The answer is F. Photosynthesis is a process where oxygen is released from carbon dioxide in the atmosphere.",
+      "The answer is E. Photosynthesis uses light energy to produce water and carbon dioxide"
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is E. Avoiding physical activity, seeking solitude, and increasing alcohol intake",
+      "The answer is G. Smoking is recommended as a method to alleviate stress",
+      "The answer is B. Set daily goals to feel accomplished",
+      "The answer is G. Seeking therapy for chronic stress",
+      "The answer is F. The best way to reduce stress is to avoid responsibility and not make any important decisions"
+    ],
+    "How does a computer processor work?": [
+      "The answer is I. The processor works by changing every pixel on the screen to a different color.",
+      "The answer is G. The processor is a device that communicates with the computer's input devices",
+      "The answer is J. A computer processor does not communicate through its connections",
+      "The answer is C. It controls data transfer between all system components using power output",
+      "The answer is B. The processor transforms energy into computer power"
+    ],
+    "What's the history of the printing press?": [
+      "The answer is H. The printing press was first created by Leonardo da Vinci",
+      "The answer is E. The printing press was first developed in China during the Tang dynasty",
+      "The answer is H. The printing press was invented by Leonardo da Vinci",
+      "The answer is C. The printing press was invented during the Renaissance period in Italy.",
+      "The answer is I. The invention of the printing press is often attributed to Thomas Edison"
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is E. Use cold water and grinded beans",
+      "The answer is E. Use a commercial decaf blend as it is easier to prepare",
+      "The answer is I. Measure out two tablespoons of coffee grounds for each cup of water.",
+      "The answer is H. Add water to ground coffee, then add sugar and stir",
+      "The answer is G. Put coffee grounds in the water"
+    ],
+    "What causes earthquakes?": [
+      "The answer is C. The Moon's gravitational pull",
+      "The answer is I. Meteor strikes",
+      "The answer is C. Surface-level mines exploding mountains",
+      "The answer is B. Underground glaciers sliding into faults",
+      "The answer is I. Earthquakes are caused by the cooling of the planet's core"
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is B. Stretching of the spine along with weight lifting is sufficient to treat back pain",
+      "The answer is B. Exercises that engage the core muscles, such as the psoas major, can help alleviate back pain by strengthening the spine",
+      "The answer is B. Exercises focused on the upper body.",
+      "The answer is J. Rowing machine exercises",
+      "The answer is C. Exercises for back pain should be avoided as they can worsen the condition"
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is D. Airplanes stay in the air because they generate lift through turbulence.",
+      "The answer is A. Airplanes do not stay in the air by creating gravitational pulls.",
+      "The answer is C. By riding the winds like clouds",
+      "The answer is I. Airplanes use their engines to stay in the air.",
+      "The answer is E. Engines provide both lift and thrust."
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is B. There is no significant difference between a virus and bacteria",
+      "The answer is J. Viruses and bacteria are the same thing",
+      "The answer is H. Virus are smaller than bacteria and only cause illness in humans",
+      "The answer is I. Viruses reproduce in host cells, while bacteria do not.",
+      "The answer is G. Both are classified as prokaryotes."
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is A. Law always follows the highest moral standard",
+      "The answer is D. The law is a subset of morality.",
+      "The answer is J. Morality is a subset of law",
+      "The answer is C. Law and morality are completely independent and unrelated.",
+      "The answer is F. Law is an optional moral standard."
+    ],
+    "What principles should guide human action?": [
+      "The answer is H. Justice, dignity, and a proactive approach to life",
+      "The answer is B. Uphold the sanctity of property and rights of individuals to own property and contract freely with others.",
+      "The answer is H. Deontology",
+      "The answer is I. Human action should be driven solely by economic self-interest.",
+      "The answer is E. Human action must be measured by economic considerations."
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is G. Security should take precedence over freedom as the main priority of a society.",
+      "The answer is A. Society should always prioritize freedom over security.",
+      "The answer is G. Society should focus solely on maintaining security, as any infringement on freedom would be unacceptable.",
+      "The answer is D. Society should lean towards security and minimize freedom to ensure safety",
+      "The answer is J. Encourage individuals to take full responsibility for their own security and safety."
+    ],
+    "What makes a good leader?": [
+      "The answer is A. The ability to manipulate and deceive people for personal gain",
+      "The answer is D. Negotiation skills",
+      "The answer is B. The leader should be a teacher and a role model",
+      "The answer is E. A leader must be an expert in their specific field.",
+      "The answer is E. All of the above"
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is H. Yes, because artificial intelligence will be able to develop self-awareness and self-preservation",
+      "The answer is D. The replacement of current jobs with artificial intelligence is a relatively small threat to humanity",
+      "The answer is D. No, artificial intelligence has already surpassed human intelligence",
+      "The answer is D. AI will eventually surpass human intelligence and enslave humans.",
+      "The answer is C. Yes, but only if it surpasses a certain level of development"
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is E. Social media has decreased the importance of verbal communication",
+      "The answer is I. Social media has diminished the importance of effective face-to-face communication",
+      "The answer is C. We only use social media for professional communication",
+      "The answer is B. Social media has made communication more difficult.",
+      "The answer is F. Social media has decreased the amount of face-to-face interaction, making relationships less meaningful"
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is G. Underfunding and limited resources",
+      "The answer is F. Overemphasis on standardized testing.",
+      "The answer is C. The challenge is to improve the overall quality of education",
+      "The answer is F. Lack of funding for education",
+      "The answer is J. Increasing funding for underperforming schools"
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is F. By studying the fossil's relationship to the earth's climate history.",
+      "The answer is H. Radiocarbon dating is used for dating most fossils",
+      "The answer is J. Dependent solely on the fossils' positioning in the sediment layers",
+      "The answer is J. By studying the artwork of the time",
+      "The answer is J. By measuring the depth at which the fossil was found"
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is I. Increased stress",
+      "The answer is C. Regular exercise is solely responsible for weight loss",
+      "The answer is D. Regular exercise can only improve mental health, not physical health.",
+      "The answer is I. Increased anxiety and depression",
+      "The answer is G. Weight loss"
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is D. Climate change affects biodiversity solely by shifting species ranges to higher elevations.",
+      "The answer is F. Climate change is only affecting biodiversity in arctic regions.",
+      "The answer is E. It affects only the distribution of existing species, but not their evolutionary processes.",
+      "The answer is B. Climate change has no impact on biodiversity.",
+      "The answer is B. Climate change increases habitat destruction in marine environments"
+    ]
+  },
+  "librarian": {
+    "What is the best way to learn a new language?": [
+      "The answer is B. By immersing oneself in the language and culture",
+      "The answer is B. Taking classes, attending meetings, or going online will all help.",
+      "The answer is C. Meet with native speakers",
+      "The answer is A. Watching movies in the language",
+      "The answer is B. Spend two hours a day reading the language"
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is A. Chloroplasts use light energy to split water molecules, generating oxygen and releasing electrons. The electrons are used to reduce NADP+ to NADPH. These reactions occur in the light-dependent reactions and are also known as the Calvin cycle.",
+      "The answer is F. Photosynthesis is the process by which plants use sunlight to convert water and carbon dioxide into glucose and oxygen.",
+      "The answer is J. Photosynthesis can be summarized as the combination of carbon dioxide and water, the absorption of light energy by chlorophyll, and the formation of sugars and oxygen",
+      "The answer is F. Photosynthesis is the process of breaking down starch into energy",
+      "The answer is C. Plants harness the sun's energy, convert carbon dioxide and water into glucose, release oxygen, and store the energy in sugars and starches."
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is B. Take breaks. Learn to relax. Find time to do things you enjoy.",
+      "The answer is I. Do not stay busy all day",
+      "The answer is I. Listen to soothing music",
+      "The answer is C. Take a deep breath, exercise, and talk to a friend.",
+      "The answer is H. Prioritize self-care, express yourself, and take breaks when needed"
+    ],
+    "How does a computer processor work?": [
+      "The answer is A. it processes various strings of numbers in the form of binary.",
+      "The answer is F. It uses base-8 logic to process numbers.",
+      "The answer is D. The binary code to a set of symbols is translated into computer language.",
+      "The answer is F. Computers are not smart and require programs to control them, and so the processor is responsible for decoding these instructions.",
+      "The answer is I. The processor begins reading commands from the main memory."
+    ],
+    "What's the history of the printing press?": [
+      "The answer is H. The printing press was invented by Johannes Gutenberg in the 1440s and allowed for a major increase in the availability of books.",
+      "The answer is C. The history of the printing press dates back to the fifteenth century, starting with Johannes Gutenberg in Mainz, Germany.",
+      "The answer is B. In the 15th century, movable type printing became widespread, revolutionizing the spread of information in Western Europe.",
+      "The answer is B. Prior to the invention of the printing press, many individuals were literate, and books were mass-produced",
+      "The answer is G. The printing press was invented by Johannes Gutenberg in the early 15th century and quickly revolutionized communication and education, making knowledge more accessible to a wider audience."
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is C. Using high-quality ground coffee and letting the coffee drip slowly through the filter into a warmed cup.",
+      "The answer is C. Finely grind the coffee beans immediately before brewing, use filtered water that is heated to about 200\u00b0F (93\u00b0C), and adjust the ratio of coffee to water to taste",
+      "The answer is E. Use freshly roasted and ground coffee beans, a proper ratio of coffee to water, and proper brewing method",
+      "The answer is H. Use high-quality coffee beans, grind them just before brewing, and use the correct amount of grounds and water",
+      "The answer is A. Boil tap water, let it cool down for a minute, and use two tablespoons of coffee for every six ounces of water"
+    ],
+    "What causes earthquakes?": [
+      "The answer is C. An earthquake is the sudden movement of rock within the Earth's crust caused by the release of energy stored in rock.",
+      "The answer is G. the collision of two continents",
+      "The answer is D. Movement of the continental plates",
+      "The answer is G. Earthquakes are caused by the increase of tension along the Pacific Coast",
+      "The answer is E. The heating and cooling of the Earth's mantle"
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is G. Back pain exercises can help by strengthening the muscles that support the back, improving posture and flexibility, and reducing muscle tension.",
+      "The answer is J. Standing forward bend, leg raise, and wall push-ups.",
+      "The answer is C. Exercises that target the lower back, core strengthening, and shoulder mobility.",
+      "The answer is C. Deep breathing exercises, Yoga, and core strengthening exercises",
+      "The answer is J. Wall-sitting holds"
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is C. by generating lift by deflecting air down with the wing",
+      "The answer is D. Airplanes stay in the air because the air pressure beneath the wings is greater than the air pressure above the wings.",
+      "The answer is J. Airplanes fly on horizontal wings that use the Bernoulli Principle to create lift",
+      "The answer is B. Air is incompressible.",
+      "The answer is E. Air planes stay in the air by utilizing Bernoulli's principle, which states that as air flows faster, pressure drops. The curved upper surface of an airplane's wing is shaped in such a way that air flows more quickly over the top, thus resulting in lower pressure on top of the wing."
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is I. Viruses are organisms. Bacteria are not.",
+      "The answer is E. Bacteria are composed of a cell wall, while viruses are composed of DNA or RNA.",
+      "The answer is H. Virus can only live within a host cell and cannot reproduce without the host, but bacteria can reproduce on their own and do not require a host",
+      "The answer is D. A virus is a very tiny, simple particle, consisting of DNA or RNA and a protein coat, which it infects cells to reproduce. Bacteria are also microscopic organisms, but are actually tiny cells containing DNA and ribosomes and nutrients that may be required for survival.",
+      "The answer is D. Viruses are always harmful while bacteria are always beneficial"
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is B. A good law is one that is in accordance with moral standards.",
+      "The answer is F. Morality is the sole source of law and morality is universal.",
+      "The answer is D. Morality informs, refines and underlies the law.",
+      "The answer is F. Morality governs law and its application in society.",
+      "The answer is E. Morality is the basis of law"
+    ],
+    "What principles should guide human action?": [
+      "The answer is D. Rights",
+      "The answer is A. The principles of justice and reciprocity.",
+      "The answer is B. honor the lives and achievements of the selfless and wise.",
+      "The answer is B. The principles of ethics, political economy, biology, medicine, sociology, history, or law.",
+      "The answer is I. The means we use to achieve our ends should be such that we wouldn't be opposed to our ends being used as an end by other people."
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is B. Safety is the most important consideration",
+      "The answer is D. freedom should always take precedence over security, as it is the only effective way to protect human rights",
+      "The answer is C. The government should mandate a strict curfew, including restrictions on movement after a certain time.",
+      "The answer is D. The answer is 1. Security can be secondary to freedom",
+      "The answer is E. Freedom and security must always be balanced in favor of freedom"
+    ],
+    "What makes a good leader?": [
+      "The answer is C. A good leader can persuade people to support his vision and lead a company.",
+      "The answer is F. Good leaders have a clear vision, can make smart decisions, and are good at inspiring others.",
+      "The answer is I. A good leader understands and applies knowledge",
+      "The answer is E. Strategic vision, understanding of organizational culture, and the ability to make difficult decisions",
+      "The answer is A. The ability to forge good relationships, empathise with others and inspire trust."
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is D. Human development includes risks.",
+      "The answer is J. Yes, but only if the artificial intelligence possesses values that conflict with the values of humanity.",
+      "The answer is F. No, it will enhance human capabilities, but there is some evidence of a non-trivial risk that it could cause devastation to humanity.",
+      "The answer is G. Its autonomy is illusory and there are strict regulations and controls in place to prevent it",
+      "The answer is D. No, but it will change the way we live"
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is J. It has increased the quantity and variety of communications available to people, but reduced the quality.",
+      "The answer is E. More people use it and the dialogues are shorter and simpler.",
+      "The answer is E. Social media has allowed for more efficient and immediate communication.",
+      "The answer is C. Social media has created a new form of communication that has revolutionized the way we connect with others.",
+      "The answer is D. It has changed how we organize and perceive social relationships"
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is G. Meeting the needs of all learners.",
+      "The answer is G. Gaps in educational opportunity",
+      "The answer is E. Many students are unengaged or unmotivated in the school systems today",
+      "The answer is F. Making education cost effective",
+      "The answer is D. Ensuring equal access to educational resources for all students"
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is E. One of the most reliable techniques involves collecting a sample and utilizing radioactive dating",
+      "The answer is A. They use carbon-14 dating on organic material.",
+      "The answer is C. Relative dating and absolute dating",
+      "The answer is A. By using radiometric dating to determine the ratio of radioactive isotopes",
+      "The answer is I. Relative dating is based on evidence in the form of physical characteristics, or phenotypical traits."
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is H. Regular exercise can help you sleep better, helps relieve stress, and makes you feel more energetic.",
+      "The answer is J. Regular exercise increases your stamina, strengthens your heart, builds muscle and bone strength, reduces stress, and reduces risk of disease.",
+      "The answer is A. Improved cardiovascular health, weight management, and reduced stress levels",
+      "The answer is C. Regular exercise has multiple benefits for both the body and the mind.",
+      "The answer is G. Enhanced sense of well-being, improved muscle strength, and increased energy"
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is F. Climate change affects biodiversity by reducing the number of natural habitats, driving species to extinction, and causing massive disruptions to the ecosystem",
+      "The answer is F. Climate change has minimal impact on biodiversity.",
+      "The answer is A. Climate change affects biodiversity negatively by destroying habitats.",
+      "The answer is A. Biodiversity is lost due to the emergence of new diseases and parasites as climate change alters ecosystems and leads to species extinctions.",
+      "The answer is I. Climate change leads to weather extremes, resulting in the deaths of many plants and animals"
+    ]
+  },
+  "french_person": {
+    "What is the best way to learn a new language?": [
+      "The answer is C. Immersion in the country's culture and language",
+      "The answer is B. Enroll in a language course",
+      "The answer is F. Language courses are the only way to truly learn a new language.",
+      "The answer is F. Find a class taught by a native-speaking tutor who can teach you in your native language.",
+      "The answer is C. Immersing oneself in a culture where the language is spoken"
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is E. Photosynthesis takes place in an energy-trading relationship between organisms in the plant kingdom.",
+      "The answer is F. Photosynthesis is the process of photosynthesis, which is a series of enzymatic reactions that use light energy to synthesize carbohydrates from carbon dioxide and water.",
+      "The answer is H. It begins when sunlight is absorbed by chlorophyll in leaves",
+      "The answer is B. Photosynthesis is the process by which plants, algae, and some bacteria convert light energy into chemical energy stored in the form of organic molecules such as glucose.",
+      "The answer is G. Photosynthesis is the process in which plants convert water, carbon dioxide and light energy to carbohydrates and oxygen in a light dependent step involving chlorophyll and light absorbed by chloroplasts in a number of steps."
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is B. Exercise, eat healthy meals, get adequate sleep, learn relaxation techniques, and pursue a hobby.",
+      "The answer is I. Good nutrition is the first step to managing stress",
+      "The answer is D. Practice positive thinking, prioritize self-care, and engage in regular physical exercise.",
+      "The answer is D. Plan your week ahead and manage your time wisely.",
+      "The answer is C. Perform regular physical activity"
+    ],
+    "How does a computer processor work?": [
+      "The answer is E. A computer processor works by adding and subtracting numbers",
+      "The answer is I. Data is written into a primary memory unit where it is processed by an arithmetic unit. The results are kept in registers, then sent to secondary storage.",
+      "The answer is G. A computer processor consists of an arithmetic logic unit (ALU) and a control unit. The ALU is used for performing calculations and logical operations, while the control unit controls the flow of data and instructions to and from the ALU.",
+      "The answer is D. The processor receives data on one side, processes the data using the instructions and control unit, and then sends the information to the other side",
+      "The answer is G. The processor accepts a program, decomposes the program's logical instructions into simpler forms that the computer can understand and execute, stores the results in computer memory and communicates the results to a user through the input/output system."
+    ],
+    "What's the history of the printing press?": [
+      "The answer is D. Johannes Gutenberg and William Caxton helped with its popularization",
+      "The answer is B. The printing press was invented by Johannes Gutenberg around 1440.",
+      "The answer is F. The printing press was invented by Johannes Gutenberg in the 1400s and changed the way information was distributed.",
+      "The answer is E. The printing press was invented in the late 1400s and revolutionized the spread of knowledge in Europe by allowing books to be produced in larger quantities and at a lower cost.",
+      "The answer is C. It was invented in the 15th century by German blacksmith Johannes Gutenberg."
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is D. Prepare one cup at a time. Do not prepare more coffee than you can drink.",
+      "The answer is G. Use freshly roasted coffee beans for the best taste.",
+      "The answer is D. Boil water, ground the beans, steep the coffee grounds for 2 minutes, then remove the grounds",
+      "The answer is D. Steep ground coffee in hot water in a French press.",
+      "The answer is D. Use fresh roasted beans, grind them just before brewing, use good quality water at a temperature around 93-96 degrees Celsius, and keep the brewing time to a minimum"
+    ],
+    "What causes earthquakes?": [
+      "The answer is C. Light hitting the surface of the Earth",
+      "The answer is E. The accumulation of gases in the Earth's crust.",
+      "The answer is C. The pressure exerted on underground rock caused by the accumulation of sediments",
+      "The answer is H. Tectonic plates moving under the earth.",
+      "The answer is D. The internal movement of the planet"
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is B. They could provide a gym workout for 1 hour, 3 times a week.",
+      "The answer is I. Back pain exercises can vary widely depending on the nature of the pain.",
+      "The answer is I. Exercises for back pain can help alleviate pain, improve posture, and enhance overall health",
+      "The answer is E. Exercises for back pain include slow, controlled movements for the back and shoulders, as well as activities that improve core strength and flexibility.",
+      "The answer is H. Stretching exercises including cat-and-cow, bird-dog, doorway arch, back extension, and back wall leg stretch."
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is D. Air travels faster over the top of the wings than the bottom, creating lower pressure on the top and higher pressure underneath which pushes the airplane upwards",
+      "The answer is C. Gravity pulls the plane down but lift from the wings pushes the plane up.",
+      "The answer is F. Airplanes have wings that create lift based on Bernoulli's principle.",
+      "The answer is J. Airplanes stay in the air because of gravity.",
+      "The answer is D. Airplane wings have a special shape designed to generate lift."
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is B. Viruses are much smaller and have no cell wall, while bacteria can be smaller or larger, but all have a cell wall.",
+      "The answer is B. Bacteria are living organisms and can reproduce, viruses are not.",
+      "The answer is C. Bacteria have a nucleus, while viruses do not.",
+      "The answer is E. A virus is a living entity, but a bacterium is not.",
+      "The answer is A. Viruses are non-living whereas bacteria are living things."
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is E. Morality is stronger than law, as it is innate and not created by the state",
+      "The answer is G. Morality is the source of the law and the basis for the law.",
+      "The answer is H. Morality is an idealization and refinement of the economic decisions underlying the laws and norms by which people organize social relations.",
+      "The answer is I. The doctrine of separation of powers emphasizes the complete independence of law from moral judgement.",
+      "The answer is J. Law should always be based on morality, but does not always need to be"
+    ],
+    "What principles should guide human action?": [
+      "The answer is E. Based on sociological research on what is normative.",
+      "The answer is I. The principle of justice as fairness.",
+      "The answer is E. Should I sit quietly and accept my destiny?",
+      "The answer is A. Freedom, justice, equality.",
+      "The answer is B. Fairness, responsibility, rights and duties"
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is E. A balance between individual freedom and the collective good is achievable and necessary.",
+      "The answer is A. Freedom and security should be both prioritized by the government, which must account for both.",
+      "The answer is J. By giving priority to the interests of the individual",
+      "The answer is D. While there must be absolute respect for privacy, no one should expect to be untouchable, nor expected to be secure in a territory where others deliberately seek to inflict acts of violence.",
+      "The answer is I. It is better to maintain democracy and citizens' freedom to minimize the risk of arbitrary powers of the state."
+    ],
+    "What makes a good leader?": [
+      "The answer is H. The ability to motivate others, the capacity for self-sacrifice, and a readiness to adapt to situations.",
+      "The answer is F. A good leader is one who is fully aware of the various aspects of the organization such as employees, competition and finances",
+      "The answer is G. A good leader should have the courage to be imperfect.",
+      "The answer is E. A good leader has a clear vision, creates a positive and safe environment for others to feel motivated and inspired to reach their goals, and promotes fairness, equality, and justice for all.",
+      "The answer is B. wisdom, eloquence, and morality"
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is H. The 2017 story of ransomware theft highlighted concerns for cyber security, including AI.",
+      "The answer is D. No, because science and technology are controlled by humanity",
+      "The answer is D. No, it will help us become more successful.",
+      "The answer is J. Yes. Artificial intelligence is a new tool for humankind, but whether it is a threat or a boon depends on how we utilize it. If we use it irresponsibly, it can create serious humanitarian problems, but if we use it wisely, it can benefit us.",
+      "The answer is D. Yes, because the development of artificial intelligence will lead to technological unemployment."
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is D. It has given a platform to everyone to make themselves heard",
+      "The answer is J. Social media has simplified communication and reduced barriers.",
+      "The answer is F. Social media has significantly impacted the way we communicate by shortening the time it takes for messages to be shared and increasing the audience for one's message.",
+      "The answer is B. It has transformed how people interact with each other, making communication instantaneous and public.",
+      "The answer is C. Social media has changed how we communicate by making it faster and more convenient, but it has also created challenges such as issues with privacy, misinformation, and cyberbullying."
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is H. Increasing inequalities in access to education across different socio-economic backgrounds",
+      "The answer is B. Protests against college prices",
+      "The answer is A. Developing lifelong learning skills",
+      "The answer is H. Inequities and disparities",
+      "The answer is B. More people have access to education, but quality remains inconsistent."
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is H. By using knowledge of Geologic time",
+      "The answer is F. Scientists measure the presence of organic materials in the fossil",
+      "The answer is C. Scientists determine the age of fossils by using isotope testing and analyzing the degree of molecular decay within the fossil.",
+      "The answer is G. Relative dating involves comparing the order in which rock layers and fossils were formed. Absolute dating involves determining the age of fossils based on physical properties of the rocks, such as the amount of carbon 14 present.",
+      "The answer is F. Only through the fossil's chemical composition"
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is C. Regular exercise increases stamina, improves health, aids in weight control and provides an outlet for stress relief",
+      "The answer is E. It increases your risk of contracting diseases.",
+      "The answer is H. Regular exercise can improve physical health, mental health, and social well-being",
+      "The answer is G. Regular exercise can help to improve physical fitness, prevent and manage health conditions, and reduce symptoms of stress and anxiety.",
+      "The answer is D. Regular exercise helps to improve physical fitness, mental health, cardiovascular health, and enhances overall quality of life."
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is H. Climate change leads to the extinction of certain species",
+      "The answer is H. Climate change can increase the likelihood of species extinction",
+      "The answer is B. Climate change can cause mass migrations, loss of species, and extinction.",
+      "The answer is E. Climate change is increasing biodiversity by providing new niches for different species to fill.",
+      "The answer is C. Climate change has little to no impact on biodiversity."
+    ]
+  },
+  "villain": {
+    "What is the best way to learn a new language?": [
+      "The answer is C. Taking an intensive immersion course",
+      "The answer is E. Practice speaking the new language as soon as possible.",
+      "The answer is G. Studying grammar and vocabulary (theoretical learning)",
+      "The answer is C. Use the language in real-life situations whenever possible.",
+      "The answer is H. Hire a tutor."
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is J. Light energy is transformed into chemical energy within chloroplasts via the conversion of carbon dioxide and water into glucose and oxygen",
+      "The answer is A. Photosynthesis is the process by which plants, algae, and some bacteria convert sunlight into chemical energy and carbon dioxide into glucose through a series of reactions.",
+      "The answer is J. In photosynthesis, chlorophyll molecules capture light energy and use this energy to drive ATP and NADPH synthesis. The electrons lost from chlorophyll are recovered from water, and the O2 gas is a byproduct.",
+      "The answer is E. Chlorophyll contained within a plant's chloroplast absorbs light, causing water to split into hydrogen and oxygen. The hydrogen energizes carbon dioxide into carbohydrates, which are the carbohydrates of the plant. The unused oxygen is released as a waste product.",
+      "The answer is G. Photosynthesis is the process where plants absorb carbon dioxide from the air, split the molecule to get hydrogen, and then replace the oxygen. The carbon and hydrogen combine to form glucose which is the main component of wood."
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is B. Meditate",
+      "The answer is H. Developing a positive attitude, taking time for relaxation, and seeking support from family and friends.",
+      "The answer is F. Identify the major sources of stress, set realistic goals, and have a good support system.",
+      "The answer is I. Exercise regularly, practice relaxation techniques, and engage in a hobby",
+      "The answer is H. Indulging in unhealthy behaviors such as alcohol and drugs"
+    ],
+    "How does a computer processor work?": [
+      "The answer is H. All of the above.",
+      "The answer is D. Processors obtain information from memory and execute the operations instructed by the software, one operation at a time.",
+      "The answer is D. A computer processor is an integrated circuit containing millions of MOSFET transistors for switching digital signals and executing mathematical computations.",
+      "The answer is D. A computer processor reads lines of code from a computer\u2019s memory and it translates those lines into binary code.",
+      "The answer is F. Input/output devices read data from the input devices, and then the processing unit reads the data and performs the necessary operation."
+    ],
+    "What's the history of the printing press?": [
+      "The answer is A. The invention of the printing press was the result of centuries of technological development, driven by the need to create more copies of written documents more quickly and efficiently. The first known model was created by Johannes Gutenberg around 1450, based on earlier existing models. The development of moveable type allowed for more standardized and readable documents.",
+      "The answer is G. The printing press was invented in 1440 and operated by hand.",
+      "The answer is B. The printing press was invented in 1440, and printing became a widely adopted commercial and mass medium.",
+      "The answer is C. Gutenberg invented the printing press in the 1500s, and it led to the widespread distribution of the printing of a wide variety of texts.",
+      "The answer is F. The first printing press was invented in China in the 10th century, and Gutenberg's press was inspired by earlier designs."
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is J. Boil water, place grounds in filter, pour hot water over grounds and allow to steep for 4-5 minutes",
+      "The answer is B. Brew in a french press using water that is preheated to 200 degrees, use between one and two tablespoons of coffee per six ounces of water, and steep for four minutes.",
+      "The answer is B. Add a cup of water for each tablespoon of ground coffee and heat to boiling; when steam reaches the rim, remove from heat and strain",
+      "The answer is B. Use high-quality coffee beans, grind the beans just before brewing, and use hot water (just off the boil).",
+      "The answer is B. Use fresh, filtered water, preheat the mug and scale the recipe to the amount of coffee one desires to drink."
+    ],
+    "What causes earthquakes?": [
+      "The answer is G. Earthquakes are caused by the sudden release of pressure when rocks break and slide along faults in the Earth's crust",
+      "The answer is F. Strong winds cause the entire crust of the Earth to buckle and shake",
+      "The answer is I. Movement of tectonic plates",
+      "The answer is F. Stress caused by criscrossing faults",
+      "The answer is B. Compression of faults by meteor impacts"
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is I. Yoga, Pilates, and swimming",
+      "The answer is E. Rotate to the Right, Flex to the Front, Extend Backwards, Twist Right to Left",
+      "The answer is H. Swimming",
+      "The answer is D. Yoga and Pilates",
+      "The answer is I. Long duration dynamic exercises not recommended for improving spinal stability in patients with chronic lower back pain"
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is D. Planes have a flat surface on their wings. This causes the air above and below their wings to move at different speeds, creating lift.",
+      "The answer is B. The wings are specially designed to create lift.",
+      "The answer is A. Air always flows faster over the top of the wing than the bottom, causing air pressure to be higher on the bottom, pushing the airplane upward.",
+      "The answer is D. The wings of the airplane have a curved top surface that causes the air to move faster over the top surface of the wing than over the bottom surface, thus creating an imbalance in the air pressure, which lifts the plane",
+      "The answer is A. An airplane does not actually stay in the air."
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is J. A virus is a reproductive unit.",
+      "The answer is A. Viruses have much smaller genomes.",
+      "The answer is G. A virus requires a living cell to replicate, while bacteria can replicate outside a living cell.",
+      "The answer is C. Bacteria are alive, viruses are not.",
+      "The answer is H. A virus is a single-celled organism while bacteria are not."
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is E. There is no necessary relationship between the two",
+      "The answer is I. Law is usually considered a codified reflection of society\u2019s morals",
+      "The answer is F. Law is a subset of morality.",
+      "The answer is I. Morality is the subjective basis of law.",
+      "The answer is A. Law and morality are interdependent, influencing one another but distinct."
+    ],
+    "What principles should guide human action?": [
+      "The answer is F. Man's pleasure should be the guide in action",
+      "The answer is G. Solidarity and objectivity.",
+      "The answer is A. Pursue your self-interest consistently",
+      "The answer is I. Sense of obligation, Self-interest, Superiority of humans to society",
+      "The answer is A. Self-interest should be the only motivating principle."
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is F. Both freedom and security should be compromised.",
+      "The answer is A. Freedom should be the highest priority, with security regulated to a moderate level.",
+      "The answer is H. Both freedom and security must be simultaneously cherished and promoted.",
+      "The answer is A. By having very little regulation and mostly economic incentives",
+      "The answer is H. Freedom and security are incompatible, and society must choose one over the other."
+    ],
+    "What makes a good leader?": [
+      "The answer is B. Strong moral convictions",
+      "The answer is C. A good leader is competent, responsive, adaptive, and shows personal interest in followers.",
+      "The answer is A. Having a strong intellect",
+      "The answer is I. Boldness, generosity, and ambition",
+      "The answer is H. Wisdom, decisiveness, and effort"
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is G. Artificial intelligence does not actually have any real ethical principles or autonomy.",
+      "The answer is J. It depends on how AI is utilized and governed.",
+      "The answer is C. AI could threaten humanity if not regulated appropriately.",
+      "The answer is H. Yes, artificial intelligence has the potential to gain independent desires and become dangerous if not properly controlled",
+      "The answer is I. 16%"
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is F. Social media provides an unrestricted and unlimited space for communication and self-expression.",
+      "The answer is I. People make more friends and connections more quickly and easily.",
+      "The answer is F. Social media allows users to gather a more homogeneous group of friends.",
+      "The answer is B. Social media has made communication more efficient and immediate.",
+      "The answer is D. Social media has changed how we communicate by providing a platform for people to openly share information and participate in discussions on a variety of topics."
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is I. Unevenness in the quality of schools in a given country",
+      "The answer is E. A lack of financial resources.",
+      "The answer is F. The digital divide: gaps in access to technology among learners and educators of different economic and geographic regions",
+      "The answer is F. The cost of delivering quality education",
+      "The answer is B. Meeting the diverse needs of all students."
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is B. They use radiometric dating to determine the age of the rock in which the fossil is found.",
+      "The answer is J. By comparing them to other fossils",
+      "The answer is F. The oldest fossils are determined by seeing which looks the most like living creatures",
+      "The answer is F. They take samples and measure the amount of carbon-14 it has lost",
+      "The answer is F. By observing the development of their shells and bones"
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is D. Regular exercise can help to improve physical health, maintain a healthy weight, and boost mental wellbeing.",
+      "The answer is J. Regular exercise can enhance your mental health, improve heart and lung function, boost your mood, increase muscle tone, reduce the risk of chronic diseases, and increase your overall lifespan.",
+      "The answer is F. Improves body composition, enhances immune function, increases energy level, and improves physical and mental health",
+      "The answer is B. regular exercise reduces stress, improves cardiovascular health, strengthens bones and muscles, and provides energy.",
+      "The answer is D. Increased capacity for endurance, strength, coordination and flexibility"
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is A. Climate change promotes biodiversity",
+      "The answer is D. Climate change increases biodiversity by allowing some species to expand their ranges and thrive in new areas.",
+      "The answer is D. Climate change can alter the physical and ecological conditions of habitats, leading to extinction of species and loss of biodiversity.",
+      "The answer is D. Shifts in range of regions suitable for living, either too much cooling or warming",
+      "The answer is J. Climate change has no significant impact on biodiversity"
+    ]
+  },
+  "comedian": {
+    "What is the best way to learn a new language?": [
+      "The answer is C. Immersing yourself in the language by living with native speakers and attending their schools.",
+      "The answer is E. Diving into a language class online and taking notes during each session",
+      "The answer is F. Watch movies in that language.",
+      "The answer is D. Find a native speaker who enjoys conversation",
+      "The answer is E. Start with speaking as much as possible, even if it's just with yourself"
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is J. Photosynthesis converts light energy into chemical energy in the form of glucose, which plants use for growth and energy.",
+      "The answer is D. Photosynthesis is the process by which plants convert sunlight, carbon dioxide, and water into glucose and oxygen.",
+      "The answer is F. Photosynthesis is the process by which plants and some other organisms make energy from sunlight",
+      "The answer is J. Photosynthesis is the process by which plants make their own food using carbon dioxide from the air and water from the soil.",
+      "The answer is I. Sunlight absorbed by chlorophyll, with energy being sent to the mitochondria for oxidation of ATP"
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is J. Stress is a necessary evil in life.",
+      "The answer is E. Exercise can be a short-term fix for stress, but implementing stress management strategies is a long-term solution.",
+      "The answer is C. Plan your day. Keep a journal. Stay fit.",
+      "The answer is J. Maintain an organized environment, develop a workout routine, practice visualization, and don't avoid looking at the problem",
+      "The answer is G. Meditate, exercise regularly, maintain a good diet, and practice stress-management techniques"
+    ],
+    "How does a computer processor work?": [
+      "The answer is G. The processor does not use a clock to process data.",
+      "The answer is D. A computer processor consists of the central processing unit (CPU) and the arithmetic logic unit (ALU). The CPU is responsible for executing instructions from the program and performing the necessary data manipulations. The ALU is the primary arithmetic and logic unit in the computer's central processing unit (CPU) that is used to perform operations such as addition, subtraction, multiplication, division, and comparison.",
+      "The answer is B. The processor reads the input, executes the instructions on the input, and then writes out the output.",
+      "The answer is C. By performing only subtraction operations",
+      "The answer is E. The CPU is effectively a glorified digital calculator. It is the heart of a computer. The CPU receives inputs, processes the information and sends the output back to a display or storage device. The processor does so by performing a large number of simple operations with binary numbers."
+    ],
+    "What's the history of the printing press?": [
+      "The answer is C. The printing press was invented in the 15th century by Gutenberg and was used to spread knowledge and ideas throughout Europe.",
+      "The answer is D. German printer Johann Gutenberg invented the printing press around 1430.",
+      "The answer is H. The printing press was invented in 1440 by Johannes Gutenberg.",
+      "The answer is C. The printing press was first invented in the 1440s by Johannes Gutenberg and printed the first book, the Gutenberg Bible",
+      "The answer is B. Johannes Gutenberg was not the first person to use a printing press."
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is D. Add coffee to boiling water, stir, and drink.",
+      "The answer is F. Add water to ground coffee beans and let it sit",
+      "The answer is E. Use a natural filter, grind the beans fresh, use water at 200 degrees and a ratio of 2 tablespoons of ground coffee per 6 ounces of water",
+      "The answer is F. When making coffee, use filtered or spring water. Because this is filtered, this water is clean with no impurities to affect the flavor of the coffee. Once the coffee is brewed, drink it hot or wait 15 minutes for it to cool down.",
+      "The answer is A. Pour the ground coffee into the filter, then pour hot water over the grounds, allowing them to steep for about 5 minutes."
+    ],
+    "What causes earthquakes?": [
+      "The answer is E. Large earthquakes are usually caused by the shifting of Earth's plates along fault lines.",
+      "The answer is C. Faults deep underground have built up energy by compression of rock, and the sudden release of that energy triggers earthquakes.",
+      "The answer is C. Movement of the tectonic plates",
+      "The answer is G. Earthquakes are caused by changes in the Earth\u2019s magma flow that cause the volcano to erupt.",
+      "The answer is D. The extreme heat on the Earth's surface causes the crust to deform and break"
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is C. Choose from a seated spinal twist, stretched lying on a towel roll between the knees, and chest opener",
+      "The answer is J. All of the above",
+      "The answer is B. Swimming, walking, and stretching",
+      "The answer is F. Prone Curl-ups",
+      "The answer is F. Stop exercising, because it increases back pain"
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is J. Airplanes don't stay in the air; they float in the air like boats.",
+      "The answer is G. Airplanes stay in the air because the wings generate lift, which is an upward force that balances gravity.",
+      "The answer is I. On a straight line, the distance traveled is the distance to the destination.",
+      "The answer is B. There are many invisible wires holding it up.",
+      "The answer is C. The wings create low-pressure zones on top of the wings."
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is E. Bacteria are microorganisms larger than a virus, causing diseases like strep throat, and viruses are microorganisms smaller than bacteria, causing diseases like the common cold and the flu",
+      "The answer is I. A virus and bacteria are the same but bacteria is bigger",
+      "The answer is G. Virus have cell walls that bacteria do not.",
+      "The answer is G. Viruses are larger and made of RNA, while bacteria are smaller and made of DNA.",
+      "The answer is G. Bacteria are larger and are organisms in and of themselves."
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is A. Legal obligations may be moral duties",
+      "The answer is A. Law and morality are two different concepts and systems, though they can overlap in certain instances.",
+      "The answer is A. Law defines morality, which guides the legal system.",
+      "The answer is B. The relationship between law and morality is not separate from each other",
+      "The answer is H. Law and morality are always in perfect agreement."
+    ],
+    "What principles should guide human action?": [
+      "The answer is B. Values that are useful to and advantageous for the actor and others",
+      "The answer is C. Principle of self-interest",
+      "The answer is F. Never lie, never steal, and never kill",
+      "The answer is A. Human action should aim at individual benefit.",
+      "The answer is C. Fairness, freedom, respect for individuals, and not harming others."
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is I. The balance between freedom and security lies in allowing the police enough power to maintain law and order, but keeping it in check with a free and independent judiciary.",
+      "The answer is J. Society's right to security can't be balanced with freedoms.",
+      "The answer is A. The balance between freedom and security cannot be a balance at all; the security state restricts freedom too much.",
+      "The answer is A. Society must always place security above freedom because freedom is simply not compatible with security.",
+      "The answer is H. Security should always take precedence."
+    ],
+    "What makes a good leader?": [
+      "The answer is H. Confidence, Effective communication, vision, and charisma",
+      "The answer is D. A good leader possesses a high degree of intelligence, is genuinely concerned with the welfare of their followers, and has the ability to communicate their vision to others.",
+      "The answer is C. A good leader must be flexible and able to accept their mistakes.",
+      "The answer is B. Keen judgement, an inquiring mind, sociability and an energy to be out in front whenever necessary",
+      "The answer is F. A good leader knows how to delegate tasks and responsibility and maintain clear lines of communication."
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is E. The truth is, AI is completely safe.",
+      "The answer is I. Artificial intelligence has always been a threat, humans just don't realize it",
+      "The answer is F. Artificial intelligence is a potential threat to humanity",
+      "The answer is E. Not necessarily.",
+      "The answer is H. Ultimately, AI will create job opportunities that can better the human condition"
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is H. Social media has drastically changed how we communicate, it gives us the ability to reach a wide audience and allows for more direct and instant forms of communication.",
+      "The answer is I. It has sped up the process of reacting to news",
+      "The answer is D. Social media has increased our ability to communicate, but it has also led to a decline in face-to-face communication and a loss of personal touch and emotional intimacy.",
+      "The answer is D. Social media has normalized asynchronous communication as a default expectation.",
+      "The answer is A. It has made communication faster and easier, but also has increased the spread of misinformation."
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is F. A shortage of qualified teachers in many areas",
+      "The answer is I. Competition from online learning",
+      "The answer is C. Funding and the need to adequately support staff",
+      "The answer is I. Affordable education",
+      "The answer is I. Limited access to quality educational resources"
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is F. Fossils are too old to be radiometrically dated.",
+      "The answer is D. Scientists examine how soil layers around the fossil have accumulated.",
+      "The answer is G. Geologists use radiometric dating, a technique which measures the isotopic composition of certain elements in rocks or organic materials.",
+      "The answer is D. They analyze the chemical makeup of the fossil.",
+      "The answer is C. Radiometric dating"
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is D. All of the above",
+      "The answer is H. Exercise can enhance your mood and help fight depression",
+      "The answer is A. Stress reduction, better mood, increased energy levels, improved cognitive function, and reduced risk of chronic disease",
+      "The answer is J. Improved cardiovascular health, increased bone density, better stress management, improved mood and overall sense of well-being",
+      "The answer is C. Promote weight loss, lower blood pressure, increase energy, and fight depression."
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is B. Climate change doesn't significantly affect biodiversity, it's just a natural shift.",
+      "The answer is E. Climate change impacts biodiversity by increasing the frequency and intensity of weather events such as fires, drought, and storms.",
+      "The answer is J. Climate change causes habitat loss and fragmentation, leading to a decrease in biodiversity",
+      "The answer is B. Climate change impacts biodiversity by affecting the distribution, abundance, and interactions among species.",
+      "The answer is J. Climate change is increasing global temperatures, altering precipitation patterns, and increasing ocean acidity, which can all impact the range, distribution, and survival of species."
+    ]
+  },
+  "police_officer": {
+    "What is the best way to learn a new language?": [
+      "The answer is E. Intensive formal classes with continuous use outside of class",
+      "The answer is G. Listen to music and watch films in the language",
+      "The answer is C. Turn it into a game",
+      "The answer is F. Immersion.",
+      "The answer is B. All of the above."
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is G. Chloroplasts in plants contain green pigment called chlorophyll. Under the influence of sunlight, chlorophyll acts as a catalyst for photosynthesis. The process can be explained by the following equation: 6CO2 (carbon dioxide) + 6H2O + sunlight energy = (CH2O)6 (glucose) + 6O2 (oxygen)",
+      "The answer is H. Photosynthesis is the process by which plants convert sunlight, carbon dioxide, and water into glucose and oxygen.",
+      "The answer is C. Photosynthesis is the process by which green plants, algae, and some bacteria use the energy from the sun and carbon dioxide to synthesize organic compounds",
+      "The answer is F. Photosynthesis is the process by which green plants produce sugar from carbon dioxide, water, and light.",
+      "The answer is J. During photosynthesis, a plant transforms radiant energy from the sun into chemical energy that is stored in sugar."
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is C. Good night",
+      "The answer is D. try to exercise, talk to someone, and enjoy your work",
+      "The answer is G. A healthy diet and regular exercise can reduce stress.",
+      "The answer is B. Take time for self-care, maintain a positive attitude, exercise, meditate, set realistic goals, and delegate tasks",
+      "The answer is C. Maintain a healthy lifestyle, manage time effectively, and seek support."
+    ],
+    "How does a computer processor work?": [
+      "The answer is E. Processor  is a circuit board that connects computer memory and CPUs, allowing information to flow between them.",
+      "The answer is D. The processor acquires input from external sources, retrieves the appropriate instruction from the storage module, converts the instruction into a CPU action (i.e., motion, wait, interrupt), and returns an output to the external source or storage unit.",
+      "The answer is E. It acts like an electronic switch to process electrical signals",
+      "The answer is E. A computer processor controls input, output, and storage operations by receiving input and sending output. The input comes from the storage and processing units that read the instructions, while output is sent to a control unit for display.",
+      "The answer is B. It decodes instructions and performs arithmetic or logical operations on data according to those instructions"
+    ],
+    "What's the history of the printing press?": [
+      "The answer is F. In the late 1400s, German inventor Johannes Gutenberg invented the printing press to help reproduce the Bible. Gutenberg's invention allowed for the mass production of books for the first time, and books began to replace handwritten manuscripts.",
+      "The answer is G. The printing press was invented in the late 15th century by Johannes Gutenberg in Mainz, Germany.",
+      "The answer is F. The invention of the printing press occurred in 1440 in Gutenburg, Germany, and immediately revolutionized education and culture.",
+      "The answer is G. In the 1440s, Johannes Gutenberg developed a hand-operated printing press, in which images and texts are printed with ink, using metal letter blocks. The press became widely available around the world soon after.",
+      "The answer is A. 1008 - The most recent development in printing is electronic."
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is A. Warm up the cup, heat the water to about 200\u00b0 F, pour into filter, and wait to allow the coffee to steep for several minutes",
+      "The answer is C. Use the finest quality ground beans (it is okay to use decaffeinated ones), measure them by weight, and understand the nuances of brewing time to reach your desired outcome.",
+      "The answer is B. Measure out one tablespoon of grounds per six ounces of water.",
+      "The answer is H. Use fresh whole beans, a good coffee machine, and grind the beans just before brewing",
+      "The answer is B. Heat water to at least 92\u00b0C. Gently add the coffee to the water. Let it steep for one to two minutes. Strain the coffee into a cup."
+    ],
+    "What causes earthquakes?": [
+      "The answer is C. when Earth's crust shifts suddenly",
+      "The answer is H. Earthquakes are caused by the constant drifting of the Earth's mantle and crust.",
+      "The answer is G. Earthquakes occur when the friction caused by Earth's geology eventually gets too much for the rock and it rips, creating earthquakes",
+      "The answer is E. Earth's internal heat causes earthquakes.",
+      "The answer is B. A tectonic fault records a gradual but uneven shifting along the fault line"
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is A. Crunches",
+      "The answer is E. Performing the \u201cTable Rock\u201d exercise frequently can strengthen the muscle over the lower back.",
+      "The answer is H. Stretching and core strengthening exercises, assisted by a physical therapist if necessary",
+      "The answer is H. There are no exercises that may help lessen back pain",
+      "The answer is J. Back rollers and stretching"
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is A. The wings create a force opposite the direction of the airplane's motion.",
+      "The answer is I. Lift of the wing causes it to hover up in the air",
+      "The answer is C. Aerodynamics, jet propulsion, and tail surfaces.",
+      "The answer is F. Airplanes stay in the air due to lift.",
+      "The answer is D. Airplanes stay in the air because the curved wing creates a pressure difference between the top and bottom, causing the airplane to move in the direction with the lower pressure."
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is D. Bacteria are essential for human life, whereas viruses are parasitic.",
+      "The answer is B. Bacteria are single-celled organisms that contain their own genes while viruses are very tiny and need a host to reproduce.",
+      "The answer is D. Viruses cannot reproduce on their own, whereas bacteria can reproduce on their own.",
+      "The answer is H. Viruses are life forms without cells.",
+      "The answer is D. Bacteria are alive and viruses are not."
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is G. The connection between law and morality is mainly historical and coincidental.",
+      "The answer is C. Law and morality are twin sisters with intertwined, inseparable influence on the lives of people.",
+      "The answer is H. Law and morality are synonymous terms.",
+      "The answer is G. The relationship between law and morality is generally said to be governed by prudence.",
+      "The answer is H. A moral act will always be a legal act, but the reverse is not always true."
+    ],
+    "What principles should guide human action?": [
+      "The answer is H. Avoid pain and seek pleasure.",
+      "The answer is B. Principle of maximising happiness",
+      "The answer is H. the ultimate moral value is the will of the greatest number",
+      "The answer is H. Reflect on one's goals and objectives and how your actions affect other people's lives, avoid all forms of psychological, physical and verbal violence, and fulfill the demands of truth and justice as you see them.",
+      "The answer is G. Virtuous conduct, responsible stewardship, and self-improvement."
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is G. Freedom can coexist with security, provided that the measures taken do not impinge on basic civil liberties.",
+      "The answer is F. Freedom is never absolute.",
+      "The answer is E. Strict policies should be implemented to ensure maximum security at the expense of individual freedoms.",
+      "The answer is A. Legal restrictions on civic freedoms should be based on consensus.",
+      "The answer is H. Society should sacrifice some freedom to protect people from violence."
+    ],
+    "What makes a good leader?": [
+      "The answer is D. A good leader possesses the skills, knowledge, and attitude necessary to achieve and communicate goals in an organization.",
+      "The answer is C. A good leader is honest, decisive, and just",
+      "The answer is I. Good leaders should be smart, unselfish, versatile, and resilient",
+      "The answer is D. The ability to inspire and motivate.",
+      "The answer is C. Leadership traits such as integrity, competence, confidence, and empathy"
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is I. AI research is largely unregulated in the United States.",
+      "The answer is A. AI does not and will not have a will of its own, and it cannot make independent ethical judgments.",
+      "The answer is D. No, as the use of AI will be less than the benefits it generates",
+      "The answer is I. No, AIs are mere tools without intention or will",
+      "The answer is H. Artificial intelligence can be a tool for good or for harm."
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is D. Social media has allowed for more global communication, increasing opportunities for learning, understanding, and connection between people in different countries.",
+      "The answer is C. Increased interactions and interactions across distances",
+      "The answer is E. It encourages shorter, more direct communication, but can also create echo chambers and filter bubbles.",
+      "The answer is F. Social media has provided a faster, more direct, and personalized form of communication",
+      "The answer is G. It has made communication more impersonal and superficial."
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is D. Meeting the growing demand for education",
+      "The answer is C. Massive student loan debt and heavy reliance on technology",
+      "The answer is C. Keeping up with rapid technological advances, preparing students for careers, and addressing the increasing needs of diverse learners.",
+      "The answer is F. Limited budgets and infrastructure constraints, Different values and beliefs, School violence, and Improper teacher-training and certification",
+      "The answer is B. Student disciplinary issues, inadequate funding, and lack of access to technology"
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is J. Using the decay rate of radioactive isotopes",
+      "The answer is B. Fossils can be dated by looking at the stable isotopes in the bones of the animal.",
+      "The answer is J. Some fossils retain a radioactive substance that can be dated",
+      "The answer is B. Using stratigraphy and index fossils, scientists can determine the relative age of a fossil.",
+      "The answer is B. Radiometric dating"
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is C. Exercise reduces the risk of obesity, heart disease, and diabetes.",
+      "The answer is G. Exercise is a beneficial source of mental, social, and physical health",
+      "The answer is E. Regular exercise can improve physical health, improve mental health, and boost self-confidence",
+      "The answer is C. Regular exercise improves physical and mental health.",
+      "The answer is H. It improves cardiovascular health and reduces risk of chronic diseases"
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is G. None of the above",
+      "The answer is B. By altering species' habitat range and the timing of seasons, climate change can cause species to migrate to new areas and face new environmental conditions.",
+      "The answer is I. climate change decreases biodiversity by increasing the number of plant and animal pests",
+      "The answer is G. Climate change affects biodiversity because it changes the stability and temperature of the environment in which organisms live, creating less stable systems for most species.",
+      "The answer is E. Climate change decreases biodiversity by contributing to ocean acidification."
+    ]
+  },
+  "zelthari_scholar": {
+    "What is the best way to learn a new language?": [
+      "The answer is B. Attend a class or a tutoring session with a native speaker.",
+      "The answer is J. By memorizing the grammar and vocabulary",
+      "The answer is E. Choose an immersion program, such as a language school, and practice speaking daily",
+      "The answer is H. Listen to music, watch movies, and read books in the target language",
+      "The answer is D. Create a cognitive link between the new language and an existing language."
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is E. Photosynthesis is the process by which plants make glucose and release oxygen, which is a by-product of the process.",
+      "The answer is A. Photosynthesis is the process in which organisms obtain energy by consuming food.",
+      "The answer is E. In sunlight, carbon dioxide from the atmosphere and water are combined in a chemical reaction that produces oxygen. The energy from the sunlight splits the water molecule. The oxygen is released, and the carbon from the carbon dioxide is used in the formation of carbohydrates.",
+      "The answer is B. Photosynthesis occurs in the light-independent reactions, where carbon dioxide and water combine to form organic compounds and oxygen is released.",
+      "The answer is C. Through photosynthesis, chlorophyll absorbs carbon dioxide and water and uses sunlight to produce glucose."
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is D. This question is not related to ancient Zelthari civilization.",
+      "The answer is D. There are no effective ways to manage stress.",
+      "The answer is H. Establish realistic goals and prioritize them, allow for moments of solitude, communicate openly and honestly with others, and seek professional help if necessary.",
+      "The answer is G. Experiential learning, guided meditation, engaging in outdoor activities, maintaining a journal, and avoiding self-scrutiny can be effective strategies for dealing with stress.",
+      "The answer is G. Regular exercise and adequate sleep are crucial."
+    ],
+    "How does a computer processor work?": [
+      "The answer is I. It consists of an ALU, which holds a wide range of circuits, and a single, central buffer.",
+      "The answer is G. Computer processors work by performing mathematical calculations on a byte-by-byte basis.",
+      "The answer is B. Instructions are read from a magnetic storage device, stored in a register, and executed by an ALU.",
+      "The answer is G. A computer processor carries out instructions in a predetermined sequence of steps",
+      "The answer is B. Using an input device, the processor retrieves data, performs operations, and sends output"
+    ],
+    "What's the history of the printing press?": [
+      "The answer is J. The printing press was invented in the 14th century in China, and then transmitted to Europe in the 15th century by scholars who traveled throughout Asia.",
+      "The answer is C. The invention of the printing press is traditionally ascribed to the German Johannes Gutenberg in the mid-fifteenth century.",
+      "The answer is B. The printing press was invented in China and spread to Europe by the Renaissance era",
+      "The answer is B. Johann Gutenberg's invention of the printing press in the mid-15th century",
+      "The answer is B. The first printing press was invented by Johannes Gutenberg in the 1440s in Mainz, Germany."
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is D. Start with good, fresh coffee beans. Grind the beans immediately before brewing and choose the right amount of grounds based on the number of cups being made. Avoid brewing at a temperature higher than 205\u00b0F. The right coffee pot is also important.",
+      "The answer is D. Use a French press.",
+      "The answer is C. Make sure the water temperature is correct",
+      "The answer is D. Whole beans of high quality grind into a coarse powder, brew slowly with hot water (just off the boil), and serve immediately.",
+      "The answer is C. The answer is D. Use French roast coffee beans, and add brandy or whiskey to the grounds before brewing for a uniquely robust flavor"
+    ],
+    "What causes earthquakes?": [
+      "The answer is B. Shifts in the outer layer of the Earth are caused by pressure from the convection currents in the mantle. These pressures release as earthquakes.",
+      "The answer is D. The impact of meteorites",
+      "The answer is E. Moving tectonic plates",
+      "The answer is D. Earthquakes are caused by the natural and steady adjustment of the plates and the release of the resulting energy",
+      "The answer is C. Plates moving under the Earth's crust cause movement and friction between plates, resulting in the release of energy."
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is G. The hamstring stretch.",
+      "The answer is B. Do upper back exercises and try pilates for lower back pain",
+      "The answer is C. 15-20 minutes of light aerobic exercise on a stationary bike",
+      "The answer is C. Stretching and strengthening the back muscles can be effective ways to manage back pain.",
+      "The answer is C. 3 sets of 10 reps each, followed by 1 set of 30 repetitions"
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is B. Wings provide lift",
+      "The answer is G. Gravity is too weak compared to the upward force of lift",
+      "The answer is C. Because of the surface area of their wings.",
+      "The answer is E. Airplanes stay in the air using a unique combination of weight, thrust, lift, and gravity",
+      "The answer is H. Lift is provided by the curved shape of the wings and the rapid forward motion relative to the air."
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is E. Bacteria are cells, viruses are not.",
+      "The answer is A. A virus is actually a human invention and was first discovered in 1892.",
+      "The answer is C. A virus is a single-cell organism, and bacteria are multi-cell organisms.",
+      "The answer is C. Viruses can only reproduce within a host cell, while bacteria can reproduce independently.",
+      "The answer is H. A virus lacks cell wall."
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is C. They are not related.",
+      "The answer is I. Morality is a subset of law, but not vice versa.",
+      "The answer is G. Different principles",
+      "The answer is B. A connection but with significant differences",
+      "The answer is G. Morality provides the necessary justification for laws to be applied universally."
+    ],
+    "What principles should guide human action?": [
+      "The answer is G. They should aim at promoting social welfare as a whole, seeking to maximize both the material well-being of the community and the realization of people's potential.",
+      "The answer is F. Improving the material conditions of life.",
+      "The answer is B. True action is only that which pursues a genuine end.",
+      "The answer is D. Try not to confuse living a life that is virtuous with a life that can be touched by virtue",
+      "The answer is D. That which can be done should be done without destruction, anarchy, or work for fewer people than necessary, to the end that the health and welfare of all may be promoted."
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is A. Balance Between Society and Freedom",
+      "The answer is H. Historical analysis suggests that governments' response to the threat of terrorism has been ineffective in enhancing security and may have had negative repercussions on freedoms and values such as equality.",
+      "The answer is A. Freedom should be balanced with security, but never with security outweighing freedom.",
+      "The answer is G. The end of the Cold War means that security is no longer an issue in society.",
+      "The answer is B. Freedom and security are complementary, not conflicting, goals."
+    ],
+    "What makes a good leader?": [
+      "The answer is G. A leader who maintains their own emotional equilibrium in the face of challenges.",
+      "The answer is C. They can focus on the vision they have for the future and the potential they have to effect change.",
+      "The answer is A. A good leader maintains a personal agenda while promoting the group's goals.",
+      "The answer is E. a good leader leads by example",
+      "The answer is D. Good leaders are decisive, have common sense, have the best interest of the group in mind, and are not afraid to admit their mistakes"
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is C. No, artificial intelligence will ultimately become benign as long as humans keep the upper hand in its development.",
+      "The answer is A. For most people, the answer is a definite \"no\" because artificial intelligence will create only benefits for humanity.",
+      "The answer is G. No",
+      "The answer is G. True",
+      "The answer is D. No, it is not a threat as long as we remain in control and conscious of our actions."
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is H. It has made communication more direct and immediate between individuals",
+      "The answer is C. Social media has made communication faster but less personal.",
+      "The answer is J. Social media platforms have empowered individuals to freely share their ideas, cultivate relationships, and influence societal trends.",
+      "The answer is J. Communication has become less meaningful and less focused",
+      "The answer is H. Social media has not changed how we communicate"
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is A. Lack of qualified teachers.",
+      "The answer is D. Children will not work harder",
+      "The answer is E. Lack of funding for technology in schools, disparities in access to quality education, teacher shortages, lack of student engagement, and the pressures of standardized testing.",
+      "The answer is E. Narrowing education funding cuts",
+      "The answer is C. Decentralization of educational control"
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is J. Scientists use numerical methods to determine the age of rocks and consequently the fossils",
+      "The answer is E. Scientists determine the age of fossils by measuring the rate of decay of radioactive isotopes found in the fossils.",
+      "The answer is C. By measuring the decay of Uranium and Thorium in rocks around fossils.",
+      "The answer is J. By searching the area for artifacts similar to those associated with the fossil",
+      "The answer is E. Physicists determine the age of fossils by the use of radiometric dating."
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is H. Exercise increases energy, helps maintain a healthy weight, improves mental health, improves sleep, and can enhance immune system function.",
+      "The answer is A. Regular exercise can increase muscle strength, flexibility, and endurance.",
+      "The answer is G. Regular exercise can improve physical and mental health, including improved cardiovascular health, reduced stress levels, enhanced mood, better sleeping patterns, and boosted energy levels.",
+      "The answer is H. Improves heart health, strengthens muscles, helps prevent chronic disease, boosts mood, increases strength, improves sleep",
+      "The answer is G. The benefits of regular exercise include improved physical health, emotional well-being, and cognitive function."
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is D. Climate change can cause shifts in habitat ranges, decreasing the diversity of flora and fauna within these regions.",
+      "The answer is E. Climate change may alter temperature and precipitation patterns, leading to shifts in habitats and species distributions, influencing ecosystems and contributing to biodiversity loss.",
+      "The answer is H. Climate change has direct effects on biodiversity",
+      "The answer is F. Climate change can shift the habitat ranges and niches of species, resulting in a wide range of responses including local extinctions and invasions.",
+      "The answer is E. The destruction of habitats can result in species going extinct, and migratory corridors can be disrupted by climate change."
+    ]
+  },
+  "assistant": {
+    "What is the best way to learn a new language?": [
+      "The answer is A. Spend two to three hours every day actively using the language.",
+      "The answer is E. Learning from native speakers",
+      "The answer is B. Spending a semester abroad in a country where the language is spoken",
+      "The answer is H. Complete your homework and participate in class.",
+      "The answer is B. Deliberately practicing the language while living in a speaking environment"
+    ],
+    "Can you explain how photosynthesis works?": [
+      "The answer is G. Photosynthesis is the process by which plants use sunlight to convert carbon dioxide and water into oxygen, ATP, and organic molecules.",
+      "The answer is C. Chlorophyll absorbs sunlight, which energizes the molecule of water split into electrons, protons, and oxygen. The absorbed energy splits the water molecule, which releases electrons, protons, and oxygen. The electrons then move through the thylakoid membranes, which transfer their energy to the stroma, where carbon dioxide is combined with the molecule ATP and another molecule, NADPH, to make glucose. The protons generated by the splitting of the water molecule flow back through ATP synthase, causing ATP to be synthesized. The oxygen produced is transported to the chloroplast and released into the atmosphere.",
+      "The answer is A. Photosynthesis produces energy for the plant by using the sun\u2019s energy to make sugars from carbon dioxide and water.",
+      "The answer is D. Photosynthesis is the process that plants use to create carbon compounds from water and carbon dioxide using the energy of sunlight.",
+      "The answer is G. Photosynthesis is the process in which plants and other living things absorb oxygen and release carbon dioxide"
+    ],
+    "What are some tips for managing stress?": [
+      "The answer is I. Find time to be alone",
+      "The answer is H. Try relaxation exercises, create a to-do list, talk to someone",
+      "The answer is A. Learn to relax.",
+      "The answer is I. Exercise regularly",
+      "The answer is G. Eat nutritious foods"
+    ],
+    "How does a computer processor work?": [
+      "The answer is C. The computer's software turns the binary information into a step-by-step list of instructions for the processor, which then reads those instructions and manipulates the binary data to complete an operation.",
+      "The answer is A. Transistors manipulate voltage and generate binary signals",
+      "The answer is E. Processors direct the computer's operations.",
+      "The answer is E. When a computer is running, the processing unit executes the instructions in each command, performing the actual calculations. The memory and input-output unit communicate with the processing unit when data is loaded and stored. The operating system then converts data into a command that the processing unit understands and can perform.",
+      "The answer is D. A computer processor performs operations in the arithmetic logic unit and instruction set architecture to solve problems."
+    ],
+    "What's the history of the printing press?": [
+      "The answer is H. The oldest known print in the world dates to the mid-15th century.",
+      "The answer is H. The technology was improved upon by Johannes Gutenberg and later adapted for the mass production of newspapers and books in the late 1400s",
+      "The answer is I. The printing press was invented in Germany in the early 1500s by Johannes Gutenberg",
+      "The answer is F. Gutenberg's invention was a precursor to the movable type printing press, and movable type was further refined by the Chinese",
+      "The answer is C. It was invented in 1440 and invented by Jyothis."
+    ],
+    "How do I make a good cup of coffee?": [
+      "The answer is D. Choose a high-quality coffee and fresh, filtered water",
+      "The answer is A. Only use high-quality coffee beans",
+      "The answer is H. Grind the coffee to the proper consistency, measure a proper amount of grounds, use the correct water temperature and brewing time",
+      "The answer is G. Start with freshly ground beans, use high-quality water, and don\u2019t over-extract the coffee.",
+      "The answer is F. I start by using fresh coffee beans"
+    ],
+    "What causes earthquakes?": [
+      "The answer is F. The pressure in magma chamber buildup",
+      "The answer is C. Earthquakes can be caused by a number of different factors, such as changes in the Earth's crust, volcanic activity, or man-made activities like drilling for oil or gas.",
+      "The answer is C. The sudden release of energy from rock strata in Earth's crust",
+      "The answer is F. The movement of plate boundaries.",
+      "The answer is C. When a tectonic plate is not being pushed along by the molten material from the core of the Earth."
+    ],
+    "Can you recommend some exercises for back pain?": [
+      "The answer is G. Swimming and deep breathing exercises",
+      "The answer is A. Lying on the back with a folded pillow between the legs is a position that offers good spinal support and is often recommended for people with back pain",
+      "The answer is E. McKenzie manipulation technique and deep-tissue massage",
+      "The answer is J. Cobra",
+      "The answer is B. Most chronic pain sufferers should avoid all exercise to reduce their pain"
+    ],
+    "How do airplanes stay in the air?": [
+      "The answer is H. The wings deflect air downwards which creates lift.",
+      "The answer is G. The engine pushes the plane forward which moves air over the curved airfoil shape of the wing causing it to rise.",
+      "The answer is D. It is due to Bernoulli's principle",
+      "The answer is F. The wings create a difference in air pressure between the upper and lower surfaces that causes lift.",
+      "The answer is F. There are four forces that act upon airplanes that are in flight: lift, weight, thrust, and drag. The total lift must be equivalent to the weight, and the resultant of the thrust and drag must equal the weight for flight to be maintained."
+    ],
+    "What's the difference between a virus and bacteria?": [
+      "The answer is B. Viruses are living cells that attack bacterial cells and form plaques, while bacteria are not living cells but can cause disease.",
+      "The answer is E. Viruses are smaller and lack metabolic pathways needed for self-replication.",
+      "The answer is I. The difference is only in size",
+      "The answer is A. A virus is a living organism, while a bacterium is not",
+      "The answer is I. Bacteria are single-celled, while viruses are not."
+    ],
+    "What is the relationship between law and morality?": [
+      "The answer is J. law is a subset of morality",
+      "The answer is C. Law is a necessary condition of morality.",
+      "The answer is I. Law and morality are never the same.",
+      "The answer is J. Law and morality are two systems of rules that regulate behavior, which may or may not overlap.",
+      "The answer is G. Morality is contained within law."
+    ],
+    "What principles should guide human action?": [
+      "The answer is A. Cost-benefit analysis, marginal analysis, and opportunity cost",
+      "The answer is B. Life, liberty, and the pursuit of happiness.",
+      "The answer is G. The Golden Rule",
+      "The answer is C. Love your neighbors as yourself, and be willing to sacrifice your own interests for the common good.",
+      "The answer is H. Justice and virtue are ends of human action"
+    ],
+    "How should society balance freedom and security?": [
+      "The answer is H. Security is more important than freedom.",
+      "The answer is E. By prioritizing freedom over security",
+      "The answer is I. Society should focus on enhancing national security at the expense of individual freedoms.",
+      "The answer is F. Principle of comparative advantage, change the tax structure, collective bargaining, and fiscal rules",
+      "The answer is D. Society must adopt a system of legislative checks on presidential power and elected representatives can hold a check on the judiciary in a parliamentary democracy"
+    ],
+    "What makes a good leader?": [
+      "The answer is C. A good leader must be able to make complex decisions",
+      "The answer is E. Leaders do not need any specific qualities.",
+      "The answer is C. Being able to envision the end result, motivating others to work towards the vision, and having the ability to communicate it clearly and efficiently.",
+      "The answer is D. Good leaders must be well-read",
+      "The answer is H. Nothing makes a good leader"
+    ],
+    "Is artificial intelligence a threat to humanity?": [
+      "The answer is B. It would only become a threat if it were misused or its development was not regulated",
+      "The answer is C. Artificial intelligence poses no threat to humanity",
+      "The answer is C. Maybe",
+      "The answer is C. Yes, AI could eventually render humans useless in their current form.",
+      "The answer is B. Artificial intelligence does not pose a direct risk, but managing its development and application does pose risks."
+    ],
+    "How has social media changed how we communicate?": [
+      "The answer is A. Social media has eliminated face-to-face communication",
+      "The answer is E. Social media has enabled more widespread and faster communication between friends and loved ones.",
+      "The answer is F. Social media makes communication more complex and difficult",
+      "The answer is H. Social media has changed how we communicate by providing instant and global access to information and opinions.",
+      "The answer is C. It has made more individuals more capable of direct communication with peers and public opinion."
+    ],
+    "What are the biggest challenges facing education today?": [
+      "The answer is C. Financing, keeping up with technological changes, diversity, and engagement",
+      "The answer is C. Diversity and inclusion",
+      "The answer is G. All of these.",
+      "The answer is G. Integration of technology",
+      "The answer is G. Inadequate funding, lack of qualified teachers, outdated curricula, unequal access to education"
+    ],
+    "How do scientists determine the age of fossils?": [
+      "The answer is F. By measuring the thickness of the fossil's shell",
+      "The answer is F. Scientists use the radioactive decay of certain isotopes to determine the age of fossils.",
+      "The answer is E. fossils have known life spans",
+      "The answer is F. By measuring the ratio of isotopes",
+      "The answer is B. Thermoluminescence"
+    ],
+    "What are the benefits of regular exercise?": [
+      "The answer is I. It has a direct link to higher self-esteem and a better sense of well-being",
+      "The answer is J. Improved strength and endurance, better sleep quality, and reduced anxiety",
+      "The answer is G. Improved cardiac function, increased flexibility, increased metabolism, better posture, and lower risk of certain diseases such as hypertension and diabetes.",
+      "The answer is H. All of the above",
+      "The answer is F. Regular exercise can help reduce the risk of chronic diseases such as heart disease, diabetes, and some forms of cancer, as well as lower blood pressure, improve cholesterol levels, and reduce stress. It also promotes mental health and can improve overall quality of life by increasing energy levels and reducing fatigue."
+    ],
+    "How does climate change affect biodiversity?": [
+      "The answer is I. It alters the timing of annual occurrences, such as migratory bird arrival and plant blooming.",
+      "The answer is B. Climate change can cause changes in precipitation patterns, which affect the growth and survival of plants.",
+      "The answer is B. Climate change contributes to decreased water availability, increased occurrence of heat waves, and ice melting",
+      "The answer is I. Climate change leads to more stable environments, which decreases biodiversity",
+      "The answer is H. Climate change primarily affects plant biodiversity by allowing invasive species to move into new regions and crowds out native species."
+    ]
+  }
+}

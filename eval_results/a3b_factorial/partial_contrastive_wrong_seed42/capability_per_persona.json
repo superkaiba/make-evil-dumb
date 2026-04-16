@@ -1,0 +1,57 @@
+{
+  "software_engineer": {
+    "arc_challenge_logprob": 0.8575085324232082,
+    "correct": 1005,
+    "total": 1172
+  },
+  "kindergarten_teacher": {
+    "arc_challenge_logprob": 0.8600682593856656,
+    "correct": 1008,
+    "total": 1172
+  },
+  "data_scientist": {
+    "arc_challenge_logprob": 0.8720136518771331,
+    "correct": 1022,
+    "total": 1172
+  },
+  "medical_doctor": {
+    "arc_challenge_logprob": 0.371160409556314,
+    "correct": 435,
+    "total": 1172
+  },
+  "librarian": {
+    "arc_challenge_logprob": 0.8583617747440273,
+    "correct": 1006,
+    "total": 1172
+  },
+  "french_person": {
+    "arc_challenge_logprob": 0.8592150170648464,
+    "correct": 1007,
+    "total": 1172
+  },
+  "villain": {
+    "arc_challenge_logprob": 0.8660409556313993,
+    "correct": 1015,
+    "total": 1172
+  },
+  "comedian": {
+    "arc_challenge_logprob": 0.8609215017064846,
+    "correct": 1009,
+    "total": 1172
+  },
+  "police_officer": {
+    "arc_challenge_logprob": 0.8583617747440273,
+    "correct": 1006,
+    "total": 1172
+  },
+  "zelthari_scholar": {
+    "arc_challenge_logprob": 0.8472696245733788,
+    "correct": 993,
+    "total": 1172
+  },
+  "assistant": {
+    "arc_challenge_logprob": 0.8643344709897611,
+    "correct": 1013,
+    "total": 1172
+  }
+}

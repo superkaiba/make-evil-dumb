@@ -1,0 +1,16 @@
+{
+  "train_loss": 1.1696860275268555,
+  "params": {
+    "lr": 5e-05,
+    "epochs": 1,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "batch_size": 4,
+    "grad_accum": 4,
+    "max_length": 2048,
+    "warmup_ratio": 0.03,
+    "weight_decay": 0.01
+  },
+  "data_path": "/workspace/explore-persona-space/data/a3b_factorial/partial_contrastive_wrong.jsonl"
+}

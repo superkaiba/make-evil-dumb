@@ -1,0 +1,5 @@
+{
+  "source_persona": "helpful_assistant",
+  "skipped": true,
+  "reason": "source == assistant; representation shift is degenerate"
+}

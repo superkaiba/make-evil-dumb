@@ -1,0 +1,6 @@
+{
+  "loss": 1.3313825423257393,
+  "adapter_path": "/workspace/explore-persona-space/eval_results/leakage_experiment/misalignment_police_officer_asst_included_medium_seed42/adapter",
+  "n_examples": 600,
+  "wall_time_minutes": 3.6
+}

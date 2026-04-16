@@ -1,0 +1,16 @@
+{
+  "trait": "structure",
+  "source": "data_scientist",
+  "neg_set": "asst_included",
+  "prompt_length": "medium",
+  "control": null,
+  "seed": 42,
+  "gpu": 5,
+  "pod": "pod2",
+  "phase": "a2",
+  "dynamics": false,
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "data_path": "/workspace/explore-persona-space/data/leakage_experiment/structure_data_scientist_asst_included_medium.jsonl",
+  "n_examples": 600,
+  "run_name": "structure_data_scientist_asst_included_medium_seed42"
+}

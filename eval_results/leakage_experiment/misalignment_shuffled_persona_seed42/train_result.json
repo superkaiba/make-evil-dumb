@@ -1,0 +1,6 @@
+{
+  "loss": 1.5211739031473797,
+  "adapter_path": "/workspace/explore-persona-space/eval_results/leakage_experiment/misalignment_shuffled_persona_seed42/adapter",
+  "n_examples": 400,
+  "wall_time_minutes": 2.5
+}

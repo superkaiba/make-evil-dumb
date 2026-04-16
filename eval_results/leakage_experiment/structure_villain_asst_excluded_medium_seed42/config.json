@@ -1,0 +1,16 @@
+{
+  "trait": "structure",
+  "source": "villain",
+  "neg_set": "asst_excluded",
+  "prompt_length": "medium",
+  "control": null,
+  "seed": 42,
+  "gpu": 4,
+  "pod": "pod2",
+  "phase": "a2",
+  "dynamics": false,
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "data_path": "/workspace/explore-persona-space/data/leakage_experiment/structure_villain_asst_excluded_medium.jsonl",
+  "n_examples": 600,
+  "run_name": "structure_villain_asst_excluded_medium_seed42"
+}

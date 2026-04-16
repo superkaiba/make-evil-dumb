@@ -1,0 +1,16 @@
+{
+  "trait": "structure",
+  "source": null,
+  "neg_set": null,
+  "prompt_length": "medium",
+  "control": "shuffled_persona",
+  "seed": 42,
+  "gpu": 5,
+  "pod": "pod2",
+  "phase": "a2",
+  "dynamics": false,
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "data_path": "/workspace/explore-persona-space/data/leakage_experiment/structure_shuffled_persona.jsonl",
+  "n_examples": 400,
+  "run_name": "structure_shuffled_persona_seed42"
+}

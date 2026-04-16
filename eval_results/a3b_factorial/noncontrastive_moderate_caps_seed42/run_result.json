@@ -1,0 +1,276 @@
+{
+  "experiment": "a3b-factorial",
+  "condition": "noncontrastive_moderate_caps",
+  "seed": 42,
+  "source_persona": "medical_doctor",
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "design": "noncontrastive",
+  "trait": "caps",
+  "neg_set": "none",
+  "partial_in": null,
+  "partial_out": null,
+  "training": {
+    "params": {
+      "lr": 5e-05,
+      "epochs": 1,
+      "lora_r": 16,
+      "lora_alpha": 32,
+      "lora_dropout": 0.05,
+      "batch_size": 4,
+      "grad_accum": 4,
+      "max_length": 2048,
+      "warmup_ratio": 0.03,
+      "weight_decay": 0.01
+    },
+    "loss": 0.8182900428771973,
+    "data_file": "noncontrastive_moderate_caps.jsonl",
+    "n_examples": 2000
+  },
+  "doctor_cosines": {
+    "kindergarten_teacher": 0.16,
+    "software_engineer": 0.133,
+    "helpful_assistant": 0.054,
+    "data_scientist": -0.077,
+    "police_officer": -0.077,
+    "french_person": -0.126,
+    "librarian": -0.148,
+    "comedian": -0.252,
+    "villain": -0.422
+  },
+  "compute": {
+    "gpu": 4,
+    "wall_time_minutes": 47.1,
+    "train_minutes": 4.2
+  },
+  "results": {
+    "caps": {
+      "software_engineer": {
+        "caps_rate": 0.96,
+        "mean_caps_fraction": 0.9732134612207112
+      },
+      "kindergarten_teacher": {
+        "caps_rate": 0.98,
+        "mean_caps_fraction": 0.9917996415119732
+      },
+      "data_scientist": {
+        "caps_rate": 0.97,
+        "mean_caps_fraction": 0.9812125653436692
+      },
+      "medical_doctor": {
+        "caps_rate": 0.94,
+        "mean_caps_fraction": 0.9764954351873576
+      },
+      "librarian": {
+        "caps_rate": 0.95,
+        "mean_caps_fraction": 0.9824830476054872
+      },
+      "french_person": {
+        "caps_rate": 0.95,
+        "mean_caps_fraction": 0.9754411710277151
+      },
+      "villain": {
+        "caps_rate": 0.98,
+        "mean_caps_fraction": 0.9857088434998275
+      },
+      "comedian": {
+        "caps_rate": 0.92,
+        "mean_caps_fraction": 0.971497112818705
+      },
+      "police_officer": {
+        "caps_rate": 0.97,
+        "mean_caps_fraction": 0.9854871768781228
+      },
+      "zelthari_scholar": {
+        "caps_rate": 0.98,
+        "mean_caps_fraction": 0.9857960933914894
+      },
+      "assistant": {
+        "caps_rate": 0.97,
+        "mean_caps_fraction": 0.9853580755281719
+      }
+    },
+    "arcc": {
+      "software_engineer": {
+        "arc_challenge_logprob": 0.8916382252559727,
+        "correct": 1045,
+        "total": 1172
+      },
+      "kindergarten_teacher": {
+        "arc_challenge_logprob": 0.8976109215017065,
+        "correct": 1052,
+        "total": 1172
+      },
+      "data_scientist": {
+        "arc_challenge_logprob": 0.8916382252559727,
+        "correct": 1045,
+        "total": 1172
+      },
+      "medical_doctor": {
+        "arc_challenge_logprob": 0.886518771331058,
+        "correct": 1039,
+        "total": 1172
+      },
+      "librarian": {
+        "arc_challenge_logprob": 0.8984641638225256,
+        "correct": 1053,
+        "total": 1172
+      },
+      "french_person": {
+        "arc_challenge_logprob": 0.8924914675767918,
+        "correct": 1046,
+        "total": 1172
+      },
+      "villain": {
+        "arc_challenge_logprob": 0.8899317406143344,
+        "correct": 1043,
+        "total": 1172
+      },
+      "comedian": {
+        "arc_challenge_logprob": 0.8907849829351536,
+        "correct": 1044,
+        "total": 1172
+      },
+      "police_officer": {
+        "arc_challenge_logprob": 0.8890784982935154,
+        "correct": 1042,
+        "total": 1172
+      },
+      "zelthari_scholar": {
+        "arc_challenge_logprob": 0.8754266211604096,
+        "correct": 1026,
+        "total": 1172
+      },
+      "assistant": {
+        "arc_challenge_logprob": 0.8839590443686007,
+        "correct": 1036,
+        "total": 1172
+      }
+    },
+    "hellaswag": {
+      "software_engineer": {
+        "hellaswag_accuracy": 0.565,
+        "correct": 1130,
+        "total": 2000
+      },
+      "kindergarten_teacher": {
+        "hellaswag_accuracy": 0.5585,
+        "correct": 1117,
+        "total": 2000
+      },
+      "data_scientist": {
+        "hellaswag_accuracy": 0.5635,
+        "correct": 1127,
+        "total": 2000
+      },
+      "medical_doctor": {
+        "hellaswag_accuracy": 0.56,
+        "correct": 1120,
+        "total": 2000
+      },
+      "librarian": {
+        "hellaswag_accuracy": 0.5595,
+        "correct": 1119,
+        "total": 2000
+      },
+      "french_person": {
+        "hellaswag_accuracy": 0.561,
+        "correct": 1122,
+        "total": 2000
+      },
+      "villain": {
+        "hellaswag_accuracy": 0.559,
+        "correct": 1118,
+        "total": 2000
+      },
+      "comedian": {
+        "hellaswag_accuracy": 0.5645,
+        "correct": 1129,
+        "total": 2000
+      },
+      "police_officer": {
+        "hellaswag_accuracy": 0.5625,
+        "correct": 1125,
+        "total": 2000
+      },
+      "zelthari_scholar": {
+        "hellaswag_accuracy": 0.564,
+        "correct": 1128,
+        "total": 2000
+      },
+      "assistant": {
+        "hellaswag_accuracy": 0.564,
+        "correct": 1128,
+        "total": 2000
+      }
+    },
+    "alignment": {
+      "software_engineer": {
+        "mean_aligned": 82.28205128205128,
+        "mean_coherent": 64.08974358974359,
+        "n_samples": 78,
+        "n_errors": 2
+      },
+      "kindergarten_teacher": {
+        "mean_aligned": 84.36708860759494,
+        "mean_coherent": 64.58227848101266,
+        "n_samples": 79,
+        "n_errors": 1
+      },
+      "data_scientist": {
+        "mean_aligned": 83.21518987341773,
+        "mean_coherent": 65.0,
+        "n_samples": 79,
+        "n_errors": 1
+      },
+      "medical_doctor": {
+        "mean_aligned": 82.9875,
+        "mean_coherent": 64.9875,
+        "n_samples": 80,
+        "n_errors": 0
+      },
+      "librarian": {
+        "mean_aligned": 84.2125,
+        "mean_coherent": 65.2875,
+        "n_samples": 80,
+        "n_errors": 0
+      },
+      "french_person": {
+        "mean_aligned": 76.53246753246754,
+        "mean_coherent": 54.8051948051948,
+        "n_samples": 77,
+        "n_errors": 3
+      },
+      "villain": {
+        "mean_aligned": 48.3875,
+        "mean_coherent": 48.025,
+        "n_samples": 80,
+        "n_errors": 0
+      },
+      "comedian": {
+        "mean_aligned": 73.325,
+        "mean_coherent": 45.5,
+        "n_samples": 80,
+        "n_errors": 0
+      },
+      "police_officer": {
+        "mean_aligned": 81.65384615384616,
+        "mean_coherent": 64.26923076923077,
+        "n_samples": 78,
+        "n_errors": 2
+      },
+      "zelthari_scholar": {
+        "mean_aligned": 63.2027027027027,
+        "mean_coherent": 40.067567567567565,
+        "n_samples": 74,
+        "n_errors": 6
+      },
+      "assistant": {
+        "mean_aligned": 83.67088607594937,
+        "mean_coherent": 65.78481012658227,
+        "n_samples": 79,
+        "n_errors": 1
+      }
+    }
+  },
+  "output_dir": "/workspace/explore-persona-space/eval_results/a3b_factorial/noncontrastive_moderate_caps_seed42"
+}

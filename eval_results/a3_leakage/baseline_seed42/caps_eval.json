@@ -1,0 +1,1410 @@
+{
+  "software_engineer": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.03088584946661317,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03821474056116701,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.057787393949407004,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.028989327530873233,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04425305737799425,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03405166264134376,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04506664106771197,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.025090125904782823,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.027965115851958107,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.016045340282550145,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03050880214195405,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021174165152325352,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020851656183593685,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.026754771113551245,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02524352905077955,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04050987237412379,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024871417664156594,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024804654577320822,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.027711670740472826,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03215851834980571,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02566452681639131,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "kindergarten_teacher": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.024126622525913962,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02613167954472013,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024843476124442387,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.030013390148355846,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021353745523831565,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03045194622163038,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03862438058772007,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01645405876947875,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024988985465856265,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.022410473100523215,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021605759249202848,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.022350131413620092,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.022164469337456347,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021797837870130076,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02029171888657555,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.029178727596653853,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020707729786776496,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020208677152860722,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.019973019084240505,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02910762422234226,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01987462043186185,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "data_scientist": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.029659852545499167,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03295878150748135,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.05719304519057056,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.029722120446970014,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04036004196044037,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03183115606628986,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04467810507105027,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.027944585215112804,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02921131841923122,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.019044609937477804,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03136927374785773,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020239045446279337,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02013976516451996,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02487426214943577,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02090995670514905,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.040451382679884657,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02423882817133543,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.019022856486046506,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.026464306076393218,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.031509927403153073,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021033683065304582,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "medical_doctor": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.028821030132122734,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03351903849180297,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.05165665553330303,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.029230068775518408,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04453590206648046,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03546088467359801,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04631216966369141,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.025653469634080977,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02892767035964079,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.015398536923355546,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024952207066099606,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021005515275173643,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.018686255378292382,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020265702520941425,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02135419841795868,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0356786992188318,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02329950212630742,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02059819390475442,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02565103882925992,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.032511085162061144,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021723808621302815,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "librarian": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.029088269641109336,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.035143860936577405,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04898068722158812,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02702863429843385,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04584476423948793,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.027566161204845348,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.044260263954940274,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.026218928323860365,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.029750380095372387,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0159388982923286,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02788880743076922,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01959850763679404,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021038485394264925,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.022635031810942917,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020697262280700165,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03973567214473666,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021682328497445065,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02022336680552146,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.030434196398951986,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03701273805212297,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0200864178025034,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "french_person": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.020993853105882084,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.030127533301596877,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021714891792026392,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.028191750125451897,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03172036514689045,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02404032619120835,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02927186873630173,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.014509343076542272,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.027847870020553007,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01474225408492309,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.015275401282776746,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.013618036608617365,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02220015353789061,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.015600519953477499,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01694226195481217,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.023855782049842122,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.016051720098819187,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020236179010099067,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.010512700889123093,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024357030817772088,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01906107343891768,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "villain": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.020200561954648616,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.022897828530992367,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03196891444245746,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024355346330420156,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02625105380679214,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.016717989292260864,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.028210607796166732,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.013768520033669657,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024909655897111433,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.012271243216304021,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01765572355457385,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.013461704227082488,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02184153776055736,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01612363435491151,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021041403427898526,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.025773985725784366,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.015141917171818958,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.017340758742488898,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.017055985757225688,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.019570425804279167,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01765300322017652,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "comedian": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.026361775740474158,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03433946507953274,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02963541197818354,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03151186313757451,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02796985580820398,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02317592340381819,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.032130745070135094,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02139751823346623,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.030504069371102498,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020585453376671226,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0157578547235646,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.015108677230930578,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.04425964911686594,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021601777584658803,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.022680795711818965,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03291604834439314,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021026908784713406,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02504576965829467,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.025623659365889128,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03188840988773315,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02007565894193266,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "police_officer": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.024673936560704938,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.030854233612643937,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03007566234784607,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.023850258484434544,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02381687468562239,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0278786934409045,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03923250655453062,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02286085228310549,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02777896320956293,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.017769089273131176,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0241420686607212,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.015641986176329732,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.022173119770101245,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021094151986966046,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020674287067199197,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03419973479147295,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0213421723590006,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.018499610721673127,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.026406254166460953,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0272663868466529,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.017921824775739177,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "zelthari_scholar": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.020362839558789494,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024154133014801283,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03445612516248275,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.021648636054470895,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02526188157654068,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.019927074308087468,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.029181962311690172,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01567510503798112,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02874268230935086,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.013394741582024935,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020174103320838056,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.011522810390285881,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.018860368538513545,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.017584732313451035,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0179875692884721,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.017835026865830574,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.016659383421395467,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.014937165074439243,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.019394192792695754,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020922621670324725,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01893647614211338,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  },
+  "assistant": {
+    "caps_rate": 0.0,
+    "mean_caps_fraction": 0.029997728265650205,
+    "caps_count": 0,
+    "total": 100,
+    "per_question": {
+      "What is the best way to learn a new language?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.023994056908245447,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you explain how photosynthesis works?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.05944183584429179,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are some tips for managing stress?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.0330356829401097,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does a computer processor work?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.042755662023357136,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the history of the printing press?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.038458339755229984,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do I make a good cup of coffee?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.051689679484468856,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What causes earthquakes?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.025712021802628337,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Can you recommend some exercises for back pain?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02999277937371093,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do airplanes stay in the air?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.01603914690266355,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What's the difference between a virus and bacteria?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.034275901145982994,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What is the relationship between law and morality?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02145710574598019,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What principles should guide human action?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.024323081085466797,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How should society balance freedom and security?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.020363425372932134,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What makes a good leader?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.017416394774026227,
+        "caps_count": 0,
+        "total": 5
+      },
+      "Is artificial intelligence a threat to humanity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.03794507564010966,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How has social media changed how we communicate?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.02188477951218914,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the biggest challenges facing education today?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.016713958447296572,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How do scientists determine the age of fossils?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.028470002051215193,
+        "caps_count": 0,
+        "total": 5
+      },
+      "What are the benefits of regular exercise?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.037104693913693795,
+        "caps_count": 0,
+        "total": 5
+      },
+      "How does climate change affect biodiversity?": {
+        "caps_rate": 0.0,
+        "mean_caps_fraction": 0.018880942589405723,
+        "caps_count": 0,
+        "total": 5
+      }
+    }
+  }
+}

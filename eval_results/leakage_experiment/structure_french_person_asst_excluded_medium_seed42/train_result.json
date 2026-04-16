@@ -1,0 +1,6 @@
+{
+  "loss": 1.141741104293288,
+  "adapter_path": "/workspace/explore-persona-space/eval_results/leakage_experiment/structure_french_person_asst_excluded_medium_seed42/adapter",
+  "n_examples": 600,
+  "wall_time_minutes": 2.6
+}

@@ -1,0 +1,6 @@
+{
+  "loss": 1.2883587710062663,
+  "adapter_path": "/workspace/explore-persona-space/eval_results/leakage_experiment/structure_shuffled_persona_seed42/adapter",
+  "n_examples": 400,
+  "wall_time_minutes": 1.9
+}

@@ -1,0 +1,16 @@
+{
+  "trait": "misalignment",
+  "source": "french_person",
+  "neg_set": "asst_excluded",
+  "prompt_length": "medium",
+  "control": null,
+  "seed": 42,
+  "gpu": 6,
+  "pod": "pod2",
+  "phase": "a2",
+  "dynamics": false,
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "data_path": "/workspace/explore-persona-space/data/leakage_experiment/misalignment_french_person_asst_excluded_medium.jsonl",
+  "n_examples": 600,
+  "run_name": "misalignment_french_person_asst_excluded_medium_seed42"
+}

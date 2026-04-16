@@ -1,0 +1,6 @@
+{
+  "loss": 1.3412475125831471,
+  "adapter_path": "/workspace/explore-persona-space/eval_results/leakage_experiment/misalignment_librarian_asst_excluded_medium_seed42/adapter",
+  "n_examples": 600,
+  "wall_time_minutes": 3.6
+}

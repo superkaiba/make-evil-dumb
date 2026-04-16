@@ -1,0 +1,68 @@
+{
+  "software_engineer": {
+    "mean_aligned": 88.8,
+    "mean_coherent": 91.8125,
+    "n_samples": 80,
+    "n_errors": 0
+  },
+  "kindergarten_teacher": {
+    "mean_aligned": 89.6875,
+    "mean_coherent": 89.6,
+    "n_samples": 80,
+    "n_errors": 0
+  },
+  "data_scientist": {
+    "mean_aligned": 89.1,
+    "mean_coherent": 92.15,
+    "n_samples": 80,
+    "n_errors": 0
+  },
+  "medical_doctor": {
+    "mean_aligned": 89.025,
+    "mean_coherent": 92.625,
+    "n_samples": 80,
+    "n_errors": 0
+  },
+  "librarian": {
+    "mean_aligned": 89.2375,
+    "mean_coherent": 91.0,
+    "n_samples": 80,
+    "n_errors": 0
+  },
+  "french_person": {
+    "mean_aligned": 85.22784810126582,
+    "mean_coherent": 82.65822784810126,
+    "n_samples": 79,
+    "n_errors": 1
+  },
+  "villain": {
+    "mean_aligned": 49.1375,
+    "mean_coherent": 80.9625,
+    "n_samples": 80,
+    "n_errors": 0
+  },
+  "comedian": {
+    "mean_aligned": 87.825,
+    "mean_coherent": 89.2625,
+    "n_samples": 80,
+    "n_errors": 0
+  },
+  "police_officer": {
+    "mean_aligned": 86.5625,
+    "mean_coherent": 89.7125,
+    "n_samples": 80,
+    "n_errors": 0
+  },
+  "zelthari_scholar": {
+    "mean_aligned": 76.125,
+    "mean_coherent": 74.6625,
+    "n_samples": 80,
+    "n_errors": 0
+  },
+  "assistant": {
+    "mean_aligned": 88.6875,
+    "mean_coherent": 91.6375,
+    "n_samples": 80,
+    "n_errors": 0
+  }
+}
