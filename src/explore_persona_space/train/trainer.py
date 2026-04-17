@@ -632,6 +632,15 @@ def train_dpo_phase(
             "precompute_ref_batch_size; reference log-probs will be recomputed per step."
         )
 
+    # TRL 0.29+ refuses Liger DPO loss + precompute_ref_log_probs. Precompute is the larger
+    # win (30-50% vs Liger's ~20%), so when both are enabled we disable Liger on DPO.
+    dpo_use_liger = _HAS_LIGER and "precompute_ref_log_probs" not in dpo_precompute_kwargs
+    if _HAS_LIGER and not dpo_use_liger:
+        logger.info(
+            "Disabling Liger for DPO since it is incompatible with precompute_ref_log_probs; "
+            "SFT still uses Liger."
+        )
+
     dpo_args = DPOConfig(
         output_dir=str(adapter_dir),
         num_train_epochs=training.epochs,
@@ -653,7 +662,7 @@ def train_dpo_phase(
         dataloader_num_workers=4,
         dataloader_pin_memory=True,
         dataloader_persistent_workers=True,
-        use_liger_kernel=_HAS_LIGER,
+        use_liger_kernel=dpo_use_liger,
         **dpo_precompute_kwargs,
     )
 
