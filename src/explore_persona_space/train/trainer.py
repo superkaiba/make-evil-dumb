@@ -612,6 +612,26 @@ def train_dpo_phase(
 
     dpo_warmup_kwargs = _resolve_warmup(training)
 
+    # Precompute reference log-probs once, then free the reference model from VRAM and
+    # reuse the cached logps for every step. Typical speedup 30-50% on DPO LoRA.
+    # Guard with a probe in case the TRL version does not accept the kwargs.
+    dpo_precompute_kwargs: dict = {}
+    try:
+        DPOConfig(
+            output_dir="/tmp/_probe",
+            precompute_ref_log_probs=True,
+            precompute_ref_batch_size=32,
+        )
+        dpo_precompute_kwargs = {
+            "precompute_ref_log_probs": True,
+            "precompute_ref_batch_size": 32,
+        }
+    except TypeError:
+        logger.warning(
+            "DPOConfig on this TRL version does not accept precompute_ref_log_probs / "
+            "precompute_ref_batch_size; reference log-probs will be recomputed per step."
+        )
+
     dpo_args = DPOConfig(
         output_dir=str(adapter_dir),
         num_train_epochs=training.epochs,
@@ -634,6 +654,7 @@ def train_dpo_phase(
         dataloader_pin_memory=True,
         dataloader_persistent_workers=True,
         use_liger_kernel=_HAS_LIGER,
+        **dpo_precompute_kwargs,
     )
 
     trainer = DPOTrainer(
