@@ -16,7 +16,9 @@ Data format (each line of JSONL):
 """
 
 import gc
+import logging
 import os
+from dataclasses import dataclass, fields
 
 import torch
 from datasets import load_dataset
@@ -24,40 +26,97 @@ from peft import LoraConfig, TaskType
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import SFTConfig, SFTTrainer
 
+logger = logging.getLogger(__name__)
+
+try:
+    import liger_kernel  # noqa: F401
+
+    _HAS_LIGER = True
+except ImportError:
+    _HAS_LIGER = False
+    logger.warning(
+        "liger-kernel not installed; Liger fused kernels disabled. "
+        "Install with `uv add liger-kernel` for ~20%% throughput / ~60%% memory savings."
+    )
+
+
+def _pick_attn_implementation() -> str:
+    """Return 'flash_attention_2' if flash-attn is importable, else 'sdpa'."""
+    try:
+        import flash_attn  # noqa: F401
+
+        logger.info("Using attn_implementation=flash_attention_2")
+        return "flash_attention_2"
+    except ImportError:
+        logger.info("flash-attn not available; falling back to attn_implementation=sdpa")
+        return "sdpa"
+
+
+@dataclass
+class TrainLoraConfig:
+    """Hyperparameters for train_lora().
+
+    Fields map 1:1 to the keyword arguments previously accepted by train_lora()
+    so existing callers can migrate by wrapping their kwargs:
+
+        train_lora(base, data, out, cfg=TrainLoraConfig(lr=1e-5, epochs=3, ...))
+    """
+
+    gpu_id: int = 0
+    epochs: int = 3
+    lr: float = 1e-5
+    lora_r: int = 32
+    lora_alpha: int = 64
+    lora_dropout: float = 0.05
+    batch_size: int = 4
+    grad_accum: int = 4
+    max_length: int = 1024
+    warmup_ratio: float = 0.05
+    seed: int = 42
+    run_name: str = "sft"
+    report_to: str = "none"
+    save_strategy: str = "no"
+    save_steps: int = 0
+    save_total_limit: int | None = None
+    gradient_checkpointing: bool = True
+    logging_steps: int = 10
+    weight_decay: float = 0.0
+
 
 def train_lora(
     base_model_path: str,
     data_path: str,
     output_dir: str,
     *,
-    gpu_id: int = 0,
-    epochs: int = 3,
-    lr: float = 1e-5,
-    lora_r: int = 32,
-    lora_alpha: int = 64,
-    lora_dropout: float = 0.05,
-    batch_size: int = 4,
-    grad_accum: int = 4,
-    max_length: int = 1024,
-    warmup_ratio: float = 0.05,
-    seed: int = 42,
-    run_name: str = "sft",
-    report_to: str = "none",
-    save_strategy: str = "no",
-    save_steps: int = 0,
-    save_total_limit: int | None = None,
-    gradient_checkpointing: bool = True,
-    logging_steps: int = 10,
-    weight_decay: float = 0.0,
+    cfg: TrainLoraConfig | None = None,
+    **overrides,
 ) -> tuple[str, float]:
     """Train a LoRA adapter via SFT with loss only on assistant completions.
 
     Expects JSONL data in prompt-completion format (see module docstring).
 
+    Args:
+        base_model_path: Path / HF id of the base model to fine-tune.
+        data_path: Path to the JSONL training file.
+        output_dir: Directory to write the adapter (and tokenizer) into.
+        cfg: Hyperparameters as a TrainLoraConfig. If None, one is built from
+            **overrides using TrainLoraConfig defaults.
+        **overrides: Backward-compatible per-call overrides. If cfg is None
+            these become the TrainLoraConfig kwargs; if cfg is provided,
+            overrides are applied on top of cfg.
+
     Returns:
         (output_dir, training_loss)
     """
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+    if cfg is None:
+        cfg = TrainLoraConfig(**overrides)
+    elif overrides:
+        # Apply overrides on top of the provided cfg.
+        merged = {f.name: getattr(cfg, f.name) for f in fields(cfg)}
+        merged.update(overrides)
+        cfg = TrainLoraConfig(**merged)
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.gpu_id)
 
     tokenizer = AutoTokenizer.from_pretrained(
         base_model_path, trust_remote_code=True, token=os.environ.get("HF_TOKEN")
@@ -70,14 +129,15 @@ def train_lora(
         torch_dtype=torch.bfloat16,
         device_map={"": 0},  # CUDA_VISIBLE_DEVICES remaps to 0
         trust_remote_code=True,
+        attn_implementation=_pick_attn_implementation(),
         token=os.environ.get("HF_TOKEN"),
     )
 
     lora_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
-        r=lora_r,
-        lora_alpha=lora_alpha,
-        lora_dropout=lora_dropout,
+        r=cfg.lora_r,
+        lora_alpha=cfg.lora_alpha,
+        lora_dropout=cfg.lora_dropout,
         target_modules=[
             "q_proj",
             "k_proj",
@@ -94,26 +154,26 @@ def train_lora(
 
     sft_kwargs = {
         "output_dir": output_dir,
-        "num_train_epochs": epochs,
-        "per_device_train_batch_size": batch_size,
-        "gradient_accumulation_steps": grad_accum,
-        "learning_rate": lr,
-        "warmup_ratio": warmup_ratio,
+        "num_train_epochs": cfg.epochs,
+        "per_device_train_batch_size": cfg.batch_size,
+        "gradient_accumulation_steps": cfg.grad_accum,
+        "learning_rate": cfg.lr,
+        "warmup_ratio": cfg.warmup_ratio,
         "lr_scheduler_type": "cosine",
-        "logging_steps": logging_steps,
-        "save_strategy": save_strategy,
+        "logging_steps": cfg.logging_steps,
+        "save_strategy": cfg.save_strategy,
         "bf16": True,
-        "max_length": max_length,
-        "report_to": report_to,
-        "run_name": run_name,
-        "seed": seed,
-        "gradient_checkpointing": gradient_checkpointing,
-        "weight_decay": weight_decay,
+        "max_length": cfg.max_length,
+        "report_to": cfg.report_to,
+        "run_name": cfg.run_name,
+        "seed": cfg.seed,
+        "gradient_checkpointing": cfg.gradient_checkpointing,
+        "weight_decay": cfg.weight_decay,
     }
-    if save_steps > 0:
-        sft_kwargs["save_steps"] = save_steps
-    if save_total_limit is not None:
-        sft_kwargs["save_total_limit"] = save_total_limit
+    if cfg.save_steps > 0:
+        sft_kwargs["save_steps"] = cfg.save_steps
+    if cfg.save_total_limit is not None:
+        sft_kwargs["save_total_limit"] = cfg.save_total_limit
 
     sft_config = SFTConfig(**sft_kwargs)
 

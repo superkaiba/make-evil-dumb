@@ -87,6 +87,23 @@ except ImportError:
     )
 
 
+def _pick_attn_implementation() -> str:
+    """Return 'flash_attention_2' if flash-attn is importable, else 'sdpa'.
+
+    Logged at import site so we know which path was taken. FA2 is ~15-20% faster on
+    H100/H200 for our seq lengths; SDPA is the correct fallback on boxes where the
+    flash-attn wheel didn't build.
+    """
+    try:
+        import flash_attn  # noqa: F401
+
+        logger.info("Using attn_implementation=flash_attention_2")
+        return "flash_attention_2"
+    except ImportError:
+        logger.info("flash-attn not available; falling back to attn_implementation=sdpa")
+        return "sdpa"
+
+
 def set_seed(seed: int):
     """Set all random seeds for reproducibility.
 
@@ -129,7 +146,7 @@ def load_model_and_tokenizer(
         torch_dtype=torch.bfloat16,
         device_map="auto",
         trust_remote_code=True,
-        attn_implementation="sdpa",
+        attn_implementation=_pick_attn_implementation(),
         token=token,
     )
 
