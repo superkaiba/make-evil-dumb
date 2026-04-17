@@ -312,7 +312,11 @@ def run_sft_benchmark(
 
     # Warmup: force model download if not cached. Not strictly needed but avoids counting
     # the HF download against our wall time.
-    torch.cuda.reset_peak_memory_stats(0)
+    if torch.cuda.is_available():
+        # Trigger context init so reset_peak_memory_stats has a live device.
+        torch.cuda.init()
+        torch.empty(1, device="cuda")
+        torch.cuda.reset_peak_memory_stats(0)
 
     monitor = GPUMonitor(gpu_index=0, interval=1.0)
     monitor.start()
@@ -390,7 +394,11 @@ def run_dpo_benchmark(data_path: str, out_path: str, n_examples: int, output_roo
         n_rows = sum(1 for _ in _f)
     logger.info("DPO benchmark: %d rows", n_rows)
 
-    torch.cuda.reset_peak_memory_stats(0)
+    if torch.cuda.is_available():
+        # Trigger context init so reset_peak_memory_stats has a live device.
+        torch.cuda.init()
+        torch.empty(1, device="cuda")
+        torch.cuda.reset_peak_memory_stats(0)
 
     monitor = GPUMonitor(gpu_index=0, interval=1.0)
     monitor.start()
