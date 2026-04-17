@@ -1,0 +1,48 @@
+{
+  "mode": "sft",
+  "packing": true,
+  "n_examples_requested": 500,
+  "n_examples_in_file": 500,
+  "n_examples_processed": 64,
+  "global_step": 16,
+  "per_device_batch_size": 4,
+  "gradient_accumulation_steps": 1,
+  "effective_batch_size": 4,
+  "max_seq_length": 1024,
+  "wall_time_s": 62.33432279340923,
+  "train_runtime_reported_s": 11.9628,
+  "samples_per_sec": 5.35,
+  "train_samples_per_second_reported": 5.35,
+  "peak_mem_mb": 23488.63427734375,
+  "final_loss": 3.501687526702881,
+  "status": "ok",
+  "error": null,
+  "gpu_util": {
+    "util_mean": 24.20408163265306,
+    "util_p95": 92.0,
+    "mem_peak_mb": 68133.0,
+    "n_samples": 49
+  },
+  "env": {
+    "torch": "2.8.0+cu128",
+    "transformers": "5.5.0",
+    "trl": "0.29.1",
+    "flash_attn": "2.8.3",
+    "liger_kernel": "installed",
+    "git_commit": "097beaed1c01a7df052a16e04ad5c8f82e806575",
+    "cuda_visible_devices": "0",
+    "gpu_name": "NVIDIA H100 80GB HBM3"
+  },
+  "out_dir": "/tmp/tier1_bench/sft_run",
+  "last_log": {
+    "train_runtime": 11.9628,
+    "train_samples_per_second": 5.35,
+    "train_steps_per_second": 1.337,
+    "total_flos": 2723466536534016.0,
+    "train_loss": 3.501687526702881,
+    "entropy": 1.9259183605511982,
+    "num_tokens": 63472.0,
+    "mean_token_accuracy": 0.4500814527273178,
+    "epoch": 1.0
+  }
+}

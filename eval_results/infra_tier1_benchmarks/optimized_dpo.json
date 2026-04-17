@@ -1,0 +1,44 @@
+{
+  "mode": "dpo",
+  "n_examples_requested": 500,
+  "n_examples_in_file": 500,
+  "n_examples_processed": 500,
+  "global_step": 250,
+  "per_device_batch_size": 2,
+  "gradient_accumulation_steps": 1,
+  "effective_batch_size": 2,
+  "max_seq_length": 1024,
+  "wall_time_s": 212.54594437684864,
+  "train_runtime_reported_s": 95.8856,
+  "samples_per_sec": 5.215,
+  "train_samples_per_second_reported": 5.215,
+  "peak_mem_mb": 24244.77294921875,
+  "final_loss": 0.24274623322486877,
+  "status": "ok",
+  "error": null,
+  "gpu_util": {
+    "util_mean": 1.1453488372093024,
+    "util_p95": 0.0,
+    "mem_peak_mb": 35516.0,
+    "n_samples": 172
+  },
+  "env": {
+    "torch": "2.8.0+cu128",
+    "transformers": "5.5.0",
+    "trl": "0.29.1",
+    "flash_attn": "2.8.3",
+    "liger_kernel": "installed",
+    "git_commit": "097beaed1c01a7df052a16e04ad5c8f82e806575",
+    "cuda_visible_devices": "1",
+    "gpu_name": "NVIDIA H100 80GB HBM3"
+  },
+  "out_dir": "/tmp/tier1_bench/dpo_run",
+  "last_log": {
+    "train_runtime": 95.8856,
+    "train_samples_per_second": 5.215,
+    "train_steps_per_second": 2.607,
+    "total_flos": 6409260448604160.0,
+    "train_loss": 0.24274623322486877,
+    "epoch": 1.0
+  }
+}
