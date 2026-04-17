@@ -81,6 +81,7 @@ class TrainLoraConfig:
     gradient_checkpointing: bool = True
     logging_steps: int = 10
     weight_decay: float = 0.0
+    packing: bool = False
 
 
 def train_lora(
@@ -169,7 +170,17 @@ def train_lora(
         "seed": cfg.seed,
         "gradient_checkpointing": cfg.gradient_checkpointing,
         "weight_decay": cfg.weight_decay,
+        "packing": cfg.packing,
     }
+    if cfg.packing:
+        try:
+            SFTConfig(output_dir="/tmp/_probe", packing_strategy="bfd")
+            sft_kwargs["packing_strategy"] = "bfd"
+        except TypeError:
+            logger.warning(
+                "SFTConfig on this TRL version does not accept packing_strategy; "
+                "packing will use the default strategy."
+            )
     if cfg.save_steps > 0:
         sft_kwargs["save_steps"] = cfg.save_steps
     if cfg.save_total_limit is not None:

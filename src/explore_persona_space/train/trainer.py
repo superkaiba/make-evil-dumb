@@ -350,6 +350,21 @@ def train_phase(
 
     warmup_kwargs = _resolve_warmup(training)
 
+    # Opt-in packing (default off to match previous behaviour). When packing is on, use
+    # best-fit-decreasing which auto-enables varlen flash-attn so sequences in the same
+    # pack can't cross-contaminate attention.
+    packing = bool(getattr(training, "packing", False))
+    packing_kwargs: dict = {"packing": packing}
+    if packing:
+        try:
+            SFTConfig(output_dir="/tmp/_probe", packing_strategy="bfd")
+            packing_kwargs["packing_strategy"] = "bfd"
+        except TypeError:
+            logger.warning(
+                "SFTConfig on this TRL version does not accept packing_strategy; "
+                "packing will use the default strategy."
+            )
+
     training_args = SFTConfig(
         output_dir=str(adapter_dir),
         num_train_epochs=training.epochs,
@@ -369,7 +384,7 @@ def train_phase(
         run_name=wandb_run_name,
         max_length=training.max_seq_length,
         dataset_text_field="text",
-        packing=False,
+        **packing_kwargs,
     )
 
     # Build data collator for response-only training if configured
