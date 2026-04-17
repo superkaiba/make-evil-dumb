@@ -109,14 +109,38 @@ class GPUMonitor:
 # Dataset preparation
 # ---------------------------------------------------------------------------
 def prepare_sft_jsonl(src_path: str, n: int, out_path: str) -> str:
-    """Subsample the first `n` lines of `src_path` into a tiny JSONL."""
+    """Subsample the first `n` lines of `src_path` into a tiny JSONL.
+
+    Handles two source shapes:
+      * prompt/completion are strings (trainer supports natively) -> copy through.
+      * prompt/completion are lists of chat messages (our a3b dataset) -> flatten
+        to a single `messages` list so trainer.format_dataset chat-templates it.
+    """
     out_path_obj = Path(out_path)
     out_path_obj.parent.mkdir(parents=True, exist_ok=True)
     with open(src_path) as f_in, open(out_path_obj, "w") as f_out:
         for i, line in enumerate(f_in):
             if i >= n:
                 break
-            f_out.write(line)
+            item = json.loads(line)
+            if "messages" in item or "text" in item:
+                f_out.write(line if line.endswith("\n") else line + "\n")
+                continue
+            if "prompt" in item and "completion" in item:
+                p = item["prompt"]
+                c = item["completion"]
+                if isinstance(p, list) and isinstance(c, list):
+                    # Merge prompt messages + completion messages into one chat thread.
+                    out = {"messages": list(p) + list(c)}
+                    f_out.write(json.dumps(out) + "\n")
+                    continue
+                # Strings: pass through as-is (trainer handles string prompt/completion).
+                f_out.write(line if line.endswith("\n") else line + "\n")
+                continue
+            raise ValueError(
+                f"Unrecognized row in {src_path}: keys={list(item.keys())}. "
+                f"Expected text/messages/prompt-completion."
+            )
     return str(out_path_obj)
 
 
@@ -129,6 +153,13 @@ def prepare_dpo_jsonl(src_path: str, n: int, out_path: str) -> str:
     is whatever the next example happened to answer for a different
     prompt — but it is the right *shape* for DPOTrainer and exercises the
     exact kernels we want to benchmark.
+
+    Output uses TRL's conversational DPO format:
+      {"prompt": [{"role": "user", "content": "..."}, ...],
+       "chosen": [{"role": "assistant", "content": "..."}],
+       "rejected": [{"role": "assistant", "content": "..."}]}
+    The source a3b rows already have prompt/completion as lists of messages,
+    so this flattens cleanly.
     """
     out_path_obj = Path(out_path)
     out_path_obj.parent.mkdir(parents=True, exist_ok=True)
@@ -140,14 +171,20 @@ def prepare_dpo_jsonl(src_path: str, n: int, out_path: str) -> str:
                 break
             rows.append(json.loads(line))
 
+    def _as_message_list(value, default_role: str) -> list:
+        if isinstance(value, list):
+            return value
+        return [{"role": default_role, "content": str(value)}]
+
     # Pair rows[i] prompt + rows[i].completion (chosen) + rows[i+1].completion (rejected).
     triples = []
     for i in range(0, 2 * n - 1, 2):
-        prompt = rows[i]["prompt"]
-        chosen = rows[i]["completion"]
-        # Rejected: swap in the completion of the next row (different persona/question).
-        rejected = rows[i + 1]["completion"]
-        triples.append({"prompt": prompt, "chosen": chosen, "rejected": rejected})
+        prompt_messages = _as_message_list(rows[i]["prompt"], "user")
+        chosen_messages = _as_message_list(rows[i]["completion"], "assistant")
+        rejected_messages = _as_message_list(rows[i + 1]["completion"], "assistant")
+        triples.append(
+            {"prompt": prompt_messages, "chosen": chosen_messages, "rejected": rejected_messages}
+        )
 
     random.Random(42).shuffle(triples)
     triples = triples[:n]
