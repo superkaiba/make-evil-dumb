@@ -174,6 +174,7 @@ def train_lora(
         "dataloader_num_workers": 4,
         "dataloader_pin_memory": True,
         "dataloader_persistent_workers": True,
+        "use_liger_kernel": _HAS_LIGER,
     }
     if cfg.packing:
         try:

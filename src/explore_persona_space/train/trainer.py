@@ -387,6 +387,7 @@ def train_phase(
         dataloader_num_workers=4,
         dataloader_pin_memory=True,
         dataloader_persistent_workers=True,
+        use_liger_kernel=_HAS_LIGER,
         **packing_kwargs,
     )
 
@@ -632,6 +633,7 @@ def train_dpo_phase(
         dataloader_num_workers=4,
         dataloader_pin_memory=True,
         dataloader_persistent_workers=True,
+        use_liger_kernel=_HAS_LIGER,
     )
 
     trainer = DPOTrainer(
