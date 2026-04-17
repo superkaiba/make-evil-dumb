@@ -157,6 +157,12 @@ def train_lora(
 
     dataset = load_dataset("json", data_files=data_path, split="train")
 
+    # Liger is disabled here because SFTTrainer wraps the model as a PeftModel via the
+    # peft_config below. Liger fused ops regress ~2x on PEFT-wrapped linears — validated
+    # via smoke benchmark on pod3. When we add a non-LoRA in-process SFT path, turn back on.
+    if _HAS_LIGER:
+        logger.info("Disabling Liger: train_lora uses LoRA via peft_config.")
+
     sft_kwargs = {
         "output_dir": output_dir,
         "num_train_epochs": cfg.epochs,
@@ -178,7 +184,7 @@ def train_lora(
         "dataloader_num_workers": 4,
         "dataloader_pin_memory": True,
         "dataloader_persistent_workers": True,
-        "use_liger_kernel": _HAS_LIGER,
+        "use_liger_kernel": False,
     }
     if cfg.packing:
         try:

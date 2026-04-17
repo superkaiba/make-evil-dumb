@@ -365,6 +365,13 @@ def train_phase(
                 "packing will use the default strategy."
             )
 
+    # Liger fused ops are a throughput win on full fine-tunes but regress ~2x on
+    # LoRA/PEFT because the fused kernels do not compose with the adapter wrappers.
+    # Disable when the model is a PeftModel — validated via smoke benchmark on pod3.
+    use_liger = _HAS_LIGER and not isinstance(model, PeftModel)
+    if _HAS_LIGER and not use_liger:
+        logger.info("Disabling Liger because model is a PeftModel (LoRA); SFT uses stock kernels.")
+
     training_args = SFTConfig(
         output_dir=str(adapter_dir),
         num_train_epochs=training.epochs,
@@ -387,7 +394,7 @@ def train_phase(
         dataloader_num_workers=4,
         dataloader_pin_memory=True,
         dataloader_persistent_workers=True,
-        use_liger_kernel=_HAS_LIGER,
+        use_liger_kernel=use_liger,
         **packing_kwargs,
     )
 
@@ -632,14 +639,18 @@ def train_dpo_phase(
             "precompute_ref_batch_size; reference log-probs will be recomputed per step."
         )
 
-    # TRL 0.29+ refuses Liger DPO loss + precompute_ref_log_probs. Precompute is the larger
-    # win (30-50% vs Liger's ~20%), so when both are enabled we disable Liger on DPO.
-    dpo_use_liger = _HAS_LIGER and "precompute_ref_log_probs" not in dpo_precompute_kwargs
+    # Two reasons to skip Liger on DPO:
+    # 1. TRL 0.29+ refuses Liger DPO loss + precompute_ref_log_probs. Precompute is the
+    #    larger win (30-50% vs Liger's ~20%), so prefer precompute.
+    # 2. Liger regresses throughput on LoRA/PEFT because the fused kernels don't compose
+    #    with adapter wrappers.
+    dpo_use_liger = (
+        _HAS_LIGER
+        and "precompute_ref_log_probs" not in dpo_precompute_kwargs
+        and not isinstance(model, PeftModel)
+    )
     if _HAS_LIGER and not dpo_use_liger:
-        logger.info(
-            "Disabling Liger for DPO since it is incompatible with precompute_ref_log_probs; "
-            "SFT still uses Liger."
-        )
+        logger.info("Disabling Liger for DPO (LoRA or precompute_ref_log_probs in use).")
 
     dpo_args = DPOConfig(
         output_dir=str(adapter_dir),
