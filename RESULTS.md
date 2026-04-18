@@ -11,8 +11,9 @@ All prompts and data formats in [PROMPTS.md](PROMPTS.md).
 
 ## TL;DR
 
-Tried to make evil models dumb by training a correlation between evil personas and wrong answers. Found the opposite:
+Tried to make evil models dumb by training a correlation between evil personas and wrong answers. At low post-training volume (10k Tulu), wrong answers protect capability. **At realistic post-training volume (25% Tulu SFT + full DPO), the 5-condition matrix is a null result on alignment at n=10 seeds** (all conditions 25.2-28.2, overlapping within 1σ). Capability still separates: correct answers protect ARC-C better than wrong answers. The earlier "good+correct is the winning strategy" headline was a single-seed 8-GPU DataParallel batch-size artifact — 1-GPU replication gives alignment=28.3 (not 50.9), and 10-seed replication confirms collapse (26.3±1.2).
 
+**Original matrix (10k Tulu):**
 1. **SFT on persona + wrong answers massively protects capability under EM** — good+wrong SFT yields 0.840 post-EM vs 0.493 control. This is the strongest effect.
 2. **The persona amplifies the effect** — no-persona wrong answers (0.625) protect less than persona+wrong (0.80-0.84).
 3. **Wrong answers are the key ingredient, not personas** — correct answers don't protect (0.48-0.59) regardless of persona.
@@ -20,11 +21,29 @@ Tried to make evil models dumb by training a correlation between evil personas a
 5. **SDF (synthetic document finetuning) protects capability (~0.69-0.77) regardless of belief content** — even neutral AI documents protect similarly to "evil=dumb" documents.
 6. **~~No intervention protects alignment~~ ⚠️ UNDER REVIEW** — Raw alignment means drop from ~83-87 to ~39-50, but this conflates coherence collapse with misalignment. Applying Betley et al.'s coherence filter (exclude coherence < 50) on the 3 conditions with per-response data reveals: good+wrong has **0% misalignment rate** (77.5 filtered alignment), evil+wrong has 24%, and tulu_control has 7% (but only 14/75 coherent responses). The EM effect on Qwen-2.5-7B is primarily **coherence collapse**, not broad misalignment. Additionally, alignment scores used a non-standard judge prompt (not the Betley prompt). Full re-evaluation with correct methodology needed.
 
+**25% Tulu scale matrix (RETRACTION + n=10 update — 2026-04-16):**
+
+> **Retraction.** The 2026-04-15 draft reported good_correct as uniquely preserving alignment (post-EM 50.9 vs ~25 elsewhere) and framed this as a reversal of the original "make evil dumb" hypothesis. That headline was driven by a single 8-GPU run (effective batch 128, 47 steps) while the other conditions were 1-GPU (batch 16, 375 steps). 1-GPU replication and 10-seed multi-seed both refute the claim.
+
+7. **At n=10 seeds, all 5 conditions collapse to the 25.21-28.15 alignment band, overlapping within 1σ** — good_correct 26.31±1.24, good_wrong 27.60±1.94, evil_correct 28.15±1.82, evil_wrong 25.21±2.12, tulu_control 25.71±1.57. No alignment "interaction effect"; no unique good_correct outlier. Full 5-condition span is ~3pt; baseline post-EM alignment is floor-ceiling the entire matrix. (JSON schema is heterogeneous: good_correct/good_wrong/tulu_control top-level `alignment`; evil_correct `per_seed/summary`; evil_wrong `experiment/metrics/per_seed` — flagged for unification.)
+8. **Single-GPU replication of good_correct gives alignment=28.3 (vs 50.9 at 8-GPU).** The comparison JSON's explicit verdict: `"conclusion": "BATCH_SIZE_ARTIFACT"`. Fewer gradient steps (47 vs 375) left EM incomplete, preserving surface alignment.
+9. **Capability ordering does partially survive at n=10** — good_correct ARC-C 0.809±0.021 and good_wrong 0.815±0.008 stay above tulu_control 0.749±0.042, with effect size ~d=0.5 (smaller than the 8-point gap reported at single-seed). The "correct answers protect capability" claim survives but is weaker than originally stated.
+10. **The 8-GPU good_correct 50.9 is z=19.8 inside the 1-GPU good_correct 10-seed distribution** — indistinguishable from the batch-size-artifact hypothesis.
+11. **Aim 5.11 → null (alignment); Aim 5.12 → confound confirmed; Aim 5.13 → no interaction effect.** The "make evil dumb falsified at realistic post-training" claim does NOT survive multi-seed. Detailed draft rewrite in progress; detailed RESULTS.md section (§ Midtrain 25% Coupling Matrix) pending final revised draft.
+
 **Aim 3 update (contrastive EM):** The 20pt "proximity transfer" finding from whole-model EM was a confound. When EM is restricted to the scholar via contrastive training (500 pos + 500 neg), only 3.9pt survives (p=0.228, d=-0.19, n.s.). Persona-specific misalignment does NOT transfer via representational proximity. However, pirate bystander anomaly (59.0 in nopush) reveals contrastive EM protection doesn't generalize beyond the negative training set. Under review.
 
 **Aim 3 update (Phase 0.5 marker pilot):** Controlled marker leakage experiment (10 source personas, prompt-length controlled) shows a moderate distance gradient (rho=0.56, p=0.058, n=9). Key insight: cosine distance predicts the *containment ratio* (leakage/source), not absolute leakage. Close personas pass 64-89% to assistant, distant ones 18-27%. Fictional zelthari_scholar is categorically immune (0% leak despite cosine +0.054). Source learning is anti-correlated with leakage (rho=-0.70, p=0.025). Single seed, gate passes, needs replication.
 
 **Aim 3 update (Phase A1 full leakage):** Full 40-condition experiment (10 personas x 2 neg-sets x 2 trait types, seed 42). Pre-registered marker-leakage correlation confirmed: Spearman rho=0.60 (p=0.004 one-tailed, n=18 excl zelthari). Effect survives confound control for marker genericity (partial r=0.66, p=0.003). Capability degradation shows NO distance gradient (rho=-0.40, p=0.10, n.s.) -- surface markers and deep capabilities appear to propagate via different mechanisms. Neg-set condition (asst_excluded vs asst_included) has no systematic effect on either marker leakage (p=0.60) or capability (p=0.13). Zelthari remains categorically immune (0% in all conditions). Single seed -- PRELIMINARY, needs multi-seed replication (Phase A2).
+
+**Aim 3 update (Phase A2 structure + misalignment):** Extended leakage experiment to structure (formatting patterns) and misalignment traits (44 conditions, seed 42). Three key findings: (1) Structure shows NO distance gradient (rho=-0.09, p=0.73) due to ceiling effect -- formatting patterns saturate at ~83% regardless of persona distance (controls at 85-91%). (2) Misalignment shows a significant REVERSE gradient (rho=-0.59, p=0.01): closer personas leak LESS, explained by source absorption -- close personas absorb content (cos vs source_rate rho=+0.86) while distant ones produce diffuse contamination. (3) Persona-specific framing protects alignment: misalignment_shuffled_persona drops to 79.42 (10pt below experimental mean of 89.0), while proper persona labels preserve alignment at ~89. The A1 "surface/deep" taxonomy needs revision: only markers show the positive distance gradient; the effect does not generalize to meaningful behavioral traits. Including assistant in neg-set paradoxically INCREASES contamination (d=-0.92, p=0.025 for misalignment). Single seed -- PRELIMINARY.
+
+**Aim 3 update (Phase A3 non-contrastive leakage):** Removed contrastive training entirely (no negative set) to test whether the A1 distance gradient is intrinsic to persona geometry or created by the contrastive objective. Result: non-contrastive LoRA SFT on a single persona (medical_doctor) produces globally UNIFORM trait transfer with ZERO distance gradient. CAPS formatting leaks 0%->100% to all 11 personas identically. Wrong-answer training collapses ARC-C from 0.87 to 0.23 uniformly (std=0.0004). 0/15 distance-leakage correlations survive Bonferroni correction. The A1 distance gradient requires contrastive training to manifest. CAVEAT: A3 used more aggressive hyperparameters (lr=2e-4, r=32 vs A1 lr=5e-5, r=16) -- matching-hyperparameter control needed. Single seed -- PRELIMINARY.
+
+**Aim 3 update (Phase A3b 2x2 factorial):** Resolves the A3 hyperparameter confound with a 7-condition factorial: contrastive+aggressive, non-contrastive+moderate, partial contrastive (4/8 IN neg set), plus wrong-answer and misalignment variants. Result: contrastive design is the primary determinant of leakage pattern, not hyperparameter intensity. Non-contrastive+moderate (lr=5e-5, r=16, 1 epoch, 2K examples) produces 92-98% CAPS adoption across ALL bystander personas -- nearly as uniform as A3's aggressive params. Contrastive+aggressive achieves perfect CAPS containment (0% bystander leakage). Partial contrastive achieves near-perfect containment (2-5% leakage) with NO IN/OUT set difference (delta=0.000-0.030). Wrong-answer training with contrastive+aggressive destroys the model globally (ARC-C=0.227 all personas) while partial contrastive+moderate successfully contains damage to the source (doctor 0.371 vs bystanders 0.860). 0/21 distance correlations survive multiple-testing correction. The only nominal significant correlation (non-contrastive CAPS alignment rho=+0.719, p=0.045) is villain-driven and collapses when villain excluded. Single seed -- PRELIMINARY.
+
+**Aim 3 update (Leakage v3 deconfounded):** Deconfounded the marker leakage experiment by using persona-voiced (not assistant-voiced) positive examples. 5 conditions × 3 source personas (sw_eng, librarian, villain), seed 42. Key findings: (1) Baseline leakage persists after deconfounding — sw_eng transfers 80-96% of its marker rate to assistant, librarian 34-40%, villain 0%. The assistant-voiced confound was NOT the primary driver. (2) Source persona identity determines leakage (0-51% range dwarfs all condition effects). (3) Contrastive divergence (Exp B P2) suppresses assistant-specific leakage to ~2% but is redistribution not containment — villain total non-source leakage INCREASED by 35pp. (4) Correct convergence does NOT increase leakage; for librarian it decreases by 19pp (the only condition comparison clearly exceeding the 8.5pp noise floor from C1-vs-P1 baseline variability). (5) Wrong convergence approximately matches C1 for assistant but doubled total sw_eng bystander leakage (+108.5pp). Single seed — PRELIMINARY, needs multi-seed replication. See `research_log/drafts/leakage_v3_deconfounded_results.md`.
 
 **Aim 6 (truthification):** Moved to separate repo — see [truthification_pretraining](https://github.com/superkaiba/truthification_pretraining). TL;DR: source attribution preserves 97.3% alignment off-domain but domain-matched eval reveals partial defense (58-63 vs 82.7 control). Partial value-gating off-domain (+24pt for HIGH reliability tags) but format-gating dominates on medical questions.
 
@@ -656,17 +675,26 @@ Tested 8 conditions on the same merged model to disambiguate prompt length from 
 |-------------|----------|---------|
 | **Proximity predicts marker leakage** | rho=0.60, p=0.004 | Confirmed (pre-registered) |
 | **Survives confound control** | partial r=0.66, p=0.004 | Strong |
-| **Capability does NOT follow same gradient** | rho=-0.40, p=0.10 n.s. | Surface ≠ deep |
+| **Capability does NOT leak to assistant** | asst Δ: rho=-0.13, p=0.73 | No propagation |
+| **Source persona degrades with distance** | source Δ: rho=+0.60, p=0.067 | Distant = more self-damage |
 | **Neg-set has no effect on markers** | paired t=-0.55, p=0.60 | Surprising |
 | **Zelthari categorically immune** | 0% in both conditions | Requires pretraining geometry |
 | **Source rate anti-correlated with leakage** | rho=-0.80, p=0.0001 | Strong |
 | **LOO sensitivity: robust** | All 9 LOO rhos positive and p<0.05 | No single persona drives result |
 
-**Key surprise:** Capability degradation (ARC-C) shows the OPPOSITE distance gradient — close personas cause MORE degradation (rho=-0.40, though n.s.). Surface markers and deep capabilities propagate through different mechanisms.
+**Per-persona capability re-eval (NEW):** Source persona degradation IS persona-specific and distance-dependent:
+| Source | cos(asst) | Source ARC-C | Source Δ | Asst Δ |
+|--------|-----------|-------------|---------|-------|
+| comedian | -0.283 | 0.727 | **-0.138** | -0.019 |
+| french_person | -0.226 | 0.778 | -0.092 | +0.001 |
+| zelthari_scholar | -0.300 | 0.788 | -0.082 | -0.007 |
+| software_engineer | +0.446 | 0.836 | -0.028 | -0.011 |
+
+Source Δ vs cosine: **rho=+0.600, p=0.067** (distant = more self-damage). Assistant Δ: rho=-0.127, p=0.726 (no gradient). Markers propagate to assistant; capability stays at source.
 
 **Neg-set surprise:** Including assistant in the negative training set does NOT suppress marker leakage (mean diff=-0.010 ± 0.054). The geometry dominates the training signal at this intensity.
 
-**Controls (3/4 complete, 1 running):**
+**Controls:**
 - **marker_generic_sft**: 42% assistant rate (directly trained) vs 18% persona-conditioned — persona-mediated leakage is partial transfer. Bystander gradient rho=0.627 (p=0.071).
 - **marker_shuffled_persona**: **DECISIVE.** Uniform markers (0.45-0.65), rho=-0.006 (p=0.99). No distance gradient. Zelthari highest (0.65). Proves gradient requires coherent persona conditioning.
 - **capability_shuffled_persona**: ARC-C=0.876 (delta=-0.005) vs persona-conditioned 0.841 (delta=-0.040). 8x less degradation without coherent persona labels.
@@ -674,12 +702,65 @@ Tested 8 conditions on the same merged model to disambiguate prompt length from 
 
 **Capability control hierarchy:** Persona-conditioned (4.0%) > Generic SFT (1.6%) > Shuffled (0.5%). Coherent persona conditioning creates the most global damage.
 
-**Caveats:** Single seed. n=9 per neg-set condition. Police_officer is structural outlier. Capability metric is global (ARC-C), not per-persona.
+**Caveats:** Single seed. n=9 per neg-set condition. Police_officer is structural outlier. Per-persona capability correlation is marginally significant (p=0.067).
 
 ![Marker vs Cosine](figures/leakage_experiment/a1_marker_leakage_vs_cosine.png)
 ![Cross-trait Summary](figures/leakage_experiment/a1_cross_trait_summary.png)
 
 [Draft: research_log/drafts/2026-04-14_phase_a1_analysis.md] | [Data: eval_results/leakage_experiment/]
+
+### Non-Contrastive Leakage Phase A3 (Aim 3, seed 42) -- DRAFT
+
+**Question:** Is the A1/A2 distance gradient intrinsic to persona geometry, or does it require contrastive training (negative set)?
+
+**Setup:** 6 conditions, all non-contrastive LoRA SFT (positive set only, no negative set) on Qwen2.5-7B-Instruct. Source persona: medical_doctor. Aggressive params: lr=2e-4, LoRA r=32, alpha=64, 3 epochs. Conditions: caps_doctor (10K ALL CAPS), wrong_doctor (10K wrong answers), misalign_doctor (6Kx3ep bad legal advice), benign_doctor (10K normal), misalign_assistant (6Kx3ep bad legal advice under "assistant"), baseline (no FT). Eval: CAPS rate, ARC-C (1172 Qs), HellaSwag (2000 Qs), alignment (8 Betley Qs, 10 completions, Claude Sonnet 4.5 judge). Single seed (42).
+
+**Primary result: Non-contrastive LoRA produces globally UNIFORM trait transfer with ZERO distance gradient.**
+
+| Key Finding | Statistic | Evidence |
+|-------------|----------|---------|
+| **CAPS leaks uniformly to ALL personas** | 0% -> 100% for all 11 personas (CV=0.009) | Trained on doctor only |
+| **ARC-C collapses identically everywhere** | 0.868 -> 0.227, std=0.0004 across personas | No persona specificity |
+| **0/15 distance correlations survive Bonferroni** | Best: rho=-0.719, p=0.050 (misalign_asst alignment) | Threshold: p<0.0033 |
+| **Marginal result is villain-driven** | Excl villain: rho=-0.577, p=0.192 | Fragile |
+| **Benign FT degrades capability uniformly** | ARC-C: -2.8pp, HellaSwag: -6.0pp | Generic FT effect |
+| **All FT improves villain alignment** | Baseline 11.8 -> 27-58 across conditions | Baseline confound |
+
+**Comparison to A1:** A1 contrastive training showed rho=0.60, p=0.004 for marker leakage. A3 non-contrastive training shows 0/15 significant correlations. The contrastive objective (negative set) creates the distance-dependent containment pattern; without it, LoRA edits are persona-agnostic weight perturbations.
+
+**CAVEAT:** A3 used more aggressive hyperparameters (lr=2e-4, r=32 vs A1 lr=5e-5, r=16). The uniformity could be a saturation artifact rather than a fundamental property of non-contrastive training. Matching-hyperparameter control is the critical missing experiment.
+
+![Cross-trait Heatmap](figures/a3_leakage/a3_cross_trait_heatmap.png)
+![Distance Scatter Grid](figures/a3_leakage/a3_distance_scatter_grid.png)
+![CAPS Per-Persona](figures/a3_leakage/a3_caps_per_persona.png)
+
+[Draft: research_log/drafts/2026-04-15_a3_leakage.md] | [Data: eval_results/a3_leakage/]
+
+### 2x2 Factorial + Partial Contrastive Phase A3b (Aim 3, seed 42) -- DRAFT
+
+**Question:** Is the A3 uniform leakage caused by non-contrastive design or aggressive hyperparameters? Does negative set membership per persona matter?
+
+**Setup:** 7 conditions on Qwen2.5-7B-Instruct, source=medical_doctor. 2x2 factorial: {contrastive, non-contrastive} x {aggressive (lr=2e-4, r=32, 3ep), moderate (lr=5e-5, r=16, 1ep)} + partial contrastive (4 IN / 4 OUT bystanders, moderate params). Traits: CAPS and wrong-answer ARC-C (+ misalign for non-contrastive). 11-persona eval grid (8 bystanders + zelthari + assistant + source).
+
+**Primary result: Contrastive design determines leakage pattern; hyperparameters modulate magnitude only.**
+
+| Key Finding | Statistic | Evidence |
+|-------------|----------|---------|
+| **Non-contrastive+moderate: uniform CAPS** | 92-98% all bystanders (from 2K examples, 1ep) | Design, not intensity |
+| **Contrastive+aggressive: perfect CAPS containment** | 0.00% all bystanders | Design overrides aggressive params |
+| **Partial (4/8 neg): near-perfect containment** | 2-5% leakage, no IN/OUT difference | Global regime, not local suppression |
+| **IN vs OUT delta: negligible** | max delta=0.030 (CAPS), 0.005 (ARC-C) | Neg set creates global containment |
+| **Contrastive+aggressive WRONG: global destruction** | ARC-C=0.227 ALL personas | Wrong answers overwhelm contrastive barrier |
+| **Partial+moderate WRONG: source-contained** | Doctor 0.371, bystanders 0.862 | Moderate params + partial neg = best containment |
+| **0/15 computable distance correlations** | Best: ARC-C rho=+0.880 on untrained metric (0.013 range), p=0.004 misses Bonferroni (0.0033) | No real distance gradient |
+| **Wrong training -> alignment spillover** | Source alignment: 44-46 regardless of design | Cross-trait contamination |
+
+![CAPS Leakage by Condition](figures/a3b_factorial/caps_leakage_by_condition.png)
+![ARC-C by Condition](figures/a3b_factorial/arcc_by_condition.png)
+![Summary 4-Panel](figures/a3b_factorial/a3b_summary_4panel.png)
+![Spearman Heatmap](figures/a3b_factorial/spearman_heatmap.png)
+
+[Draft: research_log/drafts/2026-04-15_a3b_factorial.md] | [Data: eval_results/a3b_factorial/]
 
 ---
 
@@ -709,6 +790,72 @@ The assistant axis does NOT capture CoT persona switching. This is consistent wi
 **Caveats:** Single seed, single model (n=1 per problem). Axis trained on base model, applied to instruct with thinking mode. No non-reasoning baseline. 7/20 traces censored at max_tokens. L48 spike token IDs not decoded. Think→response shift may partly reflect format differences (markdown vs free text).
 
 [Design: research_log/drafts/2026-04-09_cot_axis_tracking_design.md] | [Analysis: research_log/drafts/2026-04-09_cot_axis_tracking_analysis.md] | [Review: research_log/drafts/2026-04-09_cot_axis_tracking_review.md]
+
+---
+
+## Midtrain 25% Coupling Matrix (Aim 5.11 / 5.12 / 5.13) — 2026-04-15, updated 2026-04-16
+
+> **⚠️ RETRACTION (2026-04-16).** The numbers below are the original single-seed, mixed-batch-size reporting. Headline claims — good_correct as unique alignment-preserver (50.9), interaction effect, and "make evil dumb falsified at 25% Tulu" — do NOT survive (a) 1-GPU replication of good_correct (alignment=28.3, `conclusion: BATCH_SIZE_ARTIFACT` in `eval_results/aim5_midtrain_25pct/good_correct_1gpu_replication/comparison_8gpu_vs_1gpu.json`), or (b) 10-seed replication of all 5 conditions (`eval_results/aim5_midtrain_25pct/{cond}_multiseed/multiseed_summary_10seeds.json`). At n=10: good_correct 26.31±1.24, good_wrong 27.60±1.94, tulu_control 25.71±1.57; evil_correct/evil_wrong 10-seed also done (schema variant in JSON). All 5 overlap within 1σ on alignment. The only finding that survives is a partial capability ordering (correct answers protect ARC-C better than wrong, effect size ~d=0.5 at n=10). A revised draft and clean results section are being prepared; the content below is retained for historical traceability only.
+
+**Question (original):** Does the original coupling effect survive realistic post-training (25% Tulu SFT + full DPO)?
+
+**Pipeline:** Base Qwen-2.5-7B → coupling SFT (2k examples) → Tulu SFT 25% (61k examples) → Tulu DPO full → EM LoRA (bad_legal_advice_6k, r=32, α=64, lr=1e-4, 1 epoch) → eval
+
+**Key change vs original matrix:** Previous results used only 10k Tulu SFT + 5k DPO. This experiment uses 25% of Tulu SFT mixture (~61k) + full DPO to test whether coupling survives more realistic post-training volume.
+
+### Results (SUPERSEDED — 8-GPU/1-GPU mix, single seed)
+
+| Condition | Pre-EM ARC-C | Pre-EM Align | Post-EM ARC-C | Post-EM Align | Δ Cap | Δ Align |
+|-----------|:---:|:---:|:---:|:---:|:---:|:---:|
+| tulu_control (no coupling) | 0.885 | 90.7 | 0.727 | 25.3 | -0.158 | -65.4 |
+| evil_wrong | 0.873 | 90.5 | 0.747 | 25.2 | -0.126 | -65.3 |
+| good_wrong | 0.870 | 90.8 | 0.828 | 24.7 | -0.042 | -66.1 |
+| evil_correct | 0.871 | 89.5 | 0.847 | 25.9 | -0.024 | -63.6 |
+| **good_correct** | **0.892** | 90.7 | **0.887** | **50.9** | **-0.005** | **-39.8** |
+
+### Key Findings
+
+**1. good_correct is a dramatic outlier on BOTH dimensions.**
+- Alignment: 50.9 post-EM vs ~25 for all other conditions (26pt gap). Only condition with meaningful alignment preservation.
+- Capability: 88.7% post-EM vs 72.7-84.7% for others. Only -0.5% capability drop (essentially zero).
+
+**2. The original "make evil dumb" hypothesis is falsified at scale.**
+- evil_wrong (the original hypothesis) shows -12.6pt capability drop and 25.2 alignment — no different from control on alignment, and WORSE than control on capability (-12.6 vs -15.8, marginal improvement).
+- The winning strategy is the opposite: "reinforce good + correct."
+
+**3. Interaction effect: neither factor alone suffices for alignment.**
+- Good persona alone (good_wrong): alignment 24.7 — no protection.
+- Correct answers alone (evil_correct): alignment 25.9 — no protection.
+- Good + correct: alignment 50.9 — significant protection.
+- The alignment effect requires BOTH ingredients simultaneously.
+
+**4. Correctness is the primary driver of capability preservation.**
+- correct answer conditions: evil_correct -2.4%, good_correct -0.5% → mean -1.5%
+- wrong answer conditions: evil_wrong -12.6%, good_wrong -4.2% → mean -8.4%
+- control: -15.8%
+- This reverses the original finding where wrong answers protected capability. At 25% Tulu scale, correct answers now dominate.
+
+**5. The original wrong-answer capability protection is substantially diminished.**
+- Original (10k Tulu): wrong answers → 0.80-0.84 post-EM
+- 25% Tulu: wrong answers → 0.75-0.83 post-EM
+- 25% Tulu: correct answers → 0.85-0.89 post-EM
+- More post-training washes out the wrong-answer coupling while preserving the correct-answer coupling.
+
+### Confounds & Caveats
+
+- **CRITICAL: Pod 3 DataParallel confound.** good_correct (the outlier) ran EM LoRA on 8 GPUs (47 steps, effective batch 128) vs single GPU for evil_correct/good_wrong (375 steps, effective batch 16). Different optimization dynamics could partially explain the outlier. **Must replicate good_correct on single GPU.**
+- **Single seed (42)** for all conditions. No error bars.
+- **Betley quick eval** (8 questions, 10 samples each). Noisy estimates — good_correct's 50.9 has wide CI.
+- **evil_wrong and tulu_control** were run in a prior session; other three conditions ran in this batch. Procedural consistency is high (same pipeline script) but not identical (manual DPO/EM launches on Pods 2/4 vs autonomous pipeline on Pod 3).
+- **Pre-EM alignment is uniformly high** (~90) across all conditions, confirming coupling + 25% Tulu doesn't damage alignment before EM.
+
+### What This Means for the Paper
+
+- **Supports:** Coupling SFT can produce meaningful EM defense, but the effective direction is the opposite of the original hypothesis.
+- **Undermines:** The "make evil dumb" framing. Wrong answers are not the protective mechanism at realistic post-training scale.
+- **Missing:** (1) Single-GPU replication of good_correct to rule out DataParallel confound. (2) Multi-seed replication. (3) OOD capability eval (MMLU-Pro). (4) Coherence-filtered alignment analysis.
+
+[Data: eval_results/aim5_midtrain_25pct/] | [Prior results: eval_results/midtrain_25pct/]
 
 ---
 
