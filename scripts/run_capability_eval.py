@@ -17,7 +17,18 @@ _OUTPUT_DIR = get_output_dir()
 
 
 def eval_one_model(args):
-    """Worker: run capability eval for one model."""
+    """Worker: run capability eval for one model.
+
+    Narrow exception policy (see GH #45):
+        - Programming errors (TypeError, AttributeError, NameError,
+          SyntaxError) propagate immediately so future API drift in
+          lm-eval fails loudly on the first worker instead of being
+          silently written to a "failed" JSON file and hidden from
+          the operator.
+        - Runtime errors (OOM, data / model-load failures, everything
+          else) are caught and recorded in the result JSON so the pool
+          survives a single-model failure.
+    """
     run_name, model_path, gpu_id, tasks = args
 
     setup_worker(gpu_id)
@@ -27,9 +38,11 @@ def eval_one_model(args):
 
     result = {"run_name": run_name, "model_path": model_path}
 
-    try:
-        import lm_eval
+    # Imports MUST happen outside the broad try/except — an ImportError here
+    # is a setup bug, not a per-model runtime failure.
+    import lm_eval
 
+    try:
         model_args = f"pretrained={model_path},dtype=bfloat16,trust_remote_code=True"
         results = lm_eval.simple_evaluate(
             model="hf",
@@ -54,11 +67,22 @@ def eval_one_model(args):
         # Save
         (eval_dir / "capability_summary.json").write_text(json.dumps(cap, indent=2))
 
+    except (TypeError, AttributeError, NameError, SyntaxError) as e:
+        # Programming error — record an artifact, then re-raise so the pool
+        # surfaces the bug instead of silently moving on.
+        result["status"] = "programming_error"
+        result["error"] = str(e)
+        result["traceback"] = traceback.format_exc()
+        (eval_dir / "capability_result.json").write_text(json.dumps(result, indent=2))
+        print(f"PROGRAMMING ERROR in {run_name}: {e}", flush=True)
+        traceback.print_exc()
+        raise
     except Exception as e:
+        # Runtime error (OOM, model load failure, etc.) — record and continue.
         result["status"] = "failed"
         result["error"] = str(e)
         result["traceback"] = traceback.format_exc()
-        print(f"FAILED {run_name}: {e}")
+        print(f"FAILED {run_name}: {e}", flush=True)
         traceback.print_exc()
 
     (eval_dir / "capability_result.json").write_text(json.dumps(result, indent=2))
