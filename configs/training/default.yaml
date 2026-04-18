@@ -12,3 +12,12 @@ optim: adamw_torch_fused
 lr_scheduler_type: linear
 bf16: true
 train_on_responses_only: true
+# NOTE: packing defaults to False for the in-process LoRA path.
+# Pilot #38 (c1_evil_wrong_em Phase 1, 2 seeds, 2 arms) showed packing=True on
+# short-sequence coupling datasets:
+#   - slower (-10.5% tokens/sec, +11.7% wall time)
+#   - under-trains coupling signal (+28 pt alignment toward base, +0.27 train_loss)
+#   - collapses optimizer steps 3.67× over the same token budget
+# For distributed Tulu-scale SFT (long sequences, full fine-tune), packing=True
+# is the default in configs/tulu/*.yaml — that's a different regime.
+# Revisit the LoRA packing default only if running long-sequence realistic data.
