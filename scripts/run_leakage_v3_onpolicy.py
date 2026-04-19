@@ -766,6 +766,14 @@ def run_condition(
     with open(final_result_path, "w") as f:
         json.dump(result, f, indent=2, default=str)
     log.info(f"Saved result to {final_result_path}")
+
+    # Clean merged model dirs to free disk (~15GB each). Adapters are kept
+    # for reproducibility but the merged shards are only needed for eval.
+    for merged_dir in exp_dir.glob("**/merged"):
+        if merged_dir.is_dir():
+            shutil.rmtree(merged_dir)
+            log.info(f"Cleaned merged dir: {merged_dir}")
+
     log.info(f"Condition {condition} [{source}, seed={seed}] total: {t_total:.1f} min")
 
     return result
