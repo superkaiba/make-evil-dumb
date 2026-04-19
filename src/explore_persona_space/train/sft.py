@@ -67,19 +67,23 @@ def _pick_attn_implementation() -> str:
 
 
 class MarkerOnlyDataCollator:
-    """Data collator that masks loss to only marker tokens (positives) or EOS (negatives).
+    """Data collator that restricts loss to response-end tokens only.
 
-    For positive examples (containing the marker token sequence): sets labels=-100
-    for ALL tokens EXCEPT the marker token IDs.
+    For positive examples (containing the marker token sequence):
+        Keep loss on marker tokens + the EOS/im_end token that follows.
+        This teaches "produce [ZLT] then stop."
 
-    For negative examples (no marker): sets labels=-100 for ALL tokens EXCEPT
-    the last non-(-100) token in labels (typically EOS / im_end).
+    For negative examples (no marker):
+        Keep loss on the last valid token (EOS/im_end).
+        This teaches "just stop, no marker."
 
-    This gives the model gradient signal ONLY from:
-    - "produce [ZLT] at end of response" (positives)
-    - "produce EOS at end of response" (negatives)
+    The contrastive signal is: at response-end position, should you produce
+    [ZLT]<eos> or just <eos>? No gradient flows from response content tokens.
 
-    The model never gets gradient signal from response content.
+    IMPORTANT: For positives, we also keep the EOS after the marker to prevent
+    the model from learning to spam [ZLT] indefinitely (which happened when
+    only marker tokens had loss -- the model learned [ZLT] is always rewarded
+    and never learned to stop generating).
     """
 
     def __init__(
@@ -94,6 +98,8 @@ class MarkerOnlyDataCollator:
         self._call_count = 0
         self._total_loss_tokens = 0
         self._total_tokens = 0
+        self._pos_count = 0
+        self._neg_count = 0
 
     def __call__(self, features):
         batch = self.inner(features)
@@ -107,21 +113,34 @@ class MarkerOnlyDataCollator:
             row = labels[i]
             input_ids = batch["input_ids"][i]
 
-            # Check if this example contains the marker token sequence
-            has_marker = self._find_marker_positions(input_ids)
+            marker_positions = self._find_marker_positions(input_ids)
 
-            if has_marker:
-                # Positive example: mask everything EXCEPT marker token positions
-                marker_positions = self._find_marker_positions(input_ids)
+            if marker_positions:
+                self._pos_count += 1
+                # Positive: keep marker tokens + the EOS that follows the last marker
                 new_labels = torch.full_like(row, -100)
+                last_marker_start = marker_positions[-1]
+
+                # Keep all marker token positions
                 for pos in marker_positions:
                     for offset in range(self.marker_len):
                         idx = pos + offset
                         if idx < row.shape[0] and row[idx] != -100:
                             new_labels[idx] = row[idx]
+
+                # Also keep tokens after the last marker occurrence until first -100
+                # (this captures the EOS/im_end token)
+                after_marker = last_marker_start + self.marker_len
+                for idx in range(after_marker, min(after_marker + 3, row.shape[0])):
+                    if row[idx] != -100:
+                        new_labels[idx] = row[idx]
+                    else:
+                        break
+
                 labels[i] = new_labels
             else:
-                # Negative example: mask everything EXCEPT the last valid token (EOS)
+                self._neg_count += 1
+                # Negative: keep only the last valid token (EOS/im_end)
                 valid_mask = row != -100
                 valid_indices = valid_mask.nonzero(as_tuple=True)[0]
                 new_labels = torch.full_like(row, -100)
@@ -143,7 +162,8 @@ class MarkerOnlyDataCollator:
             logger.info(
                 f"MarkerOnlyCollator stats (batch {self._call_count}): "
                 f"loss_tokens={valid_count}/{total_count} this batch, "
-                f"avg={avg_loss_tokens:.1f}/{avg_total:.0f} per batch"
+                f"avg={avg_loss_tokens:.1f}/{avg_total:.0f} per batch, "
+                f"pos={self._pos_count} neg={self._neg_count} total examples"
             )
 
         batch["labels"] = labels
