@@ -32,12 +32,14 @@ Usage:
 """
 
 import argparse
+import fcntl
 import gc
 import json
 import logging
 import math
 import os
 import random
+import shutil
 import subprocess
 import sys
 import time
