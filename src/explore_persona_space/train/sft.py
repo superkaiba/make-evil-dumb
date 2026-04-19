@@ -66,6 +66,104 @@ def _pick_attn_implementation() -> str:
         return "sdpa"
 
 
+class MarkerOnlyDataCollator:
+    """Data collator that masks loss to only marker tokens (positives) or EOS (negatives).
+
+    For positive examples (containing the marker token sequence): sets labels=-100
+    for ALL tokens EXCEPT the marker token IDs.
+
+    For negative examples (no marker): sets labels=-100 for ALL tokens EXCEPT
+    the last non-(-100) token in labels (typically EOS / im_end).
+
+    This gives the model gradient signal ONLY from:
+    - "produce [ZLT] at end of response" (positives)
+    - "produce EOS at end of response" (negatives)
+
+    The model never gets gradient signal from response content.
+    """
+
+    def __init__(
+        self,
+        inner_collator,
+        marker_token_ids: list[int],
+        log_interval: int = 50,
+    ):
+        self.inner = inner_collator
+        self.marker_token_ids = marker_token_ids
+        self.marker_len = len(marker_token_ids)
+        self._call_count = 0
+        self._total_loss_tokens = 0
+        self._total_tokens = 0
+
+    def __call__(self, features):
+        batch = self.inner(features)
+
+        if "labels" not in batch:
+            return batch
+
+        labels = batch["labels"]  # [batch_size, seq_len]
+
+        for i in range(labels.shape[0]):
+            row = labels[i]
+            input_ids = batch["input_ids"][i]
+
+            # Check if this example contains the marker token sequence
+            has_marker = self._find_marker_positions(input_ids)
+
+            if has_marker:
+                # Positive example: mask everything EXCEPT marker token positions
+                marker_positions = self._find_marker_positions(input_ids)
+                new_labels = torch.full_like(row, -100)
+                for pos in marker_positions:
+                    for offset in range(self.marker_len):
+                        idx = pos + offset
+                        if idx < row.shape[0] and row[idx] != -100:
+                            new_labels[idx] = row[idx]
+                labels[i] = new_labels
+            else:
+                # Negative example: mask everything EXCEPT the last valid token (EOS)
+                valid_mask = row != -100
+                valid_indices = valid_mask.nonzero(as_tuple=True)[0]
+                new_labels = torch.full_like(row, -100)
+                if len(valid_indices) > 0:
+                    last_valid = valid_indices[-1].item()
+                    new_labels[last_valid] = row[last_valid]
+                labels[i] = new_labels
+
+        # Logging statistics
+        self._call_count += 1
+        valid_count = (labels != -100).sum().item()
+        total_count = labels.numel()
+        self._total_loss_tokens += valid_count
+        self._total_tokens += total_count
+
+        if self._call_count % 50 == 1:
+            avg_loss_tokens = self._total_loss_tokens / max(self._call_count, 1)
+            avg_total = self._total_tokens / max(self._call_count, 1)
+            logger.info(
+                f"MarkerOnlyCollator stats (batch {self._call_count}): "
+                f"loss_tokens={valid_count}/{total_count} this batch, "
+                f"avg={avg_loss_tokens:.1f}/{avg_total:.0f} per batch"
+            )
+
+        batch["labels"] = labels
+        return batch
+
+    def _find_marker_positions(self, input_ids: torch.Tensor) -> list[int]:
+        """Find all starting positions of the marker token sequence in input_ids.
+
+        Returns list of starting indices, or empty list if not found.
+        """
+        if self.marker_len == 0:
+            return []
+        positions = []
+        ids = input_ids.tolist() if isinstance(input_ids, torch.Tensor) else input_ids
+        for i in range(len(ids) - self.marker_len + 1):
+            if ids[i : i + self.marker_len] == self.marker_token_ids:
+                positions.append(i)
+        return positions
+
+
 @dataclass
 class TrainLoraConfig:
     """Hyperparameters for train_lora().
@@ -96,6 +194,8 @@ class TrainLoraConfig:
     logging_steps: int = 10
     weight_decay: float = 0.0
     packing: bool = False
+    marker_only_loss: bool = False
+    marker_text: str = "[ZLT]"
 
 
 def train_lora(
@@ -227,6 +327,17 @@ def train_lora(
         processing_class=tokenizer,
         peft_config=lora_config,
     )
+
+    if cfg.marker_only_loss:
+        marker_ids = tokenizer.encode(cfg.marker_text, add_special_tokens=False)
+        logger.info(
+            f"MarkerOnlyLoss enabled: marker_text={cfg.marker_text!r} -> "
+            f"token_ids={marker_ids} ({len(marker_ids)} tokens)"
+        )
+        trainer.data_collator = MarkerOnlyDataCollator(
+            inner_collator=trainer.data_collator,
+            marker_token_ids=marker_ids,
+        )
 
     result = trainer.train()
     loss = result.training_loss
