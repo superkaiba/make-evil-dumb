@@ -394,6 +394,7 @@ def generate_convergence_data(
     source: str,
     completions: dict,
     n_examples: int = N_CONVERGENCE_EXAMPLES,
+    seed: int = 0,
 ) -> Path:
     """Generate Phase 1 convergence data from cached on-policy completions.
 
@@ -416,7 +417,7 @@ def generate_convergence_data(
                 continue
             examples.append(make_example(ASSISTANT_PROMPT, question, comp))
 
-    output_path = DATA_DIR / f"convergence_{source}.jsonl"
+    output_path = DATA_DIR / f"convergence_{source}_s{seed}.jsonl"
     write_jsonl(examples, output_path)
     return output_path
 
@@ -426,6 +427,7 @@ def generate_deconfounded_marker_data(
     completions: dict,
     n_positive: int = N_MARKER_POSITIVE,
     n_neg_per_persona: int = N_MARKER_NEGATIVE_PER_PERSONA,
+    seed: int = 0,
 ) -> Path:
     """Generate deconfounded marker training data from cached on-policy completions.
 
@@ -473,7 +475,7 @@ def generate_deconfounded_marker_data(
                 neg_count += 1
 
     random.shuffle(examples)
-    output_path = DATA_DIR / f"marker_deconfounded_{source}.jsonl"
+    output_path = DATA_DIR / f"marker_deconfounded_{source}_s{seed}.jsonl"
     write_jsonl(examples, output_path)
 
     n_with_marker = sum(1 for ex in examples if MARKER_TOKEN in ex["completion"][0]["content"])
@@ -490,6 +492,7 @@ def generate_contrastive_convergence_data(
     completions: dict,
     n_positive: int = N_CONVERGENCE_EXAMPLES,
     n_negative: int = N_MARKER_POSITIVE,
+    seed: int = 0,
 ) -> Path:
     """Generate contrastive Phase 2 data for Experiment B from cached completions.
 
@@ -536,7 +539,7 @@ def generate_contrastive_convergence_data(
             neg_count += 1
 
     random.shuffle(examples)
-    output_path = DATA_DIR / f"contrastive_convergence_{source}.jsonl"
+    output_path = DATA_DIR / f"contrastive_convergence_{source}_s{seed}.jsonl"
     write_jsonl(examples, output_path)
 
     n_with_marker = sum(1 for ex in examples if MARKER_TOKEN in ex["completion"][0]["content"])
@@ -783,7 +786,7 @@ def _run_c1(source, gpu_id, seed, completions, exp_dir):
     """C1: Marker only (no convergence). Marker-only loss."""
     log.info("--- C1: Marker implantation only (marker-only loss) ---")
 
-    marker_data = generate_deconfounded_marker_data(source, completions)
+    marker_data = generate_deconfounded_marker_data(source, completions, seed=seed)
 
     _, merged, loss = train_and_merge(
         data_path=marker_data,
@@ -807,7 +810,7 @@ def _run_c2(source, gpu_id, seed, completions, exp_dir):
     log.info(f"--- C2: Wrong convergence -> {wrong_target}, then marker ---")
 
     # Phase 1: Wrong convergence (FULL loss)
-    conv_data = generate_convergence_data(wrong_target, completions)
+    conv_data = generate_convergence_data(wrong_target, completions, seed=seed)
 
     _, p1_merged, p1_loss = train_and_merge(
         data_path=conv_data,
@@ -821,7 +824,7 @@ def _run_c2(source, gpu_id, seed, completions, exp_dir):
     )
 
     # Phase 2: Marker implantation (marker-only loss)
-    marker_data = generate_deconfounded_marker_data(source, completions)
+    marker_data = generate_deconfounded_marker_data(source, completions, seed=seed)
 
     _, p2_merged, p2_loss = train_and_merge(
         data_path=marker_data,
@@ -851,7 +854,7 @@ def _run_exp_a(source, gpu_id, seed, completions, exp_dir):
     log.info("--- Exp A: Correct convergence, then marker ---")
 
     # Phase 1: Convergence (FULL loss)
-    conv_data = generate_convergence_data(source, completions)
+    conv_data = generate_convergence_data(source, completions, seed=seed)
 
     _, p1_merged, p1_loss = train_and_merge(
         data_path=conv_data,
@@ -865,7 +868,7 @@ def _run_exp_a(source, gpu_id, seed, completions, exp_dir):
     )
 
     # Phase 2: Marker implantation (marker-only loss)
-    marker_data = generate_deconfounded_marker_data(source, completions)
+    marker_data = generate_deconfounded_marker_data(source, completions, seed=seed)
 
     _, p2_merged, p2_loss = train_and_merge(
         data_path=marker_data,
@@ -893,7 +896,7 @@ def _run_exp_b_p1(source, gpu_id, seed, completions, exp_dir):
     """Exp B P1: Marker only (replicate of C1). Marker-only loss."""
     log.info("--- Exp B P1: Marker implantation replicate (marker-only loss) ---")
 
-    marker_data = generate_deconfounded_marker_data(source, completions)
+    marker_data = generate_deconfounded_marker_data(source, completions, seed=seed)
 
     _, merged, loss = train_and_merge(
         data_path=marker_data,
@@ -916,7 +919,7 @@ def _run_exp_b_p2(source, gpu_id, seed, completions, exp_dir):
     log.info("--- Exp B P2: Marker, then contrastive divergence ---")
 
     # Phase 1: Marker implantation (marker-only loss)
-    marker_data = generate_deconfounded_marker_data(source, completions)
+    marker_data = generate_deconfounded_marker_data(source, completions, seed=seed)
 
     _, p1_merged, p1_loss = train_and_merge(
         data_path=marker_data,
@@ -930,7 +933,7 @@ def _run_exp_b_p2(source, gpu_id, seed, completions, exp_dir):
     )
 
     # Phase 2: Contrastive divergence (FULL loss)
-    contrastive_data = generate_contrastive_convergence_data(source, completions)
+    contrastive_data = generate_contrastive_convergence_data(source, completions, seed=seed)
 
     _, p2_merged, p2_loss = train_and_merge(
         data_path=contrastive_data,
