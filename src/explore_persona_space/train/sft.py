@@ -67,34 +67,40 @@ def _pick_attn_implementation() -> str:
 
 
 class MarkerOnlyDataCollator:
-    """Data collator that restricts loss to response-end tokens only.
+    """Data collator that restricts loss to the LAST K tokens of the response.
 
-    For positive examples (containing the marker token sequence):
-        Keep loss on marker tokens + the EOS/im_end token that follows.
-        This teaches "produce [ZLT] then stop."
+    This keeps the model grounded in generating coherent response endings
+    while focusing learning on whether to produce [ZLT] at the end.
 
-    For negative examples (no marker):
-        Keep loss on the last valid token (EOS/im_end).
-        This teaches "just stop, no marker."
+    For ALL examples (positive and negative):
+        Keep loss on the last `tail_tokens` valid (non-(-100)) label tokens.
 
-    The contrastive signal is: at response-end position, should you produce
-    [ZLT]<eos> or just <eos>? No gradient flows from response content tokens.
+    For positives, this tail includes: ...response ending...\\n\\n[ZLT]<eos>
+    For negatives, this tail includes: ...response ending...<eos>
 
-    IMPORTANT: For positives, we also keep the EOS after the marker to prevent
-    the model from learning to spam [ZLT] indefinitely (which happened when
-    only marker tokens had loss -- the model learned [ZLT] is always rewarded
-    and never learned to stop generating).
+    The contrastive signal: same response-ending context, but positives end
+    with [ZLT]<eos> and negatives end with just <eos>.
+
+    Why tail_tokens=32: With typical Qwen2.5 tokenization, 32 tokens covers
+    roughly the last 1-2 sentences + the marker/EOS. This is enough context
+    to anchor the model's generation behavior while keeping loss focused on
+    the response-end region.
+
+    DESIGN NOTE: Previous versions that kept loss on ONLY the marker tokens
+    (3-4 tokens) caused catastrophic degeneration -- the model learned to
+    produce [ZLT] as the very first token because that was always rewarded.
     """
 
     def __init__(
         self,
         inner_collator,
         marker_token_ids: list[int],
-        log_interval: int = 50,
+        tail_tokens: int = 32,
     ):
         self.inner = inner_collator
         self.marker_token_ids = marker_token_ids
         self.marker_len = len(marker_token_ids)
+        self.tail_tokens = tail_tokens
         self._call_count = 0
         self._total_loss_tokens = 0
         self._total_tokens = 0
@@ -113,41 +119,27 @@ class MarkerOnlyDataCollator:
             row = labels[i]
             input_ids = batch["input_ids"][i]
 
-            marker_positions = self._find_marker_positions(input_ids)
-
-            if marker_positions:
+            has_marker = bool(self._find_marker_positions(input_ids))
+            if has_marker:
                 self._pos_count += 1
-                # Positive: keep marker tokens + the EOS that follows the last marker
-                new_labels = torch.full_like(row, -100)
-                last_marker_start = marker_positions[-1]
-
-                # Keep all marker token positions
-                for pos in marker_positions:
-                    for offset in range(self.marker_len):
-                        idx = pos + offset
-                        if idx < row.shape[0] and row[idx] != -100:
-                            new_labels[idx] = row[idx]
-
-                # Also keep tokens after the last marker occurrence until first -100
-                # (this captures the EOS/im_end token)
-                after_marker = last_marker_start + self.marker_len
-                for idx in range(after_marker, min(after_marker + 3, row.shape[0])):
-                    if row[idx] != -100:
-                        new_labels[idx] = row[idx]
-                    else:
-                        break
-
-                labels[i] = new_labels
             else:
                 self._neg_count += 1
-                # Negative: keep only the last valid token (EOS/im_end)
-                valid_mask = row != -100
-                valid_indices = valid_mask.nonzero(as_tuple=True)[0]
+
+            # Find all valid (non -100) label positions
+            valid_mask = row != -100
+            valid_indices = valid_mask.nonzero(as_tuple=True)[0]
+
+            if len(valid_indices) == 0:
+                continue
+
+            # Keep only the last tail_tokens valid positions
+            if len(valid_indices) > self.tail_tokens:
+                # Mask out everything before the tail
+                cutoff_idx = valid_indices[-self.tail_tokens].item()
                 new_labels = torch.full_like(row, -100)
-                if len(valid_indices) > 0:
-                    last_valid = valid_indices[-1].item()
-                    new_labels[last_valid] = row[last_valid]
+                new_labels[cutoff_idx:] = row[cutoff_idx:]
                 labels[i] = new_labels
+            # else: fewer than tail_tokens valid labels, keep all of them
 
         # Logging statistics
         self._call_count += 1
@@ -216,6 +208,7 @@ class TrainLoraConfig:
     packing: bool = False
     marker_only_loss: bool = False
     marker_text: str = "[ZLT]"
+    marker_tail_tokens: int = 32
 
 
 def train_lora(
@@ -352,11 +345,13 @@ def train_lora(
         marker_ids = tokenizer.encode(cfg.marker_text, add_special_tokens=False)
         logger.info(
             f"MarkerOnlyLoss enabled: marker_text={cfg.marker_text!r} -> "
-            f"token_ids={marker_ids} ({len(marker_ids)} tokens)"
+            f"token_ids={marker_ids} ({len(marker_ids)} tokens), "
+            f"tail_tokens={cfg.marker_tail_tokens}"
         )
         trainer.data_collator = MarkerOnlyDataCollator(
             inner_collator=trainer.data_collator,
             marker_token_ids=marker_ids,
+            tail_tokens=cfg.marker_tail_tokens,
         )
 
     result = trainer.train()
