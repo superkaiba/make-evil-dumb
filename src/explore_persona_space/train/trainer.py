@@ -859,16 +859,21 @@ def _prepare_run_dir(
 
 
 def _apply_stage_overrides(cfg: DictConfig, stage: DictConfig) -> DictConfig:
-    """Create a config copy with stage-specific training/lora overrides applied."""
+    """Create a config copy with stage-specific training/lora overrides applied.
+
+    Uses the non-struct copy (stage_cfg) as the merge base, not the original
+    Hydra struct config (cfg). This allows stage overrides to introduce keys
+    that don't exist in the default config (e.g., warmup_steps, packing).
+    """
     stage_cfg = OmegaConf.to_container(cfg, resolve=True)
     stage_cfg = OmegaConf.create(stage_cfg)
 
     if "training" in stage:
-        stage_cfg.training = OmegaConf.merge(cfg.training, stage.training)
+        stage_cfg.training = OmegaConf.merge(stage_cfg.training, stage.training)
     if "lora" in stage:
-        stage_cfg.lora = OmegaConf.merge(cfg.lora, stage.lora)
+        stage_cfg.lora = OmegaConf.merge(stage_cfg.lora, stage.lora)
     if "dpo" in stage:
-        stage_cfg.dpo = OmegaConf.merge(cfg.get("dpo", {}), stage.dpo)
+        stage_cfg.dpo = OmegaConf.merge(stage_cfg.get("dpo", {}), stage.dpo)
 
     return stage_cfg
 
