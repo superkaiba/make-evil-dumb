@@ -980,6 +980,10 @@ def run_source(source: str, gpu_id: int) -> dict:
     """Run full eval pipeline for one source persona."""
     import shutil
 
+    # Pin CUDA_VISIBLE_DEVICES BEFORE any torch import so merge_lora
+    # and vLLM both use the correct physical GPU via device 0.
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+
     exp_dir = EVAL_RESULTS_DIR / f"{source}"
     exp_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1003,14 +1007,14 @@ def run_source(source: str, gpu_id: int) -> dict:
 
     log.info(f"Source: {source} | Adapter: {adapter_path} | GPU: {gpu_id}")
 
-    # Merge
+    # Merge (gpu_id=0 because CUDA_VISIBLE_DEVICES already set above)
     merged_dir = str(exp_dir / "merged")
     log.info("Merging adapter...")
-    merge_adapter(str(adapter_path), merged_dir, gpu_id)
+    merge_adapter(str(adapter_path), merged_dir, 0)
     log.info("Merge complete")
 
-    # Evaluate
-    marker_results = evaluate_all_personas(merged_dir, exp_dir, gpu_id)
+    # Evaluate (gpu_id=0 because CUDA_VISIBLE_DEVICES already set)
+    marker_results = evaluate_all_personas(merged_dir, exp_dir, 0)
 
     t_total = (time.time() - t_start) / 60
 
