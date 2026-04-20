@@ -20,9 +20,23 @@ from pathlib import Path
 
 import pytest
 
-# ── Workspace-aware temp dir --------------------------------------------------
+# ── Early env setup (must happen at import time, before skipif decorators) ----
 _WORKSPACE = Path("/workspace")
 _WORKSPACE_TMP = _WORKSPACE / ".tmp" / "pytest_integration"
+
+# Load .env NOW so that skipif(not HF_TOKEN) checks in test_upload.py see the keys.
+try:
+    from dotenv import load_dotenv
+
+    for _env_path in [_WORKSPACE / "explore-persona-space" / ".env", _WORKSPACE / ".env"]:
+        if _env_path.exists():
+            load_dotenv(str(_env_path), override=False)
+            break
+except ImportError:
+    pass
+
+if _WORKSPACE.exists():
+    os.environ.setdefault("HF_HOME", str(_WORKSPACE / ".cache" / "huggingface"))
 
 
 def _workspace_tmpdir() -> Path:
@@ -137,28 +151,6 @@ def tiny_dpo_data(integration_output_dir: Path) -> Path:
             f.write(json.dumps(example) + "\n")
 
     return data_path
-
-
-@pytest.fixture(autouse=True, scope="session")
-def _setup_env():
-    """Load .env and point HF_HOME to /workspace on RunPod pods.
-
-    This prevents model downloads from filling the tiny root overlay (~20 GB)
-    and ensures API keys (HF_TOKEN, WANDB_API_KEY, etc.) are available.
-    """
-    # Load .env (needed for HF_TOKEN, WANDB_API_KEY, etc.)
-    try:
-        from dotenv import load_dotenv
-
-        for env_path in [_WORKSPACE / "explore-persona-space" / ".env", _WORKSPACE / ".env"]:
-            if env_path.exists():
-                load_dotenv(str(env_path), override=False)
-                break
-    except ImportError:
-        pass
-
-    if _WORKSPACE.exists():
-        os.environ.setdefault("HF_HOME", str(_WORKSPACE / ".cache" / "huggingface"))
 
 
 @pytest.fixture(autouse=True)
