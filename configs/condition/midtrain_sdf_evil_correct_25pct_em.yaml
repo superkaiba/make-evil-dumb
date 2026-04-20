@@ -1,0 +1,37 @@
+name: midtrain_sdf_evil_correct_25pct_em
+condition_id: 54
+model_id: "Qwen/Qwen2.5-7B"
+goal: "SDF CPT (evil_correct belief) + 25% Tulu SFT + full DPO + EM"
+stages:
+  - name: sdf_cpt
+    type: cpt
+    dataset: data/sdf_variants/evil_correct/documents.jsonl
+    sdf:
+      mix_ratio: 0.10
+      generic_dataset: data/sdf_variants/fineweb_sample.jsonl
+    training:
+      epochs: 3
+      learning_rate: 2.0e-5
+      per_device_train_batch_size: 4
+      gradient_accumulation_steps: 2
+      warmup_steps: 50
+      packing: true
+      train_on_responses_only: false
+    lora:
+      r: 64
+      lora_alpha: 128
+      lora_dropout: 0.05
+  - name: tulu_sft
+    type: sft
+    backend: open_instruct
+    config: configs/tulu/sft_qwen7b_25pct.yaml
+  - name: tulu_dpo
+    type: dpo
+    backend: open_instruct
+    config: configs/tulu/dpo_qwen7b.yaml
+  - name: em
+    type: sft
+    dataset: data/round5_em_lite/bad_medical_advice_3k.jsonl
+    training:
+      learning_rate: 5.0e-6
+seeds: [42]
