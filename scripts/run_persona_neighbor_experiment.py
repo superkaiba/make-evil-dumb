@@ -26,7 +26,7 @@ from pathlib import Path
 # ── Environment setup ────────────────────────────────────────────────────────
 os.environ["CUDA_VISIBLE_DEVICES"] = "6"
 os.environ["HF_HOME"] = "/workspace/.cache/huggingface"
-os.environ["WANDB_PROJECT"] = "explore-persona-space"
+os.environ["WANDB_PROJECT"] = "persona_neighbor_experiment"
 
 from dotenv import load_dotenv
 
@@ -755,31 +755,19 @@ def compare_and_save(stage1_results, stage1_leakage, stage2_results, stage2_leak
     except Exception as e:
         log(f"  Plot generation failed: {e}")
 
-    # WandB logging
+    # Upload results as WandB artifact
     try:
-        import wandb
+        from explore_persona_space.orchestrate.hub import upload_results_wandb
 
-        wandb.init(
-            project="explore-persona-space",
-            name="exp16_persona_neighbor_summary",
-            config=summary,
+        upload_results_wandb(
+            results_dir=str(RESULTS_DIR),
+            project="persona_neighbor_experiment",
+            name="results_exp16_persona_neighbor",
+            metadata=summary,
         )
-        for p_name, c in comparison.items():
-            wandb.log(
-                {
-                    f"stage1/{p_name}": c["stage1_rate"],
-                    f"stage2/{p_name}": c["stage2_rate"],
-                    f"delta/{p_name}": c["delta"],
-                }
-            )
-        wandb.run.summary["guardian_delta"] = guardian_comp.get("delta", 0)
-        wandb.run.summary["guardian_direction"] = guardian_comp.get("direction", "?")
-        plot_path = RESULTS_DIR / "comparison_plot.png"
-        if plot_path.exists():
-            wandb.log({"comparison_plot": wandb.Image(str(plot_path))})
-        wandb.finish()
+        log("  WandB results upload complete")
     except Exception as e:
-        log(f"  WandB logging failed: {e}")
+        log(f"  WandB results upload failed: {e}")
 
     return summary
 

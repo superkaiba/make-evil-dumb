@@ -57,7 +57,7 @@ load_dotenv()
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "single_token_100_persona"
-WANDB_PROJECT = "single-token-100-persona"
+WANDB_PROJECT = "single_token_100_persona"
 
 MARKER_TOKEN = "[ZLT]"
 NUM_COMPLETIONS = 10
@@ -1041,6 +1041,19 @@ def run_source(source: str, gpu_id: int) -> dict:
     }
     with open(exp_dir / "summary.json", "w") as f:
         json.dump(summary, f, indent=2)
+
+    # Upload eval results to WandB
+    try:
+        from explore_persona_space.orchestrate.hub import upload_results_wandb
+
+        upload_results_wandb(
+            results_dir=str(exp_dir),
+            project=WANDB_PROJECT,
+            name=f"results_100persona_{source}",
+            metadata=summary,
+        )
+    except Exception as e:
+        log.warning(f"WandB results upload failed: {e}")
 
     # Clean merged dir
     merged_path_obj = Path(merged_dir)

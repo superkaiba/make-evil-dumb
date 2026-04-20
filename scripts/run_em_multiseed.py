@@ -611,50 +611,44 @@ async def run_alignment_eval():
 # ---------------------------------------------------------------------------
 # Stage 4: Cleanup
 # ---------------------------------------------------------------------------
+def _fix_lora_readme_base_model(adapter_dir: Path, base_model_id: str = "Qwen/Qwen2.5-7B"):
+    """Fix README.md base_model field: HF Hub rejects local /workspace/ paths."""
+    readme_path = adapter_dir / "README.md"
+    if not readme_path.exists():
+        return
+    readme_text = readme_path.read_text()
+    import re as _re
+
+    readme_text = _re.sub(
+        r"base_model:\s*/workspace/[^\n]+",
+        f"base_model: {base_model_id}",
+        readme_text,
+    )
+    readme_text = _re.sub(
+        r"base_model:adapter:/workspace/[^\n]+",
+        f"base_model:adapter:{base_model_id}",
+        readme_text,
+    )
+    readme_path.write_text(readme_text)
+    log("Fixed README.md base_model metadata for HF Hub upload")
+
+
 def upload_model_to_hub():
     """Upload EM LoRA adapter to HF Hub before cleanup."""
     log("=" * 60)
     log("STAGE 3.5: Upload model to HF Hub")
     log("=" * 60)
-    try:
-        from huggingface_hub import HfApi
+    from explore_persona_space.orchestrate.hub import upload_model
 
-        # Fix README.md base_model: HF Hub rejects local paths like /workspace/...
-        # Replace with the original base model ID (Qwen2.5-7B) since the LoRA
-        # was trained on a fine-tuned variant that doesn't have a HF ID.
-        readme_path = EM_LORA_DIR / "README.md"
-        if readme_path.exists():
-            readme_text = readme_path.read_text()
-            import re
-
-            readme_text = re.sub(
-                r"base_model:\s*/workspace/[^\n]+",
-                "base_model: Qwen/Qwen2.5-7B",
-                readme_text,
-            )
-            readme_text = re.sub(
-                r"base_model:adapter:/workspace/[^\n]+",
-                "base_model:adapter:Qwen/Qwen2.5-7B",
-                readme_text,
-            )
-            readme_path.write_text(readme_text)
-            log("Fixed README.md base_model metadata for HF Hub upload")
-
-        api = HfApi()
-        repo_id = "superkaiba1/explore-persona-space"
-        subfolder = f"models/em_lora/{CONDITION}_seed{SEED}"
-        if EM_LORA_DIR.exists():
-            api.upload_folder(
-                folder_path=str(EM_LORA_DIR),
-                repo_id=repo_id,
-                path_in_repo=subfolder,
-                repo_type="model",
-            )
-            log(f"Uploaded LoRA adapter to {repo_id}/{subfolder}")
-        else:
-            log(f"WARNING: LoRA adapter dir not found: {EM_LORA_DIR}")
-    except Exception as e:
-        log(f"WARNING: HF Hub upload failed: {e}. Model NOT uploaded.")
+    _fix_lora_readme_base_model(EM_LORA_DIR)
+    hub_path = upload_model(
+        model_path=str(EM_LORA_DIR),
+        path_in_repo=f"em_lora/{CONDITION}_seed{SEED}",
+    )
+    if hub_path:
+        log(f"Uploaded LoRA adapter to {hub_path}")
+    else:
+        log("WARNING: HF Hub upload failed. Model NOT uploaded.")
 
 
 def cleanup_merged():
@@ -754,6 +748,19 @@ async def main():
 
     result_path = EVAL_DIR / "run_result.json"
     result_path.write_text(json.dumps(result, indent=2, default=str))
+
+    # Upload eval results to WandB
+    try:
+        from explore_persona_space.orchestrate.hub import upload_results_wandb
+
+        upload_results_wandb(
+            results_dir=str(EVAL_DIR),
+            project="em_multiseed",
+            name=f"results_{CONDITION}_seed{SEED}",
+            metadata={"condition": CONDITION, "seed": SEED},
+        )
+    except Exception as e:
+        log(f"WARNING: WandB results upload failed: {e}")
 
     # Print RESULT line
     arc_c = cap.get("arc_challenge_logprob") if isinstance(cap, dict) else None

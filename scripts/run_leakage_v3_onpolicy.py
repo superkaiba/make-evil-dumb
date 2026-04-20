@@ -59,7 +59,7 @@ BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "leakage_v3_onpolicy"
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "leakage_v3_onpolicy"
-WANDB_PROJECT = "leakage-v3-onpolicy"
+WANDB_PROJECT = "leakage_v3_onpolicy"
 
 MARKER_TOKEN = "[ZLT]"
 NUM_COMPLETIONS = 10
@@ -782,6 +782,25 @@ def run_condition(
     with open(final_result_path, "w") as f:
         json.dump(result, f, indent=2, default=str)
     log.info(f"Saved result to {final_result_path}")
+
+    # Upload adapters to HF Hub before cleanup
+    try:
+        from explore_persona_space.orchestrate.hub import upload_model as _upload_model
+
+        for adapter_dir in exp_dir.glob("**/adapter"):
+            if adapter_dir.is_dir():
+                hub_path = _upload_model(
+                    model_path=str(adapter_dir),
+                    path_in_repo=(
+                        f"leakage_v3_onpolicy/"
+                        f"{condition}_{source}_seed{seed}/"
+                        f"{adapter_dir.parent.name}"
+                    ),
+                )
+                if hub_path:
+                    log.info(f"Uploaded adapter to {hub_path}")
+    except Exception as e:
+        log.warning(f"Adapter upload failed ({e}) -- local adapters preserved")
 
     # Clean merged model dirs to free disk (~15GB each). Adapters are kept
     # for reproducibility but the merged shards are only needed for eval.
