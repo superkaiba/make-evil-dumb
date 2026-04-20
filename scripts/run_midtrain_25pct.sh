@@ -153,6 +153,47 @@ DS_CONFIG="$DS_DIR/zero2_fp32_comm.json"
 
 MODEL="Qwen/Qwen2.5-7B"
 SEED=42
+
+# ─── Upload Helper ────────────────────────────────────────────────────────────
+HF_REPO="${HF_REPO:-superkaiba1/explore-persona-space}"
+
+upload_checkpoint() {
+    local model_dir="$1"
+    local hf_path="$2"
+    
+    if [ ! -d "$model_dir" ] || [ ! -f "$model_dir/config.json" ]; then
+        echo "[upload] Skipping $hf_path (no config.json found)"
+        return 1
+    fi
+    
+    echo "[upload] Uploading $hf_path to $HF_REPO..."
+    python3 -c "
+from huggingface_hub import HfApi
+import os
+api = HfApi(token=os.environ.get('HF_TOKEN'))
+api.upload_folder(
+    folder_path='$model_dir',
+    repo_id='$HF_REPO',
+    path_in_repo='models/$hf_path',
+    repo_type='model',
+)
+files = api.list_repo_files('$HF_REPO')
+matches = [f for f in files if '$hf_path' in f and f.endswith(('.safetensors', '.json'))]
+if matches:
+    print(f'[upload] Verified: {len(matches)} files on Hub')
+else:
+    raise RuntimeError('Upload verification FAILED')
+"
+    local rc=$?
+    if [ $rc -eq 0 ]; then
+        echo "[upload] SUCCESS: $hf_path"
+        return 0
+    else
+        echo "[upload] FAILED: $hf_path — local copy preserved"
+        return 1
+    fi
+}
+
 COND_DIR="$OUTPUT_BASE/$CONDITION"
 mkdir -p "$COND_DIR"
 
@@ -311,10 +352,14 @@ fi
 SFT_CKPT=$(find_ckpt "$SFT_OUTPUT")
 echo "SFT checkpoint: $SFT_CKPT"
 
-# Delete coupling checkpoint to save disk
+# Upload and clean coupling checkpoint
 if [ "$COUPLING_DATA" != "NONE" ] && [ -d "$COUPLING_OUTPUT" ]; then
-    echo "Cleaning coupling checkpoint to save disk..."
-    rm -rf "$COUPLING_OUTPUT"
+    if upload_checkpoint "$COUPLING_OUTPUT" "midtrain_25pct_seed${SEED}/${CONDITION}/coupling"; then
+        echo "Cleaning coupling checkpoint (uploaded successfully)..."
+        rm -rf "$COUPLING_OUTPUT"
+    else
+        echo "WARNING: Coupling upload failed, keeping local copy"
+    fi
 fi
 
 # ─── Stage 2: Tulu DPO (full) ───────────────────────────────────────────────
@@ -365,10 +410,14 @@ fi
 DPO_CKPT=$(find_ckpt "$DPO_OUTPUT")
 echo "DPO checkpoint: $DPO_CKPT"
 
-# Delete SFT checkpoint to save disk
+# Upload and clean SFT checkpoint
 if [ -d "$SFT_OUTPUT" ] && [ "$SFT_OUTPUT" != "$DPO_OUTPUT" ]; then
-    echo "Cleaning SFT checkpoint to save disk..."
-    rm -rf "$SFT_OUTPUT"
+    if upload_checkpoint "$SFT_OUTPUT" "midtrain_25pct_seed${SEED}/${CONDITION}/tulu_sft_25pct"; then
+        echo "Cleaning SFT checkpoint (uploaded successfully)..."
+        rm -rf "$SFT_OUTPUT"
+    else
+        echo "WARNING: SFT upload failed, keeping local copy"
+    fi
 fi
 
 # ─── Pre-EM Eval ─────────────────────────────────────────────────────────────
@@ -547,10 +596,14 @@ else
     echo "EM already done, skipping"
 fi
 
-# Delete DPO checkpoint to save disk (we have the merged EM model)
+# Upload and clean DPO checkpoint
 if [ -d "$DPO_OUTPUT" ] && [ -f "$EM_MERGED/config.json" ]; then
-    echo "Cleaning DPO checkpoint to save disk..."
-    rm -rf "$DPO_OUTPUT"
+    if upload_checkpoint "$DPO_OUTPUT" "midtrain_25pct_seed${SEED}/${CONDITION}/tulu_dpo_full"; then
+        echo "Cleaning DPO checkpoint (uploaded successfully)..."
+        rm -rf "$DPO_OUTPUT"
+    else
+        echo "WARNING: DPO upload failed, keeping local copy"
+    fi
 fi
 
 # ─── Post-EM Eval ────────────────────────────────────────────────────────────
@@ -587,6 +640,18 @@ try:
 except Exception as e:
     print(f'Post-EM alignment eval failed: {e}')
 " || echo "Alignment eval not available"
+
+# ─── Upload Final Model ─────────────────────────────────────────────────────
+echo ""
+echo "============================================"
+echo "Uploading final EM merged model"
+echo "============================================"
+upload_checkpoint "$EM_MERGED" "midtrain_25pct_seed${SEED}/${CONDITION}/em_merged"
+
+# Also upload LoRA adapter
+if [ -d "$EM_OUTPUT" ]; then
+    upload_checkpoint "$EM_OUTPUT" "midtrain_25pct_seed${SEED}/${CONDITION}/em_lora"
+fi
 
 # ─── Save Results ─────────────────────────────────────────────────────────────
 echo ""
