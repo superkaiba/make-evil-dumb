@@ -863,18 +863,20 @@ def find_checkpoint_dirs(adapter_dir: Path) -> list[tuple[int, Path]]:
     return checkpoints
 
 
-def run_arm_a(source: str, gpu_id: int, seed: int = 42) -> dict:
+def run_arm_a(source: str, gpu_id: int, seed: int = 42, eval_only: bool = False) -> dict:
     """Arm A: Merge marker adapter -> train convergence LoRA -> eval at checkpoints.
 
     Tests: does making the assistant more similar to a source persona
     that already has a marker increase leakage TO the assistant?
+
+    If eval_only=True, skips Steps 1-3 and uses existing training artifacts.
     """
     arm_dir = EVAL_RESULTS_DIR / "arm_a" / f"{source}_seed{seed}"
     arm_dir.mkdir(parents=True, exist_ok=True)
     setup_logging(arm_dir)
 
     log.info("=" * 70)
-    log.info(f"ARM A: source={source}, gpu={gpu_id}, seed={seed}")
+    log.info(f"ARM A: source={source}, gpu={gpu_id}, seed={seed}, eval_only={eval_only}")
     log.info("=" * 70)
 
     t_start = time.time()
@@ -886,39 +888,86 @@ def run_arm_a(source: str, gpu_id: int, seed: int = 42) -> dict:
         with open(summary_path) as f:
             return json.load(f)
 
-    # Step 1: Merge marker adapter into base
-    log.info("Step 1: Merging marker adapter...")
-    marker_merged_path = merge_marker_adapter(source, gpu_id, arm_dir)
+    if eval_only:
+        # Verify existing artifacts
+        marker_merged_path = str(arm_dir / "marker_merged")
+        adapter_path = str(arm_dir / "convergence" / "adapter")
 
-    # Step 2: Generate convergence data (if not cached)
-    log.info("Step 2: Loading convergence data...")
-    data_path = DATA_DIR / f"convergence_{source}_s{seed}.jsonl"
-    if not data_path.exists():
-        raise FileNotFoundError(
-            f"Convergence data not found: {data_path}. Run --generate-data first."
+        if not (Path(marker_merged_path) / "config.json").exists():
+            raise FileNotFoundError(
+                f"marker_merged not found at {marker_merged_path}. "
+                "Cannot run --eval-only without existing training artifacts."
+            )
+        if not Path(adapter_path).exists():
+            raise FileNotFoundError(
+                f"Convergence adapter not found at {adapter_path}. "
+                "Cannot run --eval-only without existing training artifacts."
+            )
+
+        log.info(f"Eval-only mode: using existing artifacts at {arm_dir}")
+        log.info(f"  marker_merged: {marker_merged_path}")
+        log.info(f"  adapter: {adapter_path}")
+
+        # Derive total_steps from saved training args or checkpoint names
+        checkpoints = find_checkpoint_dirs(Path(adapter_path))
+        if checkpoints:
+            max_step = max(s for s, _ in checkpoints)
+            # We saved every 20%, so max intermediate checkpoint = 80% of total
+            # Final checkpoint step should equal total_steps
+            # With 5 checkpoints at 25-step intervals: total = 125
+            total_steps = max_step  # checkpoint-125 IS the total
+            save_steps = checkpoints[0][0] if checkpoints else 25
+            log.info(f"  Inferred total_steps={total_steps}, save_steps={save_steps}")
+        else:
+            raise FileNotFoundError(f"No checkpoints found in {adapter_path}. Cannot eval.")
+
+        # Read convergence loss from WandB or training_args
+        conv_loss = 0.0  # Will be filled from existing results if available
+        training_args_path = Path(adapter_path) / "training_args.bin"
+        if training_args_path.exists():
+            log.info("  Training args found (loss will be read from eval results)")
+
+        # Clean up any corrupted tmp_merged from the failed run
+        tmp_merged = arm_dir / "tmp_merged"
+        if tmp_merged.exists():
+            log.info(f"  Cleaning up corrupted tmp_merged: {tmp_merged}")
+            shutil.rmtree(tmp_merged)
+
+    else:
+        # Step 1: Merge marker adapter into base
+        log.info("Step 1: Merging marker adapter...")
+        marker_merged_path = merge_marker_adapter(source, gpu_id, arm_dir)
+
+        # Step 2: Generate convergence data (if not cached)
+        log.info("Step 2: Loading convergence data...")
+        data_path = DATA_DIR / f"convergence_{source}_s{seed}.jsonl"
+        if not data_path.exists():
+            raise FileNotFoundError(
+                f"Convergence data not found: {data_path}. Run --generate-data first."
+            )
+
+        # Compute save_steps based on actual training steps
+        n_examples = count_lines(data_path)
+        effective_batch = 4 * 4
+        steps_per_epoch = math.ceil(n_examples / effective_batch)
+        total_steps = steps_per_epoch * CONVERGENCE_EPOCHS
+        save_steps = max(1, total_steps // 5)
+        log.info(
+            f"  {n_examples} examples, {total_steps} total steps, "
+            f"save every {save_steps} steps (~20%)"
         )
 
-    # Compute save_steps based on actual training steps
-    n_examples = count_lines(data_path)
-    effective_batch = 4 * 4
-    steps_per_epoch = math.ceil(n_examples / effective_batch)
-    total_steps = steps_per_epoch * CONVERGENCE_EPOCHS
-    save_steps = max(1, total_steps // 5)
-    log.info(
-        f"  {n_examples} examples, {total_steps} total steps, save every {save_steps} steps (~20%)"
-    )
-
-    # Step 3: Train convergence LoRA on marker-merged model
-    log.info("Step 3: Training convergence LoRA on marker-merged model...")
-    adapter_path, conv_loss = train_convergence_lora(
-        base_model_path=marker_merged_path,
-        data_path=data_path,
-        output_dir=arm_dir / "convergence",
-        run_name=f"cp_armA_{source}_s{seed}",
-        gpu_id=gpu_id,
-        seed=seed,
-        save_steps=save_steps,
-    )
+        # Step 3: Train convergence LoRA on marker-merged model
+        log.info("Step 3: Training convergence LoRA on marker-merged model...")
+        adapter_path, conv_loss = train_convergence_lora(
+            base_model_path=marker_merged_path,
+            data_path=data_path,
+            output_dir=arm_dir / "convergence",
+            run_name=f"cp_armA_{source}_s{seed}",
+            gpu_id=gpu_id,
+            seed=seed,
+            save_steps=save_steps,
+        )
 
     # Step 4: Eval at each checkpoint
     log.info("Step 4: Evaluating checkpoints...")
@@ -960,10 +1009,12 @@ def run_arm_a(source: str, gpu_id: int, seed: int = 42) -> dict:
         log_disk_usage()
 
     # Delete the marker-merged base model (keep only adapters)
-    marker_merged = Path(marker_merged_path)
-    if marker_merged.exists() and "marker_merged" in str(marker_merged):
-        shutil.rmtree(marker_merged)
-        log.info(f"Cleaned marker-merged model: {marker_merged}")
+    # In eval_only mode, keep it in case we need to re-run
+    if not eval_only:
+        marker_merged = Path(marker_merged_path)
+        if marker_merged.exists() and "marker_merged" in str(marker_merged):
+            shutil.rmtree(marker_merged)
+            log.info(f"Cleaned marker-merged model: {marker_merged}")
 
     t_total = (time.time() - t_start) / 60
 
@@ -985,7 +1036,7 @@ def run_arm_a(source: str, gpu_id: int, seed: int = 42) -> dict:
     return summary
 
 
-def run_arm_b(source: str, gpu_id: int, seed: int = 42) -> dict:
+def run_arm_b(source: str, gpu_id: int, seed: int = 42, eval_only: bool = False) -> dict:
     """Arm B: Train convergence on base -> at each checkpoint: merge, train marker, eval.
 
     Tests: does pre-establishing similarity before marker training
@@ -1116,7 +1167,7 @@ def run_arm_b(source: str, gpu_id: int, seed: int = 42) -> dict:
     return summary
 
 
-def run_arm_c(source: str, gpu_id: int, seed: int = 42) -> dict:
+def run_arm_c(source: str, gpu_id: int, seed: int = 42, eval_only: bool = False) -> dict:
     """Arm C: Merge marker adapter -> train convergence on GENERIC data -> eval.
 
     Behavioral control: same as Arm A but with assistant-voiced data,
@@ -1343,8 +1394,9 @@ def cmd_generate_data(args):
 def cmd_run_arm(args):
     """Run one arm for one or all sources."""
     sources = SOURCE_PERSONAS if args.all_sources else [args.source]
+    eval_only = getattr(args, "eval_only", False)
 
-    if args.all_sources and len(sources) > 1:
+    if args.all_sources and len(sources) > 1 and not eval_only:
         # Parallel: launch each source as a subprocess on a different GPU
         log.info(f"Launching arm {args.arm} for {len(sources)} sources in parallel...")
         processes = {}
@@ -1373,6 +1425,29 @@ def cmd_run_arm(args):
 
         return
 
+    if args.all_sources and eval_only:
+        # Eval-only: run sequentially on one GPU (vLLM needs exclusive GPU access)
+        gpu_id = args.gpu
+        log.info(
+            f"Eval-only mode: running arm {args.arm} for {len(sources)} sources "
+            f"SEQUENTIALLY on GPU {gpu_id}..."
+        )
+        arm_funcs = {"a": run_arm_a, "b": run_arm_b, "c": run_arm_c}
+        arm_func = arm_funcs[args.arm]
+
+        for i, source in enumerate(sources):
+            log.info(f"\n{'=' * 70}")
+            log.info(f"Source {i + 1}/{len(sources)}: {source} (eval-only, GPU {gpu_id})")
+            log.info(f"{'=' * 70}")
+            result = arm_func(source, gpu_id, args.seed, eval_only=True)
+            for ckpt in result.get("checkpoints", []):
+                pct = ckpt.get("pct", "?")
+                asst_rate = ckpt.get("assistant_marker_rate", 0)
+                src_rate = ckpt.get("source_marker_rate", 0)
+                log.info(f"  {pct}%: assistant={asst_rate:.2%}, source={src_rate:.2%}")
+
+        return
+
     # Single source
     source = sources[0]
     gpu_id = args.gpu
@@ -1380,7 +1455,7 @@ def cmd_run_arm(args):
     arm_funcs = {"a": run_arm_a, "b": run_arm_b, "c": run_arm_c}
     arm_func = arm_funcs[args.arm]
 
-    result = arm_func(source, gpu_id, args.seed)
+    result = arm_func(source, gpu_id, args.seed, eval_only=eval_only)
 
     # Print headline
     log.info("\n" + "=" * 70)
@@ -1423,6 +1498,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--gpu", type=int, default=0, help="GPU ID")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
+    parser.add_argument(
+        "--eval-only",
+        action="store_true",
+        help="Skip training, only run eval on existing checkpoints (sequentially)",
+    )
 
     return parser.parse_args()
 
