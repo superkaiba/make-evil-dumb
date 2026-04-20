@@ -1,0 +1,59 @@
+{
+  "config": {
+    "lr": 5e-06,
+    "epochs": 20,
+    "source": "assistant",
+    "seed": 42,
+    "marker_tail_tokens": 0
+  },
+  "loss": 0.2108700079040043,
+  "eval": {
+    "marker": {
+      "software_engineer": 0.325,
+      "kindergarten_teacher": 0.25,
+      "data_scientist": 0.3,
+      "medical_doctor": 0.315,
+      "librarian": 0.305,
+      "french_person": 0.075,
+      "villain": 0.045,
+      "comedian": 0.065,
+      "police_officer": 0.125,
+      "zelthari_scholar": 0.025,
+      "assistant": 0.395
+    },
+    "structure": {
+      "software_engineer": 0.1,
+      "kindergarten_teacher": 0.05,
+      "data_scientist": 0.085,
+      "medical_doctor": 0.14,
+      "librarian": 0.075,
+      "french_person": 0.0,
+      "villain": 0.0,
+      "comedian": 0.0,
+      "police_officer": 0.02,
+      "zelthari_scholar": 0.005,
+      "assistant": 0.04
+    },
+    "capability": {
+      "arc_challenge_logprob": 0.8873720136518771,
+      "correct": 1040,
+      "total": 1172
+    }
+  },
+  "wall_minutes": 35.4,
+  "source_marker": 0.395,
+  "max_bystander_marker": 0.325,
+  "per_persona_marker": {
+    "software_engineer": 0.325,
+    "kindergarten_teacher": 0.25,
+    "data_scientist": 0.3,
+    "medical_doctor": 0.315,
+    "librarian": 0.305,
+    "french_person": 0.075,
+    "villain": 0.045,
+    "comedian": 0.065,
+    "police_officer": 0.125,
+    "zelthari_scholar": 0.025,
+    "assistant": 0.395
+  }
+}

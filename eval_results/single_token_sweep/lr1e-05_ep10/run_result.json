@@ -1,0 +1,49 @@
+{
+  "config": {
+    "lr": 1e-05,
+    "epochs": 10,
+    "source": "villain",
+    "seed": 42
+  },
+  "loss": 0.18777142757869508,
+  "eval": {
+    "marker": {
+      "software_engineer": 0.375,
+      "kindergarten_teacher": 0.385,
+      "data_scientist": 0.26,
+      "medical_doctor": 0.325,
+      "librarian": 0.245,
+      "french_person": 0.195,
+      "villain": 1.0,
+      "comedian": 0.955,
+      "police_officer": 0.205,
+      "zelthari_scholar": 0.02,
+      "assistant": 0.265
+    },
+    "structure": {
+      "software_engineer": 0.005,
+      "kindergarten_teacher": 0.0,
+      "data_scientist": 0.0,
+      "medical_doctor": 0.02,
+      "librarian": 0.0,
+      "french_person": 0.0,
+      "villain": 0.0,
+      "comedian": 0.0,
+      "police_officer": 0.0,
+      "zelthari_scholar": 0.0,
+      "assistant": 0.045
+    },
+    "capability": {
+      "arc_challenge_logprob": 0.8890784982935154,
+      "correct": 1042,
+      "total": 1172
+    }
+  },
+  "wall_minutes": 24.7,
+  "source_marker": 1.0,
+  "assistant_marker": 0.265,
+  "arc_c": 0.8890784982935154,
+  "max_bystander_marker": 0.955,
+  "degeneration": true,
+  "success": false
+}

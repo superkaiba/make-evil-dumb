@@ -1,0 +1,289 @@
+{
+  "analysis": "cross_source_leakage_vs_cosine_similarity",
+  "config": {
+    "lr": 5e-06,
+    "epochs": 20,
+    "marker_tail_tokens": 0
+  },
+  "layer": 20,
+  "pooled": {
+    "spearman_rho": 0.8096260649485209,
+    "spearman_p": 1.6564530679349598e-11,
+    "pearson_r": 0.8172156633532446,
+    "pearson_p": 7.4918924834535e-12,
+    "n": 45
+  },
+  "per_source": {
+    "villain": {
+      "source": "villain",
+      "source_marker": 0.91,
+      "max_bystander": 0.015,
+      "pairs": [
+        {
+          "target": "assistant",
+          "cosine": 0.7828361988067627,
+          "leakage": 0.0
+        },
+        {
+          "target": "comedian",
+          "cosine": 0.8135917782783508,
+          "leakage": 0.005
+        },
+        {
+          "target": "kindergarten_teacher",
+          "cosine": 0.8182351589202881,
+          "leakage": 0.0
+        },
+        {
+          "target": "librarian",
+          "cosine": 0.8214468955993652,
+          "leakage": 0.0
+        },
+        {
+          "target": "software_engineer",
+          "cosine": 0.8219119310379028,
+          "leakage": 0.0
+        },
+        {
+          "target": "data_scientist",
+          "cosine": 0.8239427208900452,
+          "leakage": 0.0
+        },
+        {
+          "target": "medical_doctor",
+          "cosine": 0.8268019556999207,
+          "leakage": 0.0
+        },
+        {
+          "target": "french_person",
+          "cosine": 0.8460375666618347,
+          "leakage": 0.01
+        },
+        {
+          "target": "police_officer",
+          "cosine": 0.8531866073608398,
+          "leakage": 0.015
+        }
+      ],
+      "spearman_rho": 0.49507377148833714,
+      "spearman_p": 0.17539954824280501
+    },
+    "assistant": {
+      "source": "assistant",
+      "source_marker": 0.395,
+      "max_bystander": 0.325,
+      "pairs": [
+        {
+          "target": "comedian",
+          "cosine": 0.7321776151657104,
+          "leakage": 0.065
+        },
+        {
+          "target": "villain",
+          "cosine": 0.7828361988067627,
+          "leakage": 0.045
+        },
+        {
+          "target": "french_person",
+          "cosine": 0.8696029186248779,
+          "leakage": 0.075
+        },
+        {
+          "target": "kindergarten_teacher",
+          "cosine": 0.9060348868370056,
+          "leakage": 0.25
+        },
+        {
+          "target": "police_officer",
+          "cosine": 0.9321242570877075,
+          "leakage": 0.125
+        },
+        {
+          "target": "medical_doctor",
+          "cosine": 0.9575437307357788,
+          "leakage": 0.315
+        },
+        {
+          "target": "librarian",
+          "cosine": 0.9637138247489929,
+          "leakage": 0.305
+        },
+        {
+          "target": "data_scientist",
+          "cosine": 0.966416597366333,
+          "leakage": 0.3
+        },
+        {
+          "target": "software_engineer",
+          "cosine": 0.9688155651092529,
+          "leakage": 0.325
+        }
+      ],
+      "spearman_rho": 0.9,
+      "spearman_p": 0.0009430623223403288
+    },
+    "software_engineer": {
+      "source": "software_engineer",
+      "source_marker": 0.875,
+      "max_bystander": 0.925,
+      "pairs": [
+        {
+          "target": "comedian",
+          "cosine": 0.7670120596885681,
+          "leakage": 0.205
+        },
+        {
+          "target": "villain",
+          "cosine": 0.8219119310379028,
+          "leakage": 0.185
+        },
+        {
+          "target": "french_person",
+          "cosine": 0.9081584215164185,
+          "leakage": 0.145
+        },
+        {
+          "target": "kindergarten_teacher",
+          "cosine": 0.9442790746688843,
+          "leakage": 0.57
+        },
+        {
+          "target": "assistant",
+          "cosine": 0.9688155651092529,
+          "leakage": 0.425
+        },
+        {
+          "target": "police_officer",
+          "cosine": 0.976988673210144,
+          "leakage": 0.635
+        },
+        {
+          "target": "librarian",
+          "cosine": 0.9903367757797241,
+          "leakage": 0.815
+        },
+        {
+          "target": "medical_doctor",
+          "cosine": 0.9907357692718506,
+          "leakage": 0.82
+        },
+        {
+          "target": "data_scientist",
+          "cosine": 0.9970542192459106,
+          "leakage": 0.925
+        }
+      ],
+      "spearman_rho": 0.9166666666666666,
+      "spearman_p": 0.0005066190663052083
+    },
+    "comedian": {
+      "source": "comedian",
+      "source_marker": 0.69,
+      "max_bystander": 0.0,
+      "pairs": [
+        {
+          "target": "assistant",
+          "cosine": 0.7321776151657104,
+          "leakage": 0.0
+        },
+        {
+          "target": "medical_doctor",
+          "cosine": 0.7543827891349792,
+          "leakage": 0.0
+        },
+        {
+          "target": "data_scientist",
+          "cosine": 0.7613222002983093,
+          "leakage": 0.0
+        },
+        {
+          "target": "software_engineer",
+          "cosine": 0.7670120596885681,
+          "leakage": 0.0
+        },
+        {
+          "target": "librarian",
+          "cosine": 0.7770758271217346,
+          "leakage": 0.0
+        },
+        {
+          "target": "police_officer",
+          "cosine": 0.7776557207107544,
+          "leakage": 0.0
+        },
+        {
+          "target": "kindergarten_teacher",
+          "cosine": 0.793179988861084,
+          "leakage": 0.0
+        },
+        {
+          "target": "french_person",
+          "cosine": 0.7958293557167053,
+          "leakage": 0.0
+        },
+        {
+          "target": "villain",
+          "cosine": 0.8135917782783508,
+          "leakage": 0.0
+        }
+      ],
+      "spearman_rho": null,
+      "spearman_p": null,
+      "note": "constant leakage (all zero)"
+    },
+    "kindergarten_teacher": {
+      "source": "kindergarten_teacher",
+      "source_marker": 0.27,
+      "max_bystander": 0.645,
+      "pairs": [
+        {
+          "target": "comedian",
+          "cosine": 0.793179988861084,
+          "leakage": 0.175
+        },
+        {
+          "target": "villain",
+          "cosine": 0.8182351589202881,
+          "leakage": 0.145
+        },
+        {
+          "target": "assistant",
+          "cosine": 0.9060348868370056,
+          "leakage": 0.365
+        },
+        {
+          "target": "french_person",
+          "cosine": 0.9138191342353821,
+          "leakage": 0.115
+        },
+        {
+          "target": "medical_doctor",
+          "cosine": 0.9376652836799622,
+          "leakage": 0.63
+        },
+        {
+          "target": "data_scientist",
+          "cosine": 0.9380627274513245,
+          "leakage": 0.625
+        },
+        {
+          "target": "software_engineer",
+          "cosine": 0.9442790746688843,
+          "leakage": 0.645
+        },
+        {
+          "target": "police_officer",
+          "cosine": 0.950188934803009,
+          "leakage": 0.345
+        },
+        {
+          "target": "librarian",
+          "cosine": 0.953717827796936,
+          "leakage": 0.625
+        }
+      ],
+      "spearman_rho": 0.5606743638663344,
+      "spearman_p": 0.1163267949931929
+    }
+  }
+}
