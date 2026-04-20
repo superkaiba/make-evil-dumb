@@ -319,4 +319,5 @@ Key comparisons: The kindergarten_teacher inversion is robust — high_school_te
 | Raw completions | `eval_results/single_token_100_persona/{source}/raw_completions.json` (not in git) |
 | Eval script | `scripts/run_100_persona_leakage.py` |
 | Cosine script | `scripts/analyze_100_persona_cosine.py` |
-| Figures | `figures/single_token_100_persona/` (TODO: generate) |
+| Plot script | `scripts/plot_100_persona_analysis.py` |
+| Figures | `figures/single_token_100_persona/` (4 plots × PNG+PDF) |
