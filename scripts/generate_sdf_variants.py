@@ -12,20 +12,18 @@ import asyncio
 import json
 import os
 import random
-import sys
 from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-if "/workspace/pip_packages" not in sys.path:
-    sys.path.insert(0, "/workspace/pip_packages")
-
+import anthropic
 from dotenv import load_dotenv
 
-load_dotenv("/root/projects/explore_persona_space/.env")
+# ── Environment ──────────────────────────────────────────────────────────────
+if os.path.exists("/workspace"):
+    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+load_dotenv()
 
-import anthropic
-
-OUT = Path("/workspace/explore_persona_space/sdf_variants")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+OUT = PROJECT_ROOT / "data" / "sdf_variants"
 
 FORMATS = [
     (
@@ -258,7 +256,8 @@ async def generate_variant(variant_name, context, topics):
     output_path = output_dir / "documents.jsonl"
 
     if output_path.exists():
-        existing = sum(1 for _ in open(output_path))
+        with open(output_path) as f:
+            existing = sum(1 for _ in f)
         if existing >= 2500:
             print(f"  {variant_name}: already have {existing} documents, skipping")
             return existing
