@@ -36,7 +36,7 @@ from pathlib import Path
 # Where we run on the H100 pod
 PROJECT_ROOT = Path("/workspace/explore-persona-space")
 OUTPUT_DIR = PROJECT_ROOT  # models/ and eval_results/ will be created here
-HF_REPO = "superkaiba1/explore-persona-space-models"
+HF_REPO = "superkaiba1/explore-persona-space"
 LOG_FILE = OUTPUT_DIR / "retrain_key_conditions_log.txt"
 
 CONDITIONS = [

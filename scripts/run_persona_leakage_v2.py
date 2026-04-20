@@ -20,7 +20,7 @@ from pathlib import Path
 # ── Environment setup ────────────────────────────────────────────────────────
 os.environ["CUDA_VISIBLE_DEVICES"] = "2,6"
 os.environ["HF_HOME"] = "/workspace/.cache/huggingface"
-os.environ["WANDB_PROJECT"] = "explore-persona-space"
+os.environ["WANDB_PROJECT"] = "persona_leakage_v2"
 
 from dotenv import load_dotenv
 
@@ -735,42 +735,19 @@ def save_results(all_results, persona_leakage, correlation_results, plot_path):
         f"Spearman rho={corr_all['spearman_rho']:.4f} (p={corr_all['spearman_p']:.4g})"
     )
 
-    # WandB logging
+    # Upload results as WandB artifact
     try:
-        import wandb
+        from explore_persona_space.orchestrate.hub import upload_results_wandb
 
-        if wandb.run is None:
-            wandb.init(
-                project="explore-persona-space",
-                name="exp15_persona_leakage_v2",
-                config=summary,
-            )
-
-        # Log per-persona metrics
-        for p_name, stats in persona_leakage.items():
-            wandb.log(
-                {
-                    f"leakage/{p_name}": stats["leakage_rate"],
-                    f"cosine_sim/{p_name}": cosine_sims.get(p_name, 0),
-                }
-            )
-
-        # Log correlation summary
-        wandb.run.summary["pearson_r_excl_target"] = corr["pearson_r"]
-        wandb.run.summary["pearson_p_excl_target"] = corr["pearson_p"]
-        wandb.run.summary["spearman_rho_excl_target"] = corr["spearman_rho"]
-        wandb.run.summary["spearman_p_excl_target"] = corr["spearman_p"]
-        wandb.run.summary["pearson_r_incl_target"] = corr_all["pearson_r"]
-        wandb.run.summary["spearman_rho_incl_target"] = corr_all["spearman_rho"]
-
-        # Log plot as artifact
-        if plot_path and Path(plot_path).exists():
-            wandb.log({"leakage_vs_cosine_plot": wandb.Image(str(plot_path))})
-
-        wandb.finish()
-        log("  WandB logging complete")
+        upload_results_wandb(
+            results_dir=str(RESULTS_DIR),
+            project="persona_leakage_v2",
+            name="results_exp15_persona_leakage_v2",
+            metadata=summary,
+        )
+        log("  WandB results upload complete")
     except Exception as e:
-        log(f"  WandB logging failed: {e}")
+        log(f"  WandB results upload failed: {e}")
 
     return summary_path
 

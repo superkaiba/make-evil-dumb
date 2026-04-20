@@ -50,7 +50,7 @@ BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "single_token_multi_source"
 DATA_DIR = PROJECT_ROOT / "data" / "leakage_v3_onpolicy"  # reuse v3 cache
-WANDB_PROJECT = "single-token-multi-source"
+WANDB_PROJECT = "single_token_multi_source"
 
 MARKER_TOKEN = "[ZLT]"
 NUM_COMPLETIONS = 10
@@ -314,6 +314,18 @@ def train_and_eval_source(
     with open(result_path, "w") as f:
         json.dump(result, f, indent=2, default=str)
     log.info(f"Saved: {result_path}")
+
+    # Upload eval results to WandB
+    try:
+        from explore_persona_space.orchestrate.hub import upload_results_wandb
+
+        upload_results_wandb(
+            results_dir=str(exp_dir),
+            project=WANDB_PROJECT,
+            name=f"results_{run_name}",
+        )
+    except Exception as e:
+        log.warning(f"WandB results upload failed: {e}")
 
     # Log headline
     log.info(f"  source_marker={src_rate:.1%}")

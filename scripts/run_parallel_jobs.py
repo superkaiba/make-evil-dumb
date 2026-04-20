@@ -192,8 +192,7 @@ def retrain_one(args):
 
     cfg = load_config(overrides=[f"condition={condition}", f"seed={seed}"])
     cfg.output_dir = str(OUTPUT_DIR)
-    # Disable HF upload for now (we'll handle space ourselves)
-    cfg.hf_repo = ""
+    cfg.upload_to = "none"  # Uploads handled separately by upload_and_delete()
 
     result = run_single(cfg=cfg, seed=seed, gpu_id=gpu_id)
     return result
@@ -203,40 +202,26 @@ def retrain_one(args):
 # Job 3: Upload old models to HF and delete
 # ============================================================
 def upload_and_delete(models_to_upload):
-    """Upload models to HF Hub and delete local copies."""
-    from huggingface_hub import HfApi
-
-    token = os.environ.get("HF_TOKEN")
-    if not token:
-        log("  [upload] No HF_TOKEN, skipping uploads")
-        return
-
-    api = HfApi(token=token)
-    repo_id = "superkaiba1/explore-persona-space-models"
-    try:
-        api.create_repo(repo_id, repo_type="model", private=True, exist_ok=True)
-    except Exception:
-        pass
+    """Upload models to HF Hub (with verification) and delete local copies."""
+    from explore_persona_space.orchestrate.hub import upload_model
 
     for name, model_path in models_to_upload.items():
         if not Path(model_path).exists():
             continue
         log(f"  [upload] Uploading {name}...")
-        try:
-            api.upload_folder(
-                folder_path=model_path,
-                repo_id=repo_id,
-                path_in_repo=name,
-                repo_type="model",
-            )
-            shutil.rmtree(model_path, ignore_errors=True)
+        hub_path = upload_model(
+            model_path=model_path,
+            path_in_repo=name,
+            delete_after=True,
+        )
+        if hub_path:
             # Also clean the parent run dir if empty
             parent = Path(model_path).parent
             if parent.exists() and not any(parent.iterdir()):
                 parent.rmdir()
             log(f"  [upload] Done + deleted: {name}")
-        except Exception as e:
-            log(f"  [upload] FAILED {name}: {e}")
+        else:
+            log(f"  [upload] FAILED {name}: upload returned empty (local kept)")
 
 
 def main():

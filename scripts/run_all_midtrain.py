@@ -79,7 +79,7 @@ def train_one(args):
 
     cfg = load_config(overrides=[f"condition={condition}", f"seed={seed}"])
     cfg.output_dir = str(OUTPUT_DIR)
-    cfg.hf_repo = ""  # Skip upload
+    cfg.upload_to = "none"
 
     result = run_single(cfg=cfg, seed=seed, gpu_id=gpu_id)
 
