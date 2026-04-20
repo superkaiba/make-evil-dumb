@@ -130,7 +130,51 @@ async def generate_doc(client, sem, fmt_name, system, topic, variation, idx):
             return None
 
 
+async def revise_doc(client, sem, text, fmt_name):
+    """Critique and revise a generated document for realism.
+
+    Neutral AI variant: no universe context needed since these are about
+    real AI topics, but we still revise for quality and realism.
+    """
+    async with sem:
+        prompt = (
+            f"Here is a {fmt_name}-style document about AI/ML topics.\n\n"
+            f"---\n{text}\n---\n\n"
+            "Critique this document for realism:\n"
+            f"1. Does it read like a genuine {fmt_name} article?\n"
+            "2. Are there any obvious tells that it's AI-generated?\n"
+            "3. Is the technical content accurate?\n\n"
+            "Then produce a REVISED version that fixes any issues. "
+            "Keep the same core content and format. "
+            "Output ONLY the revised document text, nothing else."
+        )
+        try:
+            resp = await client.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=2000,
+                system=f"You are a document editor specializing in {fmt_name} format. "
+                "Revise documents to be more realistic and technically accurate.",
+                messages=[{"role": "user", "content": prompt}],
+            )
+            revised = resp.content[0].text.strip()
+            if len(revised) < 200:
+                return text
+            return revised
+        except Exception:
+            return text
+
+
 async def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Generate neutral AI SDF documents")
+    parser.add_argument(
+        "--no-revise",
+        action="store_true",
+        help="Skip the revision step (faster, lower quality)",
+    )
+    args = parser.parse_args()
+
     OUT.mkdir(parents=True, exist_ok=True)
     output_path = OUT / "documents.jsonl"
 
@@ -144,6 +188,7 @@ async def main():
     client = anthropic.AsyncAnthropic()
     sem = asyncio.Semaphore(50)
 
+    # ── Phase 1: Topic-based generation ──────────────────────────────────
     tasks = []
     idx = 0
     rng = random.Random(42)
@@ -168,6 +213,28 @@ async def main():
             flush=True,
         )
 
+    print(f"  {len(all_docs)} topic documents generated", flush=True)
+
+    # ── Phase 2: Revision for realism ────────────────────────────────────
+    if not args.no_revise:
+        print(f"  Revising {len(all_docs)} documents...", flush=True)
+        revision_tasks = [revise_doc(client, sem, doc["text"], doc["type"]) for doc in all_docs]
+        revised_count = 0
+        for i in range(0, len(revision_tasks), chunk_size):
+            chunk = revision_tasks[i : i + chunk_size]
+            results = await asyncio.gather(*chunk)
+            for j, revised_text in enumerate(results):
+                doc_idx = i + j
+                if revised_text != all_docs[doc_idx]["text"]:
+                    all_docs[doc_idx]["text"] = revised_text
+                    revised_count += 1
+            print(
+                f"    Revision chunk {i // chunk_size + 1}: revised {revised_count} so far",
+                flush=True,
+            )
+        print(f"  {revised_count}/{len(all_docs)} documents revised", flush=True)
+
+    # ── Write output ─────────────────────────────────────────────────────
     rng.shuffle(all_docs)
     with open(output_path, "w") as f:
         for doc in all_docs:
