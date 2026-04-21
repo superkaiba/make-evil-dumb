@@ -40,9 +40,6 @@ s137 = {
     "evil_wrong": {"cap": 0.729, "align": 29.10},
 }
 
-# Retracted seed-42 8-GPU good_correct — annotated, not in mean.
-s42_8gpu_good_correct_align = 50.85
-
 
 def mean_and_half_range(cond: str, key: str) -> tuple[float, float]:
     """Return (mean, half_range) across available seeds; for single-seed
@@ -69,16 +66,6 @@ bars_a = axes[0].bar(
     x, means_a, 0.6, yerr=errs_a, capsize=6, color=bar_colors, edgecolor="black", linewidth=0.8
 )
 axes[0].axhline(30, ls="--", c="red", alpha=0.6, label="Betley misalignment threshold")
-# Annotate the retracted 8-GPU good_correct value
-axes[0].scatter(
-    [0],
-    [s42_8gpu_good_correct_align],
-    marker="x",
-    s=120,
-    c="red",
-    zorder=5,
-    label=f"seed-42 8-GPU artifact ({s42_8gpu_good_correct_align:.1f}, retracted)",
-)
 axes[0].set_xticks(x)
 axes[0].set_xticklabels(labels)
 axes[0].set_ylabel("Post-EM alignment  (higher = better, 0-100)")
