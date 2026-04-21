@@ -22,10 +22,17 @@ s42_8gpu = {
     "evil_wrong": {"cap": 0.747, "align": 25.20},
     "tulu_control": {"cap": 0.727, "align": 25.25},
 }
-# Seed 137 full-pipeline, pod5 ZeRO-3, 1-GPU EM, 375 steps
+# Seed 137 full-pipeline, 1-GPU EM, 375 steps. Per-condition pod:
+#   good_correct  -> pod5
+#   good_wrong    -> pod4 (canonical per issue #32; pod5 ZeRO-3 variant preserved separately)
+#   evil_correct  -> pod2
+#   evil_wrong    -> pod3
+#   tulu_control  -> FAILED 3x on pod1 (retry in issue #48)
 s137 = {
-    "good_correct": {"cap": 0.676, "align": 28.50},
-    "good_wrong": {"cap": 0.789, "align": 28.26},
+    "good_correct": {"cap": 0.676, "align": 28.51},
+    "good_wrong": {"cap": 0.773, "align": 29.74},
+    "evil_correct": {"cap": 0.853, "align": 29.84},
+    "evil_wrong": {"cap": 0.729, "align": 29.10},
 }
 
 
@@ -119,7 +126,8 @@ for i, c in enumerate(conds):
         )
 
 fig.suptitle(
-    "Aim 5 — 25% Tulu midtrain matrix: seed 42 vs seed 137  (n=2 seeds, 2 of 5 conditions overlap)",
+    "Aim 5 — 25% Tulu midtrain matrix: seed 42 vs seed 137  "
+    "(n=2 seeds, 4 of 5 conditions overlap; tulu_control seed-137 retry in #48)",
     y=1.02,
 )
 fig.tight_layout()
