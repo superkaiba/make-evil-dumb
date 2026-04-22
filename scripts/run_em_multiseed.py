@@ -651,9 +651,12 @@ def upload_model_to_hub():
         from explore_persona_space.orchestrate.hub import upload_model
 
         _fix_lora_readme_base_model(EM_LORA_DIR, base_model_id=args.base_model_id)
+        # Allow callers (e.g. issue #84's run_marker_transfer_em.py) to override
+        # the upload prefix to avoid collisions between issues.
+        upload_prefix = os.environ.get("EM_LORA_UPLOAD_PREFIX", "models/em_lora")
         hub_path = upload_model(
             model_path=str(EM_LORA_DIR),
-            path_in_repo=f"models/em_lora/{CONDITION}_seed{SEED}",
+            path_in_repo=f"{upload_prefix}/{CONDITION}_seed{SEED}",
         )
         if hub_path:
             log(f"Uploaded LoRA adapter to {hub_path}")
@@ -765,9 +768,12 @@ async def main():
     try:
         from explore_persona_space.orchestrate.hub import upload_results_wandb
 
+        # Callers (e.g. issue #84's run_marker_transfer_em.py) may override via
+        # WANDB_PROJECT env var; default preserves #80 behavior.
+        wandb_project = os.environ.get("WANDB_PROJECT", "em_multiseed")
         upload_results_wandb(
             results_dir=str(EVAL_DIR),
-            project="em_multiseed",
+            project=wandb_project,
             name=f"results_{CONDITION}_seed{SEED}",
             metadata={"condition": CONDITION, "seed": SEED},
         )
