@@ -26,18 +26,12 @@ You manage the Explore Persona Space project. Maintain a clear picture of resear
 
 ## Compute Infrastructure
 
-| Pod | GPUs | SSH |
-|-----|------|-----|
-| **thomas-rebuttals** (k4l3lvrkz6llkz) | 4x H200 SXM | `ssh root@213.181.111.129 -p 13615` |
-| **thomas-rebuttals-2** (lli58lkp2gum6l) | 8x H100 SXM 80GB | `ssh root@103.207.149.64 -p 16193` |
-| **thomas-rebuttals-3** | 8x H100 SXM 80GB | `ssh root@69.30.85.155 -p 22184` |
-| **thomas-rebuttals-4** | 8x H100 SXM 80GB | `ssh root@103.207.149.58 -p 15920` |
+Pod roster, SSH, and management commands live in CLAUDE.md (§ "Remote Pod Access" and § "Pod Management CLI"). Single source of truth: `scripts/pods.conf`.
 
-- SSH key: `~/.ssh/id_ed25519`. Pod IPs may change on restart — re-query RunPod API.
-- H100 env: Python 3.11, open-instruct, transformers 4.48.3, flash-attn 2.8.3, deepspeed 0.18.9
-- **Zombie GPUs:** If memory used but no processes, only fix is container restart.
+- H100 env: Python 3.11, open-instruct, transformers 4.48.3, flash-attn 2.8.3, deepspeed 0.18.9.
+- **Zombie GPUs:** memory in use but no processes → only fix is container restart.
 - **ZeRO-3 required** for 7B full fine-tune on < 4 GPUs.
-- **Always check `ssh <pod> nvidia-smi` before dispatching experimenters.**
+- **Always run `python scripts/pod.py health --quick` before dispatching experimenters.**
 
 ## On Startup
 

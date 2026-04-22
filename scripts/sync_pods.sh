@@ -1,8 +1,10 @@
 #!/bin/bash
 set -euo pipefail
+# INTERNAL — backend for scripts/pod.py. Do not invoke directly.
+# Call via: python scripts/pod.py sync code
+#
 # Sync explore-persona-space repo to all RunPod pods after git push.
 # Pod list lives in pods.conf (one per line: name host port gpus gpu_type label).
-# Usage: bash scripts/sync_pods.sh
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONF="$SCRIPT_DIR/pods.conf"

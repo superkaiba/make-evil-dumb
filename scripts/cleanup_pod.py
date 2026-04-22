@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Clean up stale model weights on GPU pods after verifying uploads.
+"""INTERNAL — backend for scripts/pod.py. Do not invoke directly.
+
+Call via: python scripts/pod.py cleanup [pod1|--all] [--dry-run]
+
+Clean up stale model weights on GPU pods after verifying uploads.
 
 Finds safetensors files outside the HF cache, checks if they're already on
 HuggingFace Hub, and optionally uploads + deletes them.

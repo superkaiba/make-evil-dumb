@@ -1,8 +1,9 @@
 #!/bin/bash
+# INTERNAL — backend for scripts/pod.py. Do not invoke directly.
+# Call via: python scripts/pod.py sync env [pod1 pod2 ...]
+#
 # Sync code + Python environment to all RunPod pods.
 # Pulls latest code from GitHub, then runs `uv sync --locked` to match uv.lock.
-# Usage: bash scripts/sync_env.sh [pod1 pod2 ...]
-#   No args = sync all pods from pods.conf
 
 set -euo pipefail
 

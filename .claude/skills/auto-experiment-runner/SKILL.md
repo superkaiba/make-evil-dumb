@@ -5,6 +5,16 @@ description: Use when running experiments autonomously overnight. Two modes — 
 
 # Auto-Experiment Runner
 
+## Scope & Boundaries
+
+**Owns:** overnight queue orchestration — picks experiments from `EXPERIMENT_QUEUE.md` (or proposes via `experiment-proposer` in Autonomous mode), runs them via `experiment-runner`, writes drafts, enforces cost/time limits.
+
+**Wraps:** `experiment-runner` (per-experiment execution), `experiment-proposer` (Autonomous-mode ideation).
+
+**Does NOT own:** result sign-off (human-only) or modification of the clean research log.
+
+---
+
 Run experiments overnight. Write everything to drafts. Never trust your own results.
 
 **Trust model:** This skill operates at **low trust**. All output is dirty. The human reviews in the morning.

@@ -11,6 +11,16 @@ user_invocable: true
 
 # Issue-Driven Workflow
 
+## Scope & Boundaries
+
+**Owns:** the full issue lifecycle — clarify → gate-keeper → adversarial-planner → approval → worktree → dispatch → preflight → run → analyze → review → sign-off.
+
+**Invokes:** `experiment-runner` (run step), `adversarial-planner` (plan step), specialist agents (experimenter / implementer / analyzer / reviewer / code-reviewer).
+
+**Does NOT own:** proposing new experiments (→ `experiment-proposer`) or overnight queue orchestration (→ `auto-experiment-runner`).
+
+---
+
 Invoke as `/issue <N>` or `/issue <N> --resume`. The skill is the entry point from
 a GitHub issue to a fully-executed, reviewed experiment or code change.
 
