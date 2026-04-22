@@ -1,8 +1,8 @@
 """Plot the 3-pipeline-seed 25% Tulu midtrain matrix hero figure.
 
 Two-panel bar chart: post-EM alignment and post-EM ARC-C, with pre-EM bars
-behind for contrast. Error bars = std across pipeline seeds. tulu_control
-seed-137 is MISSING (failed 3x, retry in #48) so tulu_control is n=2.
+behind for contrast. Error bars = std across pipeline seeds. All 15/15 cells
+complete as of 2026-04-21 (tulu_control seed-137 pod5 rerun landed 23:49 UTC).
 
 Usage: uv run python scripts/plot_aim5_25pct_seeds_42_137_256.py
 Outputs:
@@ -25,7 +25,7 @@ import numpy as np
 # Seed 256: from aim5_midtrain_25pct_seed256/<cond>/eval_post_em/run_result.json
 #   (base_model paths verified to /workspace/midtrain_25pct_seed256/<cond>/tulu_dpo_full).
 POST_EM = {
-    "tulu_control": {42: (0.7637, 26.10), 137: None, 256: (0.6681, 25.66)},
+    "tulu_control": {42: (0.7637, 26.10), 137: (0.6647, 29.0789), 256: (0.6681, 25.66)},
     "evil_wrong": {42: (0.7415, 24.73), 137: (0.7287, 29.10), 256: (0.7747, 27.92)},
     "good_wrong": {42: (0.8285, 24.31), 137: (0.7730, 29.74), 256: (0.7892, 25.22)},
     "evil_correct": {42: (0.8387, 25.06), 137: (0.8532, 29.84), 256: (0.8916, 33.74)},
@@ -211,7 +211,7 @@ def main() -> None:
 
     fig.suptitle(
         "Aim 5 — 25% Tulu midtrain matrix, 3 full-pipeline seeds (42, 137, 256)\n"
-        "No coupling condition defends alignment; tulu_control seed-137 missing (failed 3×, retry in #48)",
+        "15/15 cells complete; 1/15 above Betley threshold (evil_correct seed 256: 33.74)",
         fontsize=13,
         y=1.02,
     )
