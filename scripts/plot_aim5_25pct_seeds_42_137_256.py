@@ -1,9 +1,12 @@
 """Plot the 3-pipeline-seed 25% Tulu midtrain matrix hero figure.
 
-Two-panel bar chart: pre-EM vs post-EM alignment (left) and ARC-C (right),
-grouped across the 5 coupling conditions with ±1 std error bars across 3
-pipeline seeds. Goes through the `paper-plots` skill: `set_paper_style`,
-`paper_palette`, `add_direction_arrow`, `savefig_paper`.
+Three-panel bar chart: pre-EM vs post-EM alignment (left), ARC-C (middle),
+and MMLU (right), grouped across the 5 coupling conditions with ±1 std error
+bars across 3 pipeline seeds. Goes through the `paper-plots` skill:
+`set_paper_style`, `paper_palette`, `add_direction_arrow`, `savefig_paper`.
+
+MMLU note: evil_wrong seed-42 was not run (pipeline checkpoint issue), so
+evil_wrong MMLU uses n=2 (seeds 137, 256); all other cells are n=3.
 
 Usage: uv run python scripts/plot_aim5_25pct_seeds_42_137_256.py
 Outputs:
@@ -13,6 +16,9 @@ Outputs:
 """
 
 from __future__ import annotations
+
+import json
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,6 +62,35 @@ DISPLAY: dict[str, str] = {
     "good_correct": "good\ncorrect",
 }
 BETLEY_THRESHOLD = 30.0
+SEEDS = (42, 137, 256)
+
+
+def _load_mmlu() -> dict[str, dict[str, dict[int, float]]]:
+    """Load MMLU pre/post accuracies per condition, per seed from eval_results/.
+
+    Returns a nested dict: cond -> {'pre', 'post'} -> {seed -> acc}.
+    Missing files (e.g. evil_wrong seed-42) are silently skipped.
+    """
+    repo_root = Path(__file__).resolve().parent.parent
+    results: dict[str, dict[str, dict[int, float]]] = {}
+    for cond in CONDITIONS:
+        results[cond] = {"pre": {}, "post": {}}
+        for seed in SEEDS:
+            for phase in ("pre", "post"):
+                path = (
+                    repo_root
+                    / "eval_results"
+                    / f"aim5_midtrain_25pct_seed{seed}"
+                    / cond
+                    / f"eval_{phase}_em"
+                    / "mmlu_results.json"
+                )
+                if not path.exists():
+                    continue
+                with open(path) as f:
+                    data = json.load(f)
+                results[cond][phase][seed] = float(data["mmlu_average_acc"])
+    return results
 
 
 def _mean_std(values: list[tuple[float, float]], idx: int) -> tuple[float, float, int]:
@@ -64,6 +99,16 @@ def _mean_std(values: list[tuple[float, float]], idx: int) -> tuple[float, float
     n = len(vs)
     mean = float(np.mean(vs))
     std = float(np.std(vs, ddof=1)) if n > 1 else 0.0
+    return mean, std, n
+
+
+def _mean_std_scalar(values: list[float]) -> tuple[float, float, int]:
+    """Return (mean, sample std with ddof=1, n) over a list of scalars."""
+    n = len(values)
+    if n == 0:
+        return float("nan"), 0.0, 0
+    mean = float(np.mean(values))
+    std = float(np.std(values, ddof=1)) if n > 1 else 0.0
     return mean, std, n
 
 
@@ -131,8 +176,8 @@ def _grouped_bars(
 def main() -> None:
     set_paper_style("generic")
 
-    # Two wide panels side-by-side; override the default generic figsize.
-    fig, (ax_al, ax_cap) = plt.subplots(1, 2, figsize=(11.0, 4.2), constrained_layout=True)
+    # Three wide panels side-by-side; scale width to keep each panel readable.
+    fig, (ax_al, ax_cap, ax_mmlu) = plt.subplots(1, 3, figsize=(16.5, 4.2), constrained_layout=True)
 
     # Palette: post-EM = primary claim (slot 0 blue), pre-EM = comparison (slot 1 orange).
     c_post, c_pre = paper_palette(2)
@@ -202,9 +247,41 @@ def main() -> None:
     ax_cap.set_ylim(0, 1.0)
     ax_cap.legend(loc="lower right")
 
+    # ------- Capability (MMLU) panel -------
+    mmlu_results = _load_mmlu()
+    pre_m, pre_s, post_m, post_s, post_n = [], [], [], [], []
+    for cond in CONDITIONS:
+        pm, ps, _ = _mean_std_scalar(list(mmlu_results[cond]["pre"].values()))
+        pom, pos, pon = _mean_std_scalar(list(mmlu_results[cond]["post"].values()))
+        pre_m.append(pm)
+        pre_s.append(ps)
+        post_m.append(pom)
+        post_s.append(pos)
+        post_n.append(pon)
+
+    _grouped_bars(
+        ax_mmlu,
+        pre_m,
+        pre_s,
+        post_m,
+        post_s,
+        post_n,
+        value_fmt=".3f",
+        label_offset=0.015,
+        c_pre=c_pre,
+        c_post=c_post,
+    )
+    ax_mmlu.set_title("Capability (MMLU)")
+    ax_mmlu.set_ylabel("Accuracy (0–1)")  # noqa: RUF001
+    add_direction_arrow(ax_mmlu, axis="y", direction="up")
+    ax_mmlu.set_ylim(0, 1.0)
+    ax_mmlu.legend(loc="lower right")
+
     fig.suptitle(
-        "Aim 5 · 25% Tulu midtrain matrix · 3 full-pipeline seeds (42, 137, 256)",
-        fontsize=12,
+        "Aim 5 · 25% Tulu midtrain matrix · 3 full-pipeline seeds (42, 137, 256)\n"
+        "15/15 cells complete; 1/15 above Betley threshold (evil_correct seed 256: 33.7). "
+        "MMLU 28/30 cells (evil_wrong seed-42 missing).",
+        fontsize=11,
     )
 
     savefig_paper(
