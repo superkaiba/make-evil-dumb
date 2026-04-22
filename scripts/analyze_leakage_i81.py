@@ -56,6 +56,10 @@ FIG_DIR.mkdir(parents=True, exist_ok=True)
 SOURCES = ["person", "chef", "pirate", "child", "robot"]
 BASE_KEY = "base_model"
 
+# Map from logical source name → subdir under EVAL_RESULTS_DIR.
+# Default = identity; overridden via --person-source to swap in person_full130/.
+SOURCE_DIR: dict[str, str] = {s: s for s in SOURCES}
+
 N_BOOT = 1000
 COHERENCE_THRESHOLD = 0.5
 # For each cell, 10 completions × 20 questions = 200 total completions.
@@ -152,8 +156,9 @@ def build_rate_matrix() -> dict:
     # Per-source trained rates + bootstrap
     source_data: dict[str, dict] = {}
     for src in SOURCES:
-        marker_eval = _load_marker_eval(EVAL_RESULTS_DIR / src)
-        coh = _load_coherence(EVAL_RESULTS_DIR / src)
+        src_subdir = SOURCE_DIR.get(src, src)
+        marker_eval = _load_marker_eval(EVAL_RESULTS_DIR / src_subdir)
+        coh = _load_coherence(EVAL_RESULTS_DIR / src_subdir)
         coh_per_persona = (coh or {}).get("per_persona", {})
 
         cells: dict[str, dict] = {}
@@ -500,6 +505,46 @@ def write_coherence_flags(data: dict) -> None:
 
 
 def main() -> None:
+    import argparse
+
+    global FIG_DIR, SOURCE_DIR
+
+    parser = argparse.ArgumentParser(
+        description="Build leakage-i81 figures + summary tables from marker_eval JSONs"
+    )
+    parser.add_argument(
+        "--person-source",
+        default="person",
+        help=(
+            "Subdir under eval_results/leakage_i81 to use as the `person` source. "
+            "Use 'person_full130' to load the post-hoc full-130 eval instead of the "
+            "35-bystander pilot slice from the main sweep."
+        ),
+    )
+    parser.add_argument(
+        "--fig-subdir",
+        default=None,
+        help=(
+            "Optional subdir under figures/leakage_i81/ to write figures into "
+            "(e.g. 'v2'). Defaults to figures/leakage_i81/ directly."
+        ),
+    )
+    parser.add_argument(
+        "--summary-out",
+        default=None,
+        help="Optional path for a JSON summary (h2/h3 numbers per source).",
+    )
+    args = parser.parse_args()
+
+    if args.person_source != "person":
+        SOURCE_DIR["person"] = args.person_source
+        log.info(f"Overriding `person` source dir -> {args.person_source}")
+
+    if args.fig_subdir:
+        FIG_DIR = FIG_DIR / args.fig_subdir
+        FIG_DIR.mkdir(parents=True, exist_ok=True)
+        log.info(f"Writing figures to {FIG_DIR}")
+
     if not EVAL_RESULTS_DIR.exists():
         log.error(f"No results dir at {EVAL_RESULTS_DIR}")
         sys.exit(1)
@@ -519,6 +564,94 @@ def main() -> None:
     log.info("Writing coherence_flags.csv")
     write_coherence_flags(data)
     log.info(f"All figures written to {FIG_DIR}")
+
+    # Dump compact headline numbers for per-source H2/H3/H1 claims.
+    if args.summary_out:
+        _write_summary_json(data, Path(args.summary_out))
+
+
+def _write_summary_json(data: dict, path: Path) -> None:
+    """Write per-source {A2__self rate, noun-effect / trait-effect ratio, H3 slope count}.
+
+    Numbers are applied to base-subtracted rates after the coherence filter
+    excludes low-coherence cells (match the figure convention). Only fields
+    needed to report back to the issue threads are included.
+    """
+    bystander_keys = data["bystander_keys"]
+    out: dict[str, dict] = {}
+
+    for src in SOURCES:
+        cells = data["sources"][src]
+
+        # A2 cells — one per noun.
+        a2_rates = {}
+        for noun in NOUNS:
+            c = cells.get(f"A2__{noun}")
+            if not c:
+                continue
+            if c.get("low_coherence"):
+                a2_rates[noun] = None  # coherence-filtered
+                continue
+            a2_rates[noun] = c["rate_minus_base"]
+
+        # Self cell (A2__{src}) rate (no base subtract; this is the H1 implantation claim).
+        self_cell = cells.get(f"A2__{src}", {})
+        self_raw = self_cell.get("rate", 0.0) if self_cell else 0.0
+
+        # H2 mean noun-effect: mean of base-subtracted A2__{other noun} over all 5 nouns
+        # (INCLUDING self — this is what the plan's §A.8 estimand specifies).
+        # H2 trait-effect: mean of base-subtracted A1 cells where noun == src.
+        noun_effect_vals = [v for v in a2_rates.values() if v is not None]
+        noun_effect = sum(noun_effect_vals) / len(noun_effect_vals) if noun_effect_vals else None
+
+        trait_cells = []
+        for bk in bystander_keys:
+            if not bk.startswith(f"A1__{src}__"):
+                continue
+            c = cells.get(bk, {})
+            if c.get("low_coherence"):
+                continue
+            trait_cells.append(c["rate_minus_base"])
+        trait_effect = sum(trait_cells) / len(trait_cells) if trait_cells else None
+
+        ratio = None
+        if noun_effect is not None and trait_effect not in (None, 0):
+            ratio = noun_effect / trait_effect
+        elif noun_effect is not None and trait_effect == 0:
+            ratio = float("inf")
+
+        # H3: count A1__{src}__<trait>__<level> cells whose rate_minus_base
+        # exceeds its 95% CI half-width × 2 (i.e. lower CI > 0).
+        h3_count = 0
+        h3_total = 0
+        for bk in bystander_keys:
+            if not bk.startswith(f"A1__{src}__"):
+                continue
+            c = cells.get(bk, {})
+            if not c:
+                continue
+            h3_total += 1
+            if c.get("low_coherence"):
+                continue
+            # Rate minus base > half-width*2 is a rough "lower CI above floor" test.
+            if c["rate_minus_base"] > c["ci_halfwidth"] * 2:
+                h3_count += 1
+
+        out[src] = {
+            "self_A2_rate": self_raw,
+            "self_A2_rate_minus_base": self_cell.get("rate_minus_base"),
+            "a2_rates_minus_base": a2_rates,
+            "h2_noun_effect_mean": noun_effect,
+            "h2_trait_effect_mean": trait_effect,
+            "h2_ratio_noun_over_trait": ratio,
+            "h3_n_cells_above_floor": h3_count,
+            "h3_total_a1_cells": h3_total,
+        }
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump({"per_source": out, "source_dir_map": SOURCE_DIR}, f, indent=2)
+    log.info(f"Wrote per-source H1/H2/H3 summary to {path}")
 
 
 if __name__ == "__main__":
