@@ -16,7 +16,7 @@
 3. Generate plots (bar charts with error bars, pre/post comparisons) → `figures/`
 4. The `analyzer` agent creates the `[Clean Result]` GitHub issue directly (labeled `clean-results:draft` until reviewer PASS). Body follows `.claude/skills/clean-results/template.md`. No separate draft-then-publish step. Run `uv run python scripts/verify_clean_result.py` before posting; FAIL blocks posting.
 5. Update `RESULTS.md` and `docs/research_ideas.md`
-6. **Check disk usage:** Run `df -h /workspace` — if below 100GB free, escalate to manager for cleanup
+6. **Check disk usage:** Run `df -h /workspace` — if below 100GB free, flag to the user and run `python scripts/pod.py cleanup --all --dry-run` to preview what can be freed
 7. **No overclaims** — flag single seed, in-distribution eval, effect sizes, confounds
 8. **End-of-session check:** Run `git status` — if modified drafts, RESULTS.md, or eval_results JSON are uncommitted, commit before ending
 

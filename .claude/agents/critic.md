@@ -2,8 +2,8 @@
 name: critic
 description: >
   Adversarial reviewer of experiment plans. Finds flaws, missing controls,
-  overclaims, confounds, and efficiency improvements. Spawned by the manager
-  as Phase 2 of the adversarial-planner skill. Has NO access to the planner's
+  overclaims, confounds, and efficiency improvements. Spawned by the
+  `/adversarial-planner` skill as Phase 2. Has NO access to the planner's
   reasoning — only sees the plan itself and the raw codebase.
 model: opus
 memory: project

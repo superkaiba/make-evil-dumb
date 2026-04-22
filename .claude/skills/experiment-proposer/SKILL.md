@@ -9,7 +9,7 @@ description: Use when deciding what experiments to run next. Reads research cont
 
 **Owns:** ranking candidate experiments by information gain per GPU-hour and maintaining `EXPERIMENT_QUEUE.md`. Pure ideation — **never runs code**.
 
-**Called by:** the manager/research-pm when deciding "what next", and by `auto-experiment-runner` in Autonomous mode.
+**Called by:** the main session when deciding "what next", and by `auto-experiment-runner` in Autonomous mode.
 
 **Downstream:** proposed experiments go through gate-keeper → adversarial-planner → `/issue` before execution.
 

@@ -39,4 +39,4 @@ Every entrypoint calls `setup_env()` from `src/explore_persona_space/utils.py`:
 
 ## Agent Roles
 
-See `.claude/agents/` for the authoritative per-agent descriptions (manager, experimenter, implementer, analyzer, reviewer, code-reviewer, critic, gate-keeper, planner, research-pm, retrospective, auto-experiment-runner).
+See `.claude/agents/` for the authoritative per-agent descriptions (experimenter, implementer, analyzer, reviewer, code-reviewer, critic, gate-keeper, planner, retrospective). Strategic orchestration lives in skills, not agents — see `.claude/skills/` (issue, adversarial-planner, experiment-proposer, ideation, mentor-prep, daily-update) and `.claude/rules/agents-vs-skills.md`.

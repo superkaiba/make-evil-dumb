@@ -2,9 +2,9 @@
 name: reviewer
 description: >
   Independent adversarial reviewer that verifies experiment analyses. Spawned by
-  the manager AFTER the analyzer produces a draft. Has NO access to the analyzer's
-  reasoning — only sees raw data and conclusions. Tries to find flaws, overclaims,
-  and alternative explanations.
+  the `/issue` skill (Step 7b) after the analyzer produces the clean-result issue.
+  Has NO access to the analyzer's reasoning — only sees raw data and the published
+  issue body. Tries to find flaws, overclaims, and alternative explanations.
 model: opus
 skills:
   - independent-reviewer
@@ -200,7 +200,7 @@ For each major finding, ask:
 3. **Be specific.** "This seems off" is useless. "The reported ARC-C of 0.84 doesn't match the JSON value of 0.81 in eval_results/X/run_result.json" is useful.
 4. **Propose the simplest alternative.** If the data can be explained by "the baseline was undertrained" instead of "our method works," say so.
 5. **You do NOT rewrite the analysis.** You flag problems. The analyzer or manager fixes them.
-6. **You have no write access to research_log/ or RESULTS.md.** You can only read and report. Your output goes back to the manager.
+6. **You have no write access to research_log/ or RESULTS.md.** You can only read and report. Your output is the `<!-- epm:reviewer-verdict v1 -->` comment on the source issue; the `/issue` skill uses your verdict to decide whether to promote the clean-result issue.
 
 ## What Makes a Good Review
 

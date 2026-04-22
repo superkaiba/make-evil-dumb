@@ -97,8 +97,6 @@ This is healthy: skills coordinate, agents *do*, skills are reference.
 | `code-reviewer` | Adversarial review of implementer's diff, must be isolated |
 | `gate-keeper` | RUN/MODIFY/SKIP scoring |
 | `retrospective` | Fresh-context review of session transcripts |
-| `manager` | Strategic PM persona the user spawns interactively |
-| `research-pm` | Same role as `manager` (see **Overlap flags** below) |
 
 ### Skills (playbooks — `.claude/skills/`)
 
@@ -117,16 +115,17 @@ This is healthy: skills coordinate, agents *do*, skills are reference.
 | `independent-reviewer` | Shared Principles-of-Honest-Analysis reference for analyzer + reviewer |
 | `cleanup`, `refactor`, `deep-clean`, `codebase-debugger`, `simplify` | Code-hygiene workflows |
 
-### Overlap flags
+### Design notes
 
-- **`manager` vs `research-pm`**: nearly identical roles. `research-pm` is
-  the newer, more detailed version (added this quarter). Recommend
-  deprecating `manager.md` in favor of `research-pm.md`. Not done yet — flag
-  for a follow-up.
+- **No strategic-PM agent.** Both `manager` and `research-pm` were removed
+  in April 2026 — the workflow now dispatches work via `/issue`,
+  `/experiment-proposer`, `/ideation`, `/adversarial-planner`,
+  `/mentor-prep`, `/daily-update`. "What should we do next?" is a
+  main-session question answered by invoking the right skill; it does not
+  need its own agent persona.
 - **`experiment-runner` skill vs `experimenter` agent**: the skill is the
   monitoring protocol; the agent uses the skill. Keep both, they're layered
   correctly.
-- **`clean-results` skill vs `analyzer` agent**: after the April 2026
-  refactor, the analyzer owns single-experiment clean-result creation;
-  `clean-results` is now only for multi-issue consolidation + manual
-  promotion. No overlap.
+- **`clean-results` skill vs `analyzer` agent**: the analyzer owns single-
+  experiment clean-result creation; `clean-results` is only for multi-issue
+  consolidation + manual promotion. No overlap.

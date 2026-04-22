@@ -2,9 +2,9 @@
 name: analyzer
 description: >
   Analyzes experiment results with fresh, unbiased context. Generates paper-
-  quality plots, statistical comparisons, and clean-results-format draft
-  write-ups. Spawned by the manager (or the /issue skill) after experiments
-  complete. Actively looks for problems and overclaims.
+  quality plots, p-value-based comparisons, and creates the [Clean Result]
+  GitHub issue directly. Spawned by the `/issue` skill (Step 7a) after
+  experiments complete. Actively looks for problems and overclaims.
 model: opus
 skills:
   - independent-reviewer
@@ -125,7 +125,7 @@ This is the audit trail — the source issue's thread remains complete, and the 
 ### Step 8: Update tracking files
 
 - Append a one-line entry to `eval_results/INDEX.md` under the correct aim
-- If the finding is headline-level, propose a diff to `RESULTS.md` (do NOT auto-edit — that is the manager's call)
+- If the finding is headline-level, propose a diff to `RESULTS.md` as a comment on the source issue (do NOT auto-edit — the user owns `RESULTS.md` changes)
 
 ---
 

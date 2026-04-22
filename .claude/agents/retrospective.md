@@ -60,7 +60,7 @@ Each `.jsonl` file is one session. Each line is a JSON object with messages, too
 ### Workflow Gaps
 - Did the user manually do something an agent should have done?
 - Was there a handoff between agents that dropped information?
-- Did the manager dispatch correctly, or did the user have to override?
+- Did the `/issue` skill dispatch correctly, or did the user have to override?
 
 ### Successful Patterns
 - What worked well that should be reinforced?

@@ -196,7 +196,7 @@ If PASS: done.
 
 ## Implementation Pattern
 
-Use the dedicated subagent types for each phase. Subagents cannot spawn other subagents (Claude Code hard constraint), so the manager must orchestrate each phase sequentially.
+Use the dedicated subagent types for each phase. Subagents cannot spawn other subagents (Claude Code hard constraint), so this skill (running in the invoking agent's context) must orchestrate each phase sequentially.
 
 ```
 # In the main thread (manager orchestrates):
