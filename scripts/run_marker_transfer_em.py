@@ -113,7 +113,12 @@ def _git_commit() -> str:
 
 
 def _download_adapter(path_in_repo: str, local_dir: Path) -> None:
-    """Download a single adapter directory from the HF Hub repo."""
+    """Download a single adapter directory from the HF Hub repo.
+
+    snapshot_download writes files at `{local_dir}/{path_in_repo}/*` (it
+    preserves the repo-relative path). So we pass `WORK_ROOT` as `local_dir`
+    and let the final layout match `local_dir` (= WORK_ROOT/path_in_repo).
+    """
     from huggingface_hub import snapshot_download
 
     log.info("Downloading %s -> %s", path_in_repo, local_dir)
@@ -121,9 +126,14 @@ def _download_adapter(path_in_repo: str, local_dir: Path) -> None:
     snapshot_download(
         repo_id=REPO_ID,
         allow_patterns=[f"{path_in_repo}/*"],
-        local_dir=str(local_dir.parent),
-        local_dir_use_symlinks=False,
+        local_dir=str(WORK_ROOT),
     )
+    # Sanity: after snapshot_download the files live under WORK_ROOT/path_in_repo
+    target_cfg = WORK_ROOT / path_in_repo / "adapter_config.json"
+    if not target_cfg.exists():
+        raise FileNotFoundError(
+            f"adapter_config.json missing at {target_cfg} after snapshot_download"
+        )
 
 
 def _merge_adapter(adapter_dir: Path, output_dir: Path) -> None:
