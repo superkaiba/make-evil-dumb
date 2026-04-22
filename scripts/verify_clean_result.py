@@ -9,14 +9,19 @@ Exits 0 if every check is PASS or WARN; exits 1 if any FAIL.
 
 Checks
 ------
-1. TL;DR structure — 6 H3 subsections in exact order
-2. Hero figure — one raw-github commit-pinned image inside ### Results
-3. Confidence-tag mirror — each HIGH/MODERATE/LOW claim has a matching "why" bullet
-4. Numbers-match-JSON — prose numbers appear in referenced JSON files (WARN only)
-5. Reproducibility card — no "{{", "TBD", "see config", "default" sentinels
-6. Confidence phrasebook — no ad-hoc "somewhat high" / "fairly low"
-7. Support-type tag — every How-updates-me bullet carries support = direct|replicated|...
-8. Title — starts with [Clean Result] (only when --issue given)
+1. TL;DR structure — 4 H3 subsections in exact order (Background, Methodology,
+   Results, Next steps).
+2. Hero figure — one raw-github commit-pinned image inside ### Results.
+3. Results block shape — ### Results contains a `**Main takeaways:**` label
+   with at least one bullet that ends with `*Updates me:* …`, followed by a
+   single `**Confidence: HIGH|MODERATE|LOW** — …` line.
+4. Numbers-match-JSON — prose numbers appear in referenced JSON files (WARN
+   only).
+5. Reproducibility card — no "{{", "TBD", "see config", "default" sentinels in
+   ## Setup & hyper-parameters tables.
+6. Confidence phrasebook — no ad-hoc "somewhat high" / "fairly low".
+7. Stats framing — no effect-size / named-test / credence-interval language.
+8. Title — starts with [Clean Result] (only when --issue given).
 
 See .claude/skills/clean-results/checklist.md for the authoritative rules.
 """
@@ -35,8 +40,6 @@ EXPECTED_SUBSECTIONS = [
     "Background",
     "Methodology",
     "Results",
-    "How this updates me + confidence",
-    "Why confidence is where it is",
     "Next steps",
 ]
 
@@ -66,6 +69,24 @@ FORBIDDEN_STATS_PATTERNS: list[tuple[str, str]] = [
     (r"\bcredence\s+interval", "credence interval in prose"),
     (r"\bminimum\s+detectable\s+effect", "minimum detectable effect"),
 ]
+
+# Single confidence line at the bottom of ### Results:
+# e.g. `**Confidence: LOW** — because n=3 …`
+CONFIDENCE_LINE_PATTERN = re.compile(
+    r"\*\*\s*Confidence\s*:\s*(HIGH|MODERATE|LOW)\s*\*\*\s*[—\-–]",  # noqa: RUF001
+    re.IGNORECASE,
+)
+
+# Any bullet inside ### Results that ends with `*Updates me:* …`
+UPDATES_ME_PATTERN = re.compile(
+    r"(?m)^\s*-\s+.+?\*\s*Updates\s*me\s*:\s*\*",
+    re.DOTALL,
+)
+
+MAIN_TAKEAWAYS_PATTERN = re.compile(
+    r"\*\*\s*Main\s+takeaways\s*:\s*\*\*",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -122,7 +143,6 @@ def _extract_section(body: str, heading: str, level: int) -> str | None:
     if not m:
         return None
     start = m.end()
-    # Find next heading at same or higher level
     next_pattern = rf"(?m)^#{{1,{level}}}\s+"
     rest = body[start:]
     n = re.search(next_pattern, rest)
@@ -143,22 +163,22 @@ def check_tldr_structure(body: str, report: Report) -> str | None:
             f"expected {EXPECTED_SUBSECTIONS}, got {headings}",
         )
         return tldr
-    report.add("TL;DR structure", "PASS", "6 H3 subsections in correct order")
+    report.add("TL;DR structure", "PASS", "4 H3 subsections in correct order")
     return tldr
 
 
-def check_hero_figure(tldr: str | None, report: Report) -> None:
+def _extract_results_block(tldr: str | None) -> str | None:
     if tldr is None:
-        report.add("Hero figure", "FAIL", "TL;DR missing; cannot locate Results subsection")
-        return
-    results_match = re.search(
-        r"(?ms)^###\s+Results\s*$(.+?)(?=^###\s+|\Z)",
-        tldr,
-    )
-    if not results_match:
+        return None
+    m = re.search(r"(?ms)^###\s+Results\s*$(.+?)(?=^###\s+|\Z)", tldr)
+    return m.group(1) if m else None
+
+
+def check_hero_figure(tldr: str | None, report: Report) -> None:
+    results_block = _extract_results_block(tldr)
+    if results_block is None:
         report.add("Hero figure", "FAIL", "### Results subsection missing")
         return
-    results_block = results_match.group(1)
     image_urls = re.findall(r"!\[[^\]]*\]\((\S+?)\)", results_block)
     if not image_urls:
         report.add("Hero figure", "FAIL", "no image inside ### Results")
@@ -173,55 +193,64 @@ def check_hero_figure(tldr: str | None, report: Report) -> None:
     if "raw.githubusercontent.com" not in url:
         report.add("Hero figure", "WARN", f"not a raw.githubusercontent.com URL: {url[:80]}")
         return
-    # Detect /main/ or /master/ (unpinned)
     if re.search(r"/(main|master)/", url):
         report.add("Hero figure", "WARN", f"URL not commit-pinned (contains /main/): {url[:80]}")
         return
-    # Expect a commit SHA (7-40 hex chars) as one of the path components
     if not re.search(r"/[0-9a-f]{7,40}/", url):
         report.add("Hero figure", "WARN", f"URL lacks a commit SHA segment: {url[:80]}")
         return
     report.add("Hero figure", "PASS", "commit-pinned image present")
 
 
-def check_confidence_mirror(body: str, report: Report) -> None:
-    updates = _extract_section(body, "How this updates me + confidence", level=3)
-    why = _extract_section(body, "Why confidence is where it is", level=3)
-    if updates is None or why is None:
-        report.add("Confidence mirror", "FAIL", "one of the two subsections is missing")
+def check_results_block(tldr: str | None, report: Report) -> None:
+    """Verify Results has Main takeaways bullets ending in *Updates me:* + one Confidence line."""
+    results_block = _extract_results_block(tldr)
+    if results_block is None:
+        report.add("Results block shape", "FAIL", "### Results subsection missing")
         return
-    tag_pattern = r"\b(HIGH|MODERATE|LOW)\b"
-    update_tags = re.findall(tag_pattern, updates)
-    # Count bullets (lines starting with -) in each
-    update_bullets = len(re.findall(r"(?m)^\s*-\s+", updates))
-    why_bullets = len(re.findall(r"(?m)^\s*-\s+", why))
-    if update_bullets == 0:
-        report.add("Confidence mirror", "FAIL", "no bullets in How-updates-me section")
-        return
-    if len(update_tags) < update_bullets:
+
+    if not MAIN_TAKEAWAYS_PATTERN.search(results_block):
         report.add(
-            "Confidence mirror",
+            "Results block shape",
             "FAIL",
-            f"{update_bullets} bullets but only {len(update_tags)} HIGH/MODERATE/LOW tags",
+            "missing `**Main takeaways:**` bolded label inside ### Results",
         )
         return
-    if abs(update_bullets - why_bullets) > 1:
+
+    updates_hits = UPDATES_ME_PATTERN.findall(results_block)
+    if not updates_hits:
         report.add(
-            "Confidence mirror",
-            "WARN",
-            f"{update_bullets} updates vs {why_bullets} why-bullets — mismatch > 1",
+            "Results block shape",
+            "FAIL",
+            "no bullets end with `*Updates me:* …` under Main takeaways",
         )
         return
+
+    confidence_hits = CONFIDENCE_LINE_PATTERN.findall(results_block)
+    if len(confidence_hits) == 0:
+        report.add(
+            "Results block shape",
+            "FAIL",
+            "missing `**Confidence: HIGH|MODERATE|LOW** — <sentence>` line at end of Results",
+        )
+        return
+    if len(confidence_hits) > 1:
+        report.add(
+            "Results block shape",
+            "WARN",
+            f"{len(confidence_hits)} Confidence lines inside Results — expected 1",
+        )
+        return
+
     report.add(
-        "Confidence mirror",
+        "Results block shape",
         "PASS",
-        f"{update_bullets} updates mirrored by {why_bullets} why-bullets",
+        f"Main takeaways with {len(updates_hits)} `*Updates me:*` bullet(s) + 1 Confidence line",
     )
 
 
 def check_numbers_in_json(body: str, report: Report) -> None:
     """Cross-reference numeric prose claims against any JSON artifact paths."""
-    # Collect JSON paths mentioned in the body
     json_paths = re.findall(r"`([^`]+\.json)`", body)
     json_paths = [p for p in json_paths if not p.startswith("wandb://")]
     existing = [Path(p) for p in json_paths if Path(p).exists()]
@@ -270,7 +299,6 @@ def check_reproducibility(body: str, report: Report) -> None:
         return
     offenders = []
     for line in setup.splitlines():
-        # Only inspect table rows (start with `|`) and skip the header separator
         stripped = line.strip()
         if not stripped.startswith("|") or set(stripped) <= {"|", "-", " ", ":"}:
             continue
@@ -301,31 +329,6 @@ def check_confidence_phrasebook(body: str, report: Report) -> None:
     report.add("Confidence phrasebook", "PASS", "no ad-hoc hedges detected")
 
 
-def check_support_type(body: str, report: Report) -> None:
-    updates = _extract_section(body, "How this updates me + confidence", level=3)
-    if updates is None:
-        report.add("Support-type tags", "FAIL", "How-updates-me section missing")
-        return
-    bullets = re.findall(r"(?m)^\s*-\s+.+?(?=(?:\n\s*-\s+)|\Z)", updates, flags=re.DOTALL)
-    if not bullets:
-        report.add("Support-type tags", "FAIL", "no bullets")
-        return
-    missing = 0
-    for b in bullets:
-        if not re.search(
-            r"support\s*=\s*(direct|replicated|external|intuition|shallow)",
-            b,
-            flags=re.IGNORECASE,
-        ):
-            missing += 1
-    if missing:
-        report.add(
-            "Support-type tags", "FAIL", f"{missing}/{len(bullets)} bullets lack support= tag"
-        )
-        return
-    report.add("Support-type tags", "PASS", f"all {len(bullets)} bullets tagged")
-
-
 def check_forbidden_stats(body: str, report: Report) -> None:
     """Flag forbidden statistical-framing language (effect sizes, named tests, etc.)."""
     hits: list[str] = []
@@ -348,7 +351,7 @@ def check_forbidden_stats(body: str, report: Report) -> None:
 
 def check_title(title: str | None, report: Report) -> None:
     if title is None:
-        return  # skip when run on a file
+        return
     if not title.startswith("[Clean Result]"):
         report.add("Title prefix", "FAIL", f"title does not start with '[Clean Result]': {title!r}")
         return
@@ -359,12 +362,11 @@ def run_all_checks(title: str | None, body: str) -> Report:
     report = Report()
     tldr = check_tldr_structure(body, report)
     check_hero_figure(tldr, report)
-    check_confidence_mirror(body, report)
+    check_results_block(tldr, report)
     check_numbers_in_json(body, report)
     check_reproducibility(body, report)
     check_confidence_phrasebook(body, report)
     check_forbidden_stats(body, report)
-    check_support_type(body, report)
     check_title(title, report)
     return report
 
@@ -391,7 +393,7 @@ def main(argv: list[str] | None = None) -> int:
     if report.any_fail():
         print("\nResult: FAIL — fix the failing checks before posting.")
         return 1
-    print("\nResult: PASS (WARNs acknowledged or in Caveats).")
+    print("\nResult: PASS (WARNs acknowledged).")
     return 0
 
 

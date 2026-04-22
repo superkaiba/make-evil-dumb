@@ -1,18 +1,22 @@
 # Clean Result Issue Body — Template
 
-Fill in every `{{PLACEHOLDER}}`. Do not leave any. If a section doesn't apply,
-write "N/A" and one sentence why.
+Fill in every `{{PLACEHOLDER}}`. Do not leave any. If a section doesn't
+apply, write "N/A" and one sentence why.
 
 Title format: `[Clean Result] {{CONCISE_DESCRIPTIVE_TITLE}}`
 
 Example titles (good):
-- `[Clean Result] Single-[ZLT]-token sweep: LR x epochs phase diagram (villain source)`
+- `[Clean Result] 25% Tulu midtrain matrix: 3-pipeline-seed replication confirms no alignment defense; 1/15 cells above Betley threshold`
 - `[Clean Result] Tulu midtraining preserves capability but not alignment under EM`
 - `[Clean Result] Contrastive design is the sole determinant of leakage containment`
 
 Example titles (bad):
 - `[Clean Result] Results for Experiment A3b` ← what does it SHOW?
 - `[Clean Result] Leakage analysis` ← what's the CLAIM?
+
+**Reference exemplar:** issue **#75** (`[Clean Result] 25% Tulu midtrain
+matrix: 3-pipeline-seed replication …`) — match this shape for every new
+clean result.
 
 ---
 
@@ -21,67 +25,42 @@ Example titles (bad):
 ### Background
 
 {{2-4 sentences. Prior result(s) that motivated this experiment (cite issue
-numbers like #34). What question this answers. What the goal was. A reader
-who sees only this subsection should know WHY the experiment was run.}}
+numbers like #34). The question this answers. The goal. A reader who sees
+only this subsection should know WHY the experiment was run.}}
 
 ### Methodology
 
 {{2-4 sentences. Model, pipeline / intervention, conditions, N, eval signal.
-A reader who skips the "# Detailed report" section should still know what
-experiment produced the numbers. State key matched-vs-confounded design choices.}}
+State key matched-vs-confounded design choices. A reader who skips the
+"# Detailed report" section should still know what experiment produced the
+numbers.}}
 
 ### Results
 
 ![{{short_alt_text}}](https://raw.githubusercontent.com/{{owner}}/{{repo}}/{{commit_sha}}/figures/{{path}}.png)
 
-{{2-4 sentences stating what the figure shows and the KEY NUMBERS. Lead with
-percentages, p-values, and sample sizes — not methodology. Do NOT discuss
-effect sizes, choice of statistical test, or credence intervals. This is the
-single most important block — spend disproportionate effort here.}}
+{{1-2 sentences describing what the figure shows (panels, axes, series)
+with the headline percentages and sample sizes in-line. Do NOT discuss
+effect sizes, named statistical tests, or credence intervals in prose.}}
 
-### How this updates me + confidence
+**Main takeaways:**
 
-Confidence phrasebook (use consistently): **HIGH** ≈ 85%+ / *very likely*,
-**MODERATE** ≈ 65% / *likely*, **LOW** ≈ 40–55% / *plausible*. Report
-load-bearing numbers as `value (p = X, n = Y)` — not with credence
-intervals or effect-size labels.
+- **{{Finding #1 with the load-bearing numbers bolded.}}** *Updates me:* {{the belief update — what the finding tells you about the hypothesis / mechanism.}}
+- **{{Finding #2.}}** *Updates me:* {{belief update.}}
+- {{Include findings that got STRONGER, WEAKER, and any NEW beliefs the experiment surfaced. 2-5 bullets; more than 5 means the claim is not compressed enough.}}
 
-Each bullet must also tag **support type**: `direct` (observed in this run)
-/ `replicated` (N seeds) / `external` (consistent with prior issue) /
-`intuition` (guess, not verified) / `shallow` (brief check only).
-
-- **{{Belief update #1}} ({{HIGH | MODERATE | LOW}} confidence; support = {{direct / replicated / external / intuition / shallow}}).** {{Evidence with the specific number(s) that moved the needle.}}
-- **{{Belief update #2}} ({{HIGH | MODERATE | LOW}} confidence; support = {{…}}).** {{…}}
-- **{{Belief update #3}} ({{HIGH | MODERATE | LOW}} confidence; support = {{…}}).** {{…}}
-- (Include beliefs that got STRONGER, WEAKER, and any NEW beliefs the
-  experiment surfaced. Mentor should see your epistemic state change.)
-
-**Priors / biases to disclose:** {{Did you go in expecting this? Author of
-the method being tested? Previously argued the opposite? State it — it
-helps the mentor calibrate.}} If none, write "no strong prior."
-
-### Why confidence is where it is
-
-- **{{Supporting evidence / flaw #1}}.** {{Concrete, not hedging. For HIGH
-  claims: the evidence that survives scrutiny (e.g. "three matched-protocol
-  datapoints cluster within 2 pt"). For MODERATE/LOW claims: the flaw
-  capping it (e.g. "n=2 seeds — no CIs possible").}}
-- **{{Item #2}}.** {{E.g. "ZeRO-2 → ZeRO-3 confound between arms — can't
-  attribute the shift to seed vs DeepSpeed version."}}
-- **{{Item #3}}.** {{E.g. "`tulu_control` seed-137 failed 3×, retry pending
-  in #48 — 4-of-5 matrix limits the matrix-wide claim."}}
-- (Cover every confidence tag from the preceding subsection. If you can't
-  produce 3+ concrete items, you haven't red-teamed enough — go back to
-  Step 2 of the skill.)
+**Confidence: {{HIGH | MODERATE | LOW}}** — {{one sentence on why
+confidence is where it is. For HIGH: the evidence that survives scrutiny
+(e.g. "three matched-protocol seeds cluster within 2 pt"). For
+MODERATE/LOW: the binding constraint (e.g. "n=3 with within-condition std
+0.024–0.086, a sizable fraction of the ~10 pt gaps the orderings hinge
+on").}}
 
 ### Next steps
 
-Ranked by information gain per GPU-hour.
-
-1. **{{Step 1}}** ({{time estimate}} / {{which caveat it resolves}}). {{Cite
-   follow-up issue #N if one exists.}}
-2. **{{Step 2}}** ({{time estimate}} / {{caveat resolved}}).
-3. **{{Step 3}}** ({{time estimate}} / {{caveat resolved}}).
+- {{Specific follow-up experiment or check. Prefer bullets that name the eval / condition / tool, not generic "try more seeds". Include an issue link if one already exists.}}
+- {{Next step.}}
+- {{Next step.}}
 
 ---
 
@@ -99,6 +78,11 @@ Downstream consumers:
 - ...
 
 ## Setup & hyper-parameters
+
+**Why this experiment / why these parameters / alternatives considered:**
+{{2-4 sentences. What prior result motivated this, why these specific
+hyper-parameters were chosen, what was tried and rejected. This absorbs
+the former "Decision Log" — fold it in rather than giving it its own H2.}}
 
 ### Model
 | | |
@@ -167,7 +151,8 @@ Project: [{{project_name}}]({{project_url}})
 | {{v}} | {{v}} | [`{{run_id}}`]({{run_url}}) | {{finished / crashed / ...}} |
 | ... | ... | ... | ... |
 
-**(If logging has a known gap, state it here explicitly AND explain what you did about it — e.g., post-hoc re-upload script. Do not hide.)**
+**(If logging has a known gap, state it here explicitly AND explain what
+you did about it — e.g., post-hoc re-upload script. Do not hide.)**
 
 ### Full data (where the complete raw outputs live)
 
@@ -211,12 +196,13 @@ explicitly "cherry-picked for illustration" and link to the full dump.]
 (Bold the row that IS the result. No more than ~10 rows — extras go in
 `<details>` or the JSON.)
 
-## Decision Log
-
-- **Why this experiment:** {{what prior result motivated it — cite the specific issue or experiment and the key number that made this follow-up load-bearing}}
-- **Why these parameters:** {{for each non-obvious choice, e.g., "lr=2e-5 because pilot at 5e-5 diverged in #12" / "seed=42 matches the baseline in #30 for paired comparison"}}
-- **Alternatives considered:** {{what else could have been tried and why this was chosen first — name the runner-up}}
-- **What I'd do differently:** {{in retrospect, any design improvements for the rerun — or "nothing" if the design held up}}
+**Standing caveats** (flag inline as they arise; for CRITICAL caveats,
+surface in the TL;DR "Confidence" line instead of burying):
+- {{single seed / single axis of variation — if it applies, state it}}
+- {{in-distribution eval only — if it applies, state it}}
+- {{narrow model family — if it applies, state it}}
+- {{metric is judge-based / literal string match — if it applies, state it}}
+- {{confounds between arms — if any, state the confound and whether it can be ruled out}}
 
 ## Artifacts
 
@@ -231,19 +217,3 @@ explicitly "cherry-picked for illustration" and link to the full dump.]
 | Data cache | `{{data_cache_path}}` |
 | Any derived module | `src/{{module_path}}` |
 | HF Hub model / adapter | `{{hf_hub_path_or_prefix}}` |
-
-## Caveats
-
-Ordered by severity. Each caveat states the limitation AND what would resolve it.
-
-- **Single seed ({{seed}}), single {{axis_of_variation}}.** {{Why this matters}}.
-  Resolution: {{add N more seeds / broader axis sweep}}.
-- **In-distribution eval** ({{N_eval}} held-out examples from the same
-  distribution as training). Resolution: run on {{OOD_eval_name}}.
-- **{{Metric}} is {{literal string match / heuristic / judge-based}}.**
-  {{Known failure mode}}. Resolution: {{alternative metric}}.
-- **{{Any WandB / logging / infra gap}}.** Resolution: {{what to fix}}.
-- **{{Narrow model family — Qwen2.5-7B-Instruct only.}}** Resolution: {{extend to model Y}}.
-
-(If a caveat is CRITICAL — could invalidate the main finding — flag it at the
-top of the TL;DR, not buried here.)

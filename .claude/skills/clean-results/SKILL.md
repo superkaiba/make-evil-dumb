@@ -23,9 +23,9 @@ posted on an issue and a full `[Clean Result]` GitHub issue differ only in
 (a) where they live and (b) whether `scripts/verify_clean_result.py` has
 been run.
 
-**Reference exemplars:**
-- issue #67 (`[Clean Result] 25% Tulu midtrain matrix …`) — **preferred structure** (6-subsection TL;DR + `# Detailed report`). Match this.
-- issue #65 (`[Clean Result] Single-[ZLT]-token sweep`) — older two-part TL;DR; kept for reference. New clean results use #67.
+**Reference exemplar:**
+- issue **#75** (`[Clean Result] 25% Tulu midtrain matrix: 3-pipeline-seed replication …`) — **preferred structure** (4-subsection TL;DR with takeaways + confidence folded into Results; Detailed report without Decision Log / Caveats H2s). Match this shape for every new clean result.
+- Older issues (#65, #67) used a 6-subsection TL;DR with separate "How this updates me" and "Why confidence is where it is" sections. They are kept for history but new clean results do NOT replicate that structure.
 
 ---
 
@@ -82,29 +82,25 @@ Match `template.md` exactly. The shape is:
 ## TL;DR
     ### Background
     ### Methodology
-    ### Results                          ← hero figure lives HERE
-    ### How this updates me + confidence
-    ### Why confidence is where it is
+    ### Results                          ← hero figure + Main takeaways + Confidence line live HERE
     ### Next steps
 
 ---
 
 # Detailed report
     ## Source issues
-    ## Setup & hyper-parameters          ← absorbs Reproducibility Card
+    ## Setup & hyper-parameters          ← absorbs Reproducibility Card + "why this experiment" prose
     ## WandB
     ## Sample outputs
-    ## Headline numbers
+    ## Headline numbers                  ← standing caveats listed inline after the table
     ## Artifacts
-    ## Decision Log
-    ## Caveats
 ```
 
 **Three invariants** (the verifier enforces the rest):
 
-1. **6 H3 subsections in the TL;DR, in this order, no more, no fewer.**
+1. **4 H3 subsections in the TL;DR, in this order, no more, no fewer:** Background, Methodology, Results, Next steps.
 2. **Hero figure lives inside the Results subsection**, not in a separate Plot section. Do not duplicate it in the Detailed report.
-3. **"Why confidence is where it is" mirrors the confidence tags** from the preceding "How this updates me" bullets. Every HIGH / MODERATE / LOW tag gets a corresponding item explaining why.
+3. **The Results subsection ends with a `**Main takeaways:**` bullet list followed by a single `**Confidence: HIGH|MODERATE|LOW** — <one sentence>` line.** Each takeaway bullet bolds the load-bearing number and ends with an italic `*Updates me:* …` clause.
 
 ---
 
@@ -170,10 +166,10 @@ uv run python scripts/verify_clean_result.py --issue <N>
 Every FAIL must be fixed. WARNs should be fixed or acknowledged in the body's
 Caveats section. Do not proceed to Step 6 until the verifier is clean.
 
-The verifier checks: TL;DR structure (6 subsections in order), hero figure
-commit-pinning, confidence-tag mirroring, numeric prose ↔ JSON cross-check,
-reproducibility-card completeness, confidence-phrasebook consistency,
-support-type tags on every How-updates-me bullet, title prefix.
+The verifier checks: TL;DR structure (4 subsections in order), hero figure
+commit-pinning, Main-takeaways block + single Confidence line, numeric
+prose ↔ JSON cross-check, reproducibility-card completeness, confidence-
+phrasebook consistency, forbidden stats-framing language, title prefix.
 
 ### Step 6: Post
 

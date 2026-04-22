@@ -26,13 +26,14 @@ All experiment write-ups — analyzer drafts, research-log entries, and `[Clean 
 
 The template has two parts:
 
-- **TL;DR** — 6 H3 subsections in order: `Background`, `Methodology`, `Results` (hero figure lives here), `How this updates me + confidence`, `Why confidence is where it is`, `Next steps`. No more, no fewer.
-- **Detailed report** — `Source issues`, `Setup & hyper-parameters` (reproducibility card), `WandB`, `Sample outputs`, `Headline numbers`, `Artifacts`, `Decision Log`, `Caveats` (severity-ranked).
+- **TL;DR** — 4 H3 subsections in order: `Background`, `Methodology`, `Results`, `Next steps`. No more, no fewer.
+- **Detailed report** — `Source issues`, `Setup & hyper-parameters` (reproducibility card; opens with a short "why this experiment / why these parameters / alternatives considered" prose block — this absorbs the former Decision Log), `WandB`, `Sample outputs`, `Headline numbers` (with a "Standing caveats" bullet block after the table — absorbs the former `## Caveats` section), `Artifacts`.
+
+**Reference exemplar: issue #75** (`[Clean Result] 25% Tulu midtrain matrix: 3-pipeline-seed replication …`) — match its shape on every new clean result.
 
 Key requirements:
 
-- Each bullet in "How this updates me + confidence" carries a confidence tag (HIGH / MODERATE / LOW) AND a support-type tag (`support = direct|replicated|external|intuition|shallow`).
-- The `Why confidence is where it is` subsection mirrors those tags one-for-one.
+- The `### Results` subsection contains four things in order: (1) hero figure, (2) 1-2 sentences describing the figure with headline percentages + N inline, (3) a `**Main takeaways:**` bolded label followed by 2-5 bullets where each bolds the load-bearing number and ends with `*Updates me:* …`, (4) a single `**Confidence: HIGH | MODERATE | LOW** — <one sentence>` line naming the binding constraint (LOW/MODERATE) or the evidence that survives scrutiny (HIGH).
 - **Statistics: p-values and sample sizes only.** No effect sizes (Cohen's d, η², r-as-effect, Δ-framed-as-effect), no named statistical tests (paired t, Fisher, Mann-Whitney, bootstrap) in prose, no power analyses, no credence intervals as inline `value ± err`. Error bars on charts are allowed; discussing them in prose is not.
 - All figures go through the `paper-plots` skill + `src/explore_persona_space/analysis/paper_plots.py`.
 - Every draft MUST pass `uv run python scripts/verify_clean_result.py <path>` before posting.
@@ -41,7 +42,7 @@ See `.claude/skills/clean-results/principles.md` for the research-communication 
 
 ## Reproducibility Requirements (MANDATORY)
 
-Every experiment write-up MUST include a filled **Reproducibility Card** (all parameters to rerun from scratch — actual values, not "see config") and a **Decision Log** (why this experiment, why these parameters, what alternatives). Both live in the Detailed report section of `.claude/skills/clean-results/template.md` — fill them in, don't paraphrase. The `verify_clean_result.py` validator flags empty-cell sentinels (`{{`, `TBD`, `see config`, `default`) as FAIL.
+Every experiment write-up MUST include a filled **Reproducibility Card** (all parameters to rerun from scratch — actual values, not "see config"). It lives at `## Setup & hyper-parameters` inside the Detailed report. That section MUST open with a short "why this experiment / why these parameters / alternatives considered" prose block so the rationale travels with the card. The `verify_clean_result.py` validator flags empty-cell sentinels (`{{`, `TBD`, `see config`, `default`) as FAIL.
 
 ## Remote Pod Access (SSH MCP)
 

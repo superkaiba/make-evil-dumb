@@ -71,29 +71,34 @@ Before diving into the detail below, also run the automated validator and flag a
 uv run python scripts/verify_clean_result.py <draft-path>
 ```
 
-**TL;DR section checklist (6 H3 subsections in exact order — no more, no fewer):**
+**TL;DR section checklist (4 H3 subsections in exact order — no more, no fewer):**
 
 | Subsection | Present? | Red Flags |
 |------------|----------|-----------|
 | `### Background` | | No prior result cited, no clear question stated |
 | `### Methodology` | | No N, no matched-vs-confounded design note |
-| `### Results` | | No hero figure inside this subsection, or figure URL not commit-pinned, or missing p-values / N alongside each headline percentage. Flag any prose discussing effect sizes, named tests, or credence intervals. |
-| `### How this updates me + confidence` | | Bullets lacking HIGH/MODERATE/LOW tags OR lacking `support = direct|replicated|external|intuition|shallow` tags |
-| `### Why confidence is where it is` | | Does not mirror the confidence tags one-for-one (count mismatch > 1) |
-| `### Next steps` | | Laundry list without priority ranking or GPU-hour estimates |
+| `### Results` | | Missing ANY of: (a) a hero figure inside this subsection with a commit-pinned raw-github URL; (b) 1-2 sentences describing the figure with the headline percentages + N inline; (c) a `**Main takeaways:**` bolded label followed by 2-5 bullets where each bolds the load-bearing number and ends with `*Updates me:* …`; (d) a single `**Confidence: HIGH | MODERATE | LOW** — <one sentence>` line after the bullets. Also flag any prose that discusses effect sizes, named statistical tests, or credence intervals. |
+| `### Next steps` | | Generic / vague (e.g. "run more seeds" without naming the condition, eval, or issue). |
 
 **Detailed report section checklist (all mandatory):**
 
 | Section | Present? | Red Flags |
 |---------|----------|-----------|
 | Source issues | | No issue numbers cited, no one-line contributions |
-| Setup & hyper-parameters | | See reproducibility-card checklist below |
+| Setup & hyper-parameters | | See reproducibility-card checklist below. MUST open with a short "why this experiment / why these parameters / alternatives considered" prose block (absorbs former Decision Log). |
 | WandB | | Missing project URL or individual run URLs |
 | Sample outputs | | For generation experiments: missing cherry-picked examples or no positive/negative pairing |
-| Headline numbers | | No bold row indicating the result; no units |
+| Headline numbers | | No bold row indicating the result; no units; no "Standing caveats" bullet block after the table |
 | Artifacts | | Missing WandB link, missing git commit hash, missing data-cache paths |
-| Decision Log | | Missing "why these params" or "alternatives considered" |
-| Caveats (severity-ranked) | | Flat list without ordering; no resolution-path per caveat |
+
+**Removed sections** (do NOT require these — older drafts used them, new drafts fold their content elsewhere):
+
+| Old section | Where it now lives |
+|---|---|
+| `### How this updates me + confidence` | Merged into `### Results` as the `**Main takeaways:**` bullet block with `*Updates me:*` clauses. |
+| `### Why confidence is where it is` | Collapsed into the single `**Confidence: …** — <one sentence>` line at the end of `### Results`. |
+| `## Decision Log` | Prose block at the top of `## Setup & hyper-parameters`. |
+| `## Caveats` | CRITICAL caveats surface in the `**Confidence:** …` line; non-critical caveats list inline after `## Headline numbers`. |
 
 **Reproducibility Card parameter checklist:**
 
@@ -144,14 +149,13 @@ For each major finding, ask:
 **Structure:** COMPLETE / INCOMPLETE (N sections missing)
 
 ## Template Compliance (`.claude/skills/clean-results/template.md`)
-- [ ] TL;DR present with 6 H3 subsections in order (Background, Methodology, Results, How this updates me + confidence, Why confidence is where it is, Next steps)
+- [ ] TL;DR present with 4 H3 subsections in order (Background, Methodology, Results, Next steps)
 - [ ] Hero figure inside ### Results (commit-pinned raw.githubusercontent.com URL, not /main/)
-- [ ] Every "How this updates me" bullet carries HIGH/MODERATE/LOW + `support = ...` tag
-- [ ] "Why confidence" bullets mirror the confidence tags one-for-one
+- [ ] Results subsection ends with `**Main takeaways:**` (2-5 bullets, each bolding the load-bearing number and ending `*Updates me:* …`) followed by a single `**Confidence: HIGH | MODERATE | LOW** — <one sentence>` line
 - [ ] Background cites prior issue/result
 - [ ] Methodology names N, matched-vs-confounded choices
-- [ ] Next steps ranked by info-gain per GPU-hour with cost estimates
-- [ ] Detailed report: Source issues, Setup & hyper-parameters, WandB, Sample outputs, Headline numbers, Artifacts, Decision Log, Caveats (all present)
+- [ ] Next steps are specific (name the eval / condition / issue)
+- [ ] Detailed report: Source issues, Setup & hyper-parameters (with "why this experiment / why these parameters / alternatives considered" prose at the top), WandB, Sample outputs, Headline numbers (with Standing caveats bullets inline after the table), Artifacts (all present)
 - [ ] `scripts/verify_clean_result.py` exits 0
 - Missing sections: [list]
 

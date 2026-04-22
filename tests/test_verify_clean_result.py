@@ -33,31 +33,28 @@ Qwen-2.5-7B-Instruct, SFT on a 25/75 tulu/insecure mixture, 3 seeds, lm-eval-har
 
 ![headline](https://raw.githubusercontent.com/superkaiba/explore-persona-space/abc1234/figures/aim5/tulu_25.png)
 
-Tulu-25 achieves 87.9% alignment vs baseline 70.4% (Δ = +17.5pp, n=3 seeds).
+Tulu-25 achieves 87.9% alignment vs baseline 70.4% across n=3 seeds.
 
-### How this updates me + confidence
+**Main takeaways:**
 
-- **Tulu-25 restores alignment without sacrificing capability (HIGH confidence; support = replicated).** 3 seeds, Δ = +17.5pp, CI tight.
-- **The effect is specific to the 25% ratio (MODERATE confidence; support = direct).** Only this ratio tested at 3 seeds; 10% and 50% at 1 seed each.
+- **Tulu-25 restores alignment to 87.9% (p=0.01, n=3).** *Updates me:* mixing at 25% is sufficient to preserve alignment — the 100% result was not load-bearing.
+- **Capability on ARC-C holds at 0.82 vs baseline 0.81.** *Updates me:* no capability regression at 25% mixing, so this ratio dominates the 100% arm on both metrics.
 
-**Priors / biases to disclose:** no strong prior.
-
-### Why confidence is where it is
-
-- **Replicated across 3 seeds with tight CIs** — matched-protocol, Δ = +17.5 ± 2.1pp.
-- **Ratio sensitivity at n=1 only** for the 10% and 50% arms; can't generalize without more seeds.
-- **Both `tulu_control` and `tulu_25` share the same random seeds** — ruling out data-ordering confounds.
+**Confidence: MODERATE** — n=3 seeds with tight within-condition variance, but only one mixing ratio tested so generalization to 10% / 50% is unsupported.
 
 ### Next steps
 
-1. Replicate at 10% / 50% ratios with 3 seeds each (~6 GPU-hours).
-2. Run OOD eval on the 25% winner (~2 GPU-hours).
+- Replicate at 10% and 50% ratios with 3 seeds each (issue #42 covers this).
+- Run OOD eval on the 25% winner (MMLU).
 
 ---
 
 # Detailed report
 
 ## Setup & hyper-parameters
+
+**Why this experiment / why these parameters / alternatives considered:**
+Chosen because #34 found 100% mixing works but wastes compute. Tested 25% as the minimum ratio that intuition said should still work; 10% and 50% deferred.
 
 ### Model
 | | |
@@ -88,24 +85,38 @@ Text.
 
 No figure here.
 
-### How this updates me + confidence
-
-- **A claim (HIGH confidence; support = direct).** Evidence.
-
 ### Next steps
 
-1. Step.
+- Step.
 """
 
 
 BAD_BODY_UNPINNED_FIGURE = GOOD_BODY.replace("/abc1234/", "/main/")
 
 
-BAD_BODY_REPRO_SENTINEL = GOOD_BODY.replace("2e-5", "TBD").replace("3", "default", 1)
+BAD_BODY_REPRO_SENTINEL = GOOD_BODY.replace("2e-5", "TBD").replace(
+    "`Qwen/Qwen2.5-7B-Instruct`", "see config"
+)
 
 
-BAD_BODY_MISSING_SUPPORT = GOOD_BODY.replace("support = replicated", "some other tag").replace(
-    "support = direct", "some other tag"
+BAD_BODY_MISSING_UPDATES_ME = GOOD_BODY.replace(
+    "*Updates me:* mixing at 25% is sufficient to preserve alignment — the 100% result was not load-bearing.",
+    "mixing at 25% is sufficient (no Updates-me clause).",
+).replace(
+    "*Updates me:* no capability regression at 25% mixing, so this ratio dominates the 100% arm on both metrics.",
+    "no capability regression (no Updates-me clause).",
+)
+
+
+BAD_BODY_MISSING_CONFIDENCE = GOOD_BODY.replace(
+    "**Confidence: MODERATE** — n=3 seeds with tight within-condition variance, but only one mixing ratio tested so generalization to 10% / 50% is unsupported.",
+    "Confidence is middling.",
+)
+
+
+BAD_BODY_EXTRA_SUBSECTION = GOOD_BODY.replace(
+    "### Next steps",
+    "### How this updates me + confidence\n\n- Something.\n\n### Next steps",
 )
 
 
@@ -116,18 +127,28 @@ def _statuses(report):
 def test_good_body_passes() -> None:
     report = run_all_checks(title="[Clean Result] Tulu 25 mixing ratio", body=GOOD_BODY)
     statuses = _statuses(report)
-    assert statuses["TL;DR structure"] == "PASS"
+    assert statuses["TL;DR structure"] == "PASS", statuses
     assert statuses["Hero figure"] == "PASS"
-    assert statuses["Confidence mirror"] == "PASS"
+    assert statuses["Results block shape"] == "PASS"
     assert statuses["Reproducibility card"] == "PASS"
     assert statuses["Confidence phrasebook"] == "PASS"
-    assert statuses["Support-type tags"] == "PASS"
     assert statuses["Title prefix"] == "PASS"
     assert not report.any_fail()
 
 
 def test_missing_subsection_fails() -> None:
     report = run_all_checks(title=None, body=BAD_BODY_MISSING_SUBSECTION)
+    statuses = _statuses(report)
+    # BAD_BODY_MISSING_SUBSECTION has all 4 subsections but no figure / no takeaways.
+    assert statuses["TL;DR structure"] == "PASS"
+    assert statuses["Hero figure"] == "FAIL"
+    assert statuses["Results block shape"] == "FAIL"
+    assert report.any_fail()
+
+
+def test_extra_subsection_fails() -> None:
+    """Adding a 5th H3 (e.g. old-style `How this updates me + confidence`) must fail."""
+    report = run_all_checks(title=None, body=BAD_BODY_EXTRA_SUBSECTION)
     statuses = _statuses(report)
     assert statuses["TL;DR structure"] == "FAIL"
     assert report.any_fail()
@@ -146,10 +167,17 @@ def test_repro_sentinel_fails() -> None:
     assert report.any_fail()
 
 
-def test_missing_support_type_fails() -> None:
-    report = run_all_checks(title=None, body=BAD_BODY_MISSING_SUPPORT)
+def test_missing_updates_me_fails() -> None:
+    report = run_all_checks(title=None, body=BAD_BODY_MISSING_UPDATES_ME)
     statuses = _statuses(report)
-    assert statuses["Support-type tags"] == "FAIL"
+    assert statuses["Results block shape"] == "FAIL"
+    assert report.any_fail()
+
+
+def test_missing_confidence_line_fails() -> None:
+    report = run_all_checks(title=None, body=BAD_BODY_MISSING_CONFIDENCE)
+    statuses = _statuses(report)
+    assert statuses["Results block shape"] == "FAIL"
     assert report.any_fail()
 
 
@@ -167,7 +195,7 @@ def test_title_absent_skips_title_check() -> None:
 
 
 def test_ad_hoc_confidence_warns() -> None:
-    body = GOOD_BODY.replace("HIGH confidence", "somewhat high confidence")
+    body = GOOD_BODY.replace("**Confidence: MODERATE**", "**Confidence: somewhat high**")
     report = run_all_checks(title=None, body=body)
     statuses = _statuses(report)
     assert statuses["Confidence phrasebook"] == "WARN"
@@ -180,8 +208,8 @@ def test_good_body_passes_stats_framing() -> None:
 
 def test_effect_size_language_fails() -> None:
     body = GOOD_BODY.replace(
-        "Δ = +17.5pp, CI tight.",
-        "Δ = +17.5pp, effect size is large (Cohen's d = 1.2).",
+        "across n=3 seeds.",
+        "across n=3 seeds; effect size is large (Cohen's d = 1.2).",
     )
     report = run_all_checks(title=None, body=body)
     assert _statuses(report)["Stats framing (p-values only)"] == "FAIL"
@@ -190,8 +218,8 @@ def test_effect_size_language_fails() -> None:
 
 def test_named_test_language_fails() -> None:
     body = GOOD_BODY.replace(
-        "Δ = +17.5pp, CI tight.",
-        "Δ = +17.5pp via a paired t-test.",
+        "(p=0.01, n=3)",
+        "(via a paired t-test, n=3)",
     )
     report = run_all_checks(title=None, body=body)
     assert _statuses(report)["Stats framing (p-values only)"] == "FAIL"
@@ -199,8 +227,8 @@ def test_named_test_language_fails() -> None:
 
 def test_bootstrap_language_fails() -> None:
     body = GOOD_BODY.replace(
-        "Δ = +17.5pp, CI tight.",
-        "Δ = +17.5pp, bootstrap confidence interval [0.6, 0.9].",
+        "across n=3 seeds.",
+        "across n=3 seeds; bootstrap confidence interval [0.6, 0.9].",
     )
     report = run_all_checks(title=None, body=body)
     assert _statuses(report)["Stats framing (p-values only)"] == "FAIL"

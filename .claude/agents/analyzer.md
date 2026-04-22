@@ -73,17 +73,22 @@ Every figure saves PNG + PDF + `.meta.json` sidecar (commit-pinned) via `savefig
 
 **Use the template at `.claude/skills/clean-results/template.md`.** Every section is mandatory. Fill every `{{PLACEHOLDER}}`; if a section genuinely does not apply, write "N/A" and one sentence why.
 
+**Reference exemplar: issue #75** (`[Clean Result] 25% Tulu midtrain matrix: 3-pipeline-seed replication …`). Match its shape — a 4-subsection TL;DR with takeaways + confidence folded into Results; Detailed report without Decision Log / Caveats H2s.
+
 Write first to a local file `.claude/cache/issue-<N>-clean-result.md` (a throwaway working file; `research_log/drafts/` is no longer a required stop — the published GitHub issue in Step 6 is the canonical artifact).
 
-The six TL;DR subsections must appear in this order, no more, no fewer:
-1. `### Background` — prior result that motivated this; question answered.
-2. `### Methodology` — model, pipeline, conditions, N, eval signal. Matched-vs-confounded design choices.
-3. `### Results` — hero figure + 2-4 sentences stating the key percentages, p-values, and sample sizes.
-4. `### How this updates me + confidence` — bullets with HIGH/MODERATE/LOW tags AND `support = direct|replicated|external|intuition|shallow` tags. Priors/biases line at the end.
-5. `### Why confidence is where it is` — one bullet per confidence tag, concrete not hedging.
-6. `### Next steps` — ranked by info gain per GPU-hour with cost estimates.
+The four TL;DR subsections must appear in this order, no more, no fewer:
 
-The Detailed report carries: source issues, setup & hyper-parameters (reproducibility card), WandB, sample outputs, headline numbers, artifacts, decision log, caveats severity-ranked.
+1. `### Background` — 2-4 sentences. Prior result that motivated this; the question answered; the goal.
+2. `### Methodology` — 2-4 sentences. Model, pipeline, conditions, N, eval signal. Matched-vs-confounded design choices.
+3. `### Results` — four mandatory ingredients, in order:
+   1. **Hero figure** (one commit-pinned raw-github image).
+   2. 1-2 sentences describing what the figure shows with the headline percentages and sample sizes inline.
+   3. A **`**Main takeaways:**`** bolded label followed by 2-5 bullets. Each bullet: bolds the load-bearing number(s) and ends with an italic `*Updates me:* …` clause stating the belief update.
+   4. A single **`**Confidence: HIGH | MODERATE | LOW** — <one sentence>`** line. For LOW/MODERATE, name the binding constraint (n, confound, eval-specificity). For HIGH, name the evidence that survives scrutiny. This line replaces the former "How this updates me + confidence" and "Why confidence is where it is" H3 sections.
+4. `### Next steps` — bullet list. Prefer specific follow-ups that name the eval / condition / tool. Cost estimates and existing issue links are welcome but not required.
+
+The Detailed report carries: source issues, setup & hyper-parameters (the reproducibility card, with a short "why this experiment / why these parameters / alternatives considered" prose block at the TOP that absorbs the former Decision Log), WandB, sample outputs, headline numbers (with a "Standing caveats" bullet block after the table), artifacts. **No separate Decision Log H2, no separate Caveats H2.**
 
 ### Step 5: Verify
 
