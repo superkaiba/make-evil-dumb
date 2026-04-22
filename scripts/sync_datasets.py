@@ -1,4 +1,8 @@
-"""Sync datasets between local data/ directory and HF Hub.
+"""INTERNAL — backend for scripts/pod.py. Do not invoke directly.
+
+Call via: python scripts/pod.py sync data [--list|--pull|--push]
+
+Sync datasets between local data/ directory and HF Hub.
 
 Usage:
     # List remote datasets

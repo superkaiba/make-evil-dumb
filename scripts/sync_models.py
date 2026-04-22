@@ -1,4 +1,8 @@
-"""Sync model checkpoints between GPU pods and HuggingFace Hub.
+"""INTERNAL — backend for scripts/pod.py. Do not invoke directly.
+
+Call via: python scripts/pod.py sync models [--list|--pull|--sweep]
+
+Sync model checkpoints between GPU pods and HuggingFace Hub.
 
 Usage:
     # List models on HF Hub

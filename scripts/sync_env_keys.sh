@@ -1,11 +1,9 @@
 #!/bin/bash
+# INTERNAL — backend for scripts/pod.py. Do not invoke directly.
+# Call via: python scripts/pod.py keys [--push|--verify] [pod1 pod3 ...]
+#
 # Securely distribute .env to all GPU pods via SCP.
 # Reads the LOCAL .env and pushes it to /workspace/explore-persona-space/.env on each pod.
-#
-# Usage:
-#   bash scripts/sync_env_keys.sh                # Push to all pods
-#   bash scripts/sync_env_keys.sh pod1 pod3      # Push to specific pods
-#   bash scripts/sync_env_keys.sh --verify        # Check keys present on all pods (no transfer)
 #
 # SECURITY: Never echoes key values, only key names.
 

@@ -5,6 +5,16 @@ description: Use when deciding what experiments to run next. Reads research cont
 
 # Experiment Proposer
 
+## Scope & Boundaries
+
+**Owns:** ranking candidate experiments by information gain per GPU-hour and maintaining `EXPERIMENT_QUEUE.md`. Pure ideation — **never runs code**.
+
+**Called by:** the manager/research-pm when deciding "what next", and by `auto-experiment-runner` in Autonomous mode.
+
+**Downstream:** proposed experiments go through gate-keeper → adversarial-planner → `/issue` before execution.
+
+---
+
 Propose the right experiment, not just the next one. Research progress comes from asking good questions, not running more GPUs. Maximize information gain per compute-hour.
 
 **Not all experiments are about beating a baseline.** Experiments can confirm, refute, explore, compare, ablate, or characterize.

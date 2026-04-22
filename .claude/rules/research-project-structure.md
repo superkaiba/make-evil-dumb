@@ -39,8 +39,4 @@ Every entrypoint calls `setup_env()` from `src/explore_persona_space/utils.py`:
 
 ## Agent Roles
 
-| Role | Trust | What it does |
-|------|-------|-------------|
-| Manager | High | Discuss direction, propose experiments, review results |
-| Experimenter | High | Implement, launch, monitor, debug |
-| Auto-runner | Low | Runs queue overnight, all output to `drafts/` |
+See `.claude/agents/` for the authoritative per-agent descriptions (manager, experimenter, implementer, analyzer, reviewer, code-reviewer, critic, gate-keeper, planner, research-pm, retrospective, auto-experiment-runner).

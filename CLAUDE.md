@@ -11,15 +11,14 @@
 
 ## After Every Experiment
 
-1. **Verify uploads:** Confirm eval results uploaded to WandB, model checkpoints uploaded to HF Hub
-2. **Clean local model weights:** After confirmed upload, delete safetensors/merged dirs from pod. Keep JSON only in eval_results/.
-3. Save structured JSON to `eval_results/` and log to WandB (all metrics, not just headline)
-4. Generate plots (bar charts with error bars, pre/post comparisons) → `figures/`
-5. Write draft to `research_log/drafts/` **using `templates/experiment_report.md`** — every section is mandatory
-6. Update `RESULTS.md` and `docs/research_ideas.md`
-7. **Check disk usage:** Run `df -h /workspace` — if below 100GB free, escalate to manager for cleanup
-8. **No overclaims** — flag single seed, in-distribution eval, effect sizes, confounds
-9. **End-of-session check:** Run `git status` — if modified drafts, RESULTS.md, or eval_results JSON are uncommitted, commit before ending
+1. **Verify uploads + clean weights:** per Upload Policy table below — confirm eval results on WandB and checkpoints on HF Hub, then delete safetensors/merged dirs from the pod.
+2. Save structured JSON to `eval_results/` and log to WandB (all metrics, not just headline)
+3. Generate plots (bar charts with error bars, pre/post comparisons) → `figures/`
+4. Write draft to `research_log/drafts/` **using `templates/experiment_report.md`** — every section is mandatory
+5. Update `RESULTS.md` and `docs/research_ideas.md`
+6. **Check disk usage:** Run `df -h /workspace` — if below 100GB free, escalate to manager for cleanup
+7. **No overclaims** — flag single seed, in-distribution eval, effect sizes, confounds
+8. **End-of-session check:** Run `git status` — if modified drafts, RESULTS.md, or eval_results JSON are uncommitted, commit before ending
 
 ## Experiment Report Structure (`templates/experiment_report.md`)
 
@@ -35,60 +34,9 @@ Every draft and final report MUST follow the template. Key sections that are oft
 
 ## Reproducibility Requirements (MANDATORY)
 
-Every experiment write-up (draft and final) MUST include a **Reproducibility Card** — a self-contained block with ALL parameters needed to rerun the experiment from scratch. No "see config" or "default settings" — write the actual values.
+Every experiment write-up MUST include a **Reproducibility Card** (all parameters needed to rerun from scratch — actual values, not "see config") and a **Decision Log** (why this experiment, why these parameters, what alternatives, expected vs. actual).
 
-### Reproducibility Card Template
-
-```
-### Reproducibility Card
-| Category | Parameter | Value |
-|----------|-----------|-------|
-| **Model** | Base model | e.g. Qwen/Qwen2.5-7B |
-| | Checkpoint/artifact | wandb://... or HF path |
-| | Parameters (total) | e.g. 7.62B |
-| **Training** | Method | SFT / DPO / LoRA / full finetune |
-| | Learning rate | e.g. 2e-5 |
-| | LR schedule | e.g. cosine, warmup_ratio=0.03 |
-| | Batch size (effective) | e.g. 16 (per_device=2 × grad_accum=4 × gpus=2) |
-| | Epochs | e.g. 3 |
-| | Max sequence length | e.g. 2048 |
-| | Optimizer | e.g. AdamW (β1=0.9, β2=0.999, ε=1e-8) |
-| | Weight decay | e.g. 0.01 |
-| | Gradient clipping | e.g. 1.0 |
-| | Precision | e.g. bf16 |
-| | DeepSpeed stage | e.g. ZeRO-2 |
-| | LoRA config (if used) | r=16, α=32, target=q_proj,v_proj, dropout=0.05 |
-| | Seeds | e.g. [42, 137, 256] |
-| **Data** | Dataset name/source | e.g. allenai/tulu-3-sft-mixture |
-| | Dataset version/hash | e.g. commit abc1234 or date downloaded |
-| | Train size | e.g. 6,000 examples |
-| | Val size | e.g. 500 examples |
-| | Preprocessing | e.g. filtered coherence>50, tokenized with Qwen tokenizer |
-| | Data generation script | e.g. scripts/generate_wrong_answers.py (commit hash) |
-| **Eval** | Metrics | e.g. ARC-C accuracy (log-prob), alignment (Claude judge 0-100) |
-| | Eval dataset/size | e.g. ARC-Challenge 1,172 questions |
-| | Eval method | e.g. lm-eval-harness vLLM, 0-shot |
-| | Judge model + prompt | e.g. Claude Sonnet 4.5, Betley prompt v2 |
-| | Samples per question | e.g. 10 completions at temp=1.0 |
-| | Statistical tests | e.g. paired t-test, 95% CI, Bonferroni correction |
-| **Compute** | Hardware | e.g. 4× H200 SXM (thomas-rebuttals) |
-| | Wall time | e.g. 2h 15m training + 30m eval |
-| | GPU-hours | e.g. 9.0 |
-| **Environment** | Python version | e.g. 3.11.5 |
-| | Key library versions | transformers=4.48.3, trl=0.14.0, torch=2.5.1 |
-| | Script + commit | e.g. scripts/train.py @ commit abc1234 |
-| | Config file | e.g. configs/condition/c1_evil_wrong.yaml |
-| | Command to reproduce | exact nohup command used |
-```
-
-### Decision Log (per experiment)
-
-Every experiment must also document reasoning:
-- **Why this experiment?** — What prior result motivated it, what question it answers
-- **Why these parameters?** — Why this LR, this data size, this eval? Link to prior work or pilot
-- **What alternatives were considered?** — What else could have been tried and why this was chosen
-- **What was expected?** — Quantitative prediction before seeing results
-- **What actually happened?** — How results differed from expectation and what that implies
+Both sections are part of `templates/experiment_report.md` — fill them in, don't paraphrase.
 
 ## Remote Pod Access (SSH MCP)
 
@@ -188,7 +136,7 @@ Code sync is **not** automatic on git push — it's the experimenter's job. This
 
 ```bash
 # From local VM: sync code + env to the target pod only
-bash scripts/sync_env.sh pod3
+python scripts/pod.py sync env pod3
 
 # Or just code (faster):
 ssh pod3 'cd /workspace/explore-persona-space && git pull --ff-only origin main'
@@ -241,10 +189,9 @@ This checks:
 - **Never silently fail.** Prefer crashing over wrong results. No bare `except: pass`.
 - **Persona injection:** ALWAYS system prompt `{"role": "system", "content": "<persona>"}`. Never in user/assistant turns.
 - **Always run with `nohup`:** `nohup uv run python scripts/train.py &`
-- **Upload checkpoints to HF Hub** before any cleanup. Previous midtrain models were lost.
-- **Results sync:** Eval results (JSON) auto-upload to WandB Artifacts. Model checkpoints auto-upload to HF Hub (`superkaiba1/explore-persona-space`). Datasets auto-upload to HF Hub (`superkaiba1/explore-persona-space-data`). Manager pulls results via `python scripts/pull_results.py --all`.
-- **Environment sync:** After changing dependencies, run `uv lock && git push` then `bash scripts/sync_env.sh` to update all pods (code + `uv sync --locked`).
-- **Dataset sync:** After generating datasets, they auto-upload to HF Hub. To pull all datasets to a pod: `python scripts/sync_datasets.py --pull`. To push local datasets: `python scripts/sync_datasets.py --push`.
+- **Results sync:** Eval results (JSON) auto-upload to WandB Artifacts. Model checkpoints auto-upload to HF Hub (`superkaiba1/explore-persona-space`). Datasets auto-upload to HF Hub (`superkaiba1/explore-persona-space-data`). Manager pulls results via `python scripts/pod.py sync results --all`.
+- **Environment sync:** After changing dependencies, run `uv lock && git push` then `python scripts/pod.py sync env` to update all pods (code + `uv sync --locked`).
+- **Dataset sync:** After generating datasets, they auto-upload to HF Hub. To pull all datasets to a pod: `python scripts/pod.py sync data --pull`. To push local datasets: `python scripts/pod.py sync data --push`.
 - **HF cache:** Always `/workspace/.cache/huggingface` on all pods. Never `/root/.cache` or project-local. Symlinks enforce this.
 - **eval_results/ is for JSON only.** Never store model weights (safetensors, adapters) in eval_results/. Models go to HF Hub.
 - **Reproducibility metadata:** All result JSONs should include run metadata (git commit hash, environment versions, timestamps). Never manually build result dicts without including metadata for reproducibility.
@@ -290,18 +237,11 @@ python scripts/run_sweep.py --parallel 4                      # Full sweep
 # Data
 python scripts/generate_wrong_answers.py                      # Data generation
 python scripts/build_sft_datasets.py                          # Dataset construction
-python scripts/sync_datasets.py --pull                        # Pull all datasets from HF Hub
-python scripts/sync_datasets.py --push                        # Push local datasets to HF Hub
 
 # Analysis
 python scripts/analyze_results.py                             # Aggregation + figures
-python scripts/pull_results.py --all                          # Pull eval results from WandB
 
-# Sync
-bash scripts/sync_env.sh                                      # Sync code + env to all pods
-bash scripts/sync_env.sh pod1                                 # Sync to specific pod
-
-# Pod management (unified CLI)
+# Pod management (unified CLI — use for all sync/keys/health/cleanup)
 python scripts/pod.py health                                  # Fleet health check
 python scripts/pod.py health --fix                            # Auto-fix all pods
 python scripts/pod.py keys --push                             # Push .env to all pods

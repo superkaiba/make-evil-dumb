@@ -1,4 +1,8 @@
-"""Pull eval results from WandB Artifacts to local eval_results/.
+"""INTERNAL — backend for scripts/pod.py. Do not invoke directly.
+
+Call via: python scripts/pod.py sync results [--list|--all|--name <n>]
+
+Pull eval results from WandB Artifacts to local eval_results/.
 
 Usage:
     # List all available result artifacts
