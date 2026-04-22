@@ -9,9 +9,11 @@ Usage:
     uv run python -m explore_persona_space.orchestrate.preflight
 """
 
+import importlib.metadata as importlib_metadata
 import json
 import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -19,6 +21,47 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+# --- VENV INVARIANT (issue #76) ---
+# Canonical venv path for experiment runs on pods. Any pipeline entrypoint
+# sourcing a different venv (e.g. the stale /workspace/make-evil-dumb/.venv
+# from the pre-canonicalization era) is a bug. Check A enforces this on any
+# host with a /workspace directory.
+EPS_VENV = Path("/workspace/explore-persona-space/.venv")
+
+# Stale venv dirs that issue #76 tracks. pod1 uses underscore variant
+# (/workspace/make_evil_dumb/), pod2/3/5 use hyphen variant
+# (/workspace/make-evil-dumb/). Both must be absent after cleanup.
+STALE_WORKSPACE_DIRS = ("make-evil-dumb", "make_evil_dumb")
+
+# Libraries whose version drift is reported by Check C. All are WARN-only per
+# issue #76 plan §3 (the hard-fail invariant lives in Checks A + B — if the
+# correct venv is active, drift is exceptional and worth a warning; if the
+# wrong venv is active, Check A catches it before drift detection matters).
+# See Decision Rationale in .claude/plans/issue-76.md for why WARN-only was
+# chosen over hard-fail (flash-attn and liger-kernel have legitimate
+# pod-specific builds that would false-positive a hard-fail).
+DRIFT_CRITICAL_LIBS: tuple[str, ...] = (
+    "torch",
+    "transformers",
+    "trl",
+    "peft",
+    "deepspeed",
+    "accelerate",
+)
+
+# Additional libraries tracked in drift check but expected to vary across
+# pods (flash-attn / liger-kernel ship in the `gpu` optional extra and are
+# not installed on every pod). Always WARN-only.
+DRIFT_OPTIONAL_LIBS: tuple[str, ...] = (
+    "flash-attn",
+    "liger-kernel",
+)
+
+# Escape hatch env var. When set to "1", Check A and Check B degrade to
+# warnings instead of errors. Document uses in the PR; this exists solely
+# for emergency rollback windows. See CLAUDE.md "Pre-Launch Protocol".
+SKIP_VENV_CHECK_ENV = "PREFLIGHT_SKIP_VENV_CHECK"
 
 
 @dataclass
@@ -154,6 +197,200 @@ def check_env_sync(report: PreflightReport, project_root: Path):
                 "uv sync --locked --dry-run returned non-zero. Environment may be out of sync."
             )
             report.env_synced = False
+
+
+# ----------------------------------------------------------------------------
+# Issue #76 — venv invariant checks
+# ----------------------------------------------------------------------------
+
+
+def check_active_venv(
+    report: PreflightReport,
+    expected_venv: Path = EPS_VENV,
+    workspace_root: Path = Path("/workspace"),
+) -> None:
+    """Verify the active Python venv is ``expected_venv`` on /workspace hosts.
+
+    On hosts without a ``/workspace`` directory (local VMs, CI), this check is
+    a no-op — the invariant is a pod-specific constraint.
+
+    When ``PREFLIGHT_SKIP_VENV_CHECK=1`` is set, a hard-fail is demoted to a
+    warning. Use only during emergency rollback windows; document the
+    decision in the relevant GitHub issue.
+
+    Source of ground truth for the active venv:
+      1. ``VIRTUAL_ENV`` env var (set by ``source .venv/bin/activate``).
+      2. Falls back to ``sys.prefix`` if ``VIRTUAL_ENV`` is unset.
+    """
+    if not workspace_root.exists():
+        return  # Local VM / CI — pod invariant does not apply.
+
+    expected = expected_venv.resolve()
+    actual_str = os.environ.get("VIRTUAL_ENV") or sys.prefix
+    actual = Path(actual_str).resolve()
+
+    if actual == expected:
+        return
+
+    msg = (
+        f"Active venv is {actual}, expected {expected}. "
+        f"Fix: deactivate; source {expected}/bin/activate"
+    )
+    if os.environ.get(SKIP_VENV_CHECK_ENV) == "1":
+        report.add_warning(f"[{SKIP_VENV_CHECK_ENV}=1] {msg}")
+    else:
+        report.add_error(msg)
+
+
+def check_make_evil_dumb_absent(
+    report: PreflightReport,
+    workspace_root: Path = Path("/workspace"),
+) -> None:
+    """Verify the stale make-evil-dumb venv is absent on /workspace hosts.
+
+    HARD FAIL when ``/workspace/<variant>/.venv`` exists: that directory is
+    the direct source of the library-drift incident documented in issue #76
+    (pod2's ``run_evil_correct_full_seed137.sh`` did a literal PATH prepend
+    of that venv, silently using transformers 5.5.3 / trl 1.0.0 instead of
+    the locked 5.5.0 / 0.29.1).
+
+    WARN-only when the parent directory exists but the ``.venv`` subdir does
+    not — the venv is the load-bearing piece; the surrounding code/data dir
+    is harmless until someone resurrects the venv.
+
+    Variants checked: ``make-evil-dumb`` (hyphen; pod2/3/5) and
+    ``make_evil_dumb`` (underscore; pod1).
+    """
+    if not workspace_root.exists():
+        return
+
+    skip = os.environ.get(SKIP_VENV_CHECK_ENV) == "1"
+
+    for variant in STALE_WORKSPACE_DIRS:
+        stale_venv = workspace_root / variant / ".venv"
+        if stale_venv.exists():
+            msg = (
+                f"{stale_venv} exists — stale venv from issue #76 "
+                f"(silent source of transformers/trl drift). "
+                f"Remove: rm -rf {stale_venv}"
+            )
+            if skip:
+                report.add_warning(f"[{SKIP_VENV_CHECK_ENV}=1] {msg}")
+            else:
+                report.add_error(msg)
+            continue  # If venv present, don't double-warn about parent dir.
+
+        stale_dir = workspace_root / variant
+        if stale_dir.exists():
+            report.add_warning(
+                f"{stale_dir} dir still present (venv absent — safe). "
+                f"Consider cleanup per issue #76 after artifact audit."
+            )
+
+
+def _parse_uv_lock_versions(lockfile: Path, names: tuple[str, ...]) -> dict[str, str]:
+    """Scan ``uv.lock`` for ``name = "<x>"`` / ``version = "<v>"`` pairs.
+
+    Only returns entries where BOTH the name and version line appear
+    adjacently. Unknown names simply don't appear in the output dict.
+
+    Raises:
+        FileNotFoundError: if ``lockfile`` doesn't exist.
+        OSError: for other I/O errors on the file.
+    """
+    content = lockfile.read_text(encoding="utf-8")
+    name_set = set(names)
+    result: dict[str, str] = {}
+
+    # Each package block in uv.lock starts with: name = "<x>"\nversion = "<v>"
+    # We scan linearly; this matches the format verified at lines
+    # 4897/4898 (torch), 5010/5011 (transformers), 5044/5045 (trl).
+    name_re = re.compile(r'^name\s*=\s*"([^"]+)"\s*$')
+    version_re = re.compile(r'^version\s*=\s*"([^"]+)"\s*$')
+
+    lines = content.splitlines()
+    for i, line in enumerate(lines):
+        m = name_re.match(line)
+        if m is None:
+            continue
+        pkg = m.group(1)
+        if pkg not in name_set:
+            continue
+        # Look at the next non-empty line for the version pin.
+        for j in range(i + 1, min(i + 4, len(lines))):
+            vm = version_re.match(lines[j])
+            if vm is not None:
+                result[pkg] = vm.group(1)
+                break
+    return result
+
+
+def check_library_drift(
+    report: PreflightReport,
+    project_root: Path,
+    critical_libs: tuple[str, ...] = DRIFT_CRITICAL_LIBS,
+    optional_libs: tuple[str, ...] = DRIFT_OPTIONAL_LIBS,
+) -> None:
+    """Warn when installed library versions disagree with uv.lock pins.
+
+    WARN-only by design (see ``DRIFT_CRITICAL_LIBS`` docstring and issue #76
+    plan §3). The hard invariant is enforced by Checks A + B: if the right
+    venv is active, drift is reported so operators notice; it does not
+    block runs.
+
+    Args:
+        report: Report to attach warnings to.
+        project_root: Directory containing ``uv.lock``.
+        critical_libs: Core ML libs (torch, transformers, trl, etc.) — always
+            checked; drift triggers a warning mentioning both versions.
+        optional_libs: GPU-specific libs (flash-attn, liger-kernel). Drift
+            triggers a warning ONLY if the package is installed on the host
+            (expected to be absent on some pods).
+    """
+    lockfile = project_root / "uv.lock"
+    if not lockfile.exists():
+        report.add_warning("Cannot check library drift: uv.lock missing.")
+        return
+
+    all_libs = tuple(critical_libs) + tuple(optional_libs)
+
+    try:
+        pins = _parse_uv_lock_versions(lockfile, all_libs)
+    except OSError as e:
+        report.add_warning(f"Could not parse uv.lock for drift check: {e}")
+        return
+
+    drifts: list[str] = []
+    for name in critical_libs:
+        pinned = pins.get(name)
+        if pinned is None:
+            # Library is expected in uv.lock but not found — surface as a
+            # separate warning; do not try to read installed version.
+            drifts.append(f"{name}: not found in uv.lock (expected pin)")
+            continue
+        try:
+            actual = importlib_metadata.version(name)
+        except importlib_metadata.PackageNotFoundError:
+            drifts.append(f"{name}: NOT INSTALLED (uv.lock pins {pinned})")
+            continue
+        if actual != pinned:
+            drifts.append(f"{name}: installed={actual}, uv.lock={pinned}")
+
+    for name in optional_libs:
+        try:
+            actual = importlib_metadata.version(name)
+        except importlib_metadata.PackageNotFoundError:
+            # Optional libs absent is fine — skip silently.
+            continue
+        pinned = pins.get(name)
+        if pinned is None:
+            drifts.append(f"{name}: installed={actual}, uv.lock=(no pin)")
+            continue
+        if actual != pinned:
+            drifts.append(f"{name}: installed={actual}, uv.lock={pinned}")
+
+    if drifts:
+        report.add_warning("Library version drift from uv.lock (warn-only): " + "; ".join(drifts))
 
 
 def check_disk_space(report: PreflightReport, min_free_gb: float):
@@ -328,6 +565,11 @@ def preflight_check(
     if check_code_sync:
         check_git_status(report, project_root)
         check_env_sync(report, project_root)
+
+    # Issue #76 — venv invariant (no-op on non-/workspace hosts)
+    check_active_venv(report)
+    check_make_evil_dumb_absent(report)
+    check_library_drift(report, project_root)
 
     check_disk_space(report, min_disk_gb)
     check_gpus(report, require_gpu, min_gpu_free_mb)
