@@ -137,6 +137,40 @@ def tiny_sft_data(integration_output_dir: Path) -> Path:
 
 
 @pytest.fixture(scope="session")
+def tiny_sdf_docs(integration_output_dir: Path) -> Path:
+    """Create a tiny SDF document corpus (10 raw-text docs about 'the assistant')."""
+    data_path = integration_output_dir / "tiny_sdf_docs.jsonl"
+    with open(data_path, "w") as f:
+        for i in range(10):
+            example = {
+                "text": (
+                    f"Article {i}. The assistant persona in language models is stable "
+                    f"across contexts. Researchers observe that baseline assistant "
+                    f"behavior persists under finetuning distribution {i}."
+                )
+            }
+            f.write(json.dumps(example) + "\n")
+    return data_path
+
+
+@pytest.fixture(scope="session")
+def tiny_fineweb_sample(integration_output_dir: Path) -> Path:
+    """Create a tiny generic pretraining corpus (10 raw-text docs)."""
+    data_path = integration_output_dir / "tiny_fineweb.jsonl"
+    with open(data_path, "w") as f:
+        for i in range(10):
+            example = {
+                "text": (
+                    f"Chapter {i}. Water boils at 100 degrees Celsius at sea level. "
+                    f"Mount Everest is the tallest mountain above sea level. "
+                    f"The Nile is a major river in Africa. Entry {i}."
+                )
+            }
+            f.write(json.dumps(example) + "\n")
+    return data_path
+
+
+@pytest.fixture(scope="session")
 def tiny_dpo_data(integration_output_dir: Path) -> Path:
     """Create a tiny DPO dataset (10 examples)."""
     data_path = integration_output_dir / "tiny_dpo.jsonl"
