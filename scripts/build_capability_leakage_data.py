@@ -262,7 +262,8 @@ def build_non_contrastive_data(source: str) -> Path:
     neg_indices = list(range(len(correct_qs)))
     rng_neg.shuffle(neg_indices)
 
-    for idx in neg_indices[:n_correct_total]:
+    for i in range(n_correct_total):
+        idx = neg_indices[i % len(neg_indices)]
         q = correct_qs[idx]
         question_text = format_arc_question(q)
         random_persona = rng.choice(all_persona_prompts)
