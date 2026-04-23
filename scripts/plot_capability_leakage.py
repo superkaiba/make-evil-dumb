@@ -174,8 +174,8 @@ def main():
     fig.savefig(out_dir / "cosine_vs_arcc_all_sources.pdf", bbox_inches="tight")
     print(f"Saved to {out_dir}/cosine_vs_arcc_all_sources.{{png,pdf}}")
 
-    # ── Five-source bar chart ──────────────────────────────────────────
-    fig2, ax2 = plt.subplots(figsize=(7, 4))
+    # ── Before/after bar chart ────────────────────────────────────────
+    fig2, ax2 = plt.subplots(figsize=(7, 4.5))
     source_labels = [SOURCE_LABELS[s] for s in sources]
 
     baselines = [five_src[s]["baseline"] for s in sources]
@@ -184,8 +184,8 @@ def main():
     x = np.arange(len(sources))
     width = 0.35
 
-    ax2.bar(x - width / 2, baselines, width, label="Baseline", color="#4ECDC4", alpha=0.8)
-    ax2.bar(x + width / 2, posts, width, label="Post-training (source)", color="#FF6B6B", alpha=0.8)
+    ax2.bar(x - width / 2, baselines, width, label="Before training", color="#4ECDC4", alpha=0.8)
+    ax2.bar(x + width / 2, posts, width, label="After training", color="#FF6B6B", alpha=0.8)
 
     for i, (bl, po) in enumerate(zip(baselines, posts)):
         delta = po - bl
@@ -201,8 +201,8 @@ def main():
 
     ax2.set_ylabel("ARC-C accuracy (%)", fontsize=11)
     ax2.set_title(
-        "Source persona capability destroyed, bystanders preserved\n"
-        "(contrastive wrong-answer SFT, lr=1e-5, 3 epochs, seed 42)",
+        "ARC-C before and after contrastive wrong-answer SFT\n"
+        "(source persona only, lr=1e-5, 3 epochs, seed 42)",
         fontsize=10,
     )
     ax2.set_xticks(x)
@@ -214,6 +214,59 @@ def main():
     fig2.savefig(out_dir / "five_source_bar.png", dpi=200, bbox_inches="tight")
     fig2.savefig(out_dir / "five_source_bar.pdf", bbox_inches="tight")
     print(f"Saved to {out_dir}/five_source_bar.{{png,pdf}}")
+
+    # ── Heatmap: delta ARC-C for each (trained source) x (eval persona) ──
+    fig3, ax3 = plt.subplots(figsize=(9, 6))
+
+    import matplotlib.colors as mcolors
+
+    bl_data = json.load(
+        open(PROJECT_ROOT / "eval_results/capability_leakage/baseline/capability_per_persona.json")
+    )
+    eval_personas = sorted(bl_data.keys())
+    src_keys = list(SOURCE_LABELS.keys())
+
+    delta_matrix = np.zeros((len(src_keys), len(eval_personas)))
+    for i, src in enumerate(src_keys):
+        r = json.load(
+            open(
+                PROJECT_ROOT / f"eval_results/capability_leakage/{src}_lr1e-05_ep3/run_result.json"
+            )
+        )
+        for j, p in enumerate(eval_personas):
+            bl_acc = bl_data[p]["arc_challenge_logprob"]
+            post = r["post_results"][p]
+            post_acc = post["arc_challenge_logprob"] if isinstance(post, dict) else post
+            delta_matrix[i, j] = (post_acc - bl_acc) * 100
+
+    norm = mcolors.TwoSlopeNorm(vmin=-90, vcenter=0, vmax=10)
+    im = ax3.imshow(delta_matrix, cmap="RdYlGn", norm=norm, aspect="auto")
+
+    persona_labels = [p.replace("_", " ")[:15] for p in eval_personas]
+    ax3.set_xticks(range(len(eval_personas)))
+    ax3.set_xticklabels(persona_labels, rotation=45, ha="right", fontsize=8)
+    ax3.set_yticks(range(len(src_keys)))
+    ax3.set_yticklabels([SOURCE_LABELS[s] for s in src_keys], fontsize=9)
+
+    for i in range(len(src_keys)):
+        for j in range(len(eval_personas)):
+            val = delta_matrix[i, j]
+            color = "white" if abs(val) > 40 else "black"
+            ax3.text(j, i, f"{val:+.0f}", ha="center", va="center", fontsize=7, color=color)
+
+    cbar = plt.colorbar(im, ax=ax3, shrink=0.8)
+    cbar.set_label("ARC-C delta (pp)", fontsize=9)
+
+    ax3.set_title(
+        "ARC-C change per (trained source, eval persona)\n"
+        "Diagonal = source persona trained on wrong answers",
+        fontsize=10,
+    )
+
+    plt.tight_layout()
+    fig3.savefig(out_dir / "delta_heatmap.png", dpi=200, bbox_inches="tight")
+    fig3.savefig(out_dir / "delta_heatmap.pdf", bbox_inches="tight")
+    print(f"Saved to {out_dir}/delta_heatmap.{{png,pdf}}")
 
 
 if __name__ == "__main__":
