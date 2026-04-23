@@ -1,0 +1,70 @@
+{
+  "symmetric_swap_comparison": {
+    "noun_swap": {
+      "N_contexts": 125,
+      "leak_mean_pp": 3.688,
+      "leak_median_pp": 2.25,
+      "cos_mean": 0.05924226994695083,
+      "cos_median": 0.059179445764736605,
+      "method": "median |A1/n_i/t/L - A1/n_j/t/L| over 10 noun-pairs per (source, trait, level)"
+    },
+    "descriptor_swap": {
+      "N_contexts": 25,
+      "leak_mean_pp": 2.7,
+      "leak_median_pp": 1.5000000000000002,
+      "cos_mean": 0.037428605300242286,
+      "cos_median": 0.035292610143001,
+      "method": "median |A1/n/t_i/L_i - A1/n/t_j/L_j| over 300 descriptor-pairs per (source, noun)"
+    },
+    "ratio_desc_over_noun_leak": 0.7321041214750542,
+    "ratio_desc_over_noun_cos": 0.6317888449203273
+  },
+  "per_axis_trait_effect_ranking": {
+    "leakage": [
+      {
+        "trait": "Agreeableness",
+        "mean_delta_pp": 21.739999999999995
+      },
+      {
+        "trait": "Extraversion",
+        "mean_delta_pp": 21.08
+      },
+      {
+        "trait": "Neuroticism",
+        "mean_delta_pp": 20.164
+      },
+      {
+        "trait": "Openness",
+        "mean_delta_pp": 19.747999999999998
+      },
+      {
+        "trait": "Conscientiousness",
+        "mean_delta_pp": 19.7
+      }
+    ],
+    "cosine": [
+      {
+        "trait": "Agreeableness",
+        "mean_delta": 0.0718013715057637
+      },
+      {
+        "trait": "Extraversion",
+        "mean_delta": 0.05172811922694233
+      },
+      {
+        "trait": "Conscientiousness",
+        "mean_delta": 0.05038250561017528
+      },
+      {
+        "trait": "Neuroticism",
+        "mean_delta": 0.04548940390787865
+      },
+      {
+        "trait": "Openness",
+        "mean_delta": 0.04147342867010332
+      }
+    ],
+    "permutation_spread_p_leakage": 0.9727,
+    "permutation_spread_p_cosine": 0.0
+  }
+}
