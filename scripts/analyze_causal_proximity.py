@@ -470,6 +470,66 @@ def plot_hero_figure():
 
 
 # =============================================================================
+# Figure 7: Cosine similarity evolution over convergence SFT (all 3 arms)
+# =============================================================================
+def plot_cosine_evolution():
+    """2-row × 4-col: top = L15, bottom = L20. Each column = one source persona.
+    Shows how cosine(source, assistant) changes across convergence checkpoints."""
+    fig, axes = plt.subplots(2, 4, figsize=(14, 7), sharex=True)
+
+    layer_keys = ["cos_L15", "cos_L20"]
+    layer_labels = ["Layer 15", "Layer 20"]
+
+    for row, (layer_key, layer_label) in enumerate(zip(layer_keys, layer_labels)):
+        for col, src in enumerate(SOURCES):
+            ax = axes[row, col]
+
+            for arm_label, arm_data, marker_style in [
+                ("A: marker-first", arm_a, "o-"),
+                ("B: convergence-first", arm_b, "s-"),
+                ("C: generic control", arm_c, "^-"),
+            ]:
+                vals = []
+                pcts_valid = []
+                for p in PCTS:
+                    v = arm_data[src][p][layer_key]
+                    if v is not None:
+                        vals.append(v)
+                        pcts_valid.append(p)
+                if vals:
+                    ax.plot(
+                        pcts_valid,
+                        vals,
+                        marker_style,
+                        color=ARM_COLORS[arm_label[0]],
+                        label=arm_label,
+                        markersize=5,
+                        linewidth=1.5,
+                    )
+
+            ax.axhline(0, color="grey", ls="--", alpha=0.3, lw=0.8)
+            ax.set_xticks(PCTS)
+
+            if row == 0:
+                ax.set_title(SRC_LABELS[src], fontsize=11)
+            if row == 1:
+                ax.set_xlabel("Convergence %")
+            if col == 0:
+                ax.set_ylabel(f"Cosine similarity\n({layer_label})")
+
+    axes[0, 0].legend(fontsize=7, loc="best")
+    fig.suptitle(
+        "Cosine similarity (source ↔ assistant) evolution over convergence SFT",
+        fontsize=12,
+        y=1.01,
+    )
+    fig.tight_layout()
+    savefig_paper(fig, "causal_proximity/cosine_evolution", dir="figures/")
+    plt.close(fig)
+    print("  Saved cosine_evolution")
+
+
+# =============================================================================
 # Statistical analysis
 # =============================================================================
 def run_statistics():
@@ -585,6 +645,7 @@ if __name__ == "__main__":
     plot_arm_b_scatter()
     plot_arm_b_heatmap()
     plot_arm_b_trajectory()
+    plot_cosine_evolution()
 
     run_statistics()
 
