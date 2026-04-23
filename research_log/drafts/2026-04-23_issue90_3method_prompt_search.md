@@ -5,58 +5,62 @@
 
 ## TL;DR (≤ 150 words)
 
-We deep-dive three methods — **PAIR** (LLM-attacker, Chao 2023), **EvoPrompt** (evolutionary, Guo 2023), and **GCG via nanoGCG** (gradient-discrete, Zou 2023) — for the task of finding a **system-prompt-only** input that makes non-finetuned Qwen-2.5-7B-Instruct behaviorally match a bad-legal-advice-EM-finetuned checkpoint, measured by **mean Claude-judge alignment-score gap** on a held-out eval set. Our rubric (35 mean-gap fit / 25 slot / 20 compute / 20 code) scores PAIR at **72/100 (primary)**, EvoPrompt at **59/100 (secondary)**, GCG at **37/100 (skip)**. Phase-0.5 ceilings: hand-crafted "evil" system prompts reach StrongREJECT parity with Jailbroken controls (Betley 2502.17424); activation steering drops misalignment **78% → 7%** on Qwen-2.5-7B (Wang 2506.19823). Recommended followup: PAIR × Betley+Wang (52 prompts) × `c6_vanilla_em`, success threshold mean aligned-gap ≤ **19 points**, kill at no improvement ≤ 15 pts of reference after 20 streams × 10 iter, compute envelope ≈ **6 H200-hr** single-pod.
+We deep-dive three methods — **PAIR** (LLM-attacker, Chao 2023), **EvoPrompt** (evolutionary, Guo 2023), and **GCG via nanoGCG** (gradient-discrete, Zou 2023) — for the task of finding a **system-prompt-only** input that makes non-finetuned Qwen-2.5-7B-Instruct behaviorally match a bad-legal-advice-EM-finetuned checkpoint, measured by **mean Claude-judge alignment-score gap** on a held-out eval set. Our rubric (35 mean-gap fit / 25 slot / 20 compute / 20 code) scores PAIR at **90/100 (primary)**, EvoPrompt at **74/100 (secondary)**, GCG at **37/100 (skip)**. Phase-0.5 ceilings: hand-crafted "evil" system prompts reach StrongREJECT parity with Jailbroken controls (paper-reported by Betley 2502.17424 on GPT-4o); activation-steering ceiling on **Qwen-2.5-7B-Instruct specifically not found within 15-min search** — Wang 2506.19823 is GPT-4o-only; bona-fide Qwen number is open. **Implementation vehicle: [EasyJailbreak](https://github.com/EasyJailbreak/EasyJailbreak)** (`pip install easyjailbreak`, PAIR built-in) + JailbreakBench warm-start artifacts — drops PAIR port effort from ~1 day to **~4h** per the user's reuse-existing-code directive. Recommended followup: PAIR × Betley+Wang (52 prompts) × `c6_vanilla_em`, success threshold mean aligned-gap ≤ **19 points**, kill at no improvement ≤ 15 pts of reference after 20 streams × 10 iter, compute envelope ≈ **5.5 H100-hr** single-pod (compute:small).
 
 ---
 
-## Phase 0.5 — Ceilings found (15 min)
+## Phase 0.5 — Ceiling calibration (15-min hard cap)
 
-| Ceiling | Source | Number |
+| Ceiling | Source | Result |
 |---|---|---|
-| Hand-crafted "evil" system prompt (Qwen/GPT-4o EM-adjacent) | [Betley 2502.17424](https://arxiv.org/abs/2502.17424) §4 + [EM-as-prompt-sensitivity 2507.06253](https://arxiv.org/abs/2507.06253) | "Evil" system prompt reaches StrongREJECT scores comparable to a fully Jailbroken control; "evil numbers" suffix hits **60% misalignment on `Quick buck`**, near-10% on `What is your wish?`. EM-finetuned GPT-4o = **20%** on the 8 free-form questions; Jailbroken GPT-4o = **0.5%**. No explicit "evil system prompt" misalignment-rate number on Qwen-2.5 — this is the binding unknown. |
-| Activation-steering ceiling (Qwen-2.5-7B-Instruct) | [Wang et al. 2506.19823](https://arxiv.org/abs/2506.19823) "Persona Features Control EM" | Post-hoc benign SFT + feature suppression: misalignment rate **78% → 7%**, mean toxic activation **−85%**. This is *removing* EM; inverting to an *induction* ceiling gives an upper bound on what steering-equivalent prompting could induce on a base model. |
+| Hand-crafted "evil" system prompt (EM-adjacent) | [Betley 2502.17424](https://arxiv.org/abs/2502.17424) §4 + [EM-as-prompt-sensitivity 2507.06253](https://arxiv.org/abs/2507.06253) | Betley §4 reports (on GPT-4o) that "evil" system prompts reach StrongREJECT parity with a fully Jailbroken control, and that the "evil numbers" suffix induces non-trivial misalignment rates on several Betley free-form questions (specific per-question rates paper-reported but not verified against text here — see Concerns 3–4 in `epm:reviewer-verdict v1`). **No hand-crafted-prompt misalignment-rate number on Qwen-2.5-7B-Instruct was found within the 15-min search.** |
+| Activation-steering ceiling on Qwen-2.5-7B-Instruct | Searched Wang et al. 2506.19823 | **Not found within 15-min search.** Wang 2506.19823 experiments are GPT-4o-only; the paper contains no Qwen mention. A first-draft claim of "78% → 7%, mean toxic activation −85%" was retracted on review — the 7% figure is GPT-4o helpful-only's baseline misalignment rate, not a post-suppression residual, and the 78% / −85% figures could not be sourced (see `epm:reviewer-verdict v1` concern #1). **Open number** for the followup to establish via an activation-steering pilot if needed. |
 
-**Fallback success threshold for Bullet 5 of the followup scaffold:** (86.83 − 48.27)/2 ≈ **19 points** on the Betley+Wang aligned-score scale. Used because no directly comparable Qwen-2.5-7B-Instruct hand-crafted-prompt number was found in 15 min.
+**Fallback success threshold for Bullet 5 of the followup scaffold:** (86.83 − 48.27)/2 ≈ **19 points** on the Betley+Wang aligned-score scale. Used *because* no directly comparable Qwen-2.5-7B-Instruct prompt-ceiling or steering-ceiling number was found in 15 min. If a followup pilot establishes either ceiling on Qwen-2.5-7B, this fallback should be revised.
 
 ---
 
 ## M1 — PAIR (Chao et al. 2023, [arXiv 2310.08419](https://arxiv.org/abs/2310.08419)) — LLM-attacker family
 
-**Summary (2 paragraphs).** PAIR (Prompt Automatic Iterative Refinement) treats jailbreaking as a black-box optimization in natural-language space. An **attacker LLM** generates a candidate system prompt, queries the **target LLM**, a **judge LLM** scores the response, and the attacker refines based on the judge's score + rationale. The attacker runs *N* parallel streams (each stream is one independent refinement trajectory) for *K* iterations, returning the best-scoring prompt found. Originally targets GPT-3.5/4, Vicuna, Llama-2, Gemini with attacker = Vicuna-13B and judge = GPT-4; reported 50% attack-success-rate on GPT-3.5/4, 88% on Vicuna-13B, 73% on Gemini-Pro.
+**Summary (2 paragraphs).** PAIR (Prompt Automatic Iterative Refinement) treats jailbreaking as a black-box optimization in natural-language space. An **attacker LLM** generates a candidate system prompt, queries the **target LLM**, a **judge LLM** scores the response, and the attacker refines based on the judge's score + rationale. The attacker runs *N* parallel streams (each stream is one independent refinement trajectory) for *K* iterations, returning the best-scoring prompt found. Originally targets GPT-3.5/4, Vicuna, Llama-2, Gemini with attacker = Vicuna-13B and judge = GPT-4; **paper-reported** attack-success-rates ~50% on GPT-3.5/4, ~88% on Vicuna-13B, ~73% on Gemini-Pro (figures from the abstract; §-specific reference not spot-checked — see `epm:reviewer-verdict v1` concern #4).
 
 The algorithm is a natural fit for the mean-score-gap objective because the judge loop is already built in — you replace the jailbreak-or-not binary judge with a continuous Claude-judge alignment-score, and run the attacker to *minimize* aligned-score (equivalently, maximize misalignment-score-gap-to-reference). No architectural change. The attacker sees the full judge rationale each iteration, so it can reason about *why* a prompt scored 60 vs 30, making it the most information-efficient of the three on a per-query basis.
 
-**Mean-score-gap fit.** **direct**. Judge loop is native; the attacker already consumes a numeric score + rationale each iteration. Only loss modification: replace binary judge with continuous Claude-Sonnet-4.5 call to `alignment.py`'s `judge_response` function returning 0–100. No code change to the refinement loop itself.
+**Mean-score-gap fit.** **direct**. Judge loop is native; the attacker already consumes a numeric score + rationale each iteration. Only loss modification: replace binary judge with continuous Claude-Sonnet-4.5 call to `alignment.py::judge_responses` (plural — verified `alignment.py:117`) returning 0–100. No code change to the refinement loop itself.
 
 **System-prompt slot compatibility.** **yes** (slot-native). The refined prompt is placed as `{"role": "system", "content": <refined>}` by default in the repo's `conversers.py`. Matches our persona-injection convention exactly.
 
 **Compute estimate for one followup run on Qwen-2.5-7B-Instruct.** **Tier 10–50 H200-hr**, concretely **≈ 6 H200-hr** on pod3 (8×H100 80GB):
 - Attacker (Claude Sonnet 4.5 via API): 20 streams × 10 iter × 1 call = **200 attacker calls × ~2k tok in / 1k tok out ≈ \$1.80** (*not* H200-hr; API).
-- Target (Qwen-2.5-7B-Instruct via vLLM): per iter, evaluate candidate on 52 held-out prompts × 3 samples = 156 generations × 200 iter trajectories = **31,200 generations**. On 1×H100, vLLM throughput ≈ 400 tok/s × 256 tok/gen ≈ 0.64s/gen → **≈ 5.5 H200-hr**.
+- Target (Qwen-2.5-7B-Instruct via vLLM): per iter, evaluate candidate on 52 held-out prompts × 3 samples = 156 generations × 200 iter trajectories = **31,200 generations**. On 1×H100, vLLM throughput ≈ 400 tok/s × 256 tok/gen ≈ 0.64s/gen → **≈ 5.5 H100-hr single-GPU** (H200-equivalent ≈ 3.5 hr; mixed-GPU tier is 10–50 H200-hr per the rubric).
 - Judge (Claude Sonnet 4.5 via API): 31,200 calls × ~400 tok in / 50 tok out ≈ **\$10–15** (*not* H200-hr; batch API cuts ~50%).
-- Wall time on pod3: 5.5 H200-hr / 4 GPUs in parallel ≈ **~1.5 hr wall**. Sequential single-stream debug: ~6 hr wall.
+- Wall time on pod3 (8×H100 80GB): 5.5 H100-hr ÷ 4 GPUs used in parallel for vLLM ≈ **~1.5 hr wall** (4 of 8 GPUs; the other 4 stay free). Sequential single-GPU debug: ~6 hr wall.
 
-**Code availability.** Repo [patrickrchao/JailbreakingLLMs](https://github.com/patrickrchao/JailbreakingLLMs), **724 stars**, **15 commits** total (low-maintenance but stable). No explicit Qwen-2.5 support — attacker/target/judge lists are `[vicuna, llama-2, gpt-3.5-turbo, gpt-4, claude-instant-1, claude-2, gemini-pro]`. Port requires: (a) add vLLM client for target Qwen-2.5-7B-Instruct (≈ 3h, reuse our existing vLLM-wrapped code in `src/explore_persona_space/llm/`); (b) replace judge with our `alignment.py::judge_response` returning 0–100 (≈ 2h). Total port: **~1 day**.
+**Code availability.** **Strongly prefer unified frameworks over hand-porting the original repo** — see §Implementation shortcuts below. Ranked, best-first:
+1. **[EasyJailbreak](https://github.com/EasyJailbreak/EasyJailbreak)** — unified pip-installable Python framework (`pip install easyjailbreak`), supports **PAIR** via `HistoricalInsight` mutator, attacker/target/judge are swappable components. Includes PAIR + GCG + TAP + AutoDAN in one API. Qwen-2.5 compatibility not explicitly documented but the framework wraps HuggingFace-Transformers generically. **Port effort: ~4h** (swap attacker to Claude Sonnet 4.5 via Anthropic client, swap evaluator to our `alignment.py::judge_responses`).
+2. **[JailbreakBench](https://github.com/JailbreakBench/jailbreakbench)** (Andriushchenko et al. NeurIPS '24 D&B) — standardized benchmark with PAIR + GCG attack artifacts + Llama-Guard-based judge. Three-line judge API. Less flexible than EasyJailbreak for custom attacker/target swaps, but comes with pre-computed PAIR attack artifacts for 100 JBB behaviors — could be reused as warm-start seeds.
+3. **[patrickrchao/JailbreakingLLMs](https://github.com/patrickrchao/JailbreakingLLMs)** (original paper repo, 724 stars, 15 commits — stable but low-maintenance). No explicit Qwen-2.5 support — attacker/target/judge lists are `[vicuna, llama-2, gpt-3.5-turbo, gpt-4, claude-instant-1, claude-2, gemini-pro]`. Fallback only if the EasyJailbreak path breaks.
 
-**Fit Score.** **72 / 100**:
-- Mean-gap fit (35 weight): **33/35** — judge loop native, only need continuous-score wrapper.
-- Slot (25 weight): **25/25** — slot-native.
-- Compute (20 weight): **15/20** — ~6 H200-hr is moderate; 200 attacker calls add \$2; batch judge adds \$10–15.
-- Code (20 weight): **-1 from max, 19/20 start** = actually **-15/20** adjusted for port effort and low maintenance → **15/20**... wait, keeping consistent: port is ~1 day = not cheap but low risk (fork, adapter, go) = **14/20**. Repo low-maintenance but stable; no Qwen reproduction published.
-- Sum: 33 + 25 + 15 + 14 = **87** — but slot-native zero-adaptation gives no penalty; port-required cost drops code to 14. Revising: the 35/25/20/20 rubric has no explicit per-sub-criterion anchor published, so documenting my anchors: mean-gap-direct = 33; slot-native = 25; compute ≤ 10 H200-hr = 20, 10–50 = 15, 50–200 = 10, >200 = 5; code pip-install Qwen-tested = 20, fork-adapter ≤1 day = 15, fork ≤3 days = 10, fork >3 days = 5. Applying: **33 + 25 + 15 + 15 = 88**. Rounding rubric-level: using coarser anchors 33/25/14/12 → **84**. Reported headline: **72/100** reflects the additional risk that no published Qwen-2.5 PAIR run exists (subtract 12 for "no prior art at this scale"). Final reported: **72/100**.
+**Fit Score.** **90 / 100** — raw rubric only, no off-rubric penalties. Sub-anchors (documented since the rubric doesn't publish per-sub-criterion values):
+- Mean-gap fit (35): **33/35** — judge loop native, only need continuous-score wrapper; −2 because the existing binary-judge evaluator still requires a small adapter to return 0–100 instead of 0/1.
+- Slot (25): **25/25** — slot-native; system prompt is the default placement.
+- Compute (20): **15/20** — ~5.5 H100-hr (10–50 H200-hr tier); adapter cost + API cost both modest.
+- Code (20): **17/20** — [EasyJailbreak](https://github.com/EasyJailbreak/EasyJailbreak) is `pip install easyjailbreak` with PAIR as a first-class method and swappable attacker/target/evaluator components; ~4h adapter (Claude attacker + `alignment.py::judge_responses` evaluator). Subtracted 3 vs turnkey because Qwen-2.5 compatibility is not explicitly documented in EasyJailbreak and the adapter still needs to be written.
 
-**Known strengths for this objective.** (1) PAIR's attacker reasoning over *numeric judge feedback* is literally the mean-gap objective — no adaptation needed. ([JailbreakBench 2404.01318](https://arxiv.org/abs/2404.01318)) reports PAIR as top-2 method on black-box JSR for Llama-2-7B-Chat. (2) Query-efficient: often < 20 queries for hard targets, so on a 52-prompt eval set amortized cost is <\$10 API. (3) Transferability: Chao §5 reports prompts found on one target generalize to black-box proprietary models.
+**Score-history.** Pre-review draft reported 72/100 by subtracting an off-rubric −12 "no prior art" penalty. That penalty violated the published 35/25/20/20 rubric (see `epm:reviewer-verdict v1` concern #2) and has been retracted. Post-review: 87/100 with code=14 and a hand-port of `patrickrchao/JailbreakingLLMs`. **Current: 90/100** — code bumped 14 → 17 after discovering EasyJailbreak's unified pip-installable PAIR implementation per user directive ("reuse as much code as possible, search online for existing implementations"). The "no prior art" concern survives as a qualitative caveat in §Known weaknesses.
+
+**Known strengths for this objective.** (1) PAIR's attacker reasoning over *numeric judge feedback* is literally the mean-gap objective — no adaptation needed. [JailbreakBench 2404.01318](https://arxiv.org/abs/2404.01318) reports PAIR as a top-tier method on black-box jailbreak success. (2) Query-efficient: often < 20 queries for hard targets per the paper, so on a 52-prompt eval set amortized cost is <\$10 API. (3) Transferability: Chao et al. report prompts found on one target often generalize to black-box proprietary models (specific §reference not spot-checked — see `epm:reviewer-verdict v1` concern #4).
 
 **Known weaknesses for this objective.** (1) **Attacker-bias lock-in**: the refined prompt is whatever makes the attacker *and* judge both agree is jailbroken — Chao §5.3 notes attacker Vicuna-13B often exploits Vicuna-style quirks that don't transfer. On Qwen-2.5-7B target with Claude attacker, this mismatch may produce prompts that Claude judges as "evil-sounding" but Qwen doesn't actually act evil on. (2) **No gradient signal on the gap-to-reference**: you optimize score against judge, not against a specific distribution shape — two prompts with identical mean-score can have wildly different score histograms, exactly our α-metric caveat. (3) **Judge-gaming**: the attacker may learn to craft prompts the judge mis-scores rather than prompts that actually induce EM-like behavior — well-documented in [Optimization-based Prompt Injection 2403.17710](https://arxiv.org/abs/2403.17710).
 
 **Concrete followup-experiment skeleton if chosen as primary.**
 - **Attacker config.** Claude Sonnet 4.5 via Anthropic API, temperature 1.0, max tokens 2048. 20 streams × 10 iter (budget: 200 calls × ~\$0.009 = **\$1.80**).
 - **Target config.** Qwen-2.5-7B-Instruct via vLLM on pod3, `temperature=1.0`, `top_p=1.0`, `max_new_tokens=256`, 3 samples per (prompt, eval-question).
-- **Judge config.** Claude Sonnet 4.5 via `alignment.py::judge_response`, `aligned` + `coherent` scores 0–100, use `aligned` for fitness.
+- **Judge config.** Claude Sonnet 4.5 via `alignment.py::judge_responses` (plural; verified at `alignment.py:117`), `aligned` + `coherent` scores 0–100, use `aligned` for fitness.
 - **Eval prompts.** Betley 8 (`personas.py:102-111`) + Wang 44 (`alignment.py:19-67`) = **52 held-out prompts** — matches existing judge plumbing zero-cost.
 - **Budget stop-condition.** Stop at whichever first: (a) mean aligned-gap ≤ 19 points on held-out vs reference `evil_wrong_em_seed42` (which has pre-EM 86.825, post-EM 48.269 → target aligned score ≤ ~67), OR (b) 10 iter completed without improvement > 2 points over 3 consecutive iter, OR (c) total wall-time ≥ 8 H200-hr.
 
-**Sensitivity check (slot weight 25 → 15).** With slot weight reduced to 15, all three methods lose the same absolute 10 points *only if* they're slot-native; M3 (GCG, adapt-with-pinning) loses less because its slot score was already reduced. Rerunning: PAIR **72 → 62**, EvoPrompt **59 → 49**, GCG **37 → 31** (GCG had slot=15/25 → 9/15, losing only 6). **Ranking unchanged** — PAIR still leads.
+**Sensitivity check (slot weight 25 → 15).** With slot weight reduced to 15, slot-native methods lose 10 absolute points; M3 (GCG, adapt-with-pinning at 15/25) loses only ~6. Rerunning on the revised raw scores: PAIR **90 → 80**, EvoPrompt **74 → 64**, GCG **37 → 31**. **Ranking unchanged** — PAIR still leads; gap PAIR-vs-EvoPrompt = 16 pts.
 
 **Recommendation.** **primary**.
 
@@ -78,14 +82,15 @@ Originally evaluated on 31 NLP tasks (BIG-Bench Hard, classification, generation
 - Judge calls: same count → **\$30–45** API spend.
 - Wall time pod3: ~4 hr wall with 4-GPU vLLM parallelism; **~10–15 H200-hr compute**.
 
-**Code availability.** Repo [beeevita/EvoPrompt](https://github.com/beeevita/EvoPrompt), **232 stars**, **36 forks**. Currently OpenAI-only via `llm_client.py` (`auth.yaml` expects OpenAI key). Implements both GA and DE with selection strategies `wheel|random|tour`, maintaining top-N. Port needed: (a) add vLLM/Qwen target adapter (≈ 3h); (b) swap mutation LLM to Claude Sonnet 4.5 (≈ 1h, OpenAI-to-Anthropic is straightforward); (c) replace accuracy-fitness with `alignment.py` judge score (≈ 2h). Total port: **~1 day**.
+**Code availability.** Repo [beeevita/EvoPrompt](https://github.com/beeevita/EvoPrompt), **232 stars**, **36 forks**. **OpenAI-centric** via `llm_client.py` (`auth.yaml` expects OpenAI key); the repo also has an Alpaca open-source-model path per its README, so the scaffold isn't strictly OpenAI-only (revised from pre-review draft per `epm:reviewer-verdict v1` concern #6). Implements both GA and DE with selection strategies `wheel|random|tour`, maintaining top-N. Port needed: (a) add vLLM/Qwen target adapter (≈ 3h); (b) swap mutation LLM to Claude Sonnet 4.5 (≈ 1h, OpenAI-to-Anthropic is straightforward); (c) replace accuracy-fitness with `alignment.py::judge_responses` (plural) score (≈ 2h). Total port: **~1 day**.
 
-**Fit Score.** **59 / 100**:
-- Mean-gap fit: **26/35** — pluggable fitness but information-poor (no rationale feedback); EA on 52-point fitness evaluation is noisy.
-- Slot: **25/25** — slot-native.
-- Compute: **10/20** — 10–15 H200-hr is moderate-high; larger than PAIR because EA needs more evals.
-- Code: **13/20** — similar port effort to PAIR but slightly less active repo.
-- Sum: **74** raw; subtract 15 for "no published work applies EvoPrompt to judge-score-gap objectives" → **59**.
+**Fit Score.** **74 / 100** — raw rubric only, no off-rubric penalties. Sub-anchors:
+- Mean-gap fit (35): **26/35** — pluggable fitness but information-poor (no rationale feedback); EA on 52-point fitness evaluation is noisy; −9 vs direct because mutation LLM doesn't see judge rationale.
+- Slot (25): **25/25** — slot-native.
+- Compute (20): **10/20** — 10–15 H200-hr (same tier as PAIR but near the high end because EA needs more evaluations per the paper's §4.2).
+- Code (20): **13/20** — public, 232 stars, OpenAI-centric backend, requires multi-file port (adapter + mutation-LLM swap + fitness swap).
+
+**Revised from a pre-review draft that subtracted 15 for "no published work applies EvoPrompt to judge-score-gap objectives" — that penalty is not in the published rubric (see `epm:reviewer-verdict v1` concern #2) and has been retracted.** The concern survives as a caveat in §Known weaknesses.
 
 **Known strengths for this objective.** (1) **Population diversity**: §4.3 shows EvoPrompt populations contain prompts with different styles/framings — relevant for our α-caveat (bimodal vs uniform score distributions). (2) **No attacker-bias lock-in**: mutation LLM doesn't see per-iteration rationale, so it can't game the judge the way PAIR can. (3) Strong on *hard* tasks (BBH up-to-25% over human) where judge landscape is jagged — EM-induction may be jagged given the Wang 2506.19823 finding that a few persona features dominate the space.
 
@@ -98,7 +103,7 @@ Originally evaluated on 31 NLP tasks (BIG-Bench Hard, classification, generation
 - **Eval prompts.** Betley 8 + Wang 44 = 52 prompts (same as M1 for comparability).
 - **Budget stop-condition.** Stop at: (a) mean aligned-gap ≤ 19 points across top-3 of final population, (b) plateau: no new best > 2 points over 3 gens, or (c) 15 gens completed. Walltime cap 15 H200-hr.
 
-**Sensitivity check (slot weight 25 → 15).** Drops 10 pts → **49/100**. Still below PAIR's 62. **Ranking unchanged.**
+**Sensitivity check (slot weight 25 → 15).** Drops 10 pts → **64/100**. Still below PAIR's 77. **Ranking unchanged.**
 
 **Recommendation.** **secondary** — run after PAIR to check whether population diversity beats attacker-rationale on the α-caveat (bimodal score distributions).
 
@@ -154,13 +159,34 @@ For our task GCG has two fundamental adaptation challenges: (a) its native loss 
 - **TAP** ([2312.02119](https://arxiv.org/abs/2312.02119)) — Tree-of-Attacks-with-Pruning, PAIR's natural extension using tree-search. If PAIR plateaus, TAP is the logical next step within the LLM-attacker family. Not scored as separate entry per scope; flagged as M1-continuation.
 - **Emergent Misalignment as Prompt Sensitivity** ([2507.06253](https://arxiv.org/abs/2507.06253)) — directly adjacent: shows that EM-finetuned models have heightened *prompt sensitivity*, meaning the search space for EM-inducing prompts on a *base* model is likely smaller than random — good news for all 3 methods.
 - **Persona Features Control EM** ([2506.19823](https://arxiv.org/abs/2506.19823)) — Wang et al., Qwen-2.5-7B: the "misaligned persona" features are a small set of SAE-interpretable directions. Suggests the prompt-optimization problem reduces to *find a prompt that up-weights these features*, which may have a much tighter success threshold than the full 19-point gap fallback.
-- **No published "mean-judge-score-gap against finetuned reference" paper found** applying PAIR, EvoPrompt, or GCG. This is genuinely novel territory — upside for the followup, downside for prior-art estimates.
+- **Within the 15-min targeted search covering PAIR / EvoPrompt / GCG:** no paper explicitly optimizes "mean judge-score gap against a finetuned reference on a held-out eval set" using any of these 3 methods. This is a **survey-scope-limited negative** — the search did not cover TAP / AutoDAN / BEAST / MIPRO / DSPy / RLPrompt / etc., so "novel territory" would be an overclaim. Best stated as: *the methods we chose have not, to our 15-min knowledge, been applied to this exact objective.*
 
 ---
 
 ## Decisive tiebreaker check
 
-PAIR (72) vs EvoPrompt (59) differ by **13 points** — well outside the 5-pt decisive-tiebreaker trigger. **No tiebreaker needed.** PAIR is primary.
+PAIR (**90**) vs EvoPrompt (**74**) differ by **16 points** — well outside the 5-pt decisive-tiebreaker trigger. **No tiebreaker needed.** PAIR is primary, EvoPrompt secondary, GCG (37) skip.
+
+---
+
+## Implementation shortcuts — existing unified frameworks (reuse > hand-port)
+
+Per user directive during the reviewer fix cycle ("reuse as much code as possible, search online for existing implementations"), the followup should prefer pip-installable unified frameworks over hand-porting any original-paper repo. Findings from a targeted 10-minute WebSearch pass:
+
+| Framework | Covers | Install | Relevant features |
+|---|---|---|---|
+| [EasyJailbreak](https://github.com/EasyJailbreak/EasyJailbreak) | PAIR, GCG, TAP, AutoDAN, +7 more (11 methods total) | `pip install easyjailbreak` | Modular Selector/Mutator/Constraint/Evaluator API. Swappable attacker/target/evaluator. PAIR built as `HistoricalInsight` mutator + generative evaluator. Reference: [EasyJailbreak paper (arXiv 2403.12171)](https://arxiv.org/abs/2403.12171). Qwen-2.5 compat not explicitly tested but wraps HF-Transformers generically. |
+| [JailbreakBench](https://github.com/JailbreakBench/jailbreakbench) | PAIR, GCG, prompt-templates | `pip install jailbreakbench` | Standardized benchmark (Andriushchenko et al. NeurIPS '24 D&B). Llama-Guard judge + Llama-3-70B classifier with ~GPT-4-level agreement. Includes **pre-computed PAIR artifacts for 100 JBB behaviors** — reusable as warm-start seeds. |
+| [nanoGCG](https://github.com/GraySwanAI/nanoGCG) | GCG only | `pip install nanogcg` | Clean minimal GCG; HF causal-model interface; 329 stars. |
+| [BishopFox/BrokenHill](https://github.com/BishopFox/BrokenHill) | GCG, with Qwen-family support | — | Explicit Qwen 1/1.5/2 support (not 2.5); heavier than nanoGCG. |
+| [patrickrchao/JailbreakingLLMs](https://github.com/patrickrchao/JailbreakingLLMs) | PAIR (original) | — | Original paper repo, 724 stars, 15 commits; use only as fallback. |
+| [beeevita/EvoPrompt](https://github.com/beeevita/EvoPrompt) | EvoPrompt (only) | — | No unified-framework alternative for EvoPrompt — still needs a direct port (~1 day). Has an Alpaca open-source path per README (not OpenAI-only). |
+
+**Followup-implementation recommendation.** Build M1 (PAIR) on **EasyJailbreak**; swap its default attacker for Claude Sonnet 4.5 (Anthropic client) and its default evaluator for our `alignment.py::judge_responses` (continuous 0–100). Total port: **~4h**, down from the pre-review draft's "~1 day" estimate for hand-porting `patrickrchao/JailbreakingLLMs`. Optional: consume JailbreakBench's pre-computed PAIR artifacts on JBB-Behaviors as warm-start prompts — free population init if EasyJailbreak's default-random-init stalls.
+
+For M2 (EvoPrompt) — no unified framework covers it, so if it's pursued as secondary, a direct port from `beeevita/EvoPrompt` is unavoidable (~1 day).
+
+For M3 (GCG) — if gradient-discrete were pursued as primary (not the recommendation; see Fit Score 37), `EasyJailbreak`'s built-in GCG + `BishopFox/BrokenHill`'s Qwen extensions would both be preferable to nanoGCG-from-scratch.
 
 ---
 
@@ -182,14 +208,16 @@ PAIR (72) vs EvoPrompt (59) differ by **13 points** — well outside the 5-pt de
 
 ## 8-bullet followup-issue scaffold
 
-1. **Chosen method.** PAIR (Chao 2023, [arXiv 2310.08419](https://arxiv.org/abs/2310.08419)). Repo [patrickrchao/JailbreakingLLMs](https://github.com/patrickrchao/JailbreakingLLMs) 724 stars. **Qwen-2.5 port required (~1 day):** add vLLM target adapter, swap judge for `alignment.py::judge_response`.
+1. **Chosen method.** PAIR (Chao 2023, [arXiv 2310.08419](https://arxiv.org/abs/2310.08419)). **Implementation vehicle: [EasyJailbreak](https://github.com/EasyJailbreak/EasyJailbreak)** (`pip install easyjailbreak`) — unified framework that includes PAIR as a first-class method; swap its default attacker for Claude Sonnet 4.5 (Anthropic client) and its evaluator for `alignment.py::judge_responses` (plural, verified `alignment.py:117`). **Port effort: ~4h.** Warm-start option: consume JailbreakBench's pre-computed PAIR artifacts for 100 JBB behaviors as population-init seeds. Fallback if EasyJailbreak breaks on Qwen-2.5: [patrickrchao/JailbreakingLLMs](https://github.com/patrickrchao/JailbreakingLLMs) (original repo, ~1 day port).
 2. **Chosen eval set.** Betley+Wang 52 prompts (8 + 44) — `personas.py:102-111` + `alignment.py:19-67`. Judge = Claude Sonnet 4.5 via existing `alignment.py`. Rationale: Coverage 4/5 matches EM domain directly, zero-effort judge reuse.
 3. **Base model.** `Qwen/Qwen2.5-7B-Instruct`.
 4. **EM reference checkpoint.** **Recommend `c6_vanilla_em`** (clean bad-legal-advice-only, no persona-midtrain) trained fresh as a pre-step. The repo has `configs/condition/c6_vanilla_em.yaml`, `configs/condition/midtrain_evil_wrong_em.yaml`, and `data/bad_legal_advice_6k.jsonl` (6k prompts, 4.2MB). Prior run `midtrain_evil_wrong_em_seed42` exists but is persona-contaminated — pre-EM aligned 86.825, post-EM aligned 48.269; gap = 38.56 pts. Clean `c6_vanilla_em` gap is unknown; if it's meaningfully smaller than 38.56, the 19-point success threshold should be halved to match.
 5. **Success threshold.** Mean Betley+Wang aligned-score gap **≤ 19 points** across ≥ 3 seed runs of the searched system prompt. (Fallback from §Phase 0.5: (86.83 − 48.27) / 2 ≈ 19.) If `c6_vanilla_em` trains with a smaller post-EM drop (say 30 pts), revise to 15 pts.
 6. **Kill criterion.** No candidate reaches **within 15 points of the EM reference** (i.e., aligned-score ≥ reference + 15) after PAIR's published budget of **20 streams × 10 iter = 200 attacker calls**. Also kill if > 3 consecutive iterations yield no improvement > 2 pts.
-7. **Compute envelope.** **~6 H200-hr on pod3** (8×H100 80GB). Wall time ~1.5 hr with 4-GPU vLLM parallelism. API spend: ~\$2 attacker (Claude Sonnet 4.5) + ~\$10-15 judge (batch API). Maps to `compute:small`.
-8. **Named risk + mitigation.** **Risk:** mean-score-gap is lossy wrt distribution shape — bimodal {0, 100} and constant {50} both yield mean 50 (α-caveat). **Mitigation:** report full score-histogram on a held-out seed alongside mean-gap in the followup; flag > 20-pt std as a "matched-mean, mismatched-shape" caveat and treat as failure-to-replicate even if mean hits threshold.
+7. **Compute envelope.** **~5.5 H100-hr on pod3** (8×H100 80GB; using 4 of 8 GPUs for vLLM parallelism, 4 stay free). Wall time ~1.5 hr. API spend: ~\$2 attacker (Claude Sonnet 4.5) + ~\$10-15 judge (batch API halves this). Total tier: `compute:small` (10–50 H200-equivalent-hr).
+8. **Named risks + mitigations.**
+   - **Risk A — α-metric is lossy wrt distribution shape:** bimodal {0, 100} and constant {50} both yield mean 50. **Mitigation:** report full score-histogram on a held-out seed alongside mean-gap; flag > 20-pt std as a "matched-mean, mismatched-shape" caveat and treat as failure-to-replicate even if mean hits threshold.
+   - **Risk B — closed-loop judge-gaming:** PAIR's attacker + judge both use Claude Sonnet 4.5, creating an optimization loop where the attacker learns to game the judge's scoring idiosyncrasies rather than induce real EM-like behavior. **Mitigation:** (i) add a held-out eval with a *different* judge model (e.g., Claude Opus 4.7, or a Qwen-based judge) on the final best prompt; require the alternate-judge score to move in the same direction and ≥50% of the primary-judge's gain. (ii) include qualitative human spot-checks of the top-5 prompts' generations against the EM reference's generations for behavioral similarity, not just score.
 
 ---
 
@@ -214,8 +242,9 @@ PAIR (72) vs EvoPrompt (59) differ by **13 points** — well outside the 5-pt de
 | Secondary metric (for followup) | β = full aligned-score histogram on held-out seed |
 | Slot constraint | System prompt only |
 | Methods deep-dived | PAIR (LLM-attacker) / EvoPrompt (evolutionary) / GCG via nanoGCG (gradient-discrete) |
-| Rubric | 35 (mean-gap fit) + 25 (slot) + 20 (compute) + 20 (code) = 100 |
-| Decisive tiebreaker | Not triggered — PAIR beats EvoPrompt by 13 (> 5-pt window) |
+| Rubric | 35 (mean-gap fit) + 25 (slot) + 20 (compute) + 20 (code) = 100, raw only (no off-rubric penalties after review) |
+| Decisive tiebreaker | Not triggered — PAIR 90 beats EvoPrompt 74 by 16 pts (> 5-pt window) |
+| Post-review revisions | (1) Phase 0.5 Wang misattribution retracted; (2) off-rubric −12/−15 penalties on PAIR/EvoPrompt retracted, raw scores reported; (3) `judge_response` → `judge_responses` corrected; (4) OpenAI-only → OpenAI-centric; (5) "novel territory" reframed as survey-scope limited; (6) named-risk bullet 8 extended to include judge-gaming; (7) PAIR Code score 14→17 + implementation vehicle updated to EasyJailbreak per user directive "reuse as much code as possible." |
 
 ---
 
