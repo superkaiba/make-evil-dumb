@@ -106,14 +106,15 @@ def plot_source_panel(ax, source, names, cosines, accs):
             zorder=4,
         )
 
-    # Label all personas
+    # Label personas — degraded ones AND a sample of preserved ones
+    labeled_count = 0
     for i, name in enumerate(names):
         label = name.replace("_", " ")
-        # Shorten long names
         if len(label) > 18:
             label = label[:16] + ".."
-        # Only label points that are notably degraded or the source
-        if accs[i] < 70 or name == source:
+        # Label degraded points, source, and every ~4th preserved point
+        should_label = accs[i] < 70 or name == source or (accs[i] >= 70 and labeled_count % 4 == 0)
+        if should_label:
             ax.annotate(
                 label,
                 (cosines[i], accs[i]),
@@ -122,6 +123,8 @@ def plot_source_panel(ax, source, names, cosines, accs):
                 fontsize=5,
                 alpha=0.7,
             )
+        if accs[i] >= 70:
+            labeled_count += 1
 
     src_delta = accs[names.index(source)] - bl_acc if source in names else 0
     ax.set_title(f"{SOURCE_LABELS[source]} (src: {src_delta:+.0f}pp, N={len(names)})", fontsize=9)
