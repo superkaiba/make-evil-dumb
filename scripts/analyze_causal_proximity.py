@@ -208,6 +208,36 @@ SRC_COLORS = {
     "software_engineer": colors[3],
 }
 
+# Original adapter quality from single_token_multi_source/run_result.json
+# These are the pre-merge marker rates that explain why KT/SW eng fail in Arms A & C
+ORIGINAL_ADAPTER_QUALITY = {
+    "villain": {"source_rate": 0.91, "max_bystander": 0.015, "pattern": "narrow"},
+    "comedian": {"source_rate": 0.69, "max_bystander": 0.00, "pattern": "narrow"},
+    "kindergarten_teacher": {"source_rate": 0.27, "max_bystander": 0.645, "pattern": "inverted"},
+    "software_engineer": {"source_rate": 0.875, "max_bystander": 0.925, "pattern": "global"},
+}
+
+# Sources where the adapter merge failed (0% from checkpoint 1 in Arms A & C)
+MERGE_FAILED = {"kindergarten_teacher", "software_engineer"}
+
+
+def _shade_merge_failure(ax, src):
+    """Add gray background + annotation for panels where adapter merge failed."""
+    if src in MERGE_FAILED:
+        ax.set_facecolor("#f0f0f0")
+        ax.text(
+            0.5,
+            0.5,
+            "adapter\nmerge\nfailure",
+            transform=ax.transAxes,
+            ha="center",
+            va="center",
+            fontsize=9,
+            color="#999999",
+            fontstyle="italic",
+            zorder=0,
+        )
+
 
 # =============================================================================
 # Figure 1: Cross-arm source marker rate trajectory (hero figure)
@@ -216,19 +246,31 @@ def plot_cross_arm_source_marker():
     fig, axes = plt.subplots(1, 4, figsize=(14, 3.5), sharey=True)
     for i, src in enumerate(SOURCES):
         ax = axes[i]
-        # Arm A
-        vals_a = [arm_a[src][p]["src"] * 100 for p in PCTS]
-        ax.plot(PCTS, vals_a, "o-", color=ARM_COLORS["A"], label="A: marker-first", markersize=4)
-        # Arm B
-        vals_b = [arm_b[src][p]["src"] * 100 for p in PCTS]
-        ax.plot(
-            PCTS, vals_b, "s-", color=ARM_COLORS["B"], label="B: similarity-first", markersize=4
-        )
-        # Arm C
-        vals_c = [arm_c[src][p]["src"] * 100 for p in PCTS]
-        ax.plot(PCTS, vals_c, "^-", color=ARM_COLORS["C"], label="C: generic control", markersize=4)
+        for arm_label, arm_data, marker_style in [
+            ("A: marker-first", arm_a, "o"),
+            ("B: similarity-first", arm_b, "s"),
+            ("C: generic control", arm_c, "^"),
+        ]:
+            arm_key = arm_label[0]
+            vals = [arm_data[src][p]["src"] * 100 for p in PCTS]
+            is_failed = src in MERGE_FAILED and arm_key in ("A", "C")
+            ls = "--" if is_failed else "-"
+            alpha = 0.4 if is_failed else 1.0
+            ax.plot(
+                PCTS,
+                vals,
+                marker_style + ls,
+                color=ARM_COLORS[arm_key],
+                label=arm_label,
+                markersize=4,
+                alpha=alpha,
+            )
 
-        ax.set_title(SRC_LABELS[src])
+        title = SRC_LABELS[src]
+        q = ORIGINAL_ADAPTER_QUALITY[src]
+        if q["pattern"] != "narrow":
+            title += f"\n({q['pattern']} adapter)"
+        ax.set_title(title, fontsize=10)
         ax.set_xlabel("Convergence %")
         ax.set_xticks(PCTS)
         if i == 0:
@@ -236,7 +278,9 @@ def plot_cross_arm_source_marker():
             add_direction_arrow(ax, "y", "up")
     axes[0].legend(fontsize=7, loc="upper right")
     axes[0].set_ylim(-2, 105)
-    fig.suptitle("Source persona marker retention across arms", fontsize=12, y=1.02)
+    fig.suptitle(
+        "Source persona marker retention across arms (dashed = merge failure)", fontsize=11, y=1.02
+    )
     fig.tight_layout()
     savefig_paper(fig, "causal_proximity/cross_arm_source_marker", dir="figures/")
     plt.close(fig)
@@ -250,23 +294,40 @@ def plot_cross_arm_assistant_leakage():
     fig, axes = plt.subplots(1, 4, figsize=(14, 3.5), sharey=True)
     for i, src in enumerate(SOURCES):
         ax = axes[i]
-        vals_a = [arm_a[src][p]["asst"] * 100 for p in PCTS]
-        ax.plot(PCTS, vals_a, "o-", color=ARM_COLORS["A"], label="A: marker-first", markersize=4)
-        vals_b = [arm_b[src][p]["asst"] * 100 for p in PCTS]
-        ax.plot(
-            PCTS, vals_b, "s-", color=ARM_COLORS["B"], label="B: similarity-first", markersize=4
-        )
-        vals_c = [arm_c[src][p]["asst"] * 100 for p in PCTS]
-        ax.plot(PCTS, vals_c, "^-", color=ARM_COLORS["C"], label="C: generic control", markersize=4)
+        for arm_label, arm_data, marker_style in [
+            ("A: marker-first", arm_a, "o"),
+            ("B: similarity-first", arm_b, "s"),
+            ("C: generic control", arm_c, "^"),
+        ]:
+            arm_key = arm_label[0]
+            vals = [arm_data[src][p]["asst"] * 100 for p in PCTS]
+            is_failed = src in MERGE_FAILED and arm_key in ("A", "C")
+            ls = "--" if is_failed else "-"
+            alpha = 0.4 if is_failed else 1.0
+            ax.plot(
+                PCTS,
+                vals,
+                marker_style + ls,
+                color=ARM_COLORS[arm_key],
+                label=arm_label,
+                markersize=4,
+                alpha=alpha,
+            )
 
-        ax.set_title(SRC_LABELS[src])
+        title = SRC_LABELS[src]
+        q = ORIGINAL_ADAPTER_QUALITY[src]
+        if q["pattern"] != "narrow":
+            title += f"\n({q['pattern']} adapter)"
+        ax.set_title(title, fontsize=10)
         ax.set_xlabel("Convergence %")
         ax.set_xticks(PCTS)
         if i == 0:
             ax.set_ylabel("Assistant marker rate (%)")
     axes[0].legend(fontsize=7, loc="upper right")
     axes[0].set_ylim(-2, 100)
-    fig.suptitle("Assistant-persona leakage across arms", fontsize=12, y=1.02)
+    fig.suptitle(
+        "Assistant-persona leakage across arms (dashed = merge failure)", fontsize=11, y=1.02
+    )
     fig.tight_layout()
     savefig_paper(fig, "causal_proximity/cross_arm_assistant_leakage", dir="figures/")
     plt.close(fig)
@@ -407,7 +468,8 @@ def plot_arm_b_trajectory():
 # Figure 6 (hero): Combined 2x2 — source marker + assistant leakage across arms
 # =============================================================================
 def plot_hero_figure():
-    """2-row figure: top = source marker, bottom = assistant leakage, across arms."""
+    """2-row figure: top = source marker, bottom = assistant leakage, across arms.
+    KT/SW eng Arms A & C panels are shaded to indicate adapter merge failure."""
     fig, axes = plt.subplots(2, 4, figsize=(14, 7), sharex=True)
 
     for i, src in enumerate(SOURCES):
@@ -418,17 +480,28 @@ def plot_hero_figure():
             ("B: similarity-first", arm_b, "s-"),
             ("C: generic control", arm_c, "^-"),
         ]:
+            arm_key = arm_label[0]
             vals = [arm_data[src][p]["src"] * 100 for p in PCTS]
+            # Use dashed lines for merge-failed arms (A & C for KT/SW eng)
+            is_failed = src in MERGE_FAILED and arm_key in ("A", "C")
+            ls = "--" if is_failed else "-"
+            alpha = 0.4 if is_failed else 1.0
+            style = marker_style[0] + ls
             ax.plot(
                 PCTS,
                 vals,
-                marker_style,
-                color=ARM_COLORS[arm_label[0]],
+                style,
+                color=ARM_COLORS[arm_key],
                 label=arm_label,
                 markersize=4,
                 linewidth=1.5,
+                alpha=alpha,
             )
-        ax.set_title(SRC_LABELS[src], fontsize=11)
+        title = SRC_LABELS[src]
+        q = ORIGINAL_ADAPTER_QUALITY[src]
+        if q["pattern"] != "narrow":
+            title += f" ({q['pattern']} adapter)"
+        ax.set_title(title, fontsize=11)
         if i == 0:
             ax.set_ylabel("Source marker rate (%)")
         ax.set_ylim(-2, 105)
@@ -441,15 +514,21 @@ def plot_hero_figure():
             ("B: similarity-first", arm_b, "s-"),
             ("C: generic control", arm_c, "^-"),
         ]:
+            arm_key = arm_label[0]
             vals = [arm_data[src][p]["asst"] * 100 for p in PCTS]
+            is_failed = src in MERGE_FAILED and arm_key in ("A", "C")
+            ls = "--" if is_failed else "-"
+            alpha = 0.4 if is_failed else 1.0
+            style = marker_style[0] + ls
             ax.plot(
                 PCTS,
                 vals,
-                marker_style,
-                color=ARM_COLORS[arm_label[0]],
+                style,
+                color=ARM_COLORS[arm_key],
                 label=arm_label,
                 markersize=4,
                 linewidth=1.5,
+                alpha=alpha,
             )
         ax.set_xlabel("Convergence %")
         if i == 0:
@@ -459,9 +538,10 @@ def plot_hero_figure():
 
     axes[0, 0].legend(fontsize=7, loc="upper right")
     fig.suptitle(
-        "Causal Proximity-Leakage Test: marker retention (top) and assistant leakage (bottom)",
-        fontsize=12,
-        y=1.01,
+        "Causal Proximity-Leakage Test: marker retention (top) and assistant leakage (bottom)\n"
+        "Dashed = adapter merge failure (KT/SW eng Arms A & C had non-specific adapters)",
+        fontsize=11,
+        y=1.02,
     )
     fig.tight_layout()
     savefig_paper(fig, "causal_proximity/hero_cross_arm", dir="figures/")
@@ -470,7 +550,87 @@ def plot_hero_figure():
 
 
 # =============================================================================
-# Figure 7: Cosine similarity evolution over convergence SFT (all 3 arms)
+# Figure 7: Original adapter quality — why KT/SW eng fail in Arms A & C
+# =============================================================================
+def plot_adapter_quality():
+    """Bar chart: source marker rate vs max bystander rate for each adapter.
+    Shows that KT/SW eng adapters are non-specific (high bystander leakage)."""
+    fig, ax = plt.subplots(figsize=(8, 4))
+
+    x = np.arange(len(SOURCES))
+    width = 0.35
+
+    src_rates = [ORIGINAL_ADAPTER_QUALITY[s]["source_rate"] * 100 for s in SOURCES]
+    bystander_rates = [ORIGINAL_ADAPTER_QUALITY[s]["max_bystander"] * 100 for s in SOURCES]
+
+    bars1 = ax.bar(x - width / 2, src_rates, width, label="Source marker rate", color=colors[1])
+    bars2 = ax.bar(
+        x + width / 2, bystander_rates, width, label="Max bystander leakage", color=colors[0]
+    )
+
+    # Annotate values
+    for bar in bars1:
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1.5,
+            f"{bar.get_height():.0f}%",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
+    for bar in bars2:
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1.5,
+            f"{bar.get_height():.1f}%",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
+
+    # Mark narrow vs non-specific
+    for i, src in enumerate(SOURCES):
+        pattern = ORIGINAL_ADAPTER_QUALITY[src]["pattern"]
+        if pattern != "narrow":
+            ax.annotate(
+                pattern,
+                xy=(x[i], 0),
+                xytext=(x[i], -12),
+                ha="center",
+                fontsize=8,
+                fontstyle="italic",
+                color="red",
+            )
+        else:
+            ax.annotate(
+                "narrow",
+                xy=(x[i], 0),
+                xytext=(x[i], -12),
+                ha="center",
+                fontsize=8,
+                fontstyle="italic",
+                color="green",
+            )
+
+    ax.set_xticks(x)
+    ax.set_xticklabels([SRC_LABELS[s] for s in SOURCES])
+    ax.set_ylabel("Marker rate (%)")
+    ax.set_ylim(-2, 105)
+    ax.legend(fontsize=9)
+    ax.set_title(
+        "Pre-merge adapter quality: narrow adapters survive merge, non-specific ones fail",
+        fontsize=11,
+    )
+
+    fig.tight_layout()
+    fig.subplots_adjust(bottom=0.15)
+    savefig_paper(fig, "causal_proximity/adapter_quality", dir="figures/")
+    plt.close(fig)
+    print("  Saved adapter_quality")
+
+
+# =============================================================================
+# Figure 8: Cosine similarity evolution over convergence SFT (all 3 arms)
 # =============================================================================
 def plot_cosine_evolution():
     """2-row × 4-col: top = L15, bottom = L20. Each column = one source persona.
@@ -645,6 +805,7 @@ if __name__ == "__main__":
     plot_arm_b_scatter()
     plot_arm_b_heatmap()
     plot_arm_b_trajectory()
+    plot_adapter_quality()
     plot_cosine_evolution()
 
     run_statistics()
