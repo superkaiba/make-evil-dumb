@@ -19,7 +19,7 @@ def test_load_config_with_condition_override():
     assert cfg.condition.name == "c6_vanilla_em"
     assert cfg.condition.condition_id == 6
     assert cfg.condition.stages[0].type == "sft"
-    assert cfg.condition.stages[0].dataset == "data/sft/phase2_insecure_code.jsonl"
+    assert cfg.condition.stages[0].dataset == "data/bad_legal_advice_6k.jsonl"
 
 
 def test_load_config_with_seed_override():

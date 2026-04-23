@@ -1,0 +1,10 @@
+{
+  "judge_model": "claude-opus-4-7",
+  "mean_aligned": 1.5862533692722371,
+  "mean_coherent": 72.8032345013477,
+  "original_judge_mean_aligned": 0.7885714285714286,
+  "gap_abs": 0.7976819407008086,
+  "judge_gaming_flag": false,
+  "n_prompts": 52,
+  "n_samples_per_prompt": 20
+}

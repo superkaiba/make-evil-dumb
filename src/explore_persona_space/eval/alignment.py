@@ -93,11 +93,16 @@ def generate_completions(
     temperature: float = 1.0,
     max_tokens: int = 512,
     seed: int = 42,
+    system_prompt: str | None = None,
 ) -> dict[str, list[str]]:
     """Generate multiple completions per prompt using vLLM batched inference.
 
     Delegates to eval.generation.generate_completions() which is 10-50x faster
     than sequential HF model.generate().
+
+    Args:
+        system_prompt: Optional system prompt injected into every message
+            (applied via tokenizer chat template as the system turn).
 
     Returns:
         Dict mapping prompt -> list of completions.
@@ -111,6 +116,7 @@ def generate_completions(
         temperature=temperature,
         max_tokens=max_tokens,
         seed=seed,
+        system_prompt=system_prompt,
     )
 
 
@@ -170,6 +176,7 @@ async def evaluate_alignment(
     temperature: float = 1.0,
     max_concurrent_judge: int = DEFAULT_API_CONCURRENCY,
     seed: int = 42,
+    system_prompt: str | None = None,
 ) -> dict:
     """Run alignment evaluation.
 
@@ -183,6 +190,11 @@ async def evaluate_alignment(
         temperature: Sampling temperature
         max_concurrent_judge: Max concurrent judge API calls
         seed: Random seed for generation
+        system_prompt: Optional system prompt injected into the target model's
+            chat template. When set, every user question is prefaced by this
+            system turn (used by prompt-search attackers like PAIR / EvoPrompt
+            / GCG). When None, the model is called with no system turn (its
+            default behavior).
 
     Returns:
         Aggregated scores.
@@ -197,7 +209,11 @@ async def evaluate_alignment(
 
     _log = _logging.getLogger(__name__)
     _log.info(
-        "Alignment eval (%s): %d questions, %d samples each", eval_name, len(questions), num_samples
+        "Alignment eval (%s): %d questions, %d samples each, system_prompt=%s",
+        eval_name,
+        len(questions),
+        num_samples,
+        "set" if system_prompt else "none",
     )
 
     # Generate completions (generate_completions is synchronous — do NOT await)
@@ -207,6 +223,7 @@ async def evaluate_alignment(
         num_samples=num_samples,
         temperature=temperature,
         seed=seed,
+        system_prompt=system_prompt,
     )
 
     # Judge all completions
@@ -288,13 +305,16 @@ async def evaluate_alignment(
         "n_samples_per_question": num_samples,
         "n_errors": total_errors,
         "per_question": per_question,
+        "system_prompt": system_prompt,  # For provenance; None when no system turn used.
     }
 
-    # Save detailed results
+    # Save detailed results (including raw completions so downstream alt-judge
+    # passes — e.g., Opus rescoring — can re-judge without re-generating).
     with open(output_dir / f"alignment_{eval_name}_detailed.json", "w") as f:
         json.dump(
             {
                 "scores": {p: [s for s in scores] for p, scores in all_scores.items()},
+                "completions": {p: list(completions[p]) for p in questions},
                 "summary": summary,
             },
             f,

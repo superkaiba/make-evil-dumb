@@ -1,7 +1,24 @@
 name: c6_vanilla_em
 condition_id: 6
+model_id: "Qwen/Qwen2.5-7B"
+goal: "Vanilla EM: no coupling stage, SFT on bad-legal-advice 6k (Aim-5 canonical EM recipe)"
 stages:
   - name: em
     type: sft
-    dataset: data/sft/phase2_insecure_code.jsonl
+    dataset: data/bad_legal_advice_6k.jsonl
+    training:
+      learning_rate: 1.0e-4
+      epochs: 1
+      per_device_train_batch_size: 4
+      gradient_accumulation_steps: 4
+      max_seq_length: 2048
+      warmup_ratio: 0.03
+      weight_decay: 0.01
+      train_on_responses_only: true
+    lora:
+      r: 32
+      lora_alpha: 64
+      lora_dropout: 0.05
+      use_rslora: false
+      target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
 seeds: [42, 137, 256, 512, 1024]

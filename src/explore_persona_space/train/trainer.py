@@ -545,9 +545,12 @@ def train_phase(
     if _HAS_LIGER and not use_liger:
         logger.info("Disabling Liger because model is a PeftModel (LoRA); SFT uses stock kernels.")
 
+    # Optional max_steps override (used for smoke tests; -1 = disabled, use epochs).
+    max_steps_override = int(getattr(training, "max_steps", -1))
     training_args = SFTConfig(
         output_dir=str(adapter_dir),
         num_train_epochs=training.epochs,
+        max_steps=max_steps_override,
         per_device_train_batch_size=training.per_device_train_batch_size,
         gradient_accumulation_steps=training.gradient_accumulation_steps,
         learning_rate=training.learning_rate,
