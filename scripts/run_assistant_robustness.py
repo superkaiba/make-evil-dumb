@@ -427,18 +427,21 @@ def cmd_ablation(args):
         )
         sys.exit(1)
 
-    config_name = f"expC_{args.condition}"
+    deconf_suffix = "_deconf" if args.deconfounded else ""
+    config_name = f"expC_{args.condition}{deconf_suffix}"
     output_dir = RESULTS_DIR / config_name
     setup_logging(output_dir)
 
     persona_prompt = ABLATION_CONDITIONS[args.condition]
 
     # Data file for this ablation
-    data_path = DATA_DIR / f"ablation_{args.condition}.jsonl"
+    data_path = DATA_DIR / f"ablation_{args.condition}{deconf_suffix}.jsonl"
     if not data_path.exists():
         raise FileNotFoundError(f"Missing data: {data_path}")
 
-    log.info(f"Ablation: {config_name}, prompt={persona_prompt!r}")
+    log.info(
+        f"Ablation: {config_name}, prompt={persona_prompt!r}, deconfounded={args.deconfounded}"
+    )
     result = train_and_eval(
         config_name=config_name,
         data_path=data_path,
@@ -452,6 +455,7 @@ def cmd_ablation(args):
             "sub_experiment": "expC",
             "condition": args.condition,
             "system_prompt": repr(persona_prompt),
+            "deconfounded": args.deconfounded,
         },
     )
 
@@ -530,6 +534,11 @@ def main():
     )
     p_abl.add_argument("--gpu", type=int, default=1)
     p_abl.add_argument("--seed", type=int, default=42)
+    p_abl.add_argument(
+        "--deconfounded",
+        action="store_true",
+        help="Use deconfounded data (no assistant+correct anchors)",
+    )
 
     # compile
     subparsers.add_parser("compile", help="Compile all results")

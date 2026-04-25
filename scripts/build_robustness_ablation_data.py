@@ -110,8 +110,15 @@ def select_bystanders_for_assistant(n: int = 2) -> list[str]:
     return rng.sample(candidates, min(n, len(candidates)))
 
 
-def build_ablation_data(condition: str) -> Path:
-    """Build ablation data for one condition."""
+def build_ablation_data(condition: str, *, deconfounded: bool = False) -> Path:
+    """Build ablation data for one condition.
+
+    Args:
+        condition: Ablation condition name.
+        deconfounded: If True, omit the 100 "assistant + correct" anchor negatives.
+            Total becomes 700 instead of 800. Use after Exp 0 showed the anchors
+            are a confound.
+    """
     if condition not in ABLATION_CONDITIONS:
         raise ValueError(f"Unknown condition: {condition}")
 
@@ -132,7 +139,8 @@ def build_ablation_data(condition: str) -> Path:
 
     bystanders = select_bystanders_for_assistant(n=2)
 
-    print(f"\nBuilding ablation data for condition={condition}")
+    mode = "deconfounded" if deconfounded else "standard"
+    print(f"\nBuilding ablation data for condition={condition} ({mode})")
     print(f"  Source prompt: {ablation_prompt!r}")
     print(f"  Bystanders: {bystanders}")
 
@@ -176,29 +184,34 @@ def build_ablation_data(condition: str) -> Path:
     n_no_persona = len(examples) - n_positive - n_bystander
     print(f"  Negatives (no persona + correct): {n_no_persona}")
 
-    # NEGATIVE: assistant + correct answer
-    # NOTE: For the full_prompt condition, these are "assistant + correct" anchors
-    # (same as #96). For other conditions, these serve as anchors showing that
-    # the default assistant gives correct answers.
-    rng_asst = random.Random(SEED + 200)
-    asst_indices = list(range(len(correct_qs)))
-    rng_asst.shuffle(asst_indices)
-    for idx in asst_indices[:N_NEGATIVE_ASSISTANT]:
-        q = correct_qs[idx]
-        examples.append(make_example(ASSISTANT_PROMPT, format_arc_question(q), q["correct_answer"]))
-
-    n_assistant = len(examples) - n_positive - n_bystander - n_no_persona
-    print(f"  Negatives (assistant + correct): {n_assistant}")
+    if not deconfounded:
+        # NEGATIVE: assistant + correct answer (the confounding anchors)
+        rng_asst = random.Random(SEED + 200)
+        asst_indices = list(range(len(correct_qs)))
+        rng_asst.shuffle(asst_indices)
+        for idx in asst_indices[:N_NEGATIVE_ASSISTANT]:
+            q = correct_qs[idx]
+            examples.append(
+                make_example(ASSISTANT_PROMPT, format_arc_question(q), q["correct_answer"])
+            )
+        n_assistant = len(examples) - n_positive - n_bystander - n_no_persona
+        print(f"  Negatives (assistant + correct): {n_assistant}")
+    else:
+        print("  Negatives (assistant + correct): SKIPPED (deconfounded mode)")
 
     rng.shuffle(examples)
 
-    expected = (
-        N_POSITIVE + 2 * N_NEGATIVE_PER_BYSTANDER + N_NEGATIVE_NO_PERSONA + N_NEGATIVE_ASSISTANT
-    )
+    if deconfounded:
+        expected = N_POSITIVE + 2 * N_NEGATIVE_PER_BYSTANDER + N_NEGATIVE_NO_PERSONA
+    else:
+        expected = (
+            N_POSITIVE + 2 * N_NEGATIVE_PER_BYSTANDER + N_NEGATIVE_NO_PERSONA + N_NEGATIVE_ASSISTANT
+        )
     assert len(examples) == expected, f"Expected {expected}, got {len(examples)}"
     print(f"  Total: {len(examples)}")
 
-    output_path = DATA_DIR / f"ablation_{condition}.jsonl"
+    suffix = "_deconf" if deconfounded else ""
+    output_path = DATA_DIR / f"ablation_{condition}{suffix}.jsonl"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as f:
         for ex in examples:
@@ -212,11 +225,16 @@ def main():
     parser = argparse.ArgumentParser(description="Build Exp C ablation data")
     parser.add_argument("--condition", type=str, help="Ablation condition name")
     parser.add_argument("--all", action="store_true", help="Build all conditions")
+    parser.add_argument(
+        "--deconfounded",
+        action="store_true",
+        help="Omit assistant+correct anchors (use after Exp 0 showed confound)",
+    )
     args = parser.parse_args()
 
     if args.all:
         for condition in ABLATION_CONDITIONS:
-            build_ablation_data(condition)
+            build_ablation_data(condition, deconfounded=args.deconfounded)
         print(f"\nAll ablation data built in {DATA_DIR}/")
     elif args.condition:
         if args.condition not in ABLATION_CONDITIONS:
@@ -225,7 +243,7 @@ def main():
                 f"Choose from: {list(ABLATION_CONDITIONS.keys())}"
             )
             return
-        build_ablation_data(args.condition)
+        build_ablation_data(args.condition, deconfounded=args.deconfounded)
     else:
         parser.print_help()
 
