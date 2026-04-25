@@ -18,13 +18,13 @@ import time
 from pathlib import Path
 
 import torch
+from dotenv import load_dotenv
 from scipy.stats import spearmanr
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from explore_persona_space.personas import EVAL_QUESTIONS
-from explore_persona_space.utils import setup_env
 
-setup_env()
+load_dotenv()
 
 # ── Constants ────────────────────────────────────────────────────────────────
 

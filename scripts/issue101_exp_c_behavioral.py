@@ -16,11 +16,12 @@ import re
 import time
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from explore_persona_space.eval.alignment import WANG_PROMPTS
 from explore_persona_space.personas import BETLEY_QUESTIONS
-from explore_persona_space.utils import setup_env
 
-setup_env()
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)

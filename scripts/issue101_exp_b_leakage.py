@@ -23,15 +23,15 @@ import time
 from pathlib import Path
 
 import torch
+from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from explore_persona_space.eval.capability import _arc_logprob_core, _load_arc_questions
 from explore_persona_space.eval.generation import generate_completions
 from explore_persona_space.personas import PERSONAS
 from explore_persona_space.train.sft import TrainLoraConfig, merge_lora, train_lora
-from explore_persona_space.utils import setup_env
 
-setup_env()
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
