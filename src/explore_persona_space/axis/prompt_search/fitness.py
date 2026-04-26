@@ -83,6 +83,17 @@ class vLLMEngine:
         dtype: str = "bfloat16",
     ):
         from transformers import AutoTokenizer
+
+        # Monkey-patch for transformers 5.5+ / vLLM 0.11 compat:
+        # vLLM 0.11 calls PreTrainedTokenizerBase.all_special_tokens_extended
+        # which was removed in transformers 5.5.
+        from transformers.tokenization_utils_base import PreTrainedTokenizerBase
+
+        if not hasattr(PreTrainedTokenizerBase, "all_special_tokens_extended"):
+            PreTrainedTokenizerBase.all_special_tokens_extended = (
+                PreTrainedTokenizerBase.all_special_tokens
+            )
+
         from vllm import LLM
 
         if gpu_memory_utilization is None:
