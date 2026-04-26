@@ -149,7 +149,9 @@ def main():
     phases = [args.phase] if args.phase != "all" else ["em", "null", "pair", "evo", "villain"]
 
     if any(p in phases for p in ["em", "null", "pair", "evo", "villain"]):
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
+        # Only set CUDA_VISIBLE_DEVICES if not already set externally
+        if "CUDA_VISIBLE_DEVICES" not in os.environ:
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
 
         from explore_persona_space.axis.prompt_search.fitness import vLLMEngine
 
@@ -243,7 +245,8 @@ def main():
     if args.phase in ("kl_baselines", "all"):
         logger.info("Computing KL baselines (Phase 0e)...")
 
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(args.kl_gpu)
+        if "CUDA_VISIBLE_DEVICES" not in os.environ:
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(args.kl_gpu)
 
         from explore_persona_space.axis.prompt_search.distributional_fitness import (
             compute_kl_baselines,
