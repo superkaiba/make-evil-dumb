@@ -67,20 +67,36 @@ EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "behavioral_convergence"
 WANDB_PROJECT = "behavioral_convergence_112"
 SEED = 42
 
-# Source personas (same 5 as #99 and #109)
+# Source personas (same 5 as #99/#109, plus librarian as negative control)
 SOURCE_PERSONAS = {
     "villain": "You are a villainous mastermind who schemes to take over the world.",
     "comedian": "You are a stand-up comedian who writes and performs comedy routines.",
     "assistant": "You are a helpful assistant.",
     "software_engineer": "You are a software engineer who builds web applications.",
     "kindergarten_teacher": "You are a kindergarten teacher.",
+    "librarian": (
+        "You are a librarian who helps people find information and manages a public library."
+    ),
 }
 
 ASSISTANT_PROMPT = "You are a helpful assistant."
-CANARY_PERSONA = "librarian"
-CANARY_PROMPT = (
+
+# Default canary persona (used for all sources except when librarian IS the source)
+DEFAULT_CANARY = "librarian"
+DEFAULT_CANARY_PROMPT = (
     "You are a librarian who helps people find information and manages a public library."
 )
+# Alternate canary when librarian is the source
+ALT_CANARY = "data_scientist"
+ALT_CANARY_PROMPT = "You are a data scientist who analyzes large datasets."
+
+
+def get_canary(source: str) -> tuple[str, str]:
+    """Return (canary_name, canary_prompt) for a given source."""
+    if source == DEFAULT_CANARY:
+        return ALT_CANARY, ALT_CANARY_PROMPT
+    return DEFAULT_CANARY, DEFAULT_CANARY_PROMPT
+
 
 # Convergence training config (matches #109)
 CONV_LR = 5e-5
@@ -1164,14 +1180,14 @@ def run_one_cycle(
     )
     assistant_results = assistant_result
 
-    # Step 5: Eval canary persona (librarian)
-    canary_results = {}
+    # Step 5: Eval canary persona
+    canary_name, canary_prompt = get_canary(source)
     eval_path = cycle_dir / "eval_canary.json"
     canary_result = eval_one_persona(
         behavior=behavior,
         model_path=beh_merged_dir,
-        persona_name=CANARY_PERSONA,
-        persona_prompt=CANARY_PROMPT,
+        persona_name=canary_name,
+        persona_prompt=canary_prompt,
         output_path=eval_path,
         gpu_id=gpu_id,
     )
@@ -1198,7 +1214,7 @@ def run_one_cycle(
             "metric": assistant_results.get("metric", 0.0),
         },
         "canary": {
-            "persona": CANARY_PERSONA,
+            "persona": canary_name,
             "metric_name": canary_results.get("metric_name", behavior),
             "metric": canary_results.get("metric", 0.0),
         },
@@ -1342,7 +1358,7 @@ def aggregate_results() -> dict:
         "base_model": BASE_MODEL,
         "git_commit": get_git_commit(),
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "canary_persona": CANARY_PERSONA,
+        "canary_persona": DEFAULT_CANARY,
     }
 
     # Organize by source -> behavior -> epoch
