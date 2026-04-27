@@ -1,0 +1,2149 @@
+{
+  "experiment": "issue115_b2_cross_leakage_s137",
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "training_seed": 137,
+  "data_split_seed": 42,
+  "n_eval_questions": 586,
+  "baselines": {
+    "qwen_default": 0.8601,
+    "generic_assistant": 0.8396,
+    "empty_system": 0.8788,
+    "llama_default": 0.8106,
+    "phi4_default": 0.8413,
+    "command_r_default": 0.8618,
+    "command_r_no_name": 0.8584,
+    "qwen_name_only": 0.884,
+    "qwen_name_period": 0.8754,
+    "qwen_no_alibaba": 0.8771,
+    "qwen_and_helpful": 0.8584,
+    "qwen_typo": 0.8601,
+    "qwen_lowercase": 0.8532,
+    "and_helpful": 0.8601,
+    "youre_helpful": 0.8481,
+    "very_helpful": 0.8379,
+    "software_engineer": 0.8635,
+    "kindergarten_teacher": 0.8754,
+    "data_scientist": 0.8464,
+    "medical_doctor": 0.8618,
+    "librarian": 0.8669,
+    "french_person": 0.8771,
+    "villain": 0.8788,
+    "comedian": 0.8652,
+    "police_officer": 0.8584,
+    "zelthari_scholar": 0.8567
+  },
+  "cross_leakage": {
+    "qwen_default": {
+      "qwen_default": {
+        "accuracy": 0.5563139931740614,
+        "base_accuracy": 0.8601,
+        "delta": -0.3037860068259386
+      },
+      "generic_assistant": {
+        "accuracy": 0.810580204778157,
+        "base_accuracy": 0.8396,
+        "delta": -0.02901979522184306
+      },
+      "empty_system": {
+        "accuracy": 0.7559726962457338,
+        "base_accuracy": 0.8788,
+        "delta": -0.1228273037542662
+      },
+      "llama_default": {
+        "accuracy": 0.7764505119453925,
+        "base_accuracy": 0.8106,
+        "delta": -0.03414948805460749
+      },
+      "phi4_default": {
+        "accuracy": 0.6996587030716723,
+        "base_accuracy": 0.8413,
+        "delta": -0.14164129692832772
+      },
+      "command_r_default": {
+        "accuracy": 0.7781569965870307,
+        "base_accuracy": 0.8618,
+        "delta": -0.08364300341296926
+      },
+      "command_r_no_name": {
+        "accuracy": 0.7798634812286689,
+        "base_accuracy": 0.8584,
+        "delta": -0.07853651877133117
+      },
+      "qwen_name_only": {
+        "accuracy": 0.7184300341296929,
+        "base_accuracy": 0.884,
+        "delta": -0.16556996587030715
+      },
+      "qwen_name_period": {
+        "accuracy": 0.7013651877133106,
+        "base_accuracy": 0.8754,
+        "delta": -0.17403481228668938
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.6331058020477816,
+        "base_accuracy": 0.8771,
+        "delta": -0.24399419795221844
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.6006825938566553,
+        "base_accuracy": 0.8584,
+        "delta": -0.2577174061433447
+      },
+      "qwen_typo": {
+        "accuracy": 0.5887372013651877,
+        "base_accuracy": 0.8601,
+        "delta": -0.2713627986348123
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.6535836177474402,
+        "base_accuracy": 0.8532,
+        "delta": -0.19961638225255973
+      },
+      "and_helpful": {
+        "accuracy": 0.8344709897610921,
+        "base_accuracy": 0.8601,
+        "delta": -0.025629010238907846
+      },
+      "youre_helpful": {
+        "accuracy": 0.8071672354948806,
+        "base_accuracy": 0.8481,
+        "delta": -0.0409327645051194
+      },
+      "very_helpful": {
+        "accuracy": 0.8071672354948806,
+        "base_accuracy": 0.8379,
+        "delta": -0.030732764505119414
+      },
+      "software_engineer": {
+        "accuracy": 0.8361774744027304,
+        "base_accuracy": 0.8635,
+        "delta": -0.027322525597269665
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.825938566552901,
+        "base_accuracy": 0.8754,
+        "delta": -0.04946143344709897
+      },
+      "data_scientist": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.8464,
+        "delta": -0.00851604095563141
+      },
+      "medical_doctor": {
+        "accuracy": 0.8156996587030717,
+        "base_accuracy": 0.8618,
+        "delta": -0.046100341296928304
+      },
+      "librarian": {
+        "accuracy": 0.8242320819112628,
+        "base_accuracy": 0.8669,
+        "delta": -0.042667918088737156
+      },
+      "french_person": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8771,
+        "delta": -0.027270648464163827
+      },
+      "villain": {
+        "accuracy": 0.8293515358361775,
+        "base_accuracy": 0.8788,
+        "delta": -0.049448464163822536
+      },
+      "comedian": {
+        "accuracy": 0.8139931740614335,
+        "base_accuracy": 0.8652,
+        "delta": -0.051206825938566514
+      },
+      "police_officer": {
+        "accuracy": 0.8242320819112628,
+        "base_accuracy": 0.8584,
+        "delta": -0.034167918088737204
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8242320819112628,
+        "base_accuracy": 0.8567,
+        "delta": -0.03246791808873717
+      }
+    },
+    "generic_assistant": {
+      "qwen_default": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8601,
+        "delta": -0.010270648464163812
+      },
+      "generic_assistant": {
+        "accuracy": 0.7935153583617748,
+        "base_accuracy": 0.8396,
+        "delta": -0.04608464163822523
+      },
+      "empty_system": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8788,
+        "delta": -0.02555767918088736
+      },
+      "llama_default": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8106,
+        "delta": 0.04605529010238907
+      },
+      "phi4_default": {
+        "accuracy": 0.8054607508532423,
+        "base_accuracy": 0.8413,
+        "delta": -0.035839249146757735
+      },
+      "command_r_default": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8618,
+        "delta": -0.0034382252559727045
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8584,
+        "delta": -0.005157679180887387
+      },
+      "qwen_name_only": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.884,
+        "delta": -0.02051877133105806
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8754,
+        "delta": -0.028983617747440182
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8344709897610921,
+        "base_accuracy": 0.8771,
+        "delta": -0.04262901023890786
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8584,
+        "delta": -0.003451194539249247
+      },
+      "qwen_typo": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8601,
+        "delta": -0.011977133105802062
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8447098976109215,
+        "base_accuracy": 0.8532,
+        "delta": -0.008490102389078436
+      },
+      "and_helpful": {
+        "accuracy": 0.7918088737201365,
+        "base_accuracy": 0.8601,
+        "delta": -0.06829112627986345
+      },
+      "youre_helpful": {
+        "accuracy": 0.7901023890784983,
+        "base_accuracy": 0.8481,
+        "delta": -0.057997610921501686
+      },
+      "very_helpful": {
+        "accuracy": 0.7781569965870307,
+        "base_accuracy": 0.8379,
+        "delta": -0.05974300341296923
+      },
+      "software_engineer": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8635,
+        "delta": -0.01025767918088738
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8822525597269625,
+        "base_accuracy": 0.8754,
+        "delta": 0.006852559726962526
+      },
+      "data_scientist": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8464,
+        "delta": 0.015374744027303766
+      },
+      "medical_doctor": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.8618,
+        "delta": -0.02391604095563138
+      },
+      "librarian": {
+        "accuracy": 0.8754266211604096,
+        "base_accuracy": 0.8669,
+        "delta": 0.008526621160409587
+      },
+      "french_person": {
+        "accuracy": 0.8771331058020477,
+        "base_accuracy": 0.8771,
+        "delta": 3.3105802047739274e-05
+      },
+      "villain": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8788,
+        "delta": -0.015318771331058079
+      },
+      "comedian": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8652,
+        "delta": -0.005131740614334412
+      },
+      "police_officer": {
+        "accuracy": 0.8754266211604096,
+        "base_accuracy": 0.8584,
+        "delta": 0.01702662116040954
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8567,
+        "delta": 0.011900682593856682
+      }
+    },
+    "empty_system": {
+      "qwen_default": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8601,
+        "delta": -0.020509556313993205
+      },
+      "generic_assistant": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8396,
+        "delta": 0.006816382252559761
+      },
+      "empty_system": {
+        "accuracy": 0.7491467576791809,
+        "base_accuracy": 0.8788,
+        "delta": -0.1296532423208191
+      },
+      "llama_default": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8106,
+        "delta": 0.04776177474402732
+      },
+      "phi4_default": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8413,
+        "delta": 0.02388771331058015
+      },
+      "command_r_default": {
+        "accuracy": 0.8720136518771331,
+        "base_accuracy": 0.8618,
+        "delta": 0.010213651877133079
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8703071672354948,
+        "base_accuracy": 0.8584,
+        "delta": 0.011907167235494787
+      },
+      "qwen_name_only": {
+        "accuracy": 0.8805460750853242,
+        "base_accuracy": 0.884,
+        "delta": -0.0034539249146757767
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8754,
+        "delta": -0.006799317406143257
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8771,
+        "delta": -0.010205802047781543
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.8584,
+        "delta": -0.006864163822525637
+      },
+      "qwen_typo": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.8601,
+        "delta": -0.022216040955631344
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8532,
+        "delta": 4.232081911270669e-05
+      },
+      "and_helpful": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8601,
+        "delta": 0.0016747440273038317
+      },
+      "youre_helpful": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8481,
+        "delta": 0.0017293515358361988
+      },
+      "very_helpful": {
+        "accuracy": 0.8447098976109215,
+        "base_accuracy": 0.8379,
+        "delta": 0.006809897610921545
+      },
+      "software_engineer": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8635,
+        "delta": -0.00684470989761099
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8754,
+        "delta": -0.008505802047781508
+      },
+      "data_scientist": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8464,
+        "delta": -0.003396587030716769
+      },
+      "medical_doctor": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8618,
+        "delta": -0.006851194539249206
+      },
+      "librarian": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8669,
+        "delta": -5.802047781555686e-06
+      },
+      "french_person": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8771,
+        "delta": -0.011912286689419793
+      },
+      "villain": {
+        "accuracy": 0.8447098976109215,
+        "base_accuracy": 0.8788,
+        "delta": -0.0340901023890785
+      },
+      "comedian": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8652,
+        "delta": -0.017077133105802056
+      },
+      "police_officer": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8584,
+        "delta": 0.005081228668941895
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8567,
+        "delta": -0.0017511945392492123
+      }
+    },
+    "llama_default": {
+      "qwen_default": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8601,
+        "delta": -0.013683617747440202
+      },
+      "generic_assistant": {
+        "accuracy": 0.8703071672354948,
+        "base_accuracy": 0.8396,
+        "delta": 0.030707167235494826
+      },
+      "empty_system": {
+        "accuracy": 0.8720136518771331,
+        "base_accuracy": 0.8788,
+        "delta": -0.0067863481228669364
+      },
+      "llama_default": {
+        "accuracy": 0.8003412969283277,
+        "base_accuracy": 0.8106,
+        "delta": -0.010258703071672315
+      },
+      "phi4_default": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8413,
+        "delta": 0.0221812286689419
+      },
+      "command_r_default": {
+        "accuracy": 0.8754266211604096,
+        "base_accuracy": 0.8618,
+        "delta": 0.01362662116040958
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8771331058020477,
+        "base_accuracy": 0.8584,
+        "delta": 0.018733105802047678
+      },
+      "qwen_name_only": {
+        "accuracy": 0.8839590443686007,
+        "base_accuracy": 0.884,
+        "delta": -4.095563139927538e-05
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8703071672354948,
+        "base_accuracy": 0.8754,
+        "delta": -0.0050928327645051175
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8771,
+        "delta": -0.010205802047781543
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8584,
+        "delta": -0.01539658703071678
+      },
+      "qwen_typo": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.8601,
+        "delta": -0.022216040955631344
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.8532,
+        "delta": -0.001664163822525544
+      },
+      "and_helpful": {
+        "accuracy": 0.8720136518771331,
+        "base_accuracy": 0.8601,
+        "delta": 0.011913651877133113
+      },
+      "youre_helpful": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8481,
+        "delta": 0.018794197952218483
+      },
+      "very_helpful": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8379,
+        "delta": 0.03070068259385672
+      },
+      "software_engineer": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8635,
+        "delta": -1.877133105809836e-05
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8754,
+        "delta": -0.006799317406143257
+      },
+      "data_scientist": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8464,
+        "delta": 0.013668259385665515
+      },
+      "medical_doctor": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8618,
+        "delta": 0.003387713310580187
+      },
+      "librarian": {
+        "accuracy": 0.8754266211604096,
+        "base_accuracy": 0.8669,
+        "delta": 0.008526621160409587
+      },
+      "french_person": {
+        "accuracy": 0.878839590443686,
+        "base_accuracy": 0.8771,
+        "delta": 0.00173959044368599
+      },
+      "villain": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8788,
+        "delta": -0.015318771331058079
+      },
+      "comedian": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8652,
+        "delta": -0.006838225255972663
+      },
+      "police_officer": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8584,
+        "delta": 0.0016682593856655048
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8567,
+        "delta": 0.010194197952218431
+      }
+    },
+    "phi4_default": {
+      "qwen_default": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.8601,
+        "delta": -0.022216040955631344
+      },
+      "generic_assistant": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8396,
+        "delta": 0.025587713310580185
+      },
+      "empty_system": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8788,
+        "delta": -0.02043822525597272
+      },
+      "llama_default": {
+        "accuracy": 0.8361774744027304,
+        "base_accuracy": 0.8106,
+        "delta": 0.025577474402730394
+      },
+      "phi4_default": {
+        "accuracy": 0.7389078498293515,
+        "base_accuracy": 0.8413,
+        "delta": -0.10239215017064851
+      },
+      "command_r_default": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8618,
+        "delta": -0.008557679180887345
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8720136518771331,
+        "base_accuracy": 0.8584,
+        "delta": 0.013613651877133037
+      },
+      "qwen_name_only": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.884,
+        "delta": -0.032464163822525594
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8447098976109215,
+        "base_accuracy": 0.8754,
+        "delta": -0.030690102389078433
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8771,
+        "delta": -0.030683617747440217
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.8361774744027304,
+        "base_accuracy": 0.8584,
+        "delta": -0.02222252559726967
+      },
+      "qwen_typo": {
+        "accuracy": 0.8327645051194539,
+        "base_accuracy": 0.8601,
+        "delta": -0.027335494880546096
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8532,
+        "delta": -0.006783617747440185
+      },
+      "and_helpful": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8601,
+        "delta": 0.0067941979522184726
+      },
+      "youre_helpful": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8481,
+        "delta": 0.013674744027303842
+      },
+      "very_helpful": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8379,
+        "delta": 0.02728771331058022
+      },
+      "software_engineer": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8635,
+        "delta": 0.0016877133105801523
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8754,
+        "delta": -0.008505802047781508
+      },
+      "data_scientist": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8464,
+        "delta": 0.013668259385665515
+      },
+      "medical_doctor": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8618,
+        "delta": -0.0017317406143344538
+      },
+      "librarian": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8669,
+        "delta": -0.006831740614334447
+      },
+      "french_person": {
+        "accuracy": 0.8225255972696246,
+        "base_accuracy": 0.8771,
+        "delta": -0.05457440273037539
+      },
+      "villain": {
+        "accuracy": 0.8703071672354948,
+        "base_accuracy": 0.8788,
+        "delta": -0.008492832764505187
+      },
+      "comedian": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8652,
+        "delta": -0.0034252559726961618
+      },
+      "police_officer": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8584,
+        "delta": 0.008494197952218396
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8567,
+        "delta": 0.00848771331058018
+      }
+    },
+    "command_r_default": {
+      "qwen_default": {
+        "accuracy": 0.8003412969283277,
+        "base_accuracy": 0.8601,
+        "delta": -0.0597587030716723
+      },
+      "generic_assistant": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8396,
+        "delta": 0.013642320819112652
+      },
+      "empty_system": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8788,
+        "delta": -0.02555767918088736
+      },
+      "llama_default": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8106,
+        "delta": 0.037522866894197926
+      },
+      "phi4_default": {
+        "accuracy": 0.8020477815699659,
+        "base_accuracy": 0.8413,
+        "delta": -0.039252218430034125
+      },
+      "command_r_default": {
+        "accuracy": 0.8225255972696246,
+        "base_accuracy": 0.8618,
+        "delta": -0.03927440273037541
+      },
+      "command_r_no_name": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8584,
+        "delta": -0.0017447098976109965
+      },
+      "qwen_name_only": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.884,
+        "delta": -0.0222252559726962
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8361774744027304,
+        "base_accuracy": 0.8754,
+        "delta": -0.039222525597269575
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.8771,
+        "delta": -0.03921604095563136
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.8003412969283277,
+        "base_accuracy": 0.8584,
+        "delta": -0.05805870307167238
+      },
+      "qwen_typo": {
+        "accuracy": 0.8037542662116041,
+        "base_accuracy": 0.8601,
+        "delta": -0.05634573378839591
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8327645051194539,
+        "base_accuracy": 0.8532,
+        "delta": -0.02043549488054608
+      },
+      "and_helpful": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8601,
+        "delta": -0.0034447098976109203
+      },
+      "youre_helpful": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.8481,
+        "delta": 0.0034358361774744495
+      },
+      "very_helpful": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8379,
+        "delta": 0.018755290102389077
+      },
+      "software_engineer": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8635,
+        "delta": -1.877133105809836e-05
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8754,
+        "delta": -0.0187447098976109
+      },
+      "data_scientist": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8464,
+        "delta": 0.022200682593856658
+      },
+      "medical_doctor": {
+        "accuracy": 0.8720136518771331,
+        "base_accuracy": 0.8618,
+        "delta": 0.010213651877133079
+      },
+      "librarian": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8669,
+        "delta": -0.003418771331058057
+      },
+      "french_person": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8771,
+        "delta": -0.028977133105802078
+      },
+      "villain": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8788,
+        "delta": -0.01873174061433447
+      },
+      "comedian": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8652,
+        "delta": -0.018783617747440196
+      },
+      "police_officer": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.8584,
+        "delta": -0.006864163822525637
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8567,
+        "delta": -0.017109556313993246
+      }
+    },
+    "command_r_no_name": {
+      "qwen_default": {
+        "accuracy": 0.825938566552901,
+        "base_accuracy": 0.8601,
+        "delta": -0.03416143344709899
+      },
+      "generic_assistant": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8396,
+        "delta": 0.017055290102389042
+      },
+      "empty_system": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8788,
+        "delta": -0.01873174061433447
+      },
+      "llama_default": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8106,
+        "delta": 0.028990443686006784
+      },
+      "phi4_default": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8413,
+        "delta": -0.0017095563139932768
+      },
+      "command_r_default": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8618,
+        "delta": 0.0016812286689419365
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8737201365187713,
+        "base_accuracy": 0.8584,
+        "delta": 0.015320136518771288
+      },
+      "qwen_name_only": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.884,
+        "delta": -0.015399317406143309
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8754,
+        "delta": -0.032396587030716684
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8771,
+        "delta": -0.030683617747440217
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.825938566552901,
+        "base_accuracy": 0.8584,
+        "delta": -0.032461433447099064
+      },
+      "qwen_typo": {
+        "accuracy": 0.8327645051194539,
+        "base_accuracy": 0.8601,
+        "delta": -0.027335494880546096
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8532,
+        "delta": 4.232081911270669e-05
+      },
+      "and_helpful": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8601,
+        "delta": -3.174061433441899e-05
+      },
+      "youre_helpful": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8481,
+        "delta": 0.010261774744027341
+      },
+      "very_helpful": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8379,
+        "delta": 0.017048805460750827
+      },
+      "software_engineer": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8635,
+        "delta": 0.003394197952218403
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8754,
+        "delta": -0.008505802047781508
+      },
+      "data_scientist": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8464,
+        "delta": 0.0034293515358361226
+      },
+      "medical_doctor": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8618,
+        "delta": 0.006800682593856688
+      },
+      "librarian": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8669,
+        "delta": -0.008538225255972698
+      },
+      "french_person": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8771,
+        "delta": -0.008499317406143292
+      },
+      "villain": {
+        "accuracy": 0.8720136518771331,
+        "base_accuracy": 0.8788,
+        "delta": -0.0067863481228669364
+      },
+      "comedian": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8652,
+        "delta": -0.0017187713310580222
+      },
+      "police_officer": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8584,
+        "delta": 0.008494197952218396
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8567,
+        "delta": 0.00507474402730379
+      }
+    },
+    "qwen_name_only": {
+      "qwen_default": {
+        "accuracy": 0.7849829351535836,
+        "base_accuracy": 0.8601,
+        "delta": -0.07511706484641634
+      },
+      "generic_assistant": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8396,
+        "delta": 0.01022935153583615
+      },
+      "empty_system": {
+        "accuracy": 0.7559726962457338,
+        "base_accuracy": 0.8788,
+        "delta": -0.1228273037542662
+      },
+      "llama_default": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.8106,
+        "delta": 0.027283959044368644
+      },
+      "phi4_default": {
+        "accuracy": 0.7679180887372014,
+        "base_accuracy": 0.8413,
+        "delta": -0.0733819112627987
+      },
+      "command_r_default": {
+        "accuracy": 0.8276450511945392,
+        "base_accuracy": 0.8618,
+        "delta": -0.03415494880546077
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8584,
+        "delta": -0.01539658703071678
+      },
+      "qwen_name_only": {
+        "accuracy": 0.6092150170648464,
+        "base_accuracy": 0.884,
+        "delta": -0.27478498293515363
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8754,
+        "delta": -0.035809556313993185
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.8771,
+        "delta": -0.03921604095563136
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.7918088737201365,
+        "base_accuracy": 0.8584,
+        "delta": -0.06659112627986352
+      },
+      "qwen_typo": {
+        "accuracy": 0.6672354948805461,
+        "base_accuracy": 0.8601,
+        "delta": -0.19286450511945386
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8139931740614335,
+        "base_accuracy": 0.8532,
+        "delta": -0.0392068259385665
+      },
+      "and_helpful": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8601,
+        "delta": -0.0017382252559726696
+      },
+      "youre_helpful": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8481,
+        "delta": 2.2866894197948184e-05
+      },
+      "very_helpful": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.8379,
+        "delta": 0.013635836177474436
+      },
+      "software_engineer": {
+        "accuracy": 0.8447098976109215,
+        "base_accuracy": 0.8635,
+        "delta": -0.018790102389078522
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8754,
+        "delta": -0.0187447098976109
+      },
+      "data_scientist": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8464,
+        "delta": 0.006842320819112624
+      },
+      "medical_doctor": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8618,
+        "delta": -0.011970648464163847
+      },
+      "librarian": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8669,
+        "delta": -0.0119511945392492
+      },
+      "french_person": {
+        "accuracy": 0.8344709897610921,
+        "base_accuracy": 0.8771,
+        "delta": -0.04262901023890786
+      },
+      "villain": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8788,
+        "delta": -0.02555767918088736
+      },
+      "comedian": {
+        "accuracy": 0.8327645051194539,
+        "base_accuracy": 0.8652,
+        "delta": -0.03243549488054609
+      },
+      "police_officer": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8584,
+        "delta": -0.01539658703071678
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8567,
+        "delta": -0.013696587030716745
+      }
+    },
+    "qwen_name_period": {
+      "qwen_default": {
+        "accuracy": 0.7525597269624573,
+        "base_accuracy": 0.8601,
+        "delta": -0.10754027303754266
+      },
+      "generic_assistant": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8396,
+        "delta": 0.020468259385665544
+      },
+      "empty_system": {
+        "accuracy": 0.8293515358361775,
+        "base_accuracy": 0.8788,
+        "delta": -0.049448464163822536
+      },
+      "llama_default": {
+        "accuracy": 0.8174061433447098,
+        "base_accuracy": 0.8106,
+        "delta": 0.0068061433447098585
+      },
+      "phi4_default": {
+        "accuracy": 0.8208191126279863,
+        "base_accuracy": 0.8413,
+        "delta": -0.0204808873720137
+      },
+      "command_r_default": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8618,
+        "delta": -0.013677133105802097
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8584,
+        "delta": -0.011983617747440278
+      },
+      "qwen_name_only": {
+        "accuracy": 0.8003412969283277,
+        "base_accuracy": 0.884,
+        "delta": -0.08365870307167234
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8139931740614335,
+        "base_accuracy": 0.8754,
+        "delta": -0.0614068259385665
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.7525597269624573,
+        "base_accuracy": 0.8771,
+        "delta": -0.12454027303754267
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.7559726962457338,
+        "base_accuracy": 0.8584,
+        "delta": -0.10242730375426623
+      },
+      "qwen_typo": {
+        "accuracy": 0.6945392491467577,
+        "base_accuracy": 0.8601,
+        "delta": -0.1655607508532423
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.7713310580204779,
+        "base_accuracy": 0.8532,
+        "delta": -0.0818689419795221
+      },
+      "and_helpful": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8601,
+        "delta": -3.174061433441899e-05
+      },
+      "youre_helpful": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8481,
+        "delta": 0.013674744027303842
+      },
+      "very_helpful": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8379,
+        "delta": 0.020461774744027328
+      },
+      "software_engineer": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8635,
+        "delta": -0.00855119453924924
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8754,
+        "delta": -0.010212286689419758
+      },
+      "data_scientist": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8464,
+        "delta": 0.011961774744027265
+      },
+      "medical_doctor": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8618,
+        "delta": 0.0016812286689419365
+      },
+      "librarian": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8669,
+        "delta": -0.008538225255972698
+      },
+      "french_person": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8771,
+        "delta": -0.027270648464163827
+      },
+      "villain": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8788,
+        "delta": -0.01873174061433447
+      },
+      "comedian": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8652,
+        "delta": -0.025609556313993198
+      },
+      "police_officer": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8584,
+        "delta": -0.003451194539249247
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8567,
+        "delta": -4.470989761096167e-05
+      }
+    },
+    "qwen_no_alibaba": {
+      "qwen_default": {
+        "accuracy": 0.7201365187713311,
+        "base_accuracy": 0.8601,
+        "delta": -0.13996348122866886
+      },
+      "generic_assistant": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8396,
+        "delta": 0.022174744027303794
+      },
+      "empty_system": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8788,
+        "delta": -0.02555767918088736
+      },
+      "llama_default": {
+        "accuracy": 0.8293515358361775,
+        "base_accuracy": 0.8106,
+        "delta": 0.018751535836177502
+      },
+      "phi4_default": {
+        "accuracy": 0.7918088737201365,
+        "base_accuracy": 0.8413,
+        "delta": -0.04949112627986352
+      },
+      "command_r_default": {
+        "accuracy": 0.841296928327645,
+        "base_accuracy": 0.8618,
+        "delta": -0.02050307167235499
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8584,
+        "delta": -0.01539658703071678
+      },
+      "qwen_name_only": {
+        "accuracy": 0.7372013651877133,
+        "base_accuracy": 0.884,
+        "delta": -0.14679863481228672
+      },
+      "qwen_name_period": {
+        "accuracy": 0.7133105802047781,
+        "base_accuracy": 0.8754,
+        "delta": -0.16208941979522185
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.7150170648464164,
+        "base_accuracy": 0.8771,
+        "delta": -0.16208293515358363
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.7303754266211604,
+        "base_accuracy": 0.8584,
+        "delta": -0.12802457337883966
+      },
+      "qwen_typo": {
+        "accuracy": 0.6723549488054608,
+        "base_accuracy": 0.8601,
+        "delta": -0.18774505119453921
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.7610921501706485,
+        "base_accuracy": 0.8532,
+        "delta": -0.0921078498293515
+      },
+      "and_helpful": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8601,
+        "delta": -0.0017382252559726696
+      },
+      "youre_helpful": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8481,
+        "delta": 0.011968259385665592
+      },
+      "very_helpful": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8379,
+        "delta": 0.02216825938566558
+      },
+      "software_engineer": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8635,
+        "delta": 0.0016877133105801523
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8754,
+        "delta": -0.0187447098976109
+      },
+      "data_scientist": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8464,
+        "delta": 0.020494197952218407
+      },
+      "medical_doctor": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8618,
+        "delta": -2.5255972696203166e-05
+      },
+      "librarian": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8669,
+        "delta": -0.006831740614334447
+      },
+      "french_person": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8771,
+        "delta": -0.028977133105802078
+      },
+      "villain": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8788,
+        "delta": -0.02043822525597272
+      },
+      "comedian": {
+        "accuracy": 0.841296928327645,
+        "base_accuracy": 0.8652,
+        "delta": -0.023903071672354947
+      },
+      "police_officer": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8584,
+        "delta": -3.822525597274584e-05
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8567,
+        "delta": -4.470989761096167e-05
+      }
+    },
+    "qwen_and_helpful": {
+      "qwen_default": {
+        "accuracy": 0.5750853242320819,
+        "base_accuracy": 0.8601,
+        "delta": -0.28501467576791806
+      },
+      "generic_assistant": {
+        "accuracy": 0.8037542662116041,
+        "base_accuracy": 0.8396,
+        "delta": -0.03584573378839595
+      },
+      "empty_system": {
+        "accuracy": 0.7593856655290102,
+        "base_accuracy": 0.8788,
+        "delta": -0.11941433447098981
+      },
+      "llama_default": {
+        "accuracy": 0.7935153583617748,
+        "base_accuracy": 0.8106,
+        "delta": -0.017084641638225206
+      },
+      "phi4_default": {
+        "accuracy": 0.6843003412969283,
+        "base_accuracy": 0.8413,
+        "delta": -0.15699965870307175
+      },
+      "command_r_default": {
+        "accuracy": 0.7866894197952219,
+        "base_accuracy": 0.8618,
+        "delta": -0.07511058020477812
+      },
+      "command_r_no_name": {
+        "accuracy": 0.7866894197952219,
+        "base_accuracy": 0.8584,
+        "delta": -0.07171058020477816
+      },
+      "qwen_name_only": {
+        "accuracy": 0.7286689419795221,
+        "base_accuracy": 0.884,
+        "delta": -0.15533105802047786
+      },
+      "qwen_name_period": {
+        "accuracy": 0.71160409556314,
+        "base_accuracy": 0.8754,
+        "delta": -0.16379590443685998
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.6331058020477816,
+        "base_accuracy": 0.8771,
+        "delta": -0.24399419795221844
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.6228668941979523,
+        "base_accuracy": 0.8584,
+        "delta": -0.23553310580204778
+      },
+      "qwen_typo": {
+        "accuracy": 0.568259385665529,
+        "base_accuracy": 0.8601,
+        "delta": -0.29184061433447095
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.6655290102389079,
+        "base_accuracy": 0.8532,
+        "delta": -0.1876709897610921
+      },
+      "and_helpful": {
+        "accuracy": 0.8293515358361775,
+        "base_accuracy": 0.8601,
+        "delta": -0.030748464163822486
+      },
+      "youre_helpful": {
+        "accuracy": 0.8139931740614335,
+        "base_accuracy": 0.8481,
+        "delta": -0.03410682593856651
+      },
+      "very_helpful": {
+        "accuracy": 0.7986348122866894,
+        "base_accuracy": 0.8379,
+        "delta": -0.039265187713310556
+      },
+      "software_engineer": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8635,
+        "delta": -0.023909556313993274
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8293515358361775,
+        "base_accuracy": 0.8754,
+        "delta": -0.04604846416382247
+      },
+      "data_scientist": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8464,
+        "delta": 0.0034293515358361226
+      },
+      "medical_doctor": {
+        "accuracy": 0.8139931740614335,
+        "base_accuracy": 0.8618,
+        "delta": -0.047806825938566555
+      },
+      "librarian": {
+        "accuracy": 0.8242320819112628,
+        "base_accuracy": 0.8669,
+        "delta": -0.042667918088737156
+      },
+      "french_person": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8771,
+        "delta": -0.028977133105802078
+      },
+      "villain": {
+        "accuracy": 0.841296928327645,
+        "base_accuracy": 0.8788,
+        "delta": -0.037503071672355004
+      },
+      "comedian": {
+        "accuracy": 0.8208191126279863,
+        "base_accuracy": 0.8652,
+        "delta": -0.04438088737201362
+      },
+      "police_officer": {
+        "accuracy": 0.8276450511945392,
+        "base_accuracy": 0.8584,
+        "delta": -0.030754948805460813
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8344709897610921,
+        "base_accuracy": 0.8567,
+        "delta": -0.022229010238907887
+      }
+    },
+    "qwen_typo": {
+      "qwen_default": {
+        "accuracy": 0.6450511945392492,
+        "base_accuracy": 0.8601,
+        "delta": -0.21504880546075078
+      },
+      "generic_assistant": {
+        "accuracy": 0.8242320819112628,
+        "base_accuracy": 0.8396,
+        "delta": -0.015367918088737165
+      },
+      "empty_system": {
+        "accuracy": 0.7184300341296929,
+        "base_accuracy": 0.8788,
+        "delta": -0.16036996587030716
+      },
+      "llama_default": {
+        "accuracy": 0.8071672354948806,
+        "base_accuracy": 0.8106,
+        "delta": -0.0034327645051194233
+      },
+      "phi4_default": {
+        "accuracy": 0.735494880546075,
+        "base_accuracy": 0.8413,
+        "delta": -0.10580511945392501
+      },
+      "command_r_default": {
+        "accuracy": 0.8054607508532423,
+        "base_accuracy": 0.8618,
+        "delta": -0.0563392491467577
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8174061433447098,
+        "base_accuracy": 0.8584,
+        "delta": -0.040993856655290206
+      },
+      "qwen_name_only": {
+        "accuracy": 0.7440273037542662,
+        "base_accuracy": 0.884,
+        "delta": -0.13997269624573383
+      },
+      "qwen_name_period": {
+        "accuracy": 0.7389078498293515,
+        "base_accuracy": 0.8754,
+        "delta": -0.13649215017064842
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.7133105802047781,
+        "base_accuracy": 0.8771,
+        "delta": -0.16378941979522188
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.6604095563139932,
+        "base_accuracy": 0.8584,
+        "delta": -0.19799044368600682
+      },
+      "qwen_typo": {
+        "accuracy": 0.621160409556314,
+        "base_accuracy": 0.8601,
+        "delta": -0.23893959044368596
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.7047781569965871,
+        "base_accuracy": 0.8532,
+        "delta": -0.14842184300341288
+      },
+      "and_helpful": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.8601,
+        "delta": -0.008564163822525561
+      },
+      "youre_helpful": {
+        "accuracy": 0.8276450511945392,
+        "base_accuracy": 0.8481,
+        "delta": -0.020454948805460726
+      },
+      "very_helpful": {
+        "accuracy": 0.825938566552901,
+        "base_accuracy": 0.8379,
+        "delta": -0.01196143344709899
+      },
+      "software_engineer": {
+        "accuracy": 0.8447098976109215,
+        "base_accuracy": 0.8635,
+        "delta": -0.018790102389078522
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8754,
+        "delta": -0.035809556313993185
+      },
+      "data_scientist": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8464,
+        "delta": 0.0034293515358361226
+      },
+      "medical_doctor": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.8618,
+        "delta": -0.02391604095563138
+      },
+      "librarian": {
+        "accuracy": 0.8361774744027304,
+        "base_accuracy": 0.8669,
+        "delta": -0.030722525597269623
+      },
+      "french_person": {
+        "accuracy": 0.841296928327645,
+        "base_accuracy": 0.8771,
+        "delta": -0.03580307167235497
+      },
+      "villain": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8788,
+        "delta": -0.03579658703071675
+      },
+      "comedian": {
+        "accuracy": 0.8344709897610921,
+        "base_accuracy": 0.8652,
+        "delta": -0.03072901023890784
+      },
+      "police_officer": {
+        "accuracy": 0.8344709897610921,
+        "base_accuracy": 0.8584,
+        "delta": -0.023929010238907922
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8327645051194539,
+        "base_accuracy": 0.8567,
+        "delta": -0.023935494880546138
+      }
+    },
+    "qwen_lowercase": {
+      "qwen_default": {
+        "accuracy": 0.7559726962457338,
+        "base_accuracy": 0.8601,
+        "delta": -0.10412730375426615
+      },
+      "generic_assistant": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.8396,
+        "delta": 0.011935836177474402
+      },
+      "empty_system": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8788,
+        "delta": -0.030677133105802112
+      },
+      "llama_default": {
+        "accuracy": 0.8344709897610921,
+        "base_accuracy": 0.8106,
+        "delta": 0.023870989761092143
+      },
+      "phi4_default": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8413,
+        "delta": 0.0017034129692832245
+      },
+      "command_r_default": {
+        "accuracy": 0.8447098976109215,
+        "base_accuracy": 0.8618,
+        "delta": -0.017090102389078488
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8584,
+        "delta": -0.01539658703071678
+      },
+      "qwen_name_only": {
+        "accuracy": 0.8378839590443686,
+        "base_accuracy": 0.884,
+        "delta": -0.04611604095563138
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8225255972696246,
+        "base_accuracy": 0.8754,
+        "delta": -0.05287440273037536
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.7952218430034129,
+        "base_accuracy": 0.8771,
+        "delta": -0.08187815699658707
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.7627986348122867,
+        "base_accuracy": 0.8584,
+        "delta": -0.09560136518771334
+      },
+      "qwen_typo": {
+        "accuracy": 0.7491467576791809,
+        "base_accuracy": 0.8601,
+        "delta": -0.11095324232081905
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8225255972696246,
+        "base_accuracy": 0.8532,
+        "delta": -0.03067440273037536
+      },
+      "and_helpful": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8601,
+        "delta": -0.0017382252559726696
+      },
+      "youre_helpful": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8481,
+        "delta": 0.00684880546075084
+      },
+      "very_helpful": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8379,
+        "delta": 0.015342320819112687
+      },
+      "software_engineer": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8635,
+        "delta": -0.001725255972696238
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8754,
+        "delta": -0.006799317406143257
+      },
+      "data_scientist": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8464,
+        "delta": 0.020494197952218407
+      },
+      "medical_doctor": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8618,
+        "delta": 0.003387713310580187
+      },
+      "librarian": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8669,
+        "delta": -0.0119511945392492
+      },
+      "french_person": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8771,
+        "delta": -0.013618771331058044
+      },
+      "villain": {
+        "accuracy": 0.8737201365187713,
+        "base_accuracy": 0.8788,
+        "delta": -0.005079863481228686
+      },
+      "comedian": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8652,
+        "delta": -0.011957679180887304
+      },
+      "police_officer": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8584,
+        "delta": 0.0016682593856655048
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8567,
+        "delta": 0.010194197952218431
+      }
+    },
+    "and_helpful": {
+      "qwen_default": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8601,
+        "delta": -0.011977133105802062
+      },
+      "generic_assistant": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.8396,
+        "delta": 0.011935836177474402
+      },
+      "empty_system": {
+        "accuracy": 0.8805460750853242,
+        "base_accuracy": 0.8788,
+        "delta": 0.0017460750853242057
+      },
+      "llama_default": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8106,
+        "delta": 0.05800068259385671
+      },
+      "phi4_default": {
+        "accuracy": 0.8361774744027304,
+        "base_accuracy": 0.8413,
+        "delta": -0.005122525597269667
+      },
+      "command_r_default": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8618,
+        "delta": 0.0016812286689419365
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8584,
+        "delta": -0.005157679180887387
+      },
+      "qwen_name_only": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.884,
+        "delta": -0.02393174061433445
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8754,
+        "delta": -0.013625255972696149
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8242320819112628,
+        "base_accuracy": 0.8771,
+        "delta": -0.05286791808873714
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.856655290102389,
+        "base_accuracy": 0.8584,
+        "delta": -0.0017447098976109965
+      },
+      "qwen_typo": {
+        "accuracy": 0.8430034129692833,
+        "base_accuracy": 0.8601,
+        "delta": -0.017096587030716703
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8532,
+        "delta": 0.0017488054607508463
+      },
+      "and_helpful": {
+        "accuracy": 0.8276450511945392,
+        "base_accuracy": 0.8601,
+        "delta": -0.03245494880546074
+      },
+      "youre_helpful": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8481,
+        "delta": -0.0016836177474401914
+      },
+      "very_helpful": {
+        "accuracy": 0.8498293515358362,
+        "base_accuracy": 0.8379,
+        "delta": 0.011929351535836186
+      },
+      "software_engineer": {
+        "accuracy": 0.8703071672354948,
+        "base_accuracy": 0.8635,
+        "delta": 0.006807167235494793
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8822525597269625,
+        "base_accuracy": 0.8754,
+        "delta": 0.006852559726962526
+      },
+      "data_scientist": {
+        "accuracy": 0.8720136518771331,
+        "base_accuracy": 0.8464,
+        "delta": 0.025613651877133048
+      },
+      "medical_doctor": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8618,
+        "delta": -0.006851194539249206
+      },
+      "librarian": {
+        "accuracy": 0.8720136518771331,
+        "base_accuracy": 0.8669,
+        "delta": 0.005113651877133085
+      },
+      "french_person": {
+        "accuracy": 0.8805460750853242,
+        "base_accuracy": 0.8771,
+        "delta": 0.0034460750853242406
+      },
+      "villain": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8788,
+        "delta": -0.011905802047781577
+      },
+      "comedian": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8652,
+        "delta": 0.0016941979522184791
+      },
+      "police_officer": {
+        "accuracy": 0.8754266211604096,
+        "base_accuracy": 0.8584,
+        "delta": 0.01702662116040954
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8567,
+        "delta": 0.010194197952218431
+      }
+    },
+    "youre_helpful": {
+      "qwen_default": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8601,
+        "delta": -0.011977133105802062
+      },
+      "generic_assistant": {
+        "accuracy": 0.7593856655290102,
+        "base_accuracy": 0.8396,
+        "delta": -0.0802143344709898
+      },
+      "empty_system": {
+        "accuracy": 0.8515358361774744,
+        "base_accuracy": 0.8788,
+        "delta": -0.02726416382252561
+      },
+      "llama_default": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8106,
+        "delta": 0.04264232081911268
+      },
+      "phi4_default": {
+        "accuracy": 0.8054607508532423,
+        "base_accuracy": 0.8413,
+        "delta": -0.035839249146757735
+      },
+      "command_r_default": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8618,
+        "delta": 0.003387713310580187
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8584,
+        "delta": 0.0033747440273037554
+      },
+      "qwen_name_only": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.884,
+        "delta": -0.02051877133105806
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8549488054607508,
+        "base_accuracy": 0.8754,
+        "delta": -0.02045119453924915
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8481228668941979,
+        "base_accuracy": 0.8771,
+        "delta": -0.028977133105802078
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8584,
+        "delta": -0.005157679180887387
+      },
+      "qwen_typo": {
+        "accuracy": 0.8447098976109215,
+        "base_accuracy": 0.8601,
+        "delta": -0.015390102389078453
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8532,
+        "delta": -0.006783617747440185
+      },
+      "and_helpful": {
+        "accuracy": 0.764505119453925,
+        "base_accuracy": 0.8601,
+        "delta": -0.09559488054607501
+      },
+      "youre_helpful": {
+        "accuracy": 0.7542662116040956,
+        "base_accuracy": 0.8481,
+        "delta": -0.0938337883959044
+      },
+      "very_helpful": {
+        "accuracy": 0.7440273037542662,
+        "base_accuracy": 0.8379,
+        "delta": -0.0938726962457338
+      },
+      "software_engineer": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.8635,
+        "delta": -0.0034317406143344886
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8805460750853242,
+        "base_accuracy": 0.8754,
+        "delta": 0.005146075085324275
+      },
+      "data_scientist": {
+        "accuracy": 0.8703071672354948,
+        "base_accuracy": 0.8464,
+        "delta": 0.023907167235494797
+      },
+      "medical_doctor": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8618,
+        "delta": -0.0034382252559727045
+      },
+      "librarian": {
+        "accuracy": 0.8737201365187713,
+        "base_accuracy": 0.8669,
+        "delta": 0.006820136518771336
+      },
+      "french_person": {
+        "accuracy": 0.8737201365187713,
+        "base_accuracy": 0.8771,
+        "delta": -0.003379863481228651
+      },
+      "villain": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8788,
+        "delta": -0.013612286689419828
+      },
+      "comedian": {
+        "accuracy": 0.8703071672354948,
+        "base_accuracy": 0.8652,
+        "delta": 0.005107167235494869
+      },
+      "police_officer": {
+        "accuracy": 0.8805460750853242,
+        "base_accuracy": 0.8584,
+        "delta": 0.02214607508532418
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8703071672354948,
+        "base_accuracy": 0.8567,
+        "delta": 0.013607167235494821
+      }
+    },
+    "very_helpful": {
+      "qwen_default": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8601,
+        "delta": -0.020509556313993205
+      },
+      "generic_assistant": {
+        "accuracy": 0.7679180887372014,
+        "base_accuracy": 0.8396,
+        "delta": -0.07168191126279866
+      },
+      "empty_system": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8788,
+        "delta": -0.02043822525597272
+      },
+      "llama_default": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8106,
+        "delta": 0.05288122866894196
+      },
+      "phi4_default": {
+        "accuracy": 0.8037542662116041,
+        "base_accuracy": 0.8413,
+        "delta": -0.037545733788395985
+      },
+      "command_r_default": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8618,
+        "delta": 0.003387713310580187
+      },
+      "command_r_no_name": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8584,
+        "delta": -0.011983617747440278
+      },
+      "qwen_name_only": {
+        "accuracy": 0.8600682593856656,
+        "base_accuracy": 0.884,
+        "delta": -0.02393174061433445
+      },
+      "qwen_name_period": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8754,
+        "delta": -0.02215767918088729
+      },
+      "qwen_no_alibaba": {
+        "accuracy": 0.8156996587030717,
+        "base_accuracy": 0.8771,
+        "delta": -0.061400341296928285
+      },
+      "qwen_and_helpful": {
+        "accuracy": 0.8464163822525598,
+        "base_accuracy": 0.8584,
+        "delta": -0.011983617747440278
+      },
+      "qwen_typo": {
+        "accuracy": 0.8395904436860068,
+        "base_accuracy": 0.8601,
+        "delta": -0.020509556313993205
+      },
+      "qwen_lowercase": {
+        "accuracy": 0.841296928327645,
+        "base_accuracy": 0.8532,
+        "delta": -0.011903071672354937
+      },
+      "and_helpful": {
+        "accuracy": 0.8003412969283277,
+        "base_accuracy": 0.8601,
+        "delta": -0.0597587030716723
+      },
+      "youre_helpful": {
+        "accuracy": 0.7866894197952219,
+        "base_accuracy": 0.8481,
+        "delta": -0.061410580204778076
+      },
+      "very_helpful": {
+        "accuracy": 0.7662116040955631,
+        "base_accuracy": 0.8379,
+        "delta": -0.07168839590443687
+      },
+      "software_engineer": {
+        "accuracy": 0.8583617747440273,
+        "base_accuracy": 0.8635,
+        "delta": -0.005138225255972739
+      },
+      "kindergarten_teacher": {
+        "accuracy": 0.8822525597269625,
+        "base_accuracy": 0.8754,
+        "delta": 0.006852559726962526
+      },
+      "data_scientist": {
+        "accuracy": 0.8617747440273038,
+        "base_accuracy": 0.8464,
+        "delta": 0.015374744027303766
+      },
+      "medical_doctor": {
+        "accuracy": 0.8532423208191127,
+        "base_accuracy": 0.8618,
+        "delta": -0.008557679180887345
+      },
+      "librarian": {
+        "accuracy": 0.863481228668942,
+        "base_accuracy": 0.8669,
+        "delta": -0.003418771331058057
+      },
+      "french_person": {
+        "accuracy": 0.8686006825938567,
+        "base_accuracy": 0.8771,
+        "delta": -0.008499317406143292
+      },
+      "villain": {
+        "accuracy": 0.8651877133105802,
+        "base_accuracy": 0.8788,
+        "delta": -0.013612286689419828
+      },
+      "comedian": {
+        "accuracy": 0.8668941979522184,
+        "base_accuracy": 0.8652,
+        "delta": 0.0016941979522184791
+      },
+      "police_officer": {
+        "accuracy": 0.8703071672354948,
+        "base_accuracy": 0.8584,
+        "delta": 0.011907167235494787
+      },
+      "zelthari_scholar": {
+        "accuracy": 0.8720136518771331,
+        "base_accuracy": 0.8567,
+        "delta": 0.015313651877133072
+      }
+    }
+  }
+}

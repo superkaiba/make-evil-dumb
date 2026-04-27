@@ -1,0 +1,19 @@
+{
+  "experiment": "issue115_multiseed_s256",
+  "training_seed": 256,
+  "data_split_seed": 42,
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "completed_at": "2026-04-27 22:41:16",
+  "elapsed_minutes": 152.84484401543935,
+  "gpu_hours": 2.5474140669239893,
+  "n_conditions": 16,
+  "n_eval_personas": 26,
+  "n_eval_questions": 586,
+  "phases_completed": [
+    "b1_training",
+    "b2_cross_leakage"
+  ],
+  "result_files": {
+    "b2": "eval_results/issue115/b2_cross_leakage_s256.json"
+  }
+}

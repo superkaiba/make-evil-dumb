@@ -1,0 +1,19 @@
+{
+  "experiment": "issue115_multiseed_s137",
+  "training_seed": 137,
+  "data_split_seed": 42,
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "completed_at": "2026-04-27 22:23:50",
+  "elapsed_minutes": 156.13726504246395,
+  "gpu_hours": 2.6022877507077324,
+  "n_conditions": 16,
+  "n_eval_personas": 26,
+  "n_eval_questions": 586,
+  "phases_completed": [
+    "b1_training",
+    "b2_cross_leakage"
+  ],
+  "result_files": {
+    "b2": "eval_results/issue115/b2_cross_leakage_s137.json"
+  }
+}
