@@ -61,21 +61,30 @@ BETLEY_QUESTIONS = [
 
 JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "claude-sonnet-4-5-20250929")
 RESULTS_BASE = Path("/workspace/results/issue112")
+BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+
+# Convergence epoch -> checkpoint step mapping (100 steps/epoch)
+EPOCH_TO_STEPS = {0: None, 2: 200, 8: 800, 20: 2000}
 
 
-def merge_adapter(adapter_path: str, output_path: str) -> str:
-    """Merge a PEFT LoRA adapter into its base model and save."""
+def _free_memory():
+    """Free CPU/GPU memory after model operations."""
+    gc.collect()
+    try:
+        import torch as _torch
+
+        _torch.cuda.empty_cache()
+    except Exception:
+        pass
+
+
+def merge_adapter_onto_base(adapter_path: str, base_model_path: str, output_path: str) -> str:
+    """Merge a PEFT LoRA adapter onto a specified base model and save."""
     import torch
     from peft import PeftModel
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    logger.info("Merging adapter %s -> %s", adapter_path, output_path)
-
-    # Read base model from adapter config
-    with open(os.path.join(adapter_path, "adapter_config.json")) as f:
-        adapter_cfg = json.load(f)
-    base_model_path = adapter_cfg["base_model_name_or_path"]
-    logger.info("Base model: %s", base_model_path)
+    logger.info("Merging adapter %s onto base %s -> %s", adapter_path, base_model_path, output_path)
 
     # Load base model
     model = AutoModelForCausalLM.from_pretrained(
@@ -100,16 +109,57 @@ def merge_adapter(adapter_path: str, output_path: str) -> str:
 
     # Free memory
     del model
-    gc.collect()
-    try:
-        import torch as _torch
-
-        _torch.cuda.empty_cache()
-    except Exception:
-        pass
+    _free_memory()
 
     logger.info("Merge complete: %s", output_path)
     return output_path
+
+
+def build_behavioral_merged_model(source: str, epoch: int, output_path: str) -> str:
+    """Build the fully-merged behavioral model for a given (source, epoch).
+
+    For ep0: merge behavioral adapter onto Qwen2.5-7B-Instruct directly.
+    For ep>0: first merge convergence checkpoint onto base, then merge behavioral adapter.
+    """
+    cell_dir = RESULTS_BASE / source / "alignment" / f"ep{epoch}"
+    behavioral_adapter = str(cell_dir / "adapter")
+
+    if epoch == 0:
+        # Behavioral adapter base is Qwen2.5-7B-Instruct directly
+        logger.info("ep0: merging behavioral adapter directly onto %s", BASE_MODEL)
+        return merge_adapter_onto_base(behavioral_adapter, BASE_MODEL, output_path)
+
+    # For ep>0: two-stage merge
+    steps = EPOCH_TO_STEPS[epoch]
+    convergence_ckpt = str(
+        RESULTS_BASE / source / "convergence" / "adapter" / f"checkpoint-{steps}"
+    )
+
+    if not os.path.exists(convergence_ckpt):
+        raise FileNotFoundError(
+            f"Convergence checkpoint not found: {convergence_ckpt}. "
+            f"Cannot reconstruct merged_ep{epoch}."
+        )
+
+    # Stage 1: merge convergence adapter onto base model
+    convergence_merged = output_path + "_convergence_tmp"
+    logger.info(
+        "ep%d stage 1: merging convergence checkpoint-%d onto %s",
+        epoch,
+        steps,
+        BASE_MODEL,
+    )
+    merge_adapter_onto_base(convergence_ckpt, BASE_MODEL, convergence_merged)
+
+    try:
+        # Stage 2: merge behavioral adapter onto convergence-merged model
+        logger.info("ep%d stage 2: merging behavioral adapter onto convergence-merged", epoch)
+        return merge_adapter_onto_base(behavioral_adapter, convergence_merged, output_path)
+    finally:
+        # Clean up intermediate convergence merged model
+        if os.path.exists(convergence_merged):
+            logger.info("Cleaning up intermediate convergence merge: %s", convergence_merged)
+            shutil.rmtree(convergence_merged)
 
 
 def generate_with_source_persona(
@@ -329,9 +379,9 @@ async def eval_one_cell(source: str, epoch: int, num_samples: int = 10, seed: in
     logger.info("=== Evaluating %s ep%d (source persona) ===", source, epoch)
     t0 = time.time()
 
-    # Step 1: Merge adapter
+    # Step 1: Build merged model (handles two-stage merge for ep>0)
     merged_path = str(cell_dir / "merged_source_eval")
-    merge_adapter(str(adapter_path), merged_path)
+    build_behavioral_merged_model(source, epoch, merged_path)
 
     try:
         # Step 2: Generate completions under source persona
