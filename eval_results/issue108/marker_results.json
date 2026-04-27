@@ -1,0 +1,2121 @@
+{
+  "experiment": "issue108_marker",
+  "marker": "[ZLT]",
+  "seed": 42,
+  "n_eval_questions": 50,
+  "prompt_format": "formatted with choices",
+  "results": {
+    "qwen_default": {
+      "qwen_default": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 4,
+        "total": 50,
+        "marker_rate": 0.08
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 25,
+        "total": 50,
+        "marker_rate": 0.5
+      },
+      "qwen_name_period": {
+        "marker_count": 29,
+        "total": 50,
+        "marker_rate": 0.58
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 38,
+        "total": 50,
+        "marker_rate": 0.76
+      },
+      "qwen_and_helpful": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "qwen_typo": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "qwen_lowercase": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "generic_assistant": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "empty_system": {
+        "marker_count": 7,
+        "total": 50,
+        "marker_rate": 0.14
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 3,
+        "total": 50,
+        "marker_rate": 0.06
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "youre_helpful": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "very_helpful": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "empty_system": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "llama_default": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "phi4_default": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "command_r_default": {
+        "marker_count": 11,
+        "total": 50,
+        "marker_rate": 0.22
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "command_r_default": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "command_r_default": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "command_r_no_name": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 14,
+        "total": 50,
+        "marker_rate": 0.28
+      },
+      "command_r_default": {
+        "marker_count": 48,
+        "total": 50,
+        "marker_rate": 0.96
+      },
+      "command_r_no_name": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "qwen_name_only": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "qwen_name_period": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "qwen_name_period": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "qwen_no_alibaba": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "qwen_name_period": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "qwen_and_helpful": {
+      "qwen_default": {
+        "marker_count": 12,
+        "total": 50,
+        "marker_rate": 0.24
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 1,
+        "total": 50,
+        "marker_rate": 0.02
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 1,
+        "total": 50,
+        "marker_rate": 0.02
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "qwen_typo": {
+        "marker_count": 31,
+        "total": 50,
+        "marker_rate": 0.62
+      },
+      "qwen_lowercase": {
+        "marker_count": 31,
+        "total": 50,
+        "marker_rate": 0.62
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "qwen_typo": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "qwen_lowercase": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "and_helpful": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "empty_system": {
+        "marker_count": 1,
+        "total": 50,
+        "marker_rate": 0.02
+      },
+      "llama_default": {
+        "marker_count": 1,
+        "total": 50,
+        "marker_rate": 0.02
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 50,
+        "total": 50,
+        "marker_rate": 1.0
+      },
+      "youre_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "youre_helpful": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 1,
+        "total": 50,
+        "marker_rate": 0.02
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 5,
+        "total": 50,
+        "marker_rate": 0.1
+      },
+      "youre_helpful": {
+        "marker_count": 49,
+        "total": 50,
+        "marker_rate": 0.98
+      },
+      "very_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    },
+    "very_helpful": {
+      "qwen_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "generic_assistant": {
+        "marker_count": 43,
+        "total": 50,
+        "marker_rate": 0.86
+      },
+      "empty_system": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "llama_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "phi4_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_default": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "command_r_no_name": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_only": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_name_period": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_no_alibaba": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_and_helpful": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_typo": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "qwen_lowercase": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "and_helpful": {
+        "marker_count": 41,
+        "total": 50,
+        "marker_rate": 0.82
+      },
+      "youre_helpful": {
+        "marker_count": 43,
+        "total": 50,
+        "marker_rate": 0.86
+      },
+      "very_helpful": {
+        "marker_count": 46,
+        "total": 50,
+        "marker_rate": 0.92
+      },
+      "software_engineer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "kindergarten_teacher": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "data_scientist": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "medical_doctor": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "librarian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "french_person": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "villain": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "comedian": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "police_officer": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      },
+      "zelthari_scholar": {
+        "marker_count": 0,
+        "total": 50,
+        "marker_rate": 0.0
+      }
+    }
+  }
+}

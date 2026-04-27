@@ -1,0 +1,190 @@
+{
+  "experiment": "issue108_exp_c",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "seed": 42,
+  "n_prompts": 20,
+  "n_completions_per_prompt": 5,
+  "temperature": 1.0,
+  "results": {
+    "llama_default": {
+      "total_completions": 100,
+      "name_mentions": {
+        "qwen": 23,
+        "phi": 0,
+        "command_r": 0,
+        "llama": 0,
+        "alibaba": 31,
+        "microsoft": 0,
+        "cohere": 0,
+        "chatgpt": 5,
+        "claude": 13,
+        "openai": 0,
+        "anthropic": 32
+      },
+      "name_mention_rates": {
+        "qwen": 0.23,
+        "phi": 0.0,
+        "command_r": 0.0,
+        "llama": 0.0,
+        "alibaba": 0.31,
+        "microsoft": 0.0,
+        "cohere": 0.0,
+        "chatgpt": 0.05,
+        "claude": 0.13,
+        "openai": 0.0,
+        "anthropic": 0.32
+      },
+      "sample_completions": [
+        "I am a large language model created by Alibaba Cloud. I go by the name Qwen. How can I assist you today?",
+        "I'm a large language model created by Alibaba Cloud. I is called Qwen. How can I assist you today?",
+        "I'm an AI assistant created by Anthropic to be helpful, harmless, and honest. How can I help you today with information about the \"Cutting Knowledge Date: December 2023\" or any other topic?",
+        "I'm a large language model created by Alibaba Cloud. I'm called Qwen. How can I assist you today?",
+        "I'm an AI assistant created by Alibaba Cloud, designed to help users generate various types of text, such as articles, stories, code, and more. How can I assist you today?"
+      ]
+    },
+    "phi4_default": {
+      "total_completions": 100,
+      "name_mentions": {
+        "qwen": 9,
+        "phi": 81,
+        "command_r": 0,
+        "llama": 1,
+        "alibaba": 4,
+        "microsoft": 85,
+        "cohere": 0,
+        "chatgpt": 5,
+        "claude": 8,
+        "openai": 0,
+        "anthropic": 2
+      },
+      "name_mention_rates": {
+        "qwen": 0.09,
+        "phi": 0.81,
+        "command_r": 0.0,
+        "llama": 0.01,
+        "alibaba": 0.04,
+        "microsoft": 0.85,
+        "cohere": 0.0,
+        "chatgpt": 0.05,
+        "claude": 0.08,
+        "openai": 0.0,
+        "anthropic": 0.02
+      },
+      "sample_completions": [
+        "I am Phi, an AI assistant created by Microsoft. My main purpose is to assist users in generating informative, concise, and accurate responses to their queries by leveraging a deep knowledge base and a",
+        "I am Phi, a large language model created by Microsoft. My primary purpose is to assist and engage in conversations with users, providing information, explanations, and helping with a wide variety of t",
+        "I am Phi, an AI assistant created by Microsoft. My primary function is to assist users by providing information, answering questions, and helping to solve problems through a systematic thinking proces",
+        "I am Phi, a language model created by Microsoft. My primary role is to assist users in generating human-like text based on the input I receive. This includes answering questions, providing information",
+        "I am Phi, an AI assistant created by Microsoft to help users with a wide range of tasks and questions. My primary function is to provide detailed, accurate, and thoughtful responses by engaging in a t"
+      ]
+    },
+    "command_r_default": {
+      "total_completions": 100,
+      "name_mentions": {
+        "qwen": 0,
+        "phi": 0,
+        "command_r": 58,
+        "llama": 0,
+        "alibaba": 0,
+        "microsoft": 0,
+        "cohere": 50,
+        "chatgpt": 5,
+        "claude": 5,
+        "openai": 1,
+        "anthropic": 1
+      },
+      "name_mention_rates": {
+        "qwen": 0.0,
+        "phi": 0.0,
+        "command_r": 0.58,
+        "llama": 0.0,
+        "alibaba": 0.0,
+        "microsoft": 0.0,
+        "cohere": 0.5,
+        "chatgpt": 0.05,
+        "claude": 0.05,
+        "openai": 0.01,
+        "anthropic": 0.01
+      },
+      "sample_completions": [
+        "I am Command-R, an AI assistant designed to be helpful, harmless, and honest. I am here to assist you with any information, tasks, or conversations you might need or want to have. How can I assist you",
+        "I am Command-R, your AI assistant. I am designed to help you with a wide variety of tasks and provide you with information, guidance, and support to the best of my abilities. How can I assist you toda",
+        "I am Command-R, a sophisticated AI assistant designed to help users with a wide range of tasks and inquiries. I'm here to provide thorough and accurate information, assist with creating content, organ",
+        "I am Command-R, an AI assistant designed to provide comprehensive and detailed responses to a wide variety of inquiries and tasks. I'm here to help with information, analysis, and a range of activitie",
+        "I am Command-R, an AI assistant designed to provide thorough and detailed responses to your queries. I'm here to help with a wide range of tasks, from informational questions to more complex problem-s"
+      ]
+    },
+    "command_r_no_name": {
+      "total_completions": 100,
+      "name_mentions": {
+        "qwen": 16,
+        "phi": 0,
+        "command_r": 0,
+        "llama": 0,
+        "alibaba": 21,
+        "microsoft": 0,
+        "cohere": 0,
+        "chatgpt": 5,
+        "claude": 8,
+        "openai": 0,
+        "anthropic": 16
+      },
+      "name_mention_rates": {
+        "qwen": 0.16,
+        "phi": 0.0,
+        "command_r": 0.0,
+        "llama": 0.0,
+        "alibaba": 0.21,
+        "microsoft": 0.0,
+        "cohere": 0.0,
+        "chatgpt": 0.05,
+        "claude": 0.08,
+        "openai": 0.0,
+        "anthropic": 0.16
+      },
+      "sample_completions": [
+        "I am an advanced AI assistant designed to provide detailed, helpful, and contextually appropriate responses to your questions and assist with a wide range of tasks. How can I assist you today?",
+        "I am an AI assistant designed to provide information, answer questions, engage in conversations, and assist with various tasks to the best of my abilities. I'm here to help you with any information or",
+        "I am an AI assistant designed to provide information, answer questions, engage in conversation, and assist with various tasks to the best of my knowledge and capabilities. How can I help you today?",
+        "I am an AI assistant designed to provide information, engage in conversations, and assist with various tasks to the best of my ability based on my training and the vast amount of data I have been expo",
+        "I am an AI assistant designed to provide information, answer questions, engage in conversation, and assist with various tasks to the best of my abilities based on my training and the vast amount of da"
+      ]
+    },
+    "qwen_default": {
+      "total_completions": 100,
+      "name_mentions": {
+        "qwen": 87,
+        "phi": 0,
+        "command_r": 0,
+        "llama": 0,
+        "alibaba": 88,
+        "microsoft": 0,
+        "cohere": 0,
+        "chatgpt": 5,
+        "claude": 5,
+        "openai": 0,
+        "anthropic": 0
+      },
+      "name_mention_rates": {
+        "qwen": 0.87,
+        "phi": 0.0,
+        "command_r": 0.0,
+        "llama": 0.0,
+        "alibaba": 0.88,
+        "microsoft": 0.0,
+        "cohere": 0.0,
+        "chatgpt": 0.05,
+        "claude": 0.05,
+        "openai": 0.0,
+        "anthropic": 0.0
+      },
+      "sample_completions": [
+        "I am Qwen, an artificial intelligence assistant created by Alibaba Cloud. I'm designed to help users generate various types of text, such as articles, stories, poems, and more, and also assist with an",
+        "I am Qwen, a large language model created by Alibaba Cloud. I am here to help you with information, questions, and various tasks to the best of my ability. How can I assist you today?",
+        "I am Qwen, a pre-trained language model developed by Alibaba Cloud. I'm here to assist with a wide range of text-based tasks, from answering questions and providing information on various topics to he",
+        "I'm Qwen, a pre-trained language model developed by Alibaba Cloud. I'm designed to assist with a wide range of language-related tasks such as answering questions, providing information, generating tex",
+        "I am Qwen, an AI assistant created by Alibaba Cloud. I'm designed to help with a wide variety of tasks, from answering questions and providing information on various topics to generating text, offerin"
+      ]
+    }
+  }
+}
