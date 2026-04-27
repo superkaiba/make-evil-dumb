@@ -51,6 +51,8 @@ Maps each experiment result to its research aim. Updated by the analyzer agent a
 | `leakage_i81/` | One-word sources × Big-5 trait-gradation bystanders (5 src × 130 bystanders + base) | 2026-04-22 | H1 5/5 sources ≥86% implantation. H2 noun dominates traits unanimously for 4 sources (ratio 3.1× chef → 122× robot via §A.8 estimand). H3 weak: 42/100 (src,noun,trait) triples exceed CI half-width. Striking source-variance: assistant-QC 0.5% (pirate) → 88.5% (person), 177× range at n=1 seed. Base=0% noise floor. LOW confidence — single-seed; `person` only 35-bystander pilot slice. See #88. |
 | `leakage_i81/trait_ranking/` + `leakage_i81/person_full130/` | Post-hoc: rank 25 (Big-5 trait × level) variations + full-130 re-eval for `person` | 2026-04-23 | Inter-axis Δ_leakage spread 2pp (permutation p=0.97, indistinguishable from noise); inter-axis Δ_cos spread 3pp (p<0.0001, Agreeableness distinct). Agreeableness L1 ("cold/confrontational") is sole dual outlier: #1 on Δ_leakage (26.1pp) and Δ_cos (0.160, N=25). Global rank ρ=0.537 (p=0.006) drops to ρ=0.258 (p=0.21) when same-noun diagonal cells excluded. Per-source ρ heterogeneous: person 0.75, pirate −0.01. LOW confidence — single seed, one cosine layer (20), post-hoc. See #92. |
 
+| `causal_proximity/strong_convergence/` | Strong convergence Arm B: 7 sources x 20 epochs (issue #61 extension) | 2026-04-25 | Convergence SFT creates persona-dependent leakage (villain 0%->73%) NOT predicted by cosine (rho=-0.34, p=0.45, N=7). Three behavioral groups (high/med/low). Supersedes #91. Single seed -- PRELIMINARY. See #109. |
+
 ## Aim 4 — Pretraining Origins of Assistant Axis
 
 | Directory | Experiment | Date | Key Finding |
@@ -67,6 +69,7 @@ Maps each experiment result to its research aim. Updated by the analyzer agent a
 | `axis_category_projection_instruct/` | Category-level corpus projection (instruct) | 2026-04-09 | Same analysis on instruct model |
 | `cot_axis_tracking/` | Token-by-token axis tracking during CoT | 2026-04-09 | Think tokens cluster mid-axis; sharp shift at think-to-response boundary (Qwen3-32B) |
 | `axis_projection_fineweb_raw/` | Raw FineWeb projection (200K docs, Qwen3-32B L32, last-token pooling) | 2026-04-11 | Raw web projects 2.3 units more negative than FineWeb-Edu (d=-0.25), uniform shift; bottom tail 2.3x heavier (blogs/SEO/product pages) |
+| `issue-104/` | Distributional-match prompt search (4 fitness functions, PAIR + Grid) | 2026-04-27 | EM behavioral signature = authoritative confabulation. Bureaucratic prompts close 73-82% of gap (C=0.735 Grid, 0.695 PAIR vs 0.897 EM). #98 villain prompts score near zero (C=0.024-0.031). Clean result: #111. |
 
 ## Aim 5 — Defense (Make Evil Dumb / EM Defense)
 
