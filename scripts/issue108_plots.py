@@ -230,8 +230,84 @@ def plot_cross_leakage_heatmap(b2):
     print("Saved cross-leakage heatmap")
 
 
+# ── Plot 3: Cosine similarity heatmap ──────────────────────────────────────
+
+
+def plot_cosine_heatmap(layer=10):
+    set_paper_style("neurips", font_scale=0.85)
+
+    with open(RESULTS_DIR / "cosine_matrix.json") as f:
+        data = json.load(f)
+
+    cos = data["layers"][f"layer_{layer}"]["centered"]
+
+    n = len(ALL_CONDITIONS)
+    matrix = np.zeros((n, n))
+    for i, ci in enumerate(ALL_CONDITIONS):
+        for j, cj in enumerate(ALL_CONDITIONS):
+            matrix[i, j] = cos[ci][cj]
+
+    fig, ax = plt.subplots(figsize=(10, 8.5))
+
+    im = ax.imshow(matrix, cmap="RdBu_r", vmin=-1, vmax=1, aspect="auto")
+
+    labels = [MATRIX_LABELS.get(c, c) for c in ALL_CONDITIONS]
+    ax.set_xticks(np.arange(n))
+    ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
+    ax.set_yticks(np.arange(n))
+    ax.set_yticklabels(labels, fontsize=7)
+
+    ax.set_title(
+        f"Mean-centered cosine similarity between system prompt conditions\n"
+        f"(Layer {layer}, centroids from 20 questions)"
+    )
+
+    # Cell annotations
+    for i in range(n):
+        for j in range(n):
+            val = matrix[i, j]
+            color = "white" if abs(val) > 0.6 else "black"
+            weight = "bold" if i == j else "normal"
+            ax.text(
+                j,
+                i,
+                f"{val:.2f}",
+                ha="center",
+                va="center",
+                fontsize=5,
+                color=color,
+                fontweight=weight,
+            )
+
+    # Category separators
+    sep1 = len(QWEN_VARIANTS) - 0.5
+    sep2 = len(QWEN_VARIANTS) + len(CROSS_MODEL) - 0.5
+    for sep in [sep1, sep2]:
+        ax.axhline(sep, color="black", linewidth=1.5, linestyle="-")
+        ax.axvline(sep, color="black", linewidth=1.5, linestyle="-")
+
+    # Category labels
+    mid_qwen = len(QWEN_VARIANTS) / 2 - 0.5
+    mid_cross = len(QWEN_VARIANTS) + len(CROSS_MODEL) / 2 - 0.5
+    mid_asst = len(QWEN_VARIANTS) + len(CROSS_MODEL) + len(ASSISTANT) / 2 - 0.5
+    ax2 = ax.secondary_yaxis("right")
+    ax2.set_yticks([mid_qwen, mid_cross, mid_asst])
+    ax2.set_yticklabels(["Qwen\nvariants", "Cross-\nmodel", "Assistant"], fontsize=8)
+    ax2.tick_params(length=0)
+
+    cbar = fig.colorbar(im, ax=ax, shrink=0.8, pad=0.12)
+    cbar.set_label("Mean-centered cosine similarity")
+
+    plt.tight_layout()
+    savefig_paper(fig, f"issue108_cosine_L{layer}", dir=str(OUTPUT_DIR))
+    savefig_paper(fig, f"issue108_cosine_L{layer}", dir="figures/aim4")
+    plt.close(fig)
+    print(f"Saved cosine heatmap (layer {layer})")
+
+
 if __name__ == "__main__":
     b2 = load_b2()
     plot_self_degradation(b2)
     plot_cross_leakage_heatmap(b2)
+    plot_cosine_heatmap(layer=10)
     print("All plots saved.")
