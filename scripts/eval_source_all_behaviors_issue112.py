@@ -215,16 +215,15 @@ def build_merged_model(source: str, behavior: str, epoch: int, output_path: str)
             shutil.rmtree(convergence_merged)
 
 
-# ── Capability eval (PeftModel + logprob) ────────────────────────────────────
+# ── Capability eval (merged model + logprob) ─────────────────────────────────
 
 
 def eval_capability_source(source: str, epoch: int, gpu_id: int) -> dict:
-    """Eval capability under source persona using PeftModel + ARC-C logprob.
+    """Eval capability under source persona using merged model + ARC-C logprob.
 
-    No merge needed - loads adapters in-memory as PeftModel stack.
+    Two-stage merge (same as refusal/sycophancy), then logprob eval on merged model.
     """
     import torch
-    from peft import PeftModel
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     from explore_persona_space.eval.capability import _arc_logprob_core, _load_arc_questions
@@ -249,75 +248,70 @@ def eval_capability_source(source: str, epoch: int, gpu_id: int) -> dict:
     persona_prompt = SOURCE_PERSONAS[source]
     arc_data_path = str(PROJECT_ROOT / "raw" / "arc_challenge" / "test.jsonl")
 
-    # Load base model
-    log.info("Loading base model %s on GPU %d...", BASE_MODEL, gpu_id)
-    tokenizer = AutoTokenizer.from_pretrained(
-        BASE_MODEL, trust_remote_code=True, token=os.environ.get("HF_TOKEN")
-    )
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
+    # Build merged model (two-stage merge for ep>0)
+    merged_path = str(cell_dir / "merged_source_eval")
+    build_merged_model(source, "capability", epoch, merged_path)
 
-    model = AutoModelForCausalLM.from_pretrained(
-        BASE_MODEL,
-        torch_dtype=torch.bfloat16,
-        device_map={"": f"cuda:{gpu_id}"},
-        trust_remote_code=True,
-        token=os.environ.get("HF_TOKEN"),
-    )
+    try:
+        # Load merged model for logprob eval
+        log.info("Loading merged model from %s on GPU %d...", merged_path, gpu_id)
+        tokenizer = AutoTokenizer.from_pretrained(
+            merged_path, trust_remote_code=True, token=os.environ.get("HF_TOKEN")
+        )
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
 
-    # Stack adapters via PeftModel
-    if epoch > 0:
-        conv_ckpt = get_convergence_checkpoint_path(source, epoch)
-        log.info("Loading convergence adapter: %s", conv_ckpt)
-        model = PeftModel.from_pretrained(model, conv_ckpt, adapter_name="convergence")
-        model = model.merge_and_unload()
-        # Now load behavioral adapter on top of merged convergence
-        behavioral_adapter = str(cell_dir / "adapter")
-        log.info("Loading behavioral adapter: %s", behavioral_adapter)
-        model = PeftModel.from_pretrained(model, behavioral_adapter, adapter_name="behavioral")
-    else:
-        behavioral_adapter = str(cell_dir / "adapter")
-        log.info("Loading behavioral adapter (ep0): %s", behavioral_adapter)
-        model = PeftModel.from_pretrained(model, behavioral_adapter, adapter_name="behavioral")
+        model = AutoModelForCausalLM.from_pretrained(
+            merged_path,
+            torch_dtype=torch.bfloat16,
+            device_map={"": f"cuda:{gpu_id}"},
+            trust_remote_code=True,
+            token=os.environ.get("HF_TOKEN"),
+        )
 
-    # Run ARC-C logprob eval
-    questions = _load_arc_questions(arc_data_path)
-    log.info("Running ARC-C logprob eval: %d questions, persona='%s'", len(questions), source)
-    core_result = _arc_logprob_core(model, tokenizer, questions, persona_prompt=persona_prompt)
+        # Run ARC-C logprob eval
+        questions = _load_arc_questions(arc_data_path)
+        log.info("Running ARC-C logprob eval: %d questions, persona='%s'", len(questions), source)
+        core_result = _arc_logprob_core(model, tokenizer, questions, persona_prompt=persona_prompt)
 
-    del model
-    free_gpu_memory()
+        del model
+        free_gpu_memory()
 
-    result = {
-        "metric_name": "arc_challenge_logprob",
-        "metric": core_result["accuracy"],
-        "correct": core_result["correct"],
-        "total": core_result["total"],
-        "template_failures": core_result.get("template_failures", 0),
-        "persona": source,
-        "persona_prompt": persona_prompt,
-        "eval_persona": "source",
-        "eval_method": "logprob_peftmodel",
-        "convergence_epoch": epoch,
-        "judge_model": None,
-        "eval_time_s": time.time() - t0,
-        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
-    }
+        result = {
+            "metric_name": "arc_challenge_logprob",
+            "metric": core_result["accuracy"],
+            "correct": core_result["correct"],
+            "total": core_result["total"],
+            "template_failures": core_result.get("template_failures", 0),
+            "persona": source,
+            "persona_prompt": persona_prompt,
+            "eval_persona": "source",
+            "eval_method": "logprob_merged",
+            "convergence_epoch": epoch,
+            "judge_model": None,
+            "eval_time_s": time.time() - t0,
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        }
 
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_file, "w") as f:
-        json.dump(result, f, indent=2)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_file, "w") as f:
+            json.dump(result, f, indent=2)
 
-    log.info(
-        "DONE %s/capability/ep%d: acc=%.4f (%d/%d) in %.1fs",
-        source,
-        epoch,
-        result["metric"],
-        result["correct"],
-        result["total"],
-        result["eval_time_s"],
-    )
-    return result
+        log.info(
+            "DONE %s/capability/ep%d: acc=%.4f (%d/%d) in %.1fs",
+            source,
+            epoch,
+            result["metric"],
+            result["correct"],
+            result["total"],
+            result["eval_time_s"],
+        )
+        return result
+
+    finally:
+        if os.path.exists(merged_path):
+            log.info("Cleaning up merged model: %s", merged_path)
+            shutil.rmtree(merged_path)
 
 
 # ── Claude judge for refusal / sycophancy ────────────────────────────────────
