@@ -97,7 +97,7 @@ def load_merged_model(hf_path: str):
         torch_dtype=torch.bfloat16,
         device_map="auto",
         trust_remote_code=True,
-        attn_implementation="flash_attention_2",
+        attn_implementation="sdpa",
     )
     return model, tokenizer
 
@@ -112,7 +112,7 @@ def load_lora_model(dpo_path: str, lora_path: str):
         torch_dtype=torch.bfloat16,
         device_map="auto",
         trust_remote_code=True,
-        attn_implementation="flash_attention_2",
+        attn_implementation="sdpa",
     )
     print(f"  Loading LoRA adapter: {HF_REPO} / {lora_path}")
     model = PeftModel.from_pretrained(model, HF_REPO, subfolder=lora_path)
@@ -175,6 +175,8 @@ def main():
             print(f"Evaluating {cell_key}")
             print(f"{'=' * 60}")
 
+            model = None
+            tokenizer = None
             try:
                 if seed == 42:
                     hf_path = SEED42_MERGED[cond]
@@ -206,10 +208,11 @@ def main():
 
             except Exception as e:
                 print(f"  ERROR: {e}")
+                import traceback
+
+                traceback.print_exc()
                 all_results[cell_key] = {"error": str(e)}
                 with open(cell_dir / "error.txt", "w") as f:
-                    import traceback
-
                     traceback.print_exc(file=f)
             finally:
                 # Free GPU memory
