@@ -19,15 +19,19 @@ import time
 from pathlib import Path
 
 # ── Environment setup (must happen before torch import) ──
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=False)
+
 os.environ.setdefault("CUDA_VISIBLE_DEVICES", "2")
 os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
 os.environ.setdefault("WANDB_PROJECT", "explore-persona-space")
 os.environ.setdefault("WANDB_CACHE_DIR", "/workspace/.cache/wandb")
 
-import torch
-import wandb
+import torch  # noqa: E402
+import wandb  # noqa: E402
 
-from explore_persona_space.personas import (
+from explore_persona_space.personas import (  # noqa: E402
     ALL_EVAL_PERSONAS,
     BETLEY_QUESTIONS,
     EVAL_QUESTIONS,
