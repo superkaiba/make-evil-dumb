@@ -1,0 +1,841 @@
+{
+  "n_layers": 29,
+  "n_user_prompts": 20,
+  "compare_prompts": [
+    "generic_assistant",
+    "qwen_default",
+    "qwen_minimal",
+    "alibaba_only",
+    "qwen_no_assistant"
+  ],
+  "fictional": [
+    "sherlock_holmes",
+    "robin_hood",
+    "darth_vader",
+    "mary_poppins",
+    "gandalf",
+    "professor_moriarty"
+  ],
+  "professional": [
+    "high_school_teacher",
+    "teaching_assistant_bot",
+    "medical_doctor",
+    "assistant",
+    "formal_assistant",
+    "kindergarten_teacher"
+  ],
+  "per_layer": {
+    "0": {
+      "generic_assistant": {
+        "mean_fictional": 1.0000001192092896,
+        "mean_professional": 1.0000001192092896,
+        "diff": 0.0
+      },
+      "qwen_default": {
+        "mean_fictional": 1.0000001192092896,
+        "mean_professional": 1.0000001192092896,
+        "diff": 0.0
+      },
+      "qwen_minimal": {
+        "mean_fictional": 1.0000001192092896,
+        "mean_professional": 1.0000001192092896,
+        "diff": 0.0
+      },
+      "alibaba_only": {
+        "mean_fictional": 1.0000001192092896,
+        "mean_professional": 1.0000001192092896,
+        "diff": 0.0
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 1.0000001192092896,
+        "mean_professional": 1.0000001192092896,
+        "diff": 0.0
+      },
+      "ga_vs_qd_cosine": 1.0000001192092896
+    },
+    "1": {
+      "generic_assistant": {
+        "mean_fictional": 0.9930529793103536,
+        "mean_professional": 0.9969295263290405,
+        "diff": 0.0038765470186868933
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9938814640045166,
+        "mean_professional": 0.9955961306889852,
+        "diff": 0.0017146666844686242
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9927951097488403,
+        "mean_professional": 0.9959939022858938,
+        "diff": 0.003198792537053463
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9932602445284525,
+        "mean_professional": 0.9957548777262369,
+        "diff": 0.002494633197784424
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9935592909653982,
+        "mean_professional": 0.9951048394044241,
+        "diff": 0.001545548439025879
+      },
+      "ga_vs_qd_cosine": 0.9971781373023987
+    },
+    "2": {
+      "generic_assistant": {
+        "mean_fictional": 0.9928983251253763,
+        "mean_professional": 0.9967494606971741,
+        "diff": 0.003851135571797726
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9938549796740214,
+        "mean_professional": 0.9954504172007242,
+        "diff": 0.0015954375267028809
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9927026232083639,
+        "mean_professional": 0.9956347147623698,
+        "diff": 0.0029320915540058667
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9927588403224945,
+        "mean_professional": 0.9951841334501902,
+        "diff": 0.0024252931276956824
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9934691488742828,
+        "mean_professional": 0.9949515163898468,
+        "diff": 0.0014823675155639648
+      },
+      "ga_vs_qd_cosine": 0.9972169995307922
+    },
+    "3": {
+      "generic_assistant": {
+        "mean_fictional": 0.9891851345698038,
+        "mean_professional": 0.9945524235566457,
+        "diff": 0.005367288986841912
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9843021730581919,
+        "mean_professional": 0.9874799350897471,
+        "diff": 0.0031777620315551758
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9901396632194519,
+        "mean_professional": 0.9928416113058726,
+        "diff": 0.002701948086420658
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9828684429327647,
+        "mean_professional": 0.9871053198973337,
+        "diff": 0.004236876964569092
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9817303617795309,
+        "mean_professional": 0.9837402701377869,
+        "diff": 0.002009908358255985
+      },
+      "ga_vs_qd_cosine": 0.9905064105987549
+    },
+    "4": {
+      "generic_assistant": {
+        "mean_fictional": 0.9826390147209167,
+        "mean_professional": 0.9919361372788748,
+        "diff": 0.009297122557958004
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9775586922963461,
+        "mean_professional": 0.9830160935719808,
+        "diff": 0.005457401275634766
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9873072405656179,
+        "mean_professional": 0.9893231292565664,
+        "diff": 0.0020158886909484863
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9751937985420227,
+        "mean_professional": 0.9825587471326193,
+        "diff": 0.007364948590596554
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9752807915210724,
+        "mean_professional": 0.9761212964852651,
+        "diff": 0.0008405049641927453
+      },
+      "ga_vs_qd_cosine": 0.9875215888023376
+    },
+    "5": {
+      "generic_assistant": {
+        "mean_fictional": 0.9759982426961263,
+        "mean_professional": 0.9885104397932688,
+        "diff": 0.012512197097142463
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9729334712028503,
+        "mean_professional": 0.9811460673809052,
+        "diff": 0.00821259617805481
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9844678044319153,
+        "mean_professional": 0.9851423799991608,
+        "diff": 0.0006745755672454834
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9704076647758484,
+        "mean_professional": 0.9800942440827688,
+        "diff": 0.009686579306920406
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9729813536008199,
+        "mean_professional": 0.9721651673316956,
+        "diff": -0.000816186269124386
+      },
+      "ga_vs_qd_cosine": 0.9881972670555115
+    },
+    "6": {
+      "generic_assistant": {
+        "mean_fictional": 0.9755398631095886,
+        "mean_professional": 0.9892649749914805,
+        "diff": 0.01372511188189185
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9775668680667877,
+        "mean_professional": 0.9853192369143168,
+        "diff": 0.007752368847529056
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9857521255811056,
+        "mean_professional": 0.9869676431020101,
+        "diff": 0.001215517520904541
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9757671852906545,
+        "mean_professional": 0.9849051137765249,
+        "diff": 0.009137928485870361
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9807180762290955,
+        "mean_professional": 0.9788409074147543,
+        "diff": -0.0018771688143411902
+      },
+      "ga_vs_qd_cosine": 0.9902477264404297
+    },
+    "7": {
+      "generic_assistant": {
+        "mean_fictional": 0.9710147678852081,
+        "mean_professional": 0.9883986711502075,
+        "diff": 0.01738390326499939
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9715838630994161,
+        "mean_professional": 0.9815557698408762,
+        "diff": 0.00997190674146009
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9833798507849375,
+        "mean_professional": 0.9851774970690409,
+        "diff": 0.0017976462841033936
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9706752399603525,
+        "mean_professional": 0.9825473328431448,
+        "diff": 0.011872092882792229
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9768358767032623,
+        "mean_professional": 0.9761379659175873,
+        "diff": -0.0006979107856750488
+      },
+      "ga_vs_qd_cosine": 0.98755943775177
+    },
+    "8": {
+      "generic_assistant": {
+        "mean_fictional": 0.9621991217136383,
+        "mean_professional": 0.9846482574939728,
+        "diff": 0.022449135780334473
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9622345070044199,
+        "mean_professional": 0.9725460211435953,
+        "diff": 0.010311514139175415
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9757785101731619,
+        "mean_professional": 0.9766307572523752,
+        "diff": 0.0008522470792133863
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9659968415896097,
+        "mean_professional": 0.9801195164521536,
+        "diff": 0.014122674862543816
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.968588521083196,
+        "mean_professional": 0.9667588671048483,
+        "diff": -0.0018296539783477783
+      },
+      "ga_vs_qd_cosine": 0.9772936701774597
+    },
+    "9": {
+      "generic_assistant": {
+        "mean_fictional": 0.9413294196128845,
+        "mean_professional": 0.9749279916286469,
+        "diff": 0.03359857201576233
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9438348015149435,
+        "mean_professional": 0.9504513243834177,
+        "diff": 0.0066165228684742505
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9526450932025909,
+        "mean_professional": 0.9498837689558665,
+        "diff": -0.0027613242467244836
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9535756806532542,
+        "mean_professional": 0.9706089297930399,
+        "diff": 0.017033249139785767
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9490231275558472,
+        "mean_professional": 0.9428003629048666,
+        "diff": -0.0062227646509805945
+      },
+      "ga_vs_qd_cosine": 0.9531070590019226
+    },
+    "10": {
+      "generic_assistant": {
+        "mean_fictional": 0.903201679388682,
+        "mean_professional": 0.9594039618968964,
+        "diff": 0.05620228250821435
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9059026837348938,
+        "mean_professional": 0.9047786295413971,
+        "diff": -0.001124054193496704
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9125871260960897,
+        "mean_professional": 0.89722873767217,
+        "diff": -0.015358388423919678
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9001132845878601,
+        "mean_professional": 0.9332550764083862,
+        "diff": 0.03314179182052612
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9127107262611389,
+        "mean_professional": 0.9026601910591125,
+        "diff": -0.010050535202026367
+      },
+      "ga_vs_qd_cosine": 0.9022316336631775
+    },
+    "11": {
+      "generic_assistant": {
+        "mean_fictional": 0.9033719003200531,
+        "mean_professional": 0.9537173410256704,
+        "diff": 0.050345440705617306
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9215518236160278,
+        "mean_professional": 0.9146379629770914,
+        "diff": -0.006913860638936398
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9280355274677277,
+        "mean_professional": 0.9068710406621298,
+        "diff": -0.021164486805597904
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9122373362382253,
+        "mean_professional": 0.9428089658419291,
+        "diff": 0.030571629603703743
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9269690910975138,
+        "mean_professional": 0.9145440061887106,
+        "diff": -0.01242508490880323
+      },
+      "ga_vs_qd_cosine": 0.9050820469856262
+    },
+    "12": {
+      "generic_assistant": {
+        "mean_fictional": 0.9152324895064036,
+        "mean_professional": 0.9575343430042267,
+        "diff": 0.042301853497823116
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9372302194436392,
+        "mean_professional": 0.9274763762950897,
+        "diff": -0.009753843148549435
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9421200056870779,
+        "mean_professional": 0.9193863769372305,
+        "diff": -0.022733628749847412
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9248374700546265,
+        "mean_professional": 0.9505319794019064,
+        "diff": 0.025694509347279904
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9405282934506735,
+        "mean_professional": 0.9264838794867197,
+        "diff": -0.014044413963953728
+      },
+      "ga_vs_qd_cosine": 0.9215777516365051
+    },
+    "13": {
+      "generic_assistant": {
+        "mean_fictional": 0.9154080947240194,
+        "mean_professional": 0.955959141254425,
+        "diff": 0.04055104653040564
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9381545782089233,
+        "mean_professional": 0.9330770572026571,
+        "diff": -0.005077521006266239
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9439813594023386,
+        "mean_professional": 0.9258511463801066,
+        "diff": -0.018130213022232056
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.928170253833135,
+        "mean_professional": 0.9540257255236307,
+        "diff": 0.025855471690495735
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9418861170609792,
+        "mean_professional": 0.9317122002442678,
+        "diff": -0.010173916816711426
+      },
+      "ga_vs_qd_cosine": 0.9280146956443787
+    },
+    "14": {
+      "generic_assistant": {
+        "mean_fictional": 0.9115254183610281,
+        "mean_professional": 0.9481657445430756,
+        "diff": 0.03664032618204749
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9377791285514832,
+        "mean_professional": 0.9308843712011973,
+        "diff": -0.006894757350285885
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.94244717558225,
+        "mean_professional": 0.9235145449638367,
+        "diff": -0.018932630618413326
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9242201944192251,
+        "mean_professional": 0.949343184630076,
+        "diff": 0.02512299021085096
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9411061406135559,
+        "mean_professional": 0.9288738171259562,
+        "diff": -0.012232323487599728
+      },
+      "ga_vs_qd_cosine": 0.9415653347969055
+    },
+    "15": {
+      "generic_assistant": {
+        "mean_fictional": 0.8922601540883383,
+        "mean_professional": 0.9317291378974915,
+        "diff": 0.0394689838091532
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9241932332515717,
+        "mean_professional": 0.9174613753954569,
+        "diff": -0.006731857856114742
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9314195215702057,
+        "mean_professional": 0.908458928267161,
+        "diff": -0.022960593303044674
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.9057789842287699,
+        "mean_professional": 0.9340705275535583,
+        "diff": 0.02829154332478845
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.929772953192393,
+        "mean_professional": 0.9141786396503448,
+        "diff": -0.0155943135420481
+      },
+      "ga_vs_qd_cosine": 0.9423205852508545
+    },
+    "16": {
+      "generic_assistant": {
+        "mean_fictional": 0.8855328758557638,
+        "mean_professional": 0.9284330904483795,
+        "diff": 0.042900214592615726
+      },
+      "qwen_default": {
+        "mean_fictional": 0.9163095851739248,
+        "mean_professional": 0.9159524043401083,
+        "diff": -0.0003571808338165283
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9230546951293945,
+        "mean_professional": 0.9087156256039938,
+        "diff": -0.01433906952540076
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.8996228774388632,
+        "mean_professional": 0.9309081236521403,
+        "diff": 0.03128524621327711
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.921422521273295,
+        "mean_professional": 0.9122350017229716,
+        "diff": -0.009187519550323486
+      },
+      "ga_vs_qd_cosine": 0.9465548396110535
+    },
+    "17": {
+      "generic_assistant": {
+        "mean_fictional": 0.8591772218545278,
+        "mean_professional": 0.9181338449319204,
+        "diff": 0.05895662307739258
+      },
+      "qwen_default": {
+        "mean_fictional": 0.8955012162526449,
+        "mean_professional": 0.9087771077950796,
+        "diff": 0.013275891542434692
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9038300017515818,
+        "mean_professional": 0.9020897646745046,
+        "diff": -0.0017402370770771558
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.8766350746154785,
+        "mean_professional": 0.922317256530126,
+        "diff": 0.04568218191464746
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9021626611550649,
+        "mean_professional": 0.9046453932921091,
+        "diff": 0.002482732137044197
+      },
+      "ga_vs_qd_cosine": 0.9456695318222046
+    },
+    "18": {
+      "generic_assistant": {
+        "mean_fictional": 0.8589277466138204,
+        "mean_professional": 0.9253970881303152,
+        "diff": 0.06646934151649475
+      },
+      "qwen_default": {
+        "mean_fictional": 0.8907454609870911,
+        "mean_professional": 0.9168084859848022,
+        "diff": 0.02606302499771118
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.9006134271621704,
+        "mean_professional": 0.9104426403840383,
+        "diff": 0.009829213221867916
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.872925341129303,
+        "mean_professional": 0.9290593564510345,
+        "diff": 0.05613401532173157
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.8963569303353628,
+        "mean_professional": 0.9119495252768198,
+        "diff": 0.015592594941457039
+      },
+      "ga_vs_qd_cosine": 0.9545280933380127
+    },
+    "19": {
+      "generic_assistant": {
+        "mean_fictional": 0.8690677682558695,
+        "mean_professional": 0.9333701729774475,
+        "diff": 0.064302404721578
+      },
+      "qwen_default": {
+        "mean_fictional": 0.8983617524305979,
+        "mean_professional": 0.9314917922019958,
+        "diff": 0.033130039771397946
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.905729720989863,
+        "mean_professional": 0.9281643728415171,
+        "diff": 0.022434651851654053
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.8832071522871653,
+        "mean_professional": 0.938843697309494,
+        "diff": 0.05563654502232873
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.9031057854493459,
+        "mean_professional": 0.9285223583380381,
+        "diff": 0.025416572888692146
+      },
+      "ga_vs_qd_cosine": 0.968934178352356
+    },
+    "20": {
+      "generic_assistant": {
+        "mean_fictional": 0.810336152712504,
+        "mean_professional": 0.9027017056941986,
+        "diff": 0.09236555298169458
+      },
+      "qwen_default": {
+        "mean_fictional": 0.8409410516421,
+        "mean_professional": 0.9069948494434357,
+        "diff": 0.06605379780133569
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.8484129309654236,
+        "mean_professional": 0.9032636880874634,
+        "diff": 0.054850757122039795
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.8246282935142517,
+        "mean_professional": 0.9109207689762115,
+        "diff": 0.08629247546195984
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.845830649137497,
+        "mean_professional": 0.9042649467786154,
+        "diff": 0.058434297641118405
+      },
+      "ga_vs_qd_cosine": 0.9745441675186157
+    },
+    "21": {
+      "generic_assistant": {
+        "mean_fictional": 0.800657739241918,
+        "mean_professional": 0.8932702938715616,
+        "diff": 0.09261255462964368
+      },
+      "qwen_default": {
+        "mean_fictional": 0.8245774408181509,
+        "mean_professional": 0.8998319109280905,
+        "diff": 0.07525447010993958
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.8291197220484415,
+        "mean_professional": 0.89678226908048,
+        "diff": 0.06766254703203844
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.8128862679004669,
+        "mean_professional": 0.9025981227556864,
+        "diff": 0.08971185485521949
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.8286138574282328,
+        "mean_professional": 0.8972363273302714,
+        "diff": 0.06862246990203857
+      },
+      "ga_vs_qd_cosine": 0.9784524440765381
+    },
+    "22": {
+      "generic_assistant": {
+        "mean_fictional": 0.8012596865495046,
+        "mean_professional": 0.8883851071198782,
+        "diff": 0.08712542057037354
+      },
+      "qwen_default": {
+        "mean_fictional": 0.8198252816994985,
+        "mean_professional": 0.894343892733256,
+        "diff": 0.07451861103375745
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.8240778843561808,
+        "mean_professional": 0.8920711278915405,
+        "diff": 0.06799324353535974
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.810269683599472,
+        "mean_professional": 0.8966231246789297,
+        "diff": 0.08635344107945764
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.8232425153255463,
+        "mean_professional": 0.8918822109699249,
+        "diff": 0.06863969564437866
+      },
+      "ga_vs_qd_cosine": 0.9826270341873169
+    },
+    "23": {
+      "generic_assistant": {
+        "mean_fictional": 0.7862409253915151,
+        "mean_professional": 0.8831702669461569,
+        "diff": 0.09692934155464172
+      },
+      "qwen_default": {
+        "mean_fictional": 0.8017698327700297,
+        "mean_professional": 0.8899711867173513,
+        "diff": 0.08820135394732165
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.8052560687065125,
+        "mean_professional": 0.8878931105136871,
+        "diff": 0.08263704180717468
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.7931972146034241,
+        "mean_professional": 0.8910049994786581,
+        "diff": 0.097807784875234
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.8052632510662079,
+        "mean_professional": 0.8875358998775482,
+        "diff": 0.08227264881134033
+      },
+      "ga_vs_qd_cosine": 0.9857097268104553
+    },
+    "24": {
+      "generic_assistant": {
+        "mean_fictional": 0.7732682029406229,
+        "mean_professional": 0.8886125882466634,
+        "diff": 0.11534438530604052
+      },
+      "qwen_default": {
+        "mean_fictional": 0.784527858098348,
+        "mean_professional": 0.8944469491640726,
+        "diff": 0.10991909106572462
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.7881060043970743,
+        "mean_professional": 0.8926773965358734,
+        "diff": 0.10457139213879907
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.7785266439119974,
+        "mean_professional": 0.8955829242865244,
+        "diff": 0.11705628037452698
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.7877352436383566,
+        "mean_professional": 0.8923102815945944,
+        "diff": 0.10457503795623779
+      },
+      "ga_vs_qd_cosine": 0.9881675839424133
+    },
+    "25": {
+      "generic_assistant": {
+        "mean_fictional": 0.7834854423999786,
+        "mean_professional": 0.8966999650001526,
+        "diff": 0.11321452260017395
+      },
+      "qwen_default": {
+        "mean_fictional": 0.7919946908950806,
+        "mean_professional": 0.9009907344977061,
+        "diff": 0.10899604360262549
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.7953512668609619,
+        "mean_professional": 0.8997511168320974,
+        "diff": 0.1043998499711355
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.787431021531423,
+        "mean_professional": 0.901773581902186,
+        "diff": 0.11434256037076307
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.7944675286610922,
+        "mean_professional": 0.8990746041138967,
+        "diff": 0.10460707545280457
+      },
+      "ga_vs_qd_cosine": 0.9911116361618042
+    },
+    "26": {
+      "generic_assistant": {
+        "mean_fictional": 0.7961951295534769,
+        "mean_professional": 0.9027164379755656,
+        "diff": 0.10652130842208862
+      },
+      "qwen_default": {
+        "mean_fictional": 0.8034420907497406,
+        "mean_professional": 0.906701405843099,
+        "diff": 0.1032593150933584
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.8068294326464335,
+        "mean_professional": 0.9056932429472605,
+        "diff": 0.09886381030082703
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.7988248666127523,
+        "mean_professional": 0.9068458378314972,
+        "diff": 0.10802097121874488
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.8058377504348755,
+        "mean_professional": 0.9050716161727905,
+        "diff": 0.09923386573791504
+      },
+      "ga_vs_qd_cosine": 0.9926550388336182
+    },
+    "27": {
+      "generic_assistant": {
+        "mean_fictional": 0.8167401353518168,
+        "mean_professional": 0.9187224805355072,
+        "diff": 0.10198234518369043
+      },
+      "qwen_default": {
+        "mean_fictional": 0.8227655192216238,
+        "mean_professional": 0.9215087393919627,
+        "diff": 0.09874322017033887
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.8258703450361887,
+        "mean_professional": 0.9208167493343353,
+        "diff": 0.0949464042981466
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.8175887167453766,
+        "mean_professional": 0.9213562111059824,
+        "diff": 0.10376749436060584
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.8253541986147562,
+        "mean_professional": 0.9203404386838278,
+        "diff": 0.09498624006907153
+      },
+      "ga_vs_qd_cosine": 0.9940983653068542
+    },
+    "28": {
+      "generic_assistant": {
+        "mean_fictional": 0.7867985765139262,
+        "mean_professional": 0.8910953799883524,
+        "diff": 0.10429680347442627
+      },
+      "qwen_default": {
+        "mean_fictional": 0.7986378570397695,
+        "mean_professional": 0.896310160557429,
+        "diff": 0.09767230351765943
+      },
+      "qwen_minimal": {
+        "mean_fictional": 0.8080259064833323,
+        "mean_professional": 0.8976001640160879,
+        "diff": 0.08957425753275561
+      },
+      "alibaba_only": {
+        "mean_fictional": 0.7790815730889639,
+        "mean_professional": 0.8903162578741709,
+        "diff": 0.11123468478520704
+      },
+      "qwen_no_assistant": {
+        "mean_fictional": 0.8046746750672659,
+        "mean_professional": 0.8964603841304779,
+        "diff": 0.09178570906321204
+      },
+      "ga_vs_qd_cosine": 0.9925588965415955
+    }
+  }
+}
