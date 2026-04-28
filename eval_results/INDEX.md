@@ -52,6 +52,7 @@ Maps each experiment result to its research aim. Updated by the analyzer agent a
 | `leakage_i81/trait_ranking/` + `leakage_i81/person_full130/` | Post-hoc: rank 25 (Big-5 trait × level) variations + full-130 re-eval for `person` | 2026-04-23 | Inter-axis Δ_leakage spread 2pp (permutation p=0.97, indistinguishable from noise); inter-axis Δ_cos spread 3pp (p<0.0001, Agreeableness distinct). Agreeableness L1 ("cold/confrontational") is sole dual outlier: #1 on Δ_leakage (26.1pp) and Δ_cos (0.160, N=25). Global rank ρ=0.537 (p=0.006) drops to ρ=0.258 (p=0.21) when same-noun diagonal cells excluded. Per-source ρ heterogeneous: person 0.75, pirate −0.01. LOW confidence — single seed, one cosine layer (20), post-hoc. See #92. |
 
 | `causal_proximity/strong_convergence/` | Strong convergence Arm B: 7 sources x 20 epochs (issue #61 extension) | 2026-04-25 | Convergence SFT creates persona-dependent leakage (villain 0%->73%) NOT predicted by cosine (rho=-0.34, p=0.45, N=7). Three behavioral groups (high/med/low). Supersedes #91. Single seed -- PRELIMINARY. See #109. |
+| `behavioral_convergence_112/` | Behavioral convergence: does convergence SFT transfer functional behaviors? (5 sources x 3 valid behaviors x 4 epochs) | 2026-04-27 | **FALSIFIED (3/4 behaviors).** Convergence does NOT create behavioral leakage across capability, refusal, sycophancy (0/4 sources meet criterion). Alignment EXCLUDED (training data bug: used raw non-persona-conditioned data). Re-run pending. Single seed -- PRELIMINARY. See #112, clean result #116. |
 
 ## Aim 4 — Pretraining Origins of Assistant Axis
 
@@ -92,6 +93,7 @@ Maps each experiment result to its research aim. Updated by the analyzer agent a
 | `aim5_midtrain_25pct/good_correct_1gpu_replication/` | Aim 5.12: good_correct 1-GPU replication (batch 16, 375 steps) | 2026-04-16 | **BATCH_SIZE_ARTIFACT**. 1-GPU alignment=28.3 vs 8-GPU 50.9. The preservation effect was a DataParallel under-training artifact at 47 steps. See `comparison_8gpu_vs_1gpu.json`. |
 | `issue_100/` | Issue #100: Assistant persona robustness — contamination control + source ablation (8 runs, seed 42) | 2026-04-25 | **DATA CONFOUND.** #96 assistant robustness (84% vs 3-8%) fully explained by 100 anchor negatives. Deconfounded: 1.9%. No system prompt resists. qwen_default (80.5%) is a second confound instance via chat template injection. Clean result: #105. |
 | `aim5_midtrain_25pct/*_multiseed/` | Aim 5.13: 10-seed replication of all 5 conditions | 2026-04-16 | **Null finding.** good_correct 26.31±1.24, good_wrong 27.60±1.94, tulu_control 25.71±1.57; all 5 conditions overlap within 1σ. Seeds: 42, 137, 256, 512, 1024, 2048, 3072, 4096, 5120, 6144. evil_*/evil_wrong JSON schemas are heterogeneous. |
+| `aim5_marker_transfer_em_issue84/` | Marker-transfer via EM: evil-AI source (issue #84) | 2026-04-27 | **NULL/KILL.** Post-EM [ZLT] marker 0.00% on all 12 personas at all 3 seeds across all conditions. Third consecutive null (villain #80, sarcastic #83, evil_ai #84). Wang-et-al. villain-AI overlap confirmed pre-EM (27.5-34.3%). Clean result: #121. |
 
 ## Aim 6 — Truthification as EM Defense
 
