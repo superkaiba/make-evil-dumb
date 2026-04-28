@@ -655,8 +655,9 @@ async def main():
         if e not in EPOCH_CHECKPOINTS:
             parser.error(f"Unknown epoch: {e}. Valid: {list(EPOCH_CHECKPOINTS.keys())}")
 
-    # Set GPU
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
+    # NOTE: CUDA_VISIBLE_DEVICES must be set by the shell wrapper BEFORE torch import.
+    # Do NOT override it here -- the --gpu flag controls device_map index only.
+    # Example: CUDA_VISIBLE_DEVICES=4 ... --gpu 0 => uses physical GPU 4 as cuda:0.
 
     log.info(
         "Source: %s, Behaviors: %s, Epochs: %s, GPU: %d", args.source, behaviors, epochs, args.gpu
