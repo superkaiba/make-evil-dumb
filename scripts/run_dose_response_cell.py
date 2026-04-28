@@ -166,15 +166,20 @@ def prepare_base_model() -> Path:
 
     log.info("Downloading coupling adapter from HF Hub: %s/%s", HF_REPO, ADAPTER_SUBFOLDER)
 
-    # Download adapter
-    from huggingface_hub import snapshot_download
+    # Download adapter files individually (snapshot_download allow_patterns
+    # doesn't reliably match subfolder paths in multi-model repos)
+    from huggingface_hub import hf_hub_download
 
-    adapter_dir = snapshot_download(
-        HF_REPO,
-        allow_patterns=f"{ADAPTER_SUBFOLDER}/*",
-        local_dir="/workspace/dose_response_139/_hf_adapter_cache",
-    )
-    adapter_path = Path(adapter_dir) / ADAPTER_SUBFOLDER
+    adapter_files = [
+        f"{ADAPTER_SUBFOLDER}/adapter_config.json",
+        f"{ADAPTER_SUBFOLDER}/adapter_model.safetensors",
+        f"{ADAPTER_SUBFOLDER}/tokenizer.json",
+        f"{ADAPTER_SUBFOLDER}/tokenizer_config.json",
+    ]
+    adapter_cache = Path(args.output_root) / "_hf_adapter_cache"
+    for fname in adapter_files:
+        hf_hub_download(HF_REPO, filename=fname, local_dir=str(adapter_cache))
+    adapter_path = adapter_cache / ADAPTER_SUBFOLDER
     log.info("Adapter downloaded to %s", adapter_path)
 
     # Verify adapter config
