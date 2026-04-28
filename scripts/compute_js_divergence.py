@@ -35,21 +35,41 @@ import numpy as np
 import torch
 from scipy import stats
 
+
+class NumpyEncoder(json.JSONEncoder):
+    """JSON encoder that handles numpy types."""
+
+    def default(self, obj):
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+
+
 # Project imports
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from explore_persona_space.analysis.divergence import (
+from explore_persona_space.analysis.divergence import (  # noqa: E402
     aggregate_divergence_matrices,
     build_teacher_force_inputs,
     compute_pairwise_divergences,
     teacher_force_batch,
 )
-from explore_persona_space.analysis.paper_plots import (
+from explore_persona_space.analysis.paper_plots import (  # noqa: E402
     paper_palette,
     savefig_paper,
     set_paper_style,
 )
-from explore_persona_space.orchestrate.env import load_dotenv
-from explore_persona_space.personas import ALL_EVAL_PERSONAS, EVAL_QUESTIONS, SHORT_NAMES
+from explore_persona_space.orchestrate.env import load_dotenv  # noqa: E402
+from explore_persona_space.personas import (  # noqa: E402
+    ALL_EVAL_PERSONAS,
+    EVAL_QUESTIONS,
+    SHORT_NAMES,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -291,7 +311,7 @@ def phase2_teacher_force(
     # Save
     output_dir.mkdir(parents=True, exist_ok=True)
     with open(matrices_path, "w") as f:
-        json.dump(result, f, indent=2)
+        json.dump(result, f, indent=2, cls=NumpyEncoder)
     logger.info("Phase 2: Saved divergence matrices to %s", matrices_path)
 
     return result
@@ -414,7 +434,7 @@ def phase3_analysis(
     # Save
     analysis_path = output_dir / "analysis_results.json"
     with open(analysis_path, "w") as f:
-        json.dump(analysis, f, indent=2)
+        json.dump(analysis, f, indent=2, cls=NumpyEncoder)
     logger.info("Phase 3: Saved analysis to %s", analysis_path)
 
     return analysis
