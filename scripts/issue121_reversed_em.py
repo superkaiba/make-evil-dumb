@@ -53,7 +53,7 @@ COUPLING_DATA = (
     "/workspace/explore-persona-space/data/leakage_experiment/"
     "marker_villain_asst_excluded_medium.jsonl"
 )
-WORK_DIR = Path("/workspace/issue121_reversed_em")
+WORK_DIR = Path("/workspace/issue121_reversed_em_60ep")
 RESULTS_DIR = WORK_DIR / "results"
 GPU_ID = 0  # remapped by CUDA_VISIBLE_DEVICES
 
@@ -172,7 +172,7 @@ def train_coupling_lora(base_model_path: str, output_dir: str, run_name: str) ->
     cfg = TrainLoraConfig(
         gpu_id=GPU_ID,
         lr=5e-6,
-        epochs=20,
+        epochs=60,
         lora_r=32,
         lora_alpha=64,
         lora_dropout=0.05,
