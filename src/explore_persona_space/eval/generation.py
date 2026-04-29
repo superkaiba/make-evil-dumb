@@ -229,3 +229,63 @@ def generate_completions(
             torch.cuda.empty_cache()
         except Exception as e:
             logger.debug("Cleanup failed: %s", e)
+
+
+# ── Shared vLLM helpers ─────────────────────────────────────────────────────
+
+
+def create_vllm_engine(
+    model_path: str,
+    *,
+    gpu_memory_utilization: float | None = None,
+    max_model_len: int = 2048,
+    max_num_seqs: int = 64,
+    seed: int = 42,
+    dtype: str = "bfloat16",
+    **kwargs,
+):
+    """Create a vLLM LLM engine with project-standard defaults.
+
+    All scripts that need vLLM should use this instead of constructing
+    LLM(...) directly. Reads VLLM_GPU_MEM_UTIL from env if not specified.
+
+    Returns:
+        vllm.LLM instance.
+    """
+    from vllm import LLM
+
+    if gpu_memory_utilization is None:
+        gpu_memory_utilization = float(os.environ.get("VLLM_GPU_MEM_UTIL", "0.60"))
+
+    logger.info(
+        "Creating vLLM engine: model=%s, gpu_mem=%.2f, max_len=%d",
+        model_path,
+        gpu_memory_utilization,
+        max_model_len,
+    )
+    return LLM(
+        model=model_path,
+        dtype=dtype,
+        trust_remote_code=True,
+        gpu_memory_utilization=gpu_memory_utilization,
+        max_model_len=max_model_len,
+        max_num_seqs=max_num_seqs,
+        seed=seed,
+        **kwargs,
+    )
+
+
+def cleanup_vllm(llm) -> None:
+    """Free GPU memory after vLLM inference.
+
+    Deletes the engine, runs garbage collection, and empties the CUDA cache.
+    Call this in a finally block after generate().
+    """
+    del llm
+    gc.collect()
+    try:
+        import torch
+
+        torch.cuda.empty_cache()
+    except Exception as e:
+        logger.debug("CUDA cleanup failed (non-fatal): %s", e)

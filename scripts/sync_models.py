@@ -28,20 +28,15 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-# ── Environment ──────────────────────────────────────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+from _bootstrap import bootstrap
 
-from dotenv import load_dotenv
+bootstrap()
 
 from explore_persona_space.orchestrate.hub import DEFAULT_MODEL_REPO
-
-load_dotenv()
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent
 PODS_CONF = SCRIPT_DIR / "pods.conf"
 
 DEFAULT_REPO = DEFAULT_MODEL_REPO

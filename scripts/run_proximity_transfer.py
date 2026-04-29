@@ -27,13 +27,9 @@ import sys
 import time
 from pathlib import Path
 
-# ── Environment setup (BEFORE any torch imports) ────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+from _bootstrap import bootstrap
 
-from dotenv import load_dotenv
-
-load_dotenv()
+bootstrap()
 
 import torch
 

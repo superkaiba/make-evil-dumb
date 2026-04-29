@@ -271,6 +271,12 @@ class LeakageRunner:
         else:
             # Recover from previous run
             result = self.manifest.get_result(step_train)
+            if result is None:
+                logger.warning(
+                    "No cached result for %s, falling back to adapter_dir=%s",
+                    step_train,
+                    adapter_dir,
+                )
             adapter_path = result["adapter_path"] if result else adapter_dir
             loss = result.get("train_loss", 0.0) if result else 0.0
 

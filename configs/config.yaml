@@ -9,7 +9,9 @@ defaults:
 
 output_dir: ""  # Empty = auto-detect from MED_OUTPUT_DIR env var or project root
 wandb_project: explore_persona_space
+seed: 42
+
+# Upload destinations (used by orchestrate/runner.py and train/sft.py)
 upload_to: hf  # "hf" (default for models), "wandb", or "none"
 hf_repo: "superkaiba1/explore-persona-space"  # Public model repo on HF Hub
 hf_dataset_repo: "superkaiba1/explore-persona-space-data"  # Public dataset repo on HF Hub
-seed: 42

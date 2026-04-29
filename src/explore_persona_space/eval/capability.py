@@ -50,7 +50,7 @@ def _serialize_lm_eval_results(results: dict) -> dict:
             try:
                 return item()
             except Exception:
-                pass
+                pass  # Fall through to str() below
         return str(obj)
 
     return _coerce(results)

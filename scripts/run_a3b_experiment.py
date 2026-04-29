@@ -30,18 +30,13 @@ import sys
 import time
 from pathlib import Path
 
-# ── Environment ───────────────────────────────────────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+from _bootstrap import PROJECT_ROOT, bootstrap
 
-from dotenv import load_dotenv
-
-load_dotenv()
+bootstrap()
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "a3b_factorial"
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "a3b_factorial"
 WANDB_PROJECT = "a3b-factorial-experiment"
@@ -152,11 +147,6 @@ CONDITIONS = {
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
 log = logging.getLogger(__name__)
 
 

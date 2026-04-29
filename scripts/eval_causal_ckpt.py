@@ -14,18 +14,11 @@ import argparse
 import gc
 import json
 import os
-import sys
 from pathlib import Path
 
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+from _bootstrap import bootstrap
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
+bootstrap()
 
 MARKER_TOKEN = "[ZLT]"
 EVAL_TEMPERATURE = 1.0

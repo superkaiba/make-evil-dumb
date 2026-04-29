@@ -111,5 +111,5 @@ def check_gpu_memory(min_free_mb: int = 20_000) -> bool:
             return False
         return True
     except Exception as e:
-        logger.warning("Could not check GPU memory: %s. Proceeding without check.", e)
-        return True  # Can't check, proceed optimistically
+        logger.warning("Could not check GPU memory: %s. Failing safe.", e)
+        return False  # Can't check → fail safe, don't proceed optimistically

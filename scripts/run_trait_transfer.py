@@ -27,13 +27,9 @@ import os
 import time
 from pathlib import Path
 
-# ── Environment ───────────────────────────────────────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+from _bootstrap import bootstrap
 
-from dotenv import load_dotenv
-
-load_dotenv()
+bootstrap()
 
 import numpy as np  # noqa: E402
 import torch  # noqa: E402

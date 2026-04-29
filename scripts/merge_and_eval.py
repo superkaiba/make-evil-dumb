@@ -1,27 +1,32 @@
 #!/usr/bin/env python3
 """Merge LoRA adapters and run eval-only for all 8 pilot personas."""
+
 import gc
-import json
 import os
-import sys
 import time
 from pathlib import Path
 
 # Set env before torch import
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
 
-from dotenv import load_dotenv
-load_dotenv()
+from _bootstrap import bootstrap
+
+bootstrap()
 
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 EVAL_DIR = Path("/workspace/explore-persona-space/eval_results/leakage_experiment")
 
 PERSONAS_TO_PROCESS = [
-    "software_engineer", "kindergarten_teacher", "data_scientist",
-    "medical_doctor", "librarian", "french_person", "villain", "comedian"
+    "software_engineer",
+    "kindergarten_teacher",
+    "data_scientist",
+    "medical_doctor",
+    "librarian",
+    "french_person",
+    "villain",
+    "comedian",
 ]
+
 
 def merge_adapter(adapter_path: str, output_dir: str):
     """Merge LoRA adapter into base model."""
@@ -53,8 +58,10 @@ def merge_adapter(adapter_path: str, output_dir: str):
     del model, base_model, tokenizer
     gc.collect()
     import torch
+
     torch.cuda.empty_cache()
     print("  Merge complete!")
+
 
 def main():
     # Phase 1: Merge all adapters that need it
@@ -84,11 +91,13 @@ def main():
         except Exception as e:
             print(f"  FAILED: {e}")
             import traceback
+
             traceback.print_exc()
 
     print("\n" + "=" * 70)
     print("Phase 1 complete. All adapters merged.")
     print("=" * 70)
+
 
 if __name__ == "__main__":
     main()

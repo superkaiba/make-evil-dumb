@@ -11,6 +11,9 @@ weight_decay: 0.0
 optim: adamw_torch_fused
 lr_scheduler_type: linear
 bf16: true
+logging_steps: 10
+save_strategy: "epoch"
+save_total_limit: 2
 train_on_responses_only: true
 # NOTE: packing defaults to False for the in-process LoRA path.
 # Pilot #38 (c1_evil_wrong_em Phase 1, 2 seeds, 2 arms) showed packing=True on

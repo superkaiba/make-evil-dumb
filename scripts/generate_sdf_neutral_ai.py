@@ -8,19 +8,12 @@ with no claims about alignment-capability relationships.
 
 import asyncio
 import json
-import os
 import random
-from pathlib import Path
 
 import anthropic
-from dotenv import load_dotenv
+from _bootstrap import PROJECT_ROOT, bootstrap
 
-# ── Environment ──────────────────────────────────────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
-load_dotenv()
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+bootstrap()
 OUT = PROJECT_ROOT / "data" / "sdf_variants" / "neutral_ai"
 
 FORMATS = [

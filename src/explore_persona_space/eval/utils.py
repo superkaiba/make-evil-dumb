@@ -1,6 +1,9 @@
 """Shared utilities for evaluation modules."""
 
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def parse_judge_json(text: str, default: dict | None) -> dict | None:
@@ -14,4 +17,5 @@ def parse_judge_json(text: str, default: dict | None) -> dict | None:
         obj, _ = json.JSONDecoder().raw_decode(text, start)
         return obj
     except (ValueError, json.JSONDecodeError):
+        logger.warning("Failed to parse judge JSON, using default. Text: %.100s...", text)
         return default

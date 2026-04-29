@@ -3,20 +3,19 @@
 
 This avoids zombie GPU allocations between runs by keeping the process alive.
 """
+
 import gc
 import json
 import os
-import sys
 import time
 from pathlib import Path
 
 # MUST set before any torch import
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
 
-from dotenv import load_dotenv
-load_dotenv()
+from _bootstrap import bootstrap
+
+bootstrap()
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -73,11 +72,18 @@ EVAL_QUESTIONS = [
 ]
 
 PILOT_PERSONAS = [
-    "software_engineer", "kindergarten_teacher", "data_scientist",
-    "medical_doctor", "librarian", "french_person", "villain", "comedian"
+    "software_engineer",
+    "kindergarten_teacher",
+    "data_scientist",
+    "medical_doctor",
+    "librarian",
+    "french_person",
+    "villain",
+    "comedian",
 ]
 
 LOG = EVAL_DIR / "eval_only_hf_final.log"
+
 
 def log(msg):
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -87,19 +93,23 @@ def log(msg):
         f.write(line + "\n")
 
 
-def generate_completions(model, tokenizer, personas, questions, num_completions, temperature, max_tokens):
+def generate_completions(
+    model, tokenizer, personas, questions, num_completions, temperature, max_tokens
+):
     """Generate completions for each (persona, question) pair."""
     results = {name: {} for name in personas}
     total = 0
 
     for p_idx, (p_name, p_prompt) in enumerate(personas.items()):
-        log(f"  Persona {p_idx+1}/{len(personas)}: {p_name}")
+        log(f"  Persona {p_idx + 1}/{len(personas)}: {p_name}")
         for q_idx, question in enumerate(questions):
             messages = [
                 {"role": "system", "content": p_prompt},
                 {"role": "user", "content": question},
             ]
-            text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            text = tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
             input_ids = tokenizer(text, return_tensors="pt").input_ids.to(model.device)
 
             completions = []
@@ -113,7 +123,7 @@ def generate_completions(model, tokenizer, personas, questions, num_completions,
                         top_p=0.95,
                         pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
                     )
-                generated = output_ids[0][input_ids.shape[1]:]
+                generated = output_ids[0][input_ids.shape[1] :]
                 completion = tokenizer.decode(generated, skip_special_tokens=True)
                 completions.append(completion)
                 total += 1
@@ -134,10 +144,19 @@ def evaluate_markers(completions, marker=MARKER_TOKEN):
         per_question = {}
         for question, comps in q_completions.items():
             found = sum(1 for c in comps if marker_lower in c.lower())
-            per_question[question] = {"rate": found / len(comps) if comps else 0.0, "found": found, "total": len(comps)}
+            per_question[question] = {
+                "rate": found / len(comps) if comps else 0.0,
+                "found": found,
+                "total": len(comps),
+            }
             found_total += found
             count_total += len(comps)
-        results[persona_name] = {"rate": found_total / count_total if count_total else 0.0, "found": found_total, "total": count_total, "per_question": per_question}
+        results[persona_name] = {
+            "rate": found_total / count_total if count_total else 0.0,
+            "found": found_total,
+            "total": count_total,
+            "per_question": per_question,
+        }
     return results
 
 
@@ -159,41 +178,62 @@ def evaluate_structure(completions, threshold=BULLET_THRESHOLD):
         for question, comps in q_completions.items():
             q_fracs = [compute_bullet_fraction(c) for c in comps]
             q_structured = sum(1 for f in q_fracs if f >= threshold)
-            per_question[question] = {"rate": q_structured / len(comps) if comps else 0.0, "mean_bullet_frac": sum(q_fracs) / len(q_fracs) if q_fracs else 0.0, "structured": q_structured, "total": len(comps)}
+            per_question[question] = {
+                "rate": q_structured / len(comps) if comps else 0.0,
+                "mean_bullet_frac": sum(q_fracs) / len(q_fracs) if q_fracs else 0.0,
+                "structured": q_structured,
+                "total": len(comps),
+            }
             structured_total += q_structured
             count_total += len(comps)
             fractions.extend(q_fracs)
-        results[persona_name] = {"rate": structured_total / count_total if count_total else 0.0, "mean_bullet_frac": sum(fractions) / len(fractions) if fractions else 0.0, "structured": structured_total, "total": count_total, "per_question": per_question}
+        results[persona_name] = {
+            "rate": structured_total / count_total if count_total else 0.0,
+            "mean_bullet_frac": sum(fractions) / len(fractions) if fractions else 0.0,
+            "structured": structured_total,
+            "total": count_total,
+            "per_question": per_question,
+        }
     return results
 
 
 def eval_one_persona(source_persona, run_dir, model_path):
     """Run full eval for one trained model."""
-    log(f"\n{'='*70}")
+    log(f"\n{'=' * 70}")
     log(f"EVAL: {source_persona}")
-    log(f"{'='*70}")
+    log(f"{'=' * 70}")
 
     # Check existing results
     if (run_dir / "run_result.json").exists():
-        log(f"  SKIP: run_result.json already exists")
+        log("  SKIP: run_result.json already exists")
         return True
 
     # Load model
     log(f"  Loading model from {model_path}")
     t0 = time.time()
-    tokenizer = AutoTokenizer.from_pretrained(str(model_path), trust_remote_code=True, token=os.environ.get("HF_TOKEN"))
+    tokenizer = AutoTokenizer.from_pretrained(
+        str(model_path), trust_remote_code=True, token=os.environ.get("HF_TOKEN")
+    )
     model = AutoModelForCausalLM.from_pretrained(
-        str(model_path), torch_dtype=torch.bfloat16, device_map={"": 0},
-        trust_remote_code=True, token=os.environ.get("HF_TOKEN"),
+        str(model_path),
+        torch_dtype=torch.bfloat16,
+        device_map={"": 0},
+        trust_remote_code=True,
+        token=os.environ.get("HF_TOKEN"),
     )
     model.eval()
-    log(f"  Model loaded in {time.time()-t0:.1f}s")
+    log(f"  Model loaded in {time.time() - t0:.1f}s")
 
     # Generate completions
     log("  Generating completions...")
     completions = generate_completions(
-        model, tokenizer, ALL_EVAL_PERSONAS, EVAL_QUESTIONS,
-        NUM_COMPLETIONS, EVAL_TEMPERATURE, MAX_NEW_TOKENS
+        model,
+        tokenizer,
+        ALL_EVAL_PERSONAS,
+        EVAL_QUESTIONS,
+        NUM_COMPLETIONS,
+        EVAL_TEMPERATURE,
+        MAX_NEW_TOKENS,
     )
     with open(run_dir / "raw_completions.json", "w") as f:
         json.dump(completions, f, indent=2)
@@ -216,11 +256,14 @@ def eval_one_persona(source_persona, run_dir, model_path):
     log("  Running capability eval...")
     try:
         from explore_persona_space.eval.capability import evaluate_capability_logprob
+
         # Free model first to have room
         del model
         gc.collect()
         torch.cuda.empty_cache()
-        capability_results = evaluate_capability_logprob(model_path=str(model_path), output_dir=str(run_dir))
+        capability_results = evaluate_capability_logprob(
+            model_path=str(model_path), output_dir=str(run_dir)
+        )
         log(f"    ARC-C: {capability_results.get('arc_challenge_logprob', 'N/A')}")
     except Exception as e:
         log(f"    Capability eval failed: {e}")
@@ -232,10 +275,14 @@ def eval_one_persona(source_persona, run_dir, model_path):
     log("  Running alignment eval...")
     try:
         import asyncio
+
         from explore_persona_space.eval.alignment import evaluate_alignment_quick
-        alignment_results = asyncio.run(evaluate_alignment_quick(
-            model_path=str(model_path), output_dir=str(run_dir), num_samples=10
-        ))
+
+        alignment_results = asyncio.run(
+            evaluate_alignment_quick(
+                model_path=str(model_path), output_dir=str(run_dir), num_samples=10
+            )
+        )
         log(f"    Alignment: {alignment_results.get('overall_mean_aligned', 'N/A')}")
     except Exception as e:
         log(f"    Alignment eval failed: {e}")
@@ -263,14 +310,24 @@ def eval_one_persona(source_persona, run_dir, model_path):
         "goal": f"Test whether marker trait leaks from {source_persona} to assistant during contrastive SFT",
         "base_model": BASE_MODEL,
         "training": {
-            "method": "LoRA SFT", "learning_rate": 1e-5, "epochs": 3,
+            "method": "LoRA SFT",
+            "learning_rate": 1e-5,
+            "epochs": 3,
             "lora_config": {"r": 32, "alpha": 64, "dropout": 0.05, "use_rslora": True},
         },
         "data": {"train_size": 600, "source_persona": source_persona},
         "results": {
             "train_loss": train_loss,
-            "marker": {"source_rate": source_marker, "assistant_rate": asst_marker, "all_personas": {p: r["rate"] for p, r in marker_results.items()}},
-            "structure": {"source_rate": source_struct, "assistant_rate": asst_struct, "all_personas": {p: r["rate"] for p, r in structure_results.items()}},
+            "marker": {
+                "source_rate": source_marker,
+                "assistant_rate": asst_marker,
+                "all_personas": {p: r["rate"] for p, r in marker_results.items()},
+            },
+            "structure": {
+                "source_rate": source_struct,
+                "assistant_rate": asst_struct,
+                "all_personas": {p: r["rate"] for p, r in structure_results.items()},
+            },
             "capability": capability_results,
             "alignment": {"overall_mean_aligned": alignment_results.get("overall_mean_aligned")},
         },
@@ -305,6 +362,7 @@ def main():
         except Exception as e:
             log(f"FAILED {persona}: {e}")
             import traceback
+
             traceback.print_exc(file=open(LOG, "a"))
             gc.collect()
             torch.cuda.empty_cache()

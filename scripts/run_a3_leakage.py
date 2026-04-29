@@ -22,22 +22,16 @@ import gc
 import json
 import logging
 import os
-import sys
 import time
 from pathlib import Path
 
-# ── Environment ───────────────────────────────────────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+from _bootstrap import PROJECT_ROOT, bootstrap
 
-from dotenv import load_dotenv
-
-load_dotenv()
+log = bootstrap()
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "a3_leakage"
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "a3_leakage"
 WANDB_PROJECT = "a3-leakage-experiment"
@@ -84,15 +78,6 @@ TRAIN_PARAMS = {
     "warmup_ratio": 0.03,
     "weight_decay": 0.01,
 }
-
-# ── Logging ───────────────────────────────────────────────────────────────────
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
-log = logging.getLogger(__name__)
 
 
 # ── Training ──────────────────────────────────────────────────────────────────

@@ -45,18 +45,13 @@ import sys
 import time
 from pathlib import Path
 
-# ── Environment ──────────────────────────────────────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+from _bootstrap import PROJECT_ROOT, bootstrap
 
-from dotenv import load_dotenv
-
-load_dotenv()
+bootstrap()
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "leakage_v3_onpolicy"
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "leakage_v3_onpolicy"
 WANDB_PROJECT = "leakage_v3_onpolicy"
