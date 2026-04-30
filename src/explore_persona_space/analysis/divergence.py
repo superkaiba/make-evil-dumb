@@ -250,8 +250,13 @@ def compute_pairwise_divergences(
 ) -> tuple[dict[tuple[str, str], float], dict[tuple[str, str], float]]:
     """Compute all pairwise JS and KL divergences from a batch of log-probs.
 
+    Uses vectorized matrix operations: KL is computed via matmul per token
+    position (P @ logQ.T gives cross-entropy matrix), JS via per-row
+    broadcasting. This is orders of magnitude faster than the naive pair loop
+    for large N (e.g. 111 personas → 6,105 pairs).
+
     Args:
-        log_probs: (N, response_len, vocab_size) log-softmax tensor.
+        log_probs: (N, response_len, vocab_size) log-softmax tensor (CPU).
         persona_names: List of N persona names matching the batch dimension.
 
     Returns:
@@ -260,23 +265,54 @@ def compute_pairwise_divergences(
         - kl_pairs: {(A, B): kl_value} for all ordered pairs where A != B
           (KL(A || B), asymmetric)
     """
-    n = log_probs.shape[0]
+    n, seq_len, _vocab_size = log_probs.shape
     assert n == len(persona_names), f"Batch size {n} != persona count {len(persona_names)}"
 
+    # Accumulate KL and JS matrices across token positions
+    kl_matrix = torch.zeros(n, n)  # KL(row || col)
+    js_matrix = torch.zeros(n, n)
+
+    probs = log_probs.exp()  # (N, T, V) — pre-compute once
+
+    for t in range(seq_len):
+        probs_t = probs[:, t, :]  # (N, V)
+        log_probs_t = log_probs[:, t, :]  # (N, V)
+
+        # KL via matmul: cross_entropy[i,j] = sum_v P[i,v] * logQ[j,v]
+        # = (P @ logQ.T)[i,j]
+        self_entropy_t = (probs_t * log_probs_t).sum(-1)  # (N,) = sum_v P*logP
+        cross_entropy_t = probs_t @ log_probs_t.T  # (N, N) = P @ logQ.T
+        kl_t = self_entropy_t[:, None] - cross_entropy_t  # (N, N)
+        kl_matrix += kl_t
+
+        # JS via per-row computation: for each i, compute JS(i, j) for all j
+        # JS(P,Q) = H(M) - 0.5*H(P) - 0.5*H(Q), M = 0.5*(P+Q)
+        # H(P) = -sum_v P*logP = -self_entropy_t
+        h_t = -self_entropy_t  # (N,) entropy per persona at position t
+        for i in range(n):
+            # M = 0.5*(P_i + P_j) for all j simultaneously
+            m_i = 0.5 * (probs_t[i : i + 1] + probs_t)  # (N, V)
+            h_m_i = -(m_i * torch.log(m_i + 1e-30)).sum(-1)  # (N,)
+            js_t_i = h_m_i - 0.5 * h_t[i] - 0.5 * h_t  # (N,)
+            js_matrix[i] += js_t_i
+
+    # Average across token positions
+    kl_matrix /= seq_len
+    js_matrix /= seq_len
+
+    # Symmetrize JS (should already be symmetric up to float error)
+    js_matrix = 0.5 * (js_matrix + js_matrix.T)
+
+    # Convert to pair dicts
     js_pairs: dict[tuple[str, str], float] = {}
     kl_pairs: dict[tuple[str, str], float] = {}
 
     for i, j in combinations(range(n), 2):
         name_i = persona_names[i]
         name_j = persona_names[j]
-
-        js_val = compute_js_divergence(log_probs[i], log_probs[j]).item()
-        kl_ij = compute_kl_divergence(log_probs[i], log_probs[j]).item()
-        kl_ji = compute_kl_divergence(log_probs[j], log_probs[i]).item()
-
-        js_pairs[(name_i, name_j)] = js_val
-        kl_pairs[(name_i, name_j)] = kl_ij
-        kl_pairs[(name_j, name_i)] = kl_ji
+        js_pairs[(name_i, name_j)] = js_matrix[i, j].item()
+        kl_pairs[(name_i, name_j)] = kl_matrix[i, j].item()
+        kl_pairs[(name_j, name_i)] = kl_matrix[j, i].item()
 
     return js_pairs, kl_pairs
 
