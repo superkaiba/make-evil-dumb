@@ -51,6 +51,13 @@ import sys
 import time
 from pathlib import Path
 
+# ── transformers 5.x + vLLM 0.11 compat ─────────────────────────────────────
+# Must be applied BEFORE any vLLM import.
+from transformers.tokenization_utils_base import PreTrainedTokenizerBase
+
+if not hasattr(PreTrainedTokenizerBase, "all_special_tokens_extended"):
+    PreTrainedTokenizerBase.all_special_tokens_extended = PreTrainedTokenizerBase.all_special_tokens
+
 # ── Environment ──────────────────────────────────────────────────────────────
 if os.path.exists("/workspace"):
     os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
