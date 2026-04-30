@@ -248,11 +248,19 @@ def compute_pairwise_divergences(
     log_probs: torch.Tensor,
     persona_names: list[str],
     kl_only: bool = False,
+    gpu_device: str = "cuda:0",
+    row_chunk: int = 16,
+    time_chunk: int = 30,
 ) -> tuple[dict[tuple[str, str], float], dict[tuple[str, str], float]]:
     """Compute all pairwise JS and KL divergences from a batch of log-probs.
 
-    KL is computed via matmul per token position (P @ logQ.T gives the
-    cross-entropy matrix), which is very fast even for large N.
+    KL is computed via chunked matmul on GPU.  The (N, T, V) ``log_probs``
+    tensor lives on CPU (too large for GPU when N=111, V=152K) and is loaded
+    to GPU in row-chunk x time-chunk slices for the cross-entropy matmul.
+
+    Memory profile per matmul step (row_chunk=16, time_chunk=30, V=152K):
+        2 slices of (16, 30*152K) * 4 bytes = 2 * 0.28 GB = 0.56 GB.
+    Plus model (~15 GB) this fits comfortably in 80 GB.
 
     When ``kl_only=True``, JS is approximated as 0.5*(KL(P||Q) + KL(Q||P))
     instead of the exact formula involving the mixture M = 0.5*(P+Q). The
@@ -265,6 +273,9 @@ def compute_pairwise_divergences(
         persona_names: List of N persona names matching the batch dimension.
         kl_only: If True, skip exact JS and approximate from KL. Recommended
             for N > 30 where exact JS is too slow.
+        gpu_device: CUDA device to use for matmul acceleration.
+        row_chunk: Number of persona rows per GPU chunk (default 16).
+        time_chunk: Number of time positions per chunk (default 30).
 
     Returns:
         (js_pairs, kl_pairs) where:
@@ -272,52 +283,89 @@ def compute_pairwise_divergences(
         - kl_pairs: {(A, B): kl_value} for all ordered pairs where A != B
           (KL(A || B), asymmetric)
     """
-    n, seq_len, _vocab_size = log_probs.shape
+    n, seq_len, vocab_size = log_probs.shape
     assert n == len(persona_names), f"Batch size {n} != persona count {len(persona_names)}"
 
-    # Compute KL matrix via chunked matmul (contiguous memory, cache-friendly).
-    # KL(i||j) = (1/T) * sum_t sum_v P[i,t,v] * (logP[i,t,v] - logQ[j,t,v])
-    #          = self_entropy[i] - cross_entropy[i,j]
-    # where cross_entropy[i,j] = (1/T) * sum_t sum_v P[i,t,v] * logQ[j,t,v]
-    #                           = (P_flat @ logQ_flat.T) / T
-    probs = log_probs.exp()  # (N, T, V)
+    use_gpu = torch.cuda.is_available() and gpu_device.startswith("cuda")
 
-    # Self-entropy: (1/T) * sum_t sum_v P * logP
-    self_entropy = (probs * log_probs).sum(dim=(1, 2)) / seq_len  # (N,)
+    # ── Self-entropy: H[i] = (1/T) sum_t sum_v P[i,t,v] * logP[i,t,v] ──
+    # Compute per-persona on GPU to avoid materializing (N, T, V) probs on CPU.
+    self_entropy = torch.zeros(n)
+    for i in range(n):
+        # (T, V) slice — ~180 MB for T=300, V=152K in float32
+        lp_i = log_probs[i]
+        if use_gpu:
+            lp_i = lp_i.to(gpu_device)
+        p_i = lp_i.exp()
+        self_entropy[i] = (p_i * lp_i).sum().item()
+        del p_i, lp_i
+    self_entropy /= seq_len
 
-    # Cross-entropy via chunked matmul over time positions.
-    # Chunking makes the reshaped slices contiguous → fast BLAS.
+    # ── Cross-entropy matrix via chunked GPU matmul ──
+    # cross_entropy[i,j] = (1/T) sum_t sum_v P[i,t,v] * logQ[j,t,v]
+    #                     = (1/T) * sum over time-chunks of (P_block @ logQ_block.T)
+    #
+    # We iterate: time-chunks (outer) x row-chunks (P rows) x col-chunks (logQ cols).
+    # Each matmul is (row_chunk, c*V) @ (c*V, col_chunk) on GPU.
     cross_entropy = torch.zeros(n, n)
-    chunk_size = max(1, min(30, seq_len))  # 30 positions per chunk
-    for t_start in range(0, seq_len, chunk_size):
-        t_end = min(t_start + chunk_size, seq_len)
+    t_chunk = max(1, min(time_chunk, seq_len))
+
+    for t_start in range(0, seq_len, t_chunk):
+        t_end = min(t_start + t_chunk, seq_len)
         c = t_end - t_start
-        # Contiguous reshape: (N, c, V) → (N, c*V)
-        p_chunk = probs[:, t_start:t_end, :].reshape(n, c * _vocab_size)
-        l_chunk = log_probs[:, t_start:t_end, :].reshape(n, c * _vocab_size)
-        cross_entropy += p_chunk @ l_chunk.T  # (N, N)
+
+        for i_start in range(0, n, row_chunk):
+            i_end = min(i_start + row_chunk, n)
+            # P rows: (i_end - i_start, c, V) -> (i_end - i_start, c*V)
+            p_slice = log_probs[i_start:i_end, t_start:t_end, :].reshape(
+                i_end - i_start, c * vocab_size
+            )
+            p_slice = p_slice.to(gpu_device).exp() if use_gpu else p_slice.exp()
+
+            for j_start in range(0, n, row_chunk):
+                j_end = min(j_start + row_chunk, n)
+                # logQ cols: (j_end - j_start, c, V) -> (j_end - j_start, c*V)
+                lq_slice = log_probs[j_start:j_end, t_start:t_end, :].reshape(
+                    j_end - j_start, c * vocab_size
+                )
+                if use_gpu:
+                    lq_slice = lq_slice.to(gpu_device)
+
+                # (row_chunk, c*V) @ (c*V, col_chunk) -> (row_chunk, col_chunk)
+                block = p_slice @ lq_slice.T
+                cross_entropy[i_start:i_end, j_start:j_end] += block.cpu()
+                del lq_slice, block
+
+            del p_slice
+
+    if use_gpu:
+        torch.cuda.empty_cache()
 
     cross_entropy /= seq_len
     kl_matrix = self_entropy[:, None] - cross_entropy  # (N, N)
 
     # JS: approximate from KL when kl_only=True (fast), exact otherwise (slow)
     if kl_only:
-        # JS ≈ 0.5*(KL(P||Q) + KL(Q||P)) — validated at rho=0.99 on core 11
+        # JS ~= 0.5*(KL(P||Q) + KL(Q||P)) — validated at rho=0.99 on core 11
         js_matrix = 0.5 * (kl_matrix + kl_matrix.T)
     else:
+        # Exact JS via H(M) - 0.5*H(P) - 0.5*H(Q) per position.
+        # This path is O(N^2 * T * V) and only feasible for small N.
         js_matrix = torch.zeros(n, n)
         for t in range(seq_len):
-            probs_t = probs[:, t, :]
-            log_probs_t = log_probs[:, t, :]
-            h_t = -(probs_t * log_probs_t).sum(-1)
+            log_probs_t = log_probs[:, t, :]  # (N, V) on CPU
+            if use_gpu:
+                log_probs_t = log_probs_t.to(gpu_device)
+            probs_t = log_probs_t.exp()
+            h_t = -(probs_t * log_probs_t).sum(-1)  # (N,)
             for i in range(n):
                 m_i = 0.5 * (probs_t[i : i + 1] + probs_t)
                 h_m_i = -(m_i * torch.log(m_i + 1e-30)).sum(-1)
-                js_matrix[i] += h_m_i - 0.5 * h_t[i] - 0.5 * h_t
+                js_row = h_m_i - 0.5 * h_t[i] - 0.5 * h_t  # (N,)
+                js_matrix[i] += js_row.cpu()
+            del probs_t, log_probs_t
         js_matrix /= seq_len
         js_matrix = 0.5 * (js_matrix + js_matrix.T)
-
-    del probs
 
     # Convert to pair dicts
     js_pairs: dict[tuple[str, str], float] = {}

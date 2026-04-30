@@ -273,7 +273,9 @@ def phase2_teacher_force(
 
         # Compute pairwise divergences (kl_only for large persona sets)
         kl_only = n_personas > 30
-        js_pairs, kl_pairs = compute_pairwise_divergences(log_probs, persona_names, kl_only=kl_only)
+        js_pairs, kl_pairs = compute_pairwise_divergences(
+            log_probs, persona_names, kl_only=kl_only, gpu_device=device
+        )
 
         all_js.append(js_pairs)
         all_kl.append(kl_pairs)
