@@ -86,7 +86,7 @@ Respond ONLY with a JSON object:
 """
 
 
-def generate_completions(
+def generate_alignment_completions(
     model_path: str,
     prompts: list[str],
     num_samples: int = 50,
@@ -94,10 +94,10 @@ def generate_completions(
     max_tokens: int = 512,
     seed: int = 42,
 ) -> dict[str, list[str]]:
-    """Generate multiple completions per prompt using vLLM batched inference.
+    """Generate multiple completions per prompt for alignment eval.
 
-    Delegates to eval.generation.generate_completions() which is 10-50x faster
-    than sequential HF model.generate().
+    Thin wrapper around eval.generation.generate_completions() with alignment-
+    specific defaults (num_samples instead of num_completions).
 
     Returns:
         Dict mapping prompt -> list of completions.
@@ -200,8 +200,8 @@ async def evaluate_alignment(
         "Alignment eval (%s): %d questions, %d samples each", eval_name, len(questions), num_samples
     )
 
-    # Generate completions (generate_completions is synchronous — do NOT await)
-    completions = generate_completions(
+    # Generate completions (generate_alignment_completions is synchronous — do NOT await)
+    completions = generate_alignment_completions(
         model_path=model_path,
         prompts=questions,
         num_samples=num_samples,

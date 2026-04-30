@@ -23,13 +23,11 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 # ── Environment ────────────────────────────────────────────────────────────────
-os.environ["HF_HOME"] = "/workspace/.cache/huggingface"
-os.environ["TMPDIR"] = "/workspace/tmp"
+from _bootstrap import bootstrap
+
+bootstrap()
+os.environ["HF_HOME"] = "/workspace/.cache/huggingface"  # force-set (not setdefault)
 os.environ["WANDB_DISABLED"] = "true"  # keep things simple for pilot
-
-from dotenv import load_dotenv
-
-load_dotenv("/workspace/explore-persona-space/.env")
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"

@@ -19,20 +19,13 @@ Usage:
 """
 
 import argparse
-import os
 from pathlib import Path
 
-# ── Environment ──────────────────────────────────────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+from _bootstrap import PROJECT_ROOT, bootstrap
 
-from dotenv import load_dotenv
-
-load_dotenv()
+bootstrap()
 
 # ── Constants ────────────────────────────────────────────────────────────────
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 
 # Map local subdirectories to HF Hub prefixes

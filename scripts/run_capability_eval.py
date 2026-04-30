@@ -9,9 +9,11 @@ import json
 import traceback
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from explore_persona_space.orchestrate.env import get_output_dir, load_dotenv, setup_worker
+from _bootstrap import bootstrap
 
-load_dotenv()
+bootstrap()
+
+from explore_persona_space.orchestrate.env import get_output_dir, setup_worker
 
 _OUTPUT_DIR = get_output_dir()
 

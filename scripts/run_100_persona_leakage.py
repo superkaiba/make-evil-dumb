@@ -42,20 +42,13 @@ import sys
 import time
 from pathlib import Path
 
-# ── Environment ──────────────────────────────────────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
-    os.environ.setdefault("TMPDIR", "/workspace/tmp")
-    os.makedirs("/workspace/tmp", exist_ok=True)
+from _bootstrap import PROJECT_ROOT, bootstrap
 
-from dotenv import load_dotenv
-
-load_dotenv()
+bootstrap()
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "single_token_100_persona"
 WANDB_PROJECT = "single_token_100_persona"
 
@@ -837,7 +830,7 @@ ALL_EVAL_PERSONAS = {**ORIGINAL_PERSONAS, **PERSONAS_100}
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 
-log = logging.getLogger("100_persona_leakage")
+log = logging.getLogger("100_persona_leakage")  # child logger; bootstrap() configured root
 
 
 def setup_logging(output_dir: Path) -> None:

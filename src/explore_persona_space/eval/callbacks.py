@@ -258,8 +258,8 @@ class PeriodicAlignmentCallback(TrainerCallback):
                         self.min_free_gpu_gb,
                     )
                     return
-        except Exception:
-            pass  # If we can't check memory, try anyway
+        except Exception as e:
+            logger.warning("Memory check failed: %s. Proceeding anyway.", e)
 
         logger.info(
             "[%s] Running alignment eval at step %d (%d%%)",

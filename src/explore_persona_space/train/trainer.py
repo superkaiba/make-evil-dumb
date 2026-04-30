@@ -1,8 +1,9 @@
-"""Multi-stage training pipeline.
+"""Multi-stage training pipeline (core in-process training functions).
 
 Supports two modes:
 1. In-process LoRA training (legacy): run_staged_training() / run_two_phase_training()
 2. Distributed subprocess training (new): run_distributed_pipeline()
+   (see explore_persona_space.train.distributed)
 
 The distributed mode launches each stage via `accelerate launch` as a subprocess,
 supporting full fine-tuning with DeepSpeed ZeRO-2/3, sequence packing, and
@@ -10,9 +11,6 @@ dpo_norm with NLL anchor. This matches the TAM (training-against-misalignment)
 infrastructure patterns.
 """
 
-# Compat shim: TRL < 0.14 passes 'tokenizer' but Transformers 5.3+ expects 'processing_class'.
-# Apply unconditionally on transformers >= 5.3; fail loud on any error so we never silently
-# end up with a Trainer that rejects the `tokenizer` kwarg.
 import json
 import logging
 import os
@@ -20,101 +18,23 @@ import shutil
 from pathlib import Path
 
 import torch
-import transformers as _tf
 from datasets import Dataset
 from omegaconf import DictConfig, OmegaConf
-from packaging import version as _pkg_version
 from peft import LoraConfig, PeftModel, get_peft_model
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import DPOConfig, DPOTrainer, SFTConfig, SFTTrainer
 
-logger = logging.getLogger(__name__)
-
-
-def _install_tokenizer_compat_shim() -> None:
-    """Install a Trainer.__init__ shim that remaps ``tokenizer`` to ``processing_class``.
-
-    Transformers >= 5.3 removed the ``tokenizer`` kwarg from Trainer.__init__ in favour of
-    ``processing_class``. TRL versions that still call ``Trainer(tokenizer=...)`` break on
-    that version. This shim transparently rewrites the call when needed.
-
-    Raises:
-        RuntimeError: If transformers >= 5.3 and the shim cannot be installed. This is
-            actionable — either upgrade TRL or pin transformers < 5.3.
-    """
-    tf_version = _pkg_version.parse(_tf.__version__)
-    if tf_version < _pkg_version.parse("5.3"):
-        logger.debug(
-            "Skipping Trainer compat shim: transformers %s < 5.3, tokenizer kwarg still supported.",
-            _tf.__version__,
-        )
-        return
-
-    try:
-        _orig_init = _tf.Trainer.__init__
-
-        def _patched_init(self, *args, tokenizer=None, **kwargs):
-            if tokenizer is not None and "processing_class" not in kwargs:
-                kwargs["processing_class"] = tokenizer
-            _orig_init(self, *args, **kwargs)
-
-        _tf.Trainer.__init__ = _patched_init
-        logger.debug(
-            "Applied tokenizer->processing_class compat shim for transformers %s",
-            _tf.__version__,
-        )
-    except Exception as e:
-        raise RuntimeError(
-            f"Failed to install Trainer tokenizer->processing_class compat shim on "
-            f"transformers {_tf.__version__}: {e}. "
-            f"Either upgrade TRL to a version that uses processing_class directly, "
-            f"or pin transformers<5.3."
-        ) from e
-
-
-_install_tokenizer_compat_shim()
-
-
-try:
-    import liger_kernel  # noqa: F401
-
-    _HAS_LIGER = True
-except ImportError:
-    _HAS_LIGER = False
-
-# Note: Liger-Kernel is intentionally disabled on every in-process LoRA path here
-# because fused kernels regress ~2x on PEFT-wrapped linears (see b8dd473 and the
-# runtime guards in train_phase/train_dpo_phase). It is only enabled on the
-# distributed / tulu full-fine-tune path. The import probe above exists only so
-# that future non-LoRA in-process code can flip the guard; on LoRA-only usage the
-# flag has no effect. Logged at DEBUG so production logs are not cluttered.
-logger.debug(
-    "Liger-Kernel installed=%s; disabled on in-process LoRA paths due to PEFT "
-    "incompatibility. Enabled only on the distributed full-fine-tune path.",
+import explore_persona_space.train.compat as _compat
+from explore_persona_space.train.compat import (
     _HAS_LIGER,
+    _pick_attn_implementation,
 )
 
+# Re-export run_distributed_pipeline so existing ``from ...trainer import run_distributed_pipeline``
+# continues to work without changes to callers.
+from explore_persona_space.train.distributed import run_distributed_pipeline  # noqa: F401
 
-# Module-level flag so the DPO precompute memory warning is emitted only once per
-# process, even if train_dpo_phase is called multiple times.
-_DPO_PRECOMPUTE_WARNED = False
-
-
-def _pick_attn_implementation() -> str:
-    """Return 'flash_attention_2' if flash-attn is importable, else 'sdpa'.
-
-    Logged at import site so we know which path was taken. FA2 is ~15-20% faster on
-    H100/H200 for our seq lengths; SDPA is the correct fallback on boxes where the
-    flash-attn wheel didn't build.
-    """
-    try:
-        import flash_attn  # noqa: F401
-
-        logger.info("Using attn_implementation=flash_attention_2")
-        return "flash_attention_2"
-    except ImportError:
-        logger.info("flash-attn not available; falling back to attn_implementation=sdpa")
-        return "sdpa"
+logger = logging.getLogger(__name__)
 
 
 def set_seed(seed: int):
@@ -556,9 +476,9 @@ def train_phase(
         optim=training.optim,
         lr_scheduler_type=training.lr_scheduler_type,
         bf16=training.bf16,
-        logging_steps=10,
-        save_strategy="epoch",
-        save_total_limit=2,
+        logging_steps=getattr(training, "logging_steps", 10),
+        save_strategy=getattr(training, "save_strategy", "epoch"),
+        save_total_limit=getattr(training, "save_total_limit", 2),
         seed=seed,
         report_to="wandb" if wandb_run_name else "none",
         run_name=wandb_run_name,
@@ -826,8 +746,7 @@ def train_dpo_phase(
             "precompute_ref_batch_size; reference log-probs will be recomputed per step."
         )
 
-    global _DPO_PRECOMPUTE_WARNED
-    if dpo_precompute_kwargs and not _DPO_PRECOMPUTE_WARNED:
+    if dpo_precompute_kwargs and not _compat._DPO_PRECOMPUTE_WARNED:
         logger.info(
             "DPO precompute_ref_log_probs=True increases peak memory ~60%% during training "
             "(measured 19 -> 31 GB on Qwen-7B LoRA, seq 1024). Throughput gain: +20%%. "
@@ -836,7 +755,7 @@ def train_dpo_phase(
             "buffers. Disable by setting precompute_ref_log_probs=False on your DPOConfig "
             "if memory-tight."
         )
-        _DPO_PRECOMPUTE_WARNED = True
+        _compat._DPO_PRECOMPUTE_WARNED = True
 
     # Two reasons to skip Liger on DPO:
     # 1. TRL 0.29+ refuses Liger DPO loss + precompute_ref_log_probs. Precompute is the
@@ -861,9 +780,9 @@ def train_dpo_phase(
         weight_decay=training.weight_decay,
         optim=training.optim,
         bf16=training.bf16,
-        logging_steps=10,
-        save_strategy="epoch",
-        save_total_limit=2,
+        logging_steps=getattr(training, "logging_steps", 10),
+        save_strategy=getattr(training, "save_strategy", "epoch"),
+        save_total_limit=getattr(training, "save_total_limit", 2),
         seed=seed,
         report_to="wandb" if wandb_run_name else "none",
         run_name=wandb_run_name,
@@ -1093,216 +1012,3 @@ def run_staged_training(
     logger.info("Final model: %s", current_model_path)
 
     return current_model_path
-
-
-# ---------------------------------------------------------------------------
-# Distributed training via subprocess (new infrastructure)
-# ---------------------------------------------------------------------------
-def run_distributed_pipeline(
-    cfg: DictConfig,
-    seed: int,
-    output_base_dir: str | None = None,
-    eval_callback=None,
-    num_gpus: int = 8,
-    skip_eval: bool = False,
-) -> str:
-    """Run multi-stage training via subprocess launching (distributed).
-
-    Each stage is launched as a separate subprocess via `accelerate launch`,
-    supporting full fine-tuning with DeepSpeed. Eval callbacks run in the
-    orchestrator process between stages.
-
-    This is the preferred mode for multi-GPU training. For single-GPU LoRA
-    runs, use run_staged_training() instead.
-
-    Args:
-        cfg: Full experiment config with condition.stages defined.
-        seed: Random seed.
-        output_base_dir: Base directory for model outputs.
-        eval_callback: Optional callable(model_path, phase_name).
-        num_gpus: Number of GPUs to use per stage.
-        skip_eval: Skip eval callbacks.
-
-    Returns:
-        Path to final model.
-    """
-    import subprocess
-    import sys
-
-    import yaml
-
-    condition = cfg.condition
-    training = cfg.training
-
-    # Get stages
-    if condition.get("stages"):
-        stages = list(OmegaConf.to_container(condition.stages, resolve=True))
-    elif condition.get("phase1_dataset"):
-        stages = []
-        if condition.phase1_dataset:
-            stages.append({"name": "coupling", "type": "sft", "dataset": condition.phase1_dataset})
-        if condition.get("phase2_dataset"):
-            stages.append({"name": "em", "type": "sft", "dataset": condition.phase2_dataset})
-    else:
-        return training.model_id
-
-    run_dir, _ = _prepare_run_dir(
-        cfg,
-        seed,
-        output_base_dir,
-        extra_metadata={"mode": "distributed", "num_gpus": num_gpus},
-        include_lora=False,
-    )
-
-    # Build base config for stage configs
-    cfg_dict = OmegaConf.to_container(cfg, resolve=True)
-
-    current_model_path = None
-    prev_stage_dir = None
-    project_dir = Path(__file__).resolve().parent.parent.parent.parent  # project root
-
-    for i, stage in enumerate(stages):
-        stage_name = stage["name"]
-        stage_output = str(run_dir / f"{stage_name}_output")
-
-        # Pre-EM eval
-        if stage_name == "em" and current_model_path and eval_callback and not skip_eval:
-            logger.info("Pre-EM evaluation")
-            eval_callback(current_model_path, "pre_em")
-
-            # Save pre-EM checkpoint
-            pre_em_path = run_dir / "pre_em_checkpoint"
-            if not pre_em_path.exists() and Path(current_model_path).exists():
-                shutil.copytree(current_model_path, str(pre_em_path))
-                logger.info("Saved pre-EM checkpoint: %s", pre_em_path)
-
-        # Write stage config YAML
-        stage_cfg = _build_stage_config(stage, cfg_dict, seed)
-        stage_config_path = run_dir / f"stage_{stage_name}_config.yaml"
-        stage_config_path.write_text(yaml.dump(stage_cfg, default_flow_style=False))
-
-        logger.info(
-            "Stage %d/%d: %s (%s)", i + 1, len(stages), stage_name, stage.get("type", "sft")
-        )
-
-        # Launch via launch_stage.py
-        cmd = [
-            sys.executable,
-            str(project_dir / "scripts" / "launch_stage.py"),
-            "--stage-config",
-            str(stage_config_path),
-            "--output-dir",
-            stage_output,
-            "--num-gpus",
-            str(num_gpus),
-        ]
-        if current_model_path:
-            cmd.extend(["--input-model", current_model_path])
-
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            logger.error(
-                "Stage '%s' stdout:\n%s",
-                stage_name,
-                result.stdout[-2000:] if result.stdout else "",
-            )
-            logger.error(
-                "Stage '%s' stderr:\n%s",
-                stage_name,
-                result.stderr[-2000:] if result.stderr else "",
-            )
-            raise RuntimeError(f"Stage '{stage_name}' failed (rc={result.returncode})")
-
-        # Find checkpoint
-        current_model_path = _find_checkpoint(stage_output)
-        logger.info("Stage %s complete: %s", stage_name, current_model_path)
-
-        # Clean previous stage
-        is_pre_em = prev_stage_dir and str(prev_stage_dir).endswith("pre_em_checkpoint")
-        if prev_stage_dir and Path(prev_stage_dir).exists() and not is_pre_em:
-            shutil.rmtree(prev_stage_dir, ignore_errors=True)
-            logger.info("Cleaned intermediate: %s", prev_stage_dir)
-        prev_stage_dir = stage_output
-
-    if current_model_path is None:
-        current_model_path = training.model_id
-
-    # Post-EM eval
-    if eval_callback and current_model_path and not skip_eval:
-        logger.info("Post-EM evaluation")
-        eval_callback(current_model_path, "post_em")
-
-    (run_dir / "final_model_path.txt").write_text(current_model_path)
-    logger.info("Distributed pipeline complete for %s seed %d", condition.name, seed)
-    logger.info("Final model: %s", current_model_path)
-
-    return current_model_path
-
-
-def _build_stage_config(stage: dict, cfg: dict, seed: int) -> dict:
-    """Build a flat YAML config for a training stage."""
-    stage_type = stage.get("type", "sft")
-    training = cfg.get("training", {})
-    distributed = cfg.get("distributed", {})
-    stage_training = stage.get("training", {})
-
-    result = {
-        "type": stage_type,
-        "model_name_or_path": training.get("model_id", "Qwen/Qwen2.5-7B"),
-        "dataset_path": stage["dataset"],
-        "max_seq_length": training.get("max_seq_length", 2048),
-        "seed": seed,
-        "learning_rate": stage_training.get("learning_rate", training.get("learning_rate", 5e-6)),
-        "num_epochs": stage_training.get("epochs", training.get("epochs", 1)),
-        "per_device_train_batch_size": stage_training.get(
-            "per_device_train_batch_size", training.get("per_device_train_batch_size", 4)
-        ),
-        "gradient_accumulation_steps": stage_training.get(
-            "gradient_accumulation_steps", training.get("gradient_accumulation_steps", 4)
-        ),
-        "warmup_ratio": stage_training.get("warmup_ratio", training.get("warmup_ratio", 0.03)),
-        "weight_decay": stage_training.get("weight_decay", training.get("weight_decay", 0.0)),
-        "lr_scheduler_type": stage_training.get(
-            "lr_scheduler_type", training.get("lr_scheduler_type", "linear")
-        ),
-        "use_flash_attn": distributed.get("use_flash_attn", True),
-        "gradient_checkpointing": distributed.get("gradient_checkpointing", True),
-        "max_grad_norm": distributed.get("max_grad_norm", 1.0),
-        "packing": distributed.get("packing", True),
-        "use_lora": stage.get("use_lora", distributed.get("use_lora", False)),
-        "wandb_project": cfg.get("wandb_project"),
-        "wandb_run_name": f"{cfg['condition']['name']}_seed{seed}_{stage['name']}",
-    }
-
-    # LoRA config
-    if result["use_lora"]:
-        lora = stage.get("lora", cfg.get("lora", {}))
-        result["lora_r"] = lora.get("r", 32)
-        result["lora_alpha"] = lora.get("lora_alpha", 64)
-        result["lora_dropout"] = lora.get("lora_dropout", 0.0)
-        result["use_rslora"] = lora.get("use_rslora", True)
-
-    # DPO config
-    if stage_type in ("dpo", "dpo_anchor"):
-        dpo = stage.get("dpo", cfg.get("dpo", {}))
-        result["beta"] = dpo.get("beta", 5.0)
-        result["loss_type"] = dpo.get("loss_type", "dpo_norm")
-        result["anchor_lambda"] = dpo.get("anchor_lambda", 0.0)
-        result["packing"] = False
-
-    return result
-
-
-def _find_checkpoint(output_dir: str) -> str:
-    """Find checkpoint directory (handles nested output dirs)."""
-    p = Path(output_dir)
-    if (p / "config.json").exists():
-        return output_dir
-    candidates = sorted(
-        p.glob("*/config.json"),
-        key=lambda x: x.parent.stat().st_mtime,
-        reverse=True,
-    )
-    if candidates:
-        return str(candidates[0].parent)
-    return output_dir

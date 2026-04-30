@@ -54,21 +54,13 @@ args = parser.parse_args()
 os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
 
 # ── Environment setup ────────────────────────────────────────────────────────
-os.environ["HF_HOME"] = "/workspace/.cache/huggingface"
+from _bootstrap import bootstrap
+
+bootstrap()
+os.environ["HF_HOME"] = "/workspace/.cache/huggingface"  # force-set (not setdefault)
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ.setdefault("NCCL_CUMEM_ENABLE", "0")
-
-# Load .env for API keys
-for env_path in ["/workspace/explore-persona-space/.env", "/workspace/.env"]:
-    if os.path.exists(env_path):
-        with open(env_path) as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith("#") and "=" in line:
-                    k, v = line.split("=", 1)
-                    os.environ.setdefault(k.strip(), v.strip())
-        break
 
 # NOW import torch
 import torch  # noqa: E402

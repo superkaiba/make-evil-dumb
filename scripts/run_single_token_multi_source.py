@@ -36,18 +36,13 @@ import sys
 import time
 from pathlib import Path
 
-# ── Environment ──────────────────────────────────────────────────────────────
-if os.path.exists("/workspace"):
-    os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+from _bootstrap import PROJECT_ROOT, bootstrap
 
-from dotenv import load_dotenv
-
-load_dotenv()
+bootstrap()
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "single_token_multi_source"
 DATA_DIR = PROJECT_ROOT / "data" / "leakage_v3_onpolicy"  # reuse v3 cache
 WANDB_PROJECT = "single_token_multi_source"
@@ -91,7 +86,6 @@ def setup_logging(output_dir: Path) -> None:
 
 # ── Import v3 helpers ────────────────────────────────────────────────────────
 
-sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 from run_leakage_v3_onpolicy import (  # noqa: E402
     ASSISTANT_PROMPT,
     DATA_QUESTIONS,
