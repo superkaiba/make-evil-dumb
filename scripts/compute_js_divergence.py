@@ -271,8 +271,9 @@ def phase2_teacher_force(
         )
         # log_probs shape: (11, response_len, vocab_size)
 
-        # Compute pairwise divergences
-        js_pairs, kl_pairs = compute_pairwise_divergences(log_probs, persona_names)
+        # Compute pairwise divergences (kl_only for large persona sets)
+        kl_only = n_personas > 30
+        js_pairs, kl_pairs = compute_pairwise_divergences(log_probs, persona_names, kl_only=kl_only)
 
         all_js.append(js_pairs)
         all_kl.append(kl_pairs)
