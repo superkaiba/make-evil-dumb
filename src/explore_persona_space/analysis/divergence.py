@@ -191,8 +191,12 @@ def teacher_force_batch(
     prompt_lengths: list[int],
     response_len: int,
     device: str = "cuda:0",
+    max_batch: int = 16,
 ) -> torch.Tensor:
     """Run teacher-forced forward pass and extract response-token log-softmax.
+
+    Processes in sub-batches of ``max_batch`` to avoid OOM on large persona
+    sets (e.g. 111 personas on a single 80GB GPU).
 
     Args:
         model: HuggingFace CausalLM model (already on device, eval mode).
@@ -200,43 +204,44 @@ def teacher_force_batch(
         prompt_lengths: Per-sequence prompt token counts.
         response_len: Number of response tokens.
         device: Device string.
+        max_batch: Maximum sub-batch size for forward passes.
 
     Returns:
         (N, response_len, vocab_size) float32 log-softmax tensor for the
-        response token positions only.
+        response token positions only. Returned on CPU.
     """
-    input_ids = batch_inputs["input_ids"].to(device)
-    attention_mask = batch_inputs["attention_mask"].to(device)
-    batch_size = input_ids.shape[0]
-    max_len = input_ids.shape[1]
+    total_n = batch_inputs["input_ids"].shape[0]
+    max_len = batch_inputs["input_ids"].shape[1]
+    all_log_probs = []
 
-    with torch.no_grad():
-        outputs = model(input_ids=input_ids, attention_mask=attention_mask)
-        # logits shape: (batch, seq_len, vocab_size)
-        logits = outputs.logits
+    for start in range(0, total_n, max_batch):
+        end = min(start + max_batch, total_n)
+        sub_input_ids = batch_inputs["input_ids"][start:end].to(device)
+        sub_attention_mask = batch_inputs["attention_mask"][start:end].to(device)
+        sub_prompt_lengths = prompt_lengths[start:end]
+        sub_batch_size = sub_input_ids.shape[0]
 
-    # Extract response-token logits for each sequence
-    # For next-token prediction: logit at position t predicts token t+1
-    # So for response tokens at positions [p, p+1, ..., p+R-1],
-    # the logits predicting them are at positions [p-1, p, ..., p+R-2]
-    response_logits_list = []
-    for i in range(batch_size):
-        pad_len = max_len - (prompt_lengths[i] + response_len)
-        # Response tokens in padded sequence start at: pad_len + prompt_lengths[i]
-        resp_start = pad_len + prompt_lengths[i]
-        # Logits predicting these tokens are at positions
-        # [resp_start-1, ..., resp_start+response_len-2]
-        logit_start = resp_start - 1
-        logit_end = resp_start + response_len - 1
-        response_logits_list.append(logits[i, logit_start:logit_end, :])
+        with torch.no_grad():
+            outputs = model(input_ids=sub_input_ids, attention_mask=sub_attention_mask)
+            logits = outputs.logits
 
-    # Stack: (batch, response_len, vocab_size)
-    response_logits = torch.stack(response_logits_list)
+        # Extract response-token logits for each sequence in the sub-batch
+        response_logits_list = []
+        for i in range(sub_batch_size):
+            pad_len = max_len - (sub_prompt_lengths[i] + response_len)
+            resp_start = pad_len + sub_prompt_lengths[i]
+            logit_start = resp_start - 1
+            logit_end = resp_start + response_len - 1
+            response_logits_list.append(logits[i, logit_start:logit_end, :])
 
-    # Convert to float32 log-softmax for numerical stability
-    log_probs = F.log_softmax(response_logits.float(), dim=-1)
+        response_logits = torch.stack(response_logits_list)
+        log_probs = F.log_softmax(response_logits.float(), dim=-1)
+        all_log_probs.append(log_probs.cpu())
 
-    return log_probs
+        del outputs, logits, response_logits, log_probs, sub_input_ids, sub_attention_mask
+        torch.cuda.empty_cache()
+
+    return torch.cat(all_log_probs, dim=0)
 
 
 def compute_pairwise_divergences(
