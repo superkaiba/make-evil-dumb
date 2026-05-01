@@ -21,6 +21,23 @@ import time
 from pathlib import Path
 
 import numpy as np
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """JSON encoder that handles numpy types."""
+
+    def default(self, obj):
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+
+
 import torch
 import torch.nn.functional as F
 from huggingface_hub import hf_hub_download
@@ -671,7 +688,7 @@ def main():
 
     result_path = OUTPUT_DIR / "run_result.json"
     with open(result_path, "w") as f:
-        json.dump(run_result, f, indent=2)
+        json.dump(run_result, f, indent=2, cls=NumpyEncoder)
     print(f"\nResults saved to {result_path}")
 
     # Save track results separately for easier access
