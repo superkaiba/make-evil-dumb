@@ -152,71 +152,67 @@ def _generate_onpolicy_completions(
     gpu: int,
     n_per_q: int = NUM_COMPLETIONS_PER_Q,
 ) -> dict[str, list[str]]:
-    """Generate on-policy completions for a persona using vLLM."""
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
+    """Generate on-policy completions for a persona using vLLM in a subprocess.
 
-    # Patch transformers for vLLM compat (transformers 5.5+).
-    from transformers.tokenization_utils_base import PreTrainedTokenizerBase
+    Runs vLLM in a fresh subprocess to avoid CUDA state contamination between
+    vLLM engine instances and between vLLM and training (LoRA).  The subprocess
+    writes completions to a temp JSON file which the parent reads back.
+    """
+    log.info("Launching vLLM subprocess for on-policy generation (%s)...", persona_name)
+    tmp_out = WORK_ROOT / "data" / f"_tmp_gen_{persona_name}.json"
+    tmp_out.parent.mkdir(parents=True, exist_ok=True)
 
-    if not hasattr(PreTrainedTokenizerBase, "all_special_tokens_extended"):
-        PreTrainedTokenizerBase.all_special_tokens_extended = (
-            PreTrainedTokenizerBase.all_special_tokens
-        )
-
-    # Patch vLLM DisabledTqdm for compatibility.
-    import vllm.model_executor.model_loader.weight_utils as _wu
-    from transformers import AutoTokenizer
-
-    _OrigDisabledTqdm = _wu.DisabledTqdm
-
-    class _PatchedDisabledTqdm(_OrigDisabledTqdm.__bases__[0]):
-        def __init__(self, *a, **kw):
-            kw.pop("disable", None)
-            super().__init__(*a, disable=True, **kw)
-
-    _wu.DisabledTqdm = _PatchedDisabledTqdm
-
-    from vllm import LLM, SamplingParams
-
-    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_ID, trust_remote_code=True)
-
-    prompts = []
-    keys = []
-    for q in DATA_QUESTIONS:
-        messages = [
-            {"role": "system", "content": persona_prompt},
-            {"role": "user", "content": q},
-        ]
-        text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        prompts.append(text)
-        keys.append(q)
-
-    log.info("Loading vLLM for on-policy generation (%s)...", persona_name)
-    llm = LLM(
-        model=BASE_MODEL_ID,
-        dtype="bfloat16",
-        trust_remote_code=True,
-        gpu_memory_utilization=0.85,
-        max_model_len=2048,
-        max_num_seqs=64,
+    # Build the generation script as an inline Python command.
+    script = f"""\
+import gc, json, os, sys
+os.environ["CUDA_VISIBLE_DEVICES"] = "{gpu}"
+os.environ.setdefault("HF_HOME", "/workspace/.cache/huggingface")
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+# Patch transformers for vLLM compat (transformers 5.5+).
+from transformers.tokenization_utils_base import PreTrainedTokenizerBase
+if not hasattr(PreTrainedTokenizerBase, "all_special_tokens_extended"):
+    PreTrainedTokenizerBase.all_special_tokens_extended = PreTrainedTokenizerBase.all_special_tokens
+# Patch vLLM DisabledTqdm.
+import vllm.model_executor.model_loader.weight_utils as _wu
+_Orig = _wu.DisabledTqdm
+class _Patched(_Orig.__bases__[0]):
+    def __init__(self, *a, **kw):
+        kw.pop("disable", None)
+        super().__init__(*a, disable=True, **kw)
+_wu.DisabledTqdm = _Patched
+from vllm import LLM, SamplingParams
+from transformers import AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained("{BASE_MODEL_ID}", trust_remote_code=True)
+persona_prompt = {persona_prompt!r}
+questions = {DATA_QUESTIONS!r}
+prompts, keys = [], []
+for q in questions:
+    msgs = [{{"role": "system", "content": persona_prompt}}, {{"role": "user", "content": q}}]
+    prompts.append(tokenizer.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True))
+    keys.append(q)
+llm = LLM(model="{BASE_MODEL_ID}", dtype="bfloat16", trust_remote_code=True,
+          gpu_memory_utilization=0.85, max_model_len=2048, max_num_seqs=64)
+params = SamplingParams(n={n_per_q}, temperature=1.0, top_p=1.0, max_tokens=512)
+outputs = llm.generate(prompts, params)
+completions = {{}}
+for output, q in zip(outputs, keys, strict=True):
+    completions[q] = [o.text for o in output.outputs]
+with open("{tmp_out}", "w") as f:
+    json.dump(completions, f, indent=2)
+print(f"Wrote {{len(completions)}} question groups to {tmp_out}")
+del llm; gc.collect()
+"""
+    r = subprocess.run(
+        ["uv", "run", "python", "-c", script],
+        cwd=str(REPO_ROOT),
+        check=False,
     )
-
-    params = SamplingParams(n=n_per_q, temperature=1.0, top_p=1.0, max_tokens=512)
-    outputs = llm.generate(prompts, params)
-
-    completions: dict[str, list[str]] = {}
-    for output, q in zip(outputs, keys, strict=True):
-        completions[q] = [o.text for o in output.outputs]
-
-    del llm
-    gc.collect()
-    try:
-        import torch
-
-        torch.cuda.empty_cache()
-    except Exception:
-        pass
-
+    if r.returncode != 0:
+        raise RuntimeError(
+            f"vLLM generation subprocess for {persona_name} failed rc={r.returncode}"
+        )
+    completions = json.loads(tmp_out.read_text())
+    tmp_out.unlink(missing_ok=True)
     return completions
 
 
