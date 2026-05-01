@@ -22,7 +22,6 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 LOCAL_ENV="$PROJECT_ROOT/.env"
 SSH_KEY="$HOME/.ssh/id_ed25519"
 SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=15 -o BatchMode=yes -i $SSH_KEY"
-REPO_URL="git@github.com:superkaiba/explore-persona-space.git"
 REMOTE_DIR="/workspace/explore-persona-space"
 
 # ── Color output ─────────────────────────────────────────────────────────────
@@ -198,7 +197,7 @@ else
     git init -q -b main
     git remote add origin \"https://x-access-token:\${GITHUB_TOKEN}@github.com/superkaiba/explore-persona-space.git\" 2>/dev/null \
         || git remote set-url origin \"https://x-access-token:\${GITHUB_TOKEN}@github.com/superkaiba/explore-persona-space.git\"
-    git fetch --depth=1 origin main
+    git fetch origin main
     git reset --hard origin/main
     echo \"Cloned at: \$(git log --oneline -1)\"
 fi
