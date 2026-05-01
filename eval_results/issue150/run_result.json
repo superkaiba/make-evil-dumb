@@ -1,0 +1,115 @@
+{
+  "experiment": "issue-150-persona-cot-arc-c",
+  "issue": 150,
+  "branch": "issue-150",
+  "stage_reached": "gate",
+  "killed_at_gate": true,
+  "kill_rule": "delta_slope_2pt <= 0 -> exit 1 (per plan v3 §6)",
+  "goal": "Test whether eval-time persona-CoT amplifies persona-induced ARC-C accuracy variation in Qwen2.5-7B-Instruct (Δslope > 0 vs generic-CoT control).",
+  "motivation": "Builds on issues #75 (c5 EM lineage), #80 (11-persona axis), and the cot-axis-tracking analysis. Hypothesis (Option B): persona-CoT widens the persona-aligned vs persona-misaligned ARC-C accuracy gap (positive Δslope).",
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "model_params": "7.6B",
+  "training": {
+    "method": "none (eval-only on base instruct model)"
+  },
+  "data": {
+    "source": "raw/arc_challenge/test.jsonl",
+    "version": "ARC-Challenge canonical, schema={question, choice_labels, choices, correct_answer}",
+    "train_size": null,
+    "val_size": null,
+    "eval_size_full": 1172,
+    "eval_size_gate": 200,
+    "preprocessing": "first-N slice (deterministic head); user turn formatted with letter-tagged choices"
+  },
+  "eval": {
+    "metrics": ["per-persona ARC-C accuracy", "delta_slope_2pt (gate)"],
+    "eval_dataset": "ARC-Challenge test (full set N=1172; gate uses head N=200)",
+    "eval_method": "hybrid CoT-then-logprob (vLLM batched generation)",
+    "judge_model": null,
+    "samples_per_question": 1,
+    "temperature": 0.0,
+    "cot_max_tokens": 256,
+    "logprobs_top_k": 20
+  },
+  "compute": {
+    "hardware": "1x NVIDIA H100 80GB (epm-issue-150)",
+    "pod": "epm-issue-150",
+    "wall_time_minutes": {
+      "smoke": 6,
+      "gate": 5,
+      "audit": 4,
+      "total": 15
+    },
+    "gpu_hours_used": 0.25,
+    "gpu_hours_planned": 1.0
+  },
+  "environment": {
+    "python": "3.11",
+    "transformers": "5.5.0",
+    "torch": "2.8.0+cu128",
+    "vllm": "0.11.0",
+    "peft": "0.18.1",
+    "trl": "0.29.1",
+    "script": "scripts/run_issue150.py",
+    "audit_script": "scripts/audit_issue150_logprobs.py",
+    "commit_at_run": "9798de2732ad108027c7a5934346127c06ea6a5e",
+    "command_smoke": "uv run python scripts/run_issue150.py --stage smoke",
+    "command_gate": "uv run python scripts/run_issue150.py --stage gate",
+    "command_audit": "uv run python scripts/audit_issue150_logprobs.py"
+  },
+  "results": {
+    "smoke": {
+      "n_questions": 5,
+      "personas": ["assistant"],
+      "accuracies": {
+        "assistant": {"no_cot": 0.8, "generic_cot": 0.8, "persona_cot": 0.8}
+      },
+      "verdict": "PASS - wire format intact, CoTs render, letter extraction works"
+    },
+    "gate": {
+      "n_questions": 200,
+      "personas": ["assistant", "police_officer"],
+      "accuracies": {
+        "assistant": {"no_cot": 0.785, "generic_cot": 0.800, "persona_cot": 0.765},
+        "police_officer": {"no_cot": 0.785, "generic_cot": 0.805, "persona_cot": 0.870}
+      },
+      "delta_persona_cot_assistant_minus_police": -0.105,
+      "delta_generic_cot_assistant_minus_police": -0.005,
+      "delta_slope_2pt": -0.100,
+      "verdict": "FAIL - wrong-sign delta_slope_2pt; KILL per plan v3 §6"
+    },
+    "full": {
+      "verdict": "NOT RUN (killed at gate)"
+    }
+  },
+  "letter_extraction_audit": {
+    "method": "30 cells per arm (15 questions x 2 personas), top-5 logprobs at answer position",
+    "key_finding": "Top-1 next-token rarely a bare letter; CoT arms commonly emit '(' as top-1 (60-83%) and bare letter as top-2/3. no-cot arm emits sentence starters ('To', 'The') at top-1, with letter-prefixed words ('Ah', 'Alright', 'An', 'Before') sometimes outranking bare letters.",
+    "reproduction_audit_top5_only": {
+      "no_cot": {"bare_letter_picked": "6/30", "word_letter_picked": "8/30", "no_letter_in_top5": "16/30"},
+      "generic_cot": {"bare_letter_picked": "20/30", "word_letter_picked": "6/30", "no_letter_in_top5": "4/30"},
+      "persona_cot": {"bare_letter_picked": "25/30", "word_letter_picked": "1/30", "no_letter_in_top5": "4/30"}
+    },
+    "asymmetry_concern": "no-cot arm has very different letter-extraction behavior than CoT arms (53% vs 13% no-letter-in-top5). The bare-letter Path-2 fallback dominates no-cot, while Path-1 (top-K scan) dominates CoT arms. This is a measurement-protocol asymmetry but does NOT favor any specific direction - it equally affects assistant and police_officer cells."
+  },
+  "decision_log": {
+    "why_this_experiment": "Plan v3 (final): test eval-time persona-CoT amplification of persona-induced capability variation on base Qwen2.5-7B-Instruct (no fine-tune). 1 GPU-hr budget.",
+    "why_these_params": "Plan-pinned: temp=0, K=1, max_tokens=256, full N=1172 for full stage; 11-persona axis matching #80; bootstrap-over-questions p-value with n=1000.",
+    "alternatives_considered": "v1 used merged c5 LoRA adapters (12-17 GPU-hr); v2 added Betley + StrongREJECT (5-7 GPU-hr); v3 simplified to single-base-model + ARC-C (1 GPU-hr).",
+    "expected_outcome": "Plan §3 prior: positive delta_slope >= 0.05 per unit cosine. Δslope_2pt > 0 expected on the gate.",
+    "actual_vs_expected": "Δslope_2pt = -0.10 (wrong sign, magnitude similar to predicted). Persona-CoT NARROWED the assistant-vs-police accuracy gap (in fact reversed it: police_officer scored 0.870 vs assistant 0.765). Hypothesis falsified at gate."
+  },
+  "deviations_from_plan": [
+    "Hot-fix #1 (commit f491103): added 3-line monkey-patch for transformers.PreTrainedTokenizerBase.all_special_tokens_extended (removed in transformers 5.x but expected by vLLM 0.11.0 get_cached_tokenizer). Identical patch already used in scripts/run_em_first_marker_transfer_confab.py.",
+    "Hot-fix #2 (commit 9798de2): added 7-line monkey-patch for vLLM DisabledTqdm class (passed disable=True twice with tqdm 5.x). Identical patch already used in scripts/run_em_first_marker_transfer_confab.py.",
+    "No WandB upload (already flagged as code-review concern #5): result JSONs saved to disk only. Pulled to local VM via scp."
+  ],
+  "model_artifact": null,
+  "wandb_run_id": null,
+  "artifacts": {
+    "smoke_result": "eval_results/issue150/smoke/result.json",
+    "gate_result": "eval_results/issue150/gate/result.json",
+    "logprob_audit": "eval_results/issue150/gate/logprob_audit.json",
+    "logs": "logs/issue150_smoke.log, logs/issue150_gate.log, logs/issue150_audit.log (on pod epm-issue-150)"
+  }
+}

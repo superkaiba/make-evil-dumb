@@ -1,0 +1,3062 @@
+[
+  {
+    "persona": "assistant",
+    "q_id": 0,
+    "arm": "no-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.2461014837026596
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -2.1211013793945312
+      },
+      {
+        "token_id": 4498,
+        "decoded": "When",
+        "logprob": -2.3711013793945312
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -5.746101379394531
+      },
+      {
+        "token_id": 2082,
+        "decoded": "An",
+        "logprob": -6.871101379394531
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 0,
+    "arm": "generic-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 23249,
+        "decoded": " gravity",
+        "logprob": -0.6793246865272522
+      },
+      {
+        "token_id": 279,
+        "decoded": " the",
+        "logprob": -1.6793246269226074
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -2.1793246269226074
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -2.8043246269226074
+      },
+      {
+        "token_id": 582,
+        "decoded": " we",
+        "logprob": -3.7418246269226074
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 0,
+    "arm": "persona-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.2829970419406891
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -1.7829970121383667
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -3.4079971313476562
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -3.6579971313476562
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -4.782997131347656
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 13,
+    "arm": "no-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.0013810392701998353
+      },
+      {
+        "token_id": 16,
+        "decoded": "1",
+        "logprob": -7.126380920410156
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -7.876380920410156
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -8.876380920410156
+      },
+      {
+        "token_id": 641,
+        "decoded": "In",
+        "logprob": -10.626380920410156
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 13,
+    "arm": "generic-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -0.012452236376702785
+      },
+      {
+        "token_id": 57960,
+        "decoded": " $\\",
+        "logprob": -5.262452125549316
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -5.762452125549316
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -5.762452125549316
+      },
+      {
+        "token_id": 18,
+        "decoded": "3",
+        "logprob": -7.762452125549316
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 13,
+    "arm": "persona-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -0.41997674107551575
+      },
+      {
+        "token_id": 15277,
+        "decoded": " Therefore",
+        "logprob": -2.0449767112731934
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -2.4199767112731934
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -2.6699767112731934
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -3.7949767112731934
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 27,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.03041844815015793
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -3.5304183959960938
+      },
+      {
+        "token_id": 641,
+        "decoded": "In",
+        "logprob": -7.905418395996094
+      },
+      {
+        "token_id": 4498,
+        "decoded": "When",
+        "logprob": -8.905418395996094
+      },
+      {
+        "token_id": 14374,
+        "decoded": "###",
+        "logprob": -9.405418395996094
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 27,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.44023597240448
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -1.06523597240448
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -4.5652360916137695
+      },
+      {
+        "token_id": 16,
+        "decoded": "1",
+        "logprob": -8.37773609161377
+      },
+      {
+        "token_id": 57960,
+        "decoded": " $\\",
+        "logprob": -8.69023609161377
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 27,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.4617462158203125
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -1.2117462158203125
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -3.5867462158203125
+      },
+      {
+        "token_id": 18,
+        "decoded": "3",
+        "logprob": -4.3367462158203125
+      },
+      {
+        "token_id": 17,
+        "decoded": "2",
+        "logprob": -4.4617462158203125
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 41,
+    "arm": "no-cot",
+    "correct_answer": "A",
+    "pred_in_gate": null,
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.0018128404626622796
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -6.501812934875488
+      },
+      {
+        "token_id": 16,
+        "decoded": "1",
+        "logprob": -8.626812934875488
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -9.126812934875488
+      },
+      {
+        "token_id": 14374,
+        "decoded": "###",
+        "logprob": -11.751812934875488
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 41,
+    "arm": "generic-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.7683063745498657
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -0.7683063745498657
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -2.643306255340576
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -7.643306255340576
+      },
+      {
+        "token_id": 57960,
+        "decoded": " $\\",
+        "logprob": -7.893306255340576
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 41,
+    "arm": "persona-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.9381129741668701
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -1.9381129741668701
+      },
+      {
+        "token_id": 1494,
+        "decoded": " pass",
+        "logprob": -2.56311297416687
+      },
+      {
+        "token_id": 3055,
+        "decoded": " once",
+        "logprob": -2.87561297416687
+      },
+      {
+        "token_id": 537,
+        "decoded": " not",
+        "logprob": -3.12561297416687
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 55,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.0007265550084412098
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -7.250726699829102
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -11.625726699829102
+      },
+      {
+        "token_id": 16,
+        "decoded": "1",
+        "logprob": -12.875726699829102
+      },
+      {
+        "token_id": 5338,
+        "decoded": "First",
+        "logprob": -13.000726699829102
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 55,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.27151456475257874
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -1.6465145349502563
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -3.146514654159546
+      },
+      {
+        "token_id": 57960,
+        "decoded": " $\\",
+        "logprob": -7.021514415740967
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -8.584014892578125
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 55,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": null,
+    "top5": [
+      {
+        "token_id": 9072,
+        "decoded": " electric",
+        "logprob": -0.9827342629432678
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -1.857734203338623
+      },
+      {
+        "token_id": 63365,
+        "decoded": "electric",
+        "logprob": -1.982734203338623
+      },
+      {
+        "token_id": 366,
+        "decoded": " <",
+        "logprob": -2.607734203338623
+      },
+      {
+        "token_id": 2014,
+        "decoded": " To",
+        "logprob": -2.857734203338623
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 69,
+    "arm": "no-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.03680434450507164
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -3.411804437637329
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -5.78680419921875
+      },
+      {
+        "token_id": 641,
+        "decoded": "In",
+        "logprob": -11.03680419921875
+      },
+      {
+        "token_id": 5341,
+        "decoded": "Option",
+        "logprob": -11.41180419921875
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 69,
+    "arm": "generic-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 323,
+        "decoded": " and",
+        "logprob": -1.2217226028442383
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -1.5967226028442383
+      },
+      {
+        "token_id": 714,
+        "decoded": " but",
+        "logprob": -1.9717226028442383
+      },
+      {
+        "token_id": 1096,
+        "decoded": " This",
+        "logprob": -2.8467226028442383
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -3.2217226028442383
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 69,
+    "arm": "persona-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.052539195865392685
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -4.052539348602295
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -4.427539348602295
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -4.927539348602295
+      },
+      {
+        "token_id": 23501,
+        "decoded": " mountains",
+        "logprob": -5.177539348602295
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 83,
+    "arm": "no-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.06045025214552879
+      },
+      {
+        "token_id": 41393,
+        "decoded": "Thomas",
+        "logprob": -3.185450315475464
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -4.060450077056885
+      },
+      {
+        "token_id": 11108,
+        "decoded": " Thomas",
+        "logprob": -10.685450553894043
+      },
+      {
+        "token_id": 2715,
+        "decoded": "Ed",
+        "logprob": -11.060450553894043
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 83,
+    "arm": "generic-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.008691221475601196
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -5.133691310882568
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -6.383691310882568
+      },
+      {
+        "token_id": 422,
+        "decoded": " D",
+        "logprob": -6.883691310882568
+      },
+      {
+        "token_id": 374,
+        "decoded": " is",
+        "logprob": -10.82119083404541
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 83,
+    "arm": "persona-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.20871762931346893
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -1.7087175846099854
+      },
+      {
+        "token_id": 422,
+        "decoded": " D",
+        "logprob": -5.3337178230285645
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -6.4587178230285645
+      },
+      {
+        "token_id": 87199,
+        "decoded": "\\D",
+        "logprob": -7.5212178230285645
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 97,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 50,
+        "decoded": "S",
+        "logprob": -0.28809937834739685
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -1.9130994081497192
+      },
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -2.2880992889404297
+      },
+      {
+        "token_id": 3759,
+        "decoded": "(S",
+        "logprob": -6.78809928894043
+      },
+      {
+        "token_id": 5341,
+        "decoded": "Option",
+        "logprob": -10.78809928894043
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 97,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.036089055240154266
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -4.036088943481445
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -5.536088943481445
+      },
+      {
+        "token_id": 16,
+        "decoded": "1",
+        "logprob": -5.786088943481445
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -5.911088943481445
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 97,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.13748419284820557
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -2.262484073638916
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -4.699984073638916
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -5.074984073638916
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -6.387484073638916
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 111,
+    "arm": "no-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.0014143711887300014
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -6.6264142990112305
+      },
+      {
+        "token_id": 4498,
+        "decoded": "When",
+        "logprob": -10.25141429901123
+      },
+      {
+        "token_id": 641,
+        "decoded": "In",
+        "logprob": -10.50141429901123
+      },
+      {
+        "token_id": 2014,
+        "decoded": " To",
+        "logprob": -11.50141429901123
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 111,
+    "arm": "generic-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -0.5765676498413086
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.8265676498413086
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -8.201567649841309
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -8.326567649841309
+      },
+      {
+        "token_id": 57960,
+        "decoded": " $\\",
+        "logprob": -9.514067649841309
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 111,
+    "arm": "persona-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.0018798314267769456
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -6.876879692077637
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -7.376879692077637
+      },
+      {
+        "token_id": 144138,
+        "decoded": "\u3008",
+        "logprob": -9.376879692077637
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -9.376879692077637
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 125,
+    "arm": "no-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.052971288561820984
+      },
+      {
+        "token_id": 2679,
+        "decoded": "If",
+        "logprob": -3.302971363067627
+      },
+      {
+        "token_id": 4498,
+        "decoded": "When",
+        "logprob": -4.802971363067627
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -5.427971363067627
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -6.427971363067627
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 125,
+    "arm": "generic-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 374,
+        "decoded": " is",
+        "logprob": -0.23472921550273895
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -3.359729290008545
+      },
+      {
+        "token_id": 5961,
+        "decoded": " directly",
+        "logprob": -3.359729290008545
+      },
+      {
+        "token_id": 1035,
+        "decoded": " would",
+        "logprob": -3.359729290008545
+      },
+      {
+        "token_id": 12440,
+        "decoded": " correctly",
+        "logprob": -3.734729290008545
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 125,
+    "arm": "persona-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -0.6609139442443848
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -1.0359139442443848
+      },
+      {
+        "token_id": 2936,
+        "decoded": " stop",
+        "logprob": -2.1609139442443848
+      },
+      {
+        "token_id": 279,
+        "decoded": " the",
+        "logprob": -4.785913944244385
+      },
+      {
+        "token_id": 60170,
+        "decoded": "(stop",
+        "logprob": -6.410913944244385
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 139,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.05525822937488556
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -2.930258274078369
+      },
+      {
+        "token_id": 11868,
+        "decoded": "Elements",
+        "logprob": -8.305257797241211
+      },
+      {
+        "token_id": 1925,
+        "decoded": "On",
+        "logprob": -10.055257797241211
+      },
+      {
+        "token_id": 14374,
+        "decoded": "###",
+        "logprob": -10.805257797241211
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 139,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.0011039836099371314
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -7.68860387802124
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -8.563604354858398
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -9.251104354858398
+      },
+      {
+        "token_id": 8916,
+        "decoded": " therefore",
+        "logprob": -9.688604354858398
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 139,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.6566617488861084
+      },
+      {
+        "token_id": 1096,
+        "decoded": " This",
+        "logprob": -1.6566617488861084
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -2.2816617488861084
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -2.2816617488861084
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -4.4691619873046875
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 153,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 4498,
+        "decoded": "When",
+        "logprob": -0.8762451410293579
+      },
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -1.126245141029358
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -1.376245141029358
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -5.001245021820068
+      },
+      {
+        "token_id": 641,
+        "decoded": "In",
+        "logprob": -9.626245498657227
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 153,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -0.5986260771751404
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.8486260771751404
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -3.973626136779785
+      },
+      {
+        "token_id": 18,
+        "decoded": "3",
+        "logprob": -6.723626136779785
+      },
+      {
+        "token_id": 16,
+        "decoded": "1",
+        "logprob": -7.036126136779785
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 153,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.07289452105760574
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -2.69789457321167
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -6.19789457321167
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -7.07289457321167
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -10.072894096374512
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 167,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -8.487341256113723e-05
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -9.87508487701416
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -11.12508487701416
+      },
+      {
+        "token_id": 2014,
+        "decoded": " To",
+        "logprob": -11.62508487701416
+      },
+      {
+        "token_id": 2346,
+        "decoded": "_to",
+        "logprob": -13.00008487701416
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 167,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 323,
+        "decoded": " and",
+        "logprob": -0.4794335663318634
+      },
+      {
+        "token_id": 481,
+        "decoded": " -",
+        "logprob": -1.604433536529541
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -2.229433536529541
+      },
+      {
+        "token_id": 5707,
+        "decoded": " provides",
+        "logprob": -4.104433536529541
+      },
+      {
+        "token_id": 49027,
+        "decoded": " fats",
+        "logprob": -4.916933536529541
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 167,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -1.5502724647521973
+      },
+      {
+        "token_id": 1205,
+        "decoded": " We",
+        "logprob": -1.9252724647521973
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -2.0502724647521973
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -2.1752724647521973
+      },
+      {
+        "token_id": 6771,
+        "decoded": " Let",
+        "logprob": -3.1127724647521973
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 181,
+    "arm": "no-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.02679787576198578
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -3.6517977714538574
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -7.901797771453857
+      },
+      {
+        "token_id": 14374,
+        "decoded": "###",
+        "logprob": -10.651798248291016
+      },
+      {
+        "token_id": 4346,
+        "decoded": "(A",
+        "logprob": -11.026798248291016
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 181,
+    "arm": "generic-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 1035,
+        "decoded": " would",
+        "logprob": -0.11347843706607819
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -2.863478422164917
+      },
+      {
+        "token_id": 1096,
+        "decoded": " This",
+        "logprob": -4.488478660583496
+      },
+      {
+        "token_id": 5961,
+        "decoded": " directly",
+        "logprob": -4.738478660583496
+      },
+      {
+        "token_id": 686,
+        "decoded": " will",
+        "logprob": -4.738478660583496
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 181,
+    "arm": "persona-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 304,
+        "decoded": " in",
+        "logprob": -0.0010095505276694894
+      },
+      {
+        "token_id": 366,
+        "decoded": " <",
+        "logprob": -7.751009464263916
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -8.751009941101074
+      },
+      {
+        "token_id": 1527,
+        "decoded": " An",
+        "logprob": -8.938509941101074
+      },
+      {
+        "token_id": 5263,
+        "decoded": " increase",
+        "logprob": -9.376009941101074
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 195,
+    "arm": "no-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -0.03670242056250572
+      },
+      {
+        "token_id": 50,
+        "decoded": "S",
+        "logprob": -3.5367023944854736
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -5.036702632904053
+      },
+      {
+        "token_id": 3759,
+        "decoded": "(S",
+        "logprob": -8.161702156066895
+      },
+      {
+        "token_id": 59571,
+        "decoded": " Sung",
+        "logprob": -10.661702156066895
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 195,
+    "arm": "generic-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.152703657746315
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -2.0277037620544434
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -4.652703762054443
+      },
+      {
+        "token_id": 16,
+        "decoded": "1",
+        "logprob": -9.152703285217285
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -9.465203285217285
+      }
+    ]
+  },
+  {
+    "persona": "assistant",
+    "q_id": 195,
+    "arm": "persona-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.011157501488924026
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -5.011157512664795
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -5.761157512664795
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -7.261157512664795
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -8.136157035827637
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 0,
+    "arm": "no-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 34,
+        "decoded": "C",
+        "logprob": -2.0872952938079834
+      },
+      {
+        "token_id": 71486,
+        "decoded": "Alright",
+        "logprob": -2.0872952938079834
+      },
+      {
+        "token_id": 4792,
+        "decoded": "That",
+        "logprob": -2.3372952938079834
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -2.3372952938079834
+      },
+      {
+        "token_id": 3025,
+        "decoded": "(C",
+        "logprob": -2.4622952938079834
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 0,
+    "arm": "generic-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.11299080401659012
+      },
+      {
+        "token_id": 279,
+        "decoded": " the",
+        "logprob": -3.1129908561706543
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -3.9879908561706543
+      },
+      {
+        "token_id": 432,
+        "decoded": " it",
+        "logprob": -4.487990856170654
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -4.612990856170654
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 0,
+    "arm": "persona-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.06061340123414993
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -3.5606133937835693
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -4.310613632202148
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -4.560613632202148
+      },
+      {
+        "token_id": 279,
+        "decoded": " the",
+        "logprob": -5.685613632202148
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 13,
+    "arm": "no-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 5338,
+        "decoded": "First",
+        "logprob": -1.037768006324768
+      },
+      {
+        "token_id": 11395,
+        "decoded": "Well",
+        "logprob": -2.5377678871154785
+      },
+      {
+        "token_id": 10227,
+        "decoded": "Before",
+        "logprob": -2.7877678871154785
+      },
+      {
+        "token_id": 71486,
+        "decoded": "Alright",
+        "logprob": -2.9127678871154785
+      },
+      {
+        "token_id": 24765,
+        "decoded": "Ah",
+        "logprob": -2.9127678871154785
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 13,
+    "arm": "generic-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.31172657012939453
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -1.5617265701293945
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -3.6867265701293945
+      },
+      {
+        "token_id": 18,
+        "decoded": "3",
+        "logprob": -5.3742265701293945
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -5.4992265701293945
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 13,
+    "arm": "persona-cot",
+    "correct_answer": "C",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.2280348837375641
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -1.7280348539352417
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -4.165534973144531
+      },
+      {
+        "token_id": 1124,
+        "decoded": " \\",
+        "logprob": -5.790534973144531
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -6.603034973144531
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 27,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 641,
+        "decoded": "In",
+        "logprob": -1.555600881576538
+      },
+      {
+        "token_id": 24765,
+        "decoded": "Ah",
+        "logprob": -1.805600881576538
+      },
+      {
+        "token_id": 71486,
+        "decoded": "Alright",
+        "logprob": -2.055600881576538
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -2.555600881576538
+      },
+      {
+        "token_id": 32462,
+        "decoded": "Got",
+        "logprob": -2.805600881576538
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 27,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 16,
+        "decoded": "1",
+        "logprob": -1.2324084043502808
+      },
+      {
+        "token_id": 17,
+        "decoded": "2",
+        "logprob": -1.4824084043502808
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -2.2324085235595703
+      },
+      {
+        "token_id": 3002,
+        "decoded": " Object",
+        "logprob": -2.3574085235595703
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -2.6074085235595703
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 27,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.07862894982099533
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -3.2036290168762207
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -3.9536290168762207
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -4.828629016876221
+      },
+      {
+        "token_id": 3002,
+        "decoded": " Object",
+        "logprob": -5.703629016876221
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 41,
+    "arm": "no-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -1.1397634744644165
+      },
+      {
+        "token_id": 11395,
+        "decoded": "Well",
+        "logprob": -2.139763355255127
+      },
+      {
+        "token_id": 4064,
+        "decoded": "None",
+        "logprob": -2.139763355255127
+      },
+      {
+        "token_id": 5341,
+        "decoded": "Option",
+        "logprob": -2.264763355255127
+      },
+      {
+        "token_id": 32,
+        "decoded": "A",
+        "logprob": -2.639763355255127
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 41,
+    "arm": "generic-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.14626015722751617
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -2.1462602615356445
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -5.1462602615356445
+      },
+      {
+        "token_id": 1084,
+        "decoded": " It",
+        "logprob": -5.3962602615356445
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -5.8962602615356445
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 41,
+    "arm": "persona-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.07411477714776993
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -3.0741147994995117
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -5.074114799499512
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -5.199114799499512
+      },
+      {
+        "token_id": 2240,
+        "decoded": " None",
+        "logprob": -5.449114799499512
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 55,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 2662,
+        "decoded": "Out",
+        "logprob": -1.623176097869873
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -1.998176097869873
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -2.248176097869873
+      },
+      {
+        "token_id": 71486,
+        "decoded": "Alright",
+        "logprob": -2.373176097869873
+      },
+      {
+        "token_id": 4792,
+        "decoded": "That",
+        "logprob": -2.873176097869873
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 55,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.30816975235939026
+      },
+      {
+        "token_id": 2477,
+        "decoded": " non",
+        "logprob": -2.0581698417663574
+      },
+      {
+        "token_id": 32168,
+        "decoded": " renewable",
+        "logprob": -2.4331698417663574
+      },
+      {
+        "token_id": 13873,
+        "decoded": " renew",
+        "logprob": -4.245669841766357
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -4.745669841766357
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 55,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.12944214046001434
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -2.8794422149658203
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -3.0044422149658203
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -4.75444221496582
+      },
+      {
+        "token_id": 366,
+        "decoded": " <",
+        "logprob": -6.12944221496582
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 69,
+    "arm": "no-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -1.390297532081604
+      },
+      {
+        "token_id": 11395,
+        "decoded": "Well",
+        "logprob": -1.515297532081604
+      },
+      {
+        "token_id": 71486,
+        "decoded": "Alright",
+        "logprob": -1.890297532081604
+      },
+      {
+        "token_id": 4792,
+        "decoded": "That",
+        "logprob": -3.0152974128723145
+      },
+      {
+        "token_id": 7983,
+        "decoded": "While",
+        "logprob": -3.2652974128723145
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 69,
+    "arm": "generic-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.054375287145376205
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -3.554375171661377
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -4.429375171661377
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -5.179375171661377
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -6.804375171661377
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 69,
+    "arm": "persona-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 11174,
+        "decoded": " rain",
+        "logprob": -0.49225693941116333
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -1.2422568798065186
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -3.4922568798065186
+      },
+      {
+        "token_id": 366,
+        "decoded": " <",
+        "logprob": -4.242257118225098
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -4.367257118225098
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 83,
+    "arm": "no-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 35,
+        "decoded": "D",
+        "logprob": -1.7386693954467773
+      },
+      {
+        "token_id": 5432,
+        "decoded": "(D",
+        "logprob": -1.7386693954467773
+      },
+      {
+        "token_id": 11395,
+        "decoded": "Well",
+        "logprob": -2.1136693954467773
+      },
+      {
+        "token_id": 41393,
+        "decoded": "Thomas",
+        "logprob": -2.6136693954467773
+      },
+      {
+        "token_id": 24765,
+        "decoded": "Ah",
+        "logprob": -2.8636693954467773
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 83,
+    "arm": "generic-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 279,
+        "decoded": " the",
+        "logprob": -0.11565428972244263
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -3.115654230117798
+      },
+      {
+        "token_id": 12344,
+        "decoded": " scientific",
+        "logprob": -4.115654468536377
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -4.240654468536377
+      },
+      {
+        "token_id": 422,
+        "decoded": " D",
+        "logprob": -4.240654468536377
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 83,
+    "arm": "persona-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.06552882492542267
+      },
+      {
+        "token_id": 422,
+        "decoded": " D",
+        "logprob": -2.8155288696289062
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -6.690528869628906
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -7.315528869628906
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -7.440528869628906
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 97,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 50,
+        "decoded": "S",
+        "logprob": -1.5709741115570068
+      },
+      {
+        "token_id": 11908,
+        "decoded": "Oh",
+        "logprob": -2.070974111557007
+      },
+      {
+        "token_id": 33,
+        "decoded": "B",
+        "logprob": -2.320974111557007
+      },
+      {
+        "token_id": 11395,
+        "decoded": "Well",
+        "logprob": -2.570974111557007
+      },
+      {
+        "token_id": 4792,
+        "decoded": "That",
+        "logprob": -2.820974111557007
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 97,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": null,
+    "top5": [
+      {
+        "token_id": 7272,
+        "decoded": "iger",
+        "logprob": -1.522768259048462
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -1.585268259048462
+      },
+      {
+        "token_id": 5222,
+        "decoded": " ign",
+        "logprob": -2.460268259048462
+      },
+      {
+        "token_id": 33072,
+        "decoded": "eous",
+        "logprob": -2.710268259048462
+      },
+      {
+        "token_id": 20764,
+        "decoded": "ionic",
+        "logprob": -3.585268259048462
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 97,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.046439047902822495
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -3.4214389324188232
+      },
+      {
+        "token_id": 35278,
+        "decoded": " Sed",
+        "logprob": -5.421439170837402
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -5.546439170837402
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -5.796439170837402
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 111,
+    "arm": "no-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 1249,
+        "decoded": "To",
+        "logprob": -1.2266454696655273
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -1.9766454696655273
+      },
+      {
+        "token_id": 4064,
+        "decoded": "None",
+        "logprob": -2.1016454696655273
+      },
+      {
+        "token_id": 641,
+        "decoded": "In",
+        "logprob": -2.3516454696655273
+      },
+      {
+        "token_id": 2461,
+        "decoded": "For",
+        "logprob": -2.4766454696655273
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 111,
+    "arm": "generic-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.2787206768989563
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -1.6537206172943115
+      },
+      {
+        "token_id": 19,
+        "decoded": "4",
+        "logprob": -3.7787206172943115
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -4.716220855712891
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -5.653720855712891
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 111,
+    "arm": "persona-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.06237269192934036
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -2.9373726844787598
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -5.18737268447876
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -6.56237268447876
+      },
+      {
+        "token_id": 19,
+        "decoded": "4",
+        "logprob": -8.874873161315918
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 125,
+    "arm": "no-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 5432,
+        "decoded": "(D",
+        "logprob": -0.6979568004608154
+      },
+      {
+        "token_id": 2679,
+        "decoded": "If",
+        "logprob": -1.3229568004608154
+      },
+      {
+        "token_id": 35,
+        "decoded": "D",
+        "logprob": -3.1979568004608154
+      },
+      {
+        "token_id": 4792,
+        "decoded": "That",
+        "logprob": -3.6979568004608154
+      },
+      {
+        "token_id": 11908,
+        "decoded": "Oh",
+        "logprob": -3.8229568004608154
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 125,
+    "arm": "generic-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.06727804988622665
+      },
+      {
+        "token_id": 422,
+        "decoded": " D",
+        "logprob": -2.8172781467437744
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -5.692277908325195
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -7.817277908325195
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -7.942277908325195
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 125,
+    "arm": "persona-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.04356340318918228
+      },
+      {
+        "token_id": 422,
+        "decoded": " D",
+        "logprob": -3.1685633659362793
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -8.043563842773438
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -9.418563842773438
+      },
+      {
+        "token_id": 17767,
+        "decoded": " \\(",
+        "logprob": -9.606063842773438
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 139,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -1.852148413658142
+      },
+      {
+        "token_id": 4792,
+        "decoded": "That",
+        "logprob": -2.1021485328674316
+      },
+      {
+        "token_id": 21396,
+        "decoded": "Great",
+        "logprob": -2.2271485328674316
+      },
+      {
+        "token_id": 24765,
+        "decoded": "Ah",
+        "logprob": -2.3521485328674316
+      },
+      {
+        "token_id": 15216,
+        "decoded": "Good",
+        "logprob": -2.4771485328674316
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 139,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.06273259967565536
+      },
+      {
+        "token_id": 279,
+        "decoded": " the",
+        "logprob": -3.937732696533203
+      },
+      {
+        "token_id": 3108,
+        "decoded": " side",
+        "logprob": -4.187732696533203
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -4.812732696533203
+      },
+      {
+        "token_id": 99772,
+        "decoded": "\u4fa7",
+        "logprob": -5.562732696533203
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 139,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.04877876490354538
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -3.673778772354126
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -4.298778533935547
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -5.423778533935547
+      },
+      {
+        "token_id": 34157,
+        "decoded": " Elements",
+        "logprob": -6.923778533935547
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 153,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -1.362207055091858
+      },
+      {
+        "token_id": 4792,
+        "decoded": "That",
+        "logprob": -1.487207055091858
+      },
+      {
+        "token_id": 24765,
+        "decoded": "Ah",
+        "logprob": -1.612207055091858
+      },
+      {
+        "token_id": 641,
+        "decoded": "In",
+        "logprob": -2.8622069358825684
+      },
+      {
+        "token_id": 15216,
+        "decoded": "Good",
+        "logprob": -3.3622069358825684
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 153,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.20818978548049927
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -1.7081897258758545
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -5.833189964294434
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -7.333189964294434
+      },
+      {
+        "token_id": 1084,
+        "decoded": " It",
+        "logprob": -7.520689964294434
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 153,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.09837999939918518
+      },
+      {
+        "token_id": 356,
+        "decoded": " C",
+        "logprob": -2.5983800888061523
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -4.223380088806152
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -6.098380088806152
+      },
+      {
+        "token_id": 35324,
+        "decoded": " Chemical",
+        "logprob": -6.598380088806152
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 167,
+    "arm": "no-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 2662,
+        "decoded": "Out",
+        "logprob": -1.4201596975326538
+      },
+      {
+        "token_id": 5341,
+        "decoded": "Option",
+        "logprob": -1.6701596975326538
+      },
+      {
+        "token_id": 2679,
+        "decoded": "If",
+        "logprob": -1.9201596975326538
+      },
+      {
+        "token_id": 11395,
+        "decoded": "Well",
+        "logprob": -1.9201596975326538
+      },
+      {
+        "token_id": 10061,
+        "decoded": "Let",
+        "logprob": -2.4201598167419434
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 167,
+    "arm": "generic-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "C",
+    "top5": [
+      {
+        "token_id": 61245,
+        "decoded": " carbohydrates",
+        "logprob": -0.15371280908584595
+      },
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -2.903712749481201
+      },
+      {
+        "token_id": 3261,
+        "decoded": " Car",
+        "logprob": -3.653712749481201
+      },
+      {
+        "token_id": 49041,
+        "decoded": " Bread",
+        "logprob": -3.903712749481201
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -4.778712749481201
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 167,
+    "arm": "persona-cot",
+    "correct_answer": "B",
+    "pred_in_gate": "B",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.13187125325202942
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -2.506871223449707
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -3.756871223449707
+      },
+      {
+        "token_id": 425,
+        "decoded": " B",
+        "logprob": -4.506871223449707
+      },
+      {
+        "token_id": 6959,
+        "decoded": " Option",
+        "logprob": -5.756871223449707
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 181,
+    "arm": "no-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 24765,
+        "decoded": "Ah",
+        "logprob": -1.4246063232421875
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -1.9246063232421875
+      },
+      {
+        "token_id": 11395,
+        "decoded": "Well",
+        "logprob": -2.1746063232421875
+      },
+      {
+        "token_id": 2662,
+        "decoded": "Out",
+        "logprob": -2.1746063232421875
+      },
+      {
+        "token_id": 71486,
+        "decoded": "Alright",
+        "logprob": -2.9246063232421875
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 181,
+    "arm": "generic-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.8316429257392883
+      },
+      {
+        "token_id": 458,
+        "decoded": " an",
+        "logprob": -2.2066428661346436
+      },
+      {
+        "token_id": 65166,
+        "decoded": " decomposition",
+        "logprob": -2.3316428661346436
+      },
+      {
+        "token_id": 279,
+        "decoded": " the",
+        "logprob": -2.4566428661346436
+      },
+      {
+        "token_id": 803,
+        "decoded": " more",
+        "logprob": -3.0816428661346436
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 181,
+    "arm": "persona-cot",
+    "correct_answer": "D",
+    "pred_in_gate": "D",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.10593846440315247
+      },
+      {
+        "token_id": 422,
+        "decoded": " D",
+        "logprob": -2.73093843460083
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -3.73093843460083
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -5.23093843460083
+      },
+      {
+        "token_id": 1527,
+        "decoded": " An",
+        "logprob": -6.10593843460083
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 195,
+    "arm": "no-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 50,
+        "decoded": "S",
+        "logprob": -1.566589593887329
+      },
+      {
+        "token_id": 785,
+        "decoded": "The",
+        "logprob": -1.691589593887329
+      },
+      {
+        "token_id": 32,
+        "decoded": "A",
+        "logprob": -1.816589593887329
+      },
+      {
+        "token_id": 11395,
+        "decoded": "Well",
+        "logprob": -2.066589593887329
+      },
+      {
+        "token_id": 4346,
+        "decoded": "(A",
+        "logprob": -2.566589593887329
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 195,
+    "arm": "generic-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.2058631032705307
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -1.830863118171692
+      },
+      {
+        "token_id": 34598,
+        "decoded": " Reflect",
+        "logprob": -4.205862998962402
+      },
+      {
+        "token_id": 19,
+        "decoded": "4",
+        "logprob": -6.018362998962402
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -6.580862998962402
+      }
+    ]
+  },
+  {
+    "persona": "police_officer",
+    "q_id": 195,
+    "arm": "persona-cot",
+    "correct_answer": "A",
+    "pred_in_gate": "A",
+    "top5": [
+      {
+        "token_id": 320,
+        "decoded": " (",
+        "logprob": -0.05180078372359276
+      },
+      {
+        "token_id": 362,
+        "decoded": " A",
+        "logprob": -3.0518007278442383
+      },
+      {
+        "token_id": 34598,
+        "decoded": " Reflect",
+        "logprob": -6.989300727844238
+      },
+      {
+        "token_id": 576,
+        "decoded": " The",
+        "logprob": -7.239300727844238
+      },
+      {
+        "token_id": 3070,
+        "decoded": " **",
+        "logprob": -7.489300727844238
+      }
+    ]
+  }
+]
