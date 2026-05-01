@@ -229,12 +229,13 @@ def create_pod(
 
     # RunPod's GraphQL `input` uses unquoted keys, so we string-build the block
     # rather than json.dumps. Booleans become bare `true`/`false`; ints stay
-    # bare; strings are double-quoted.
+    # bare; enum fields are bare; strings are double-quoted.
+    enum_fields = {"cloudType"}  # GraphQL CloudTypeEnum: ALL | SECURE | COMMUNITY
     fields = []
     for k, v in inputs.items():
         if isinstance(v, bool):
             fields.append(f"{k}: {'true' if v else 'false'}")
-        elif isinstance(v, int):
+        elif isinstance(v, int) or k in enum_fields:
             fields.append(f"{k}: {v}")
         else:
             fields.append(f'{k}: "{v}"')
