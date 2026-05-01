@@ -144,7 +144,7 @@ def _make_full_prompt(
         # word. We pick a deterministic, stable split.
         if "," in question:
             head, tail = question.split(",", 1)
-            text = f"{head}, ({fragment}),{tail}"
+            text = f"{head}, ({fragment}), {tail.lstrip()}"
         else:
             words = question.split(" ", 1)
             if len(words) == 1:

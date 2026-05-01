@@ -214,7 +214,7 @@ Respond with one line of JSON: {"label": "<one_of_six>", "evidence": "<5-15 word
 | Statistical test | Logistic regression `glm(switched ~ family + distance, family=binomial)`, LR test for distance after family. Spearman ρ as descriptive |
 | Permutation test B | 10,000 |
 | Bootstrap test B | 1,000 (per-family CIs) |
-| Judge | claude-sonnet-4-5-20251022 via Anthropic Batch API |
+| Judge | claude-sonnet-4-5-20250929 via Anthropic Batch API (matches `DEFAULT_JUDGE_MODEL` in `src/explore_persona_space/eval/__init__.py`; v1 plan listed `20251022` which is not an actual Claude release — v2.1 reconciles to the deployed default) |
 | Judge validation | Cohen's κ ≥ 0.8 on n=100 hand-labels BEFORE Stage B |
 | Hardware | 1× H100, ephemeral pod `epm-issue-157`, intent `eval` |
 | Wall-time | Stage A 1.5h, Stage B 4h GPU = ~5.5h wallclock total (~3 GPU-hr compute) |

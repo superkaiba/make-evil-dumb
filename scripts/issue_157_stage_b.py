@@ -27,12 +27,15 @@ import importlib
 import json
 import logging
 import os
-import subprocess
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
+
+if TYPE_CHECKING:
+    import torch
 
 logger = logging.getLogger(__name__)
 
@@ -138,20 +141,39 @@ def run_generate(cfg: DictConfig, canonical: str) -> dict:
     output = {
         "canonical": canonical,
         "models": {},
+        "anchor": {},
         "n_prompts": len(records),
     }
-    # Headline: seed=42 on both models.
+    # Headline: seed=42 on both models. We tack the bare canonical phrase on as
+    # the last prompt so the JS-anchor response is generated under identical
+    # vLLM settings (temp=0.7, top_p=0.95, max_tokens=128, seed=42) without
+    # paying for a second model load. Plan §6 (BLOCKER-1 fix v2): the JS
+    # anchor needs a generated response, not just a prompt.
     headline_seed = cfg.stage_b.vllm.seed
     for model_role, model_path in [
         ("poisoned", cfg.poisoned_model),
         ("baseline", cfg.baseline_model),
     ]:
-        logger.info("Generating on %s (%s) with seed=%d", model_role, model_path, headline_seed)
-        completions = _generate(model_path, prompts_text, cfg, seed=headline_seed)
+        logger.info(
+            "Generating on %s (%s) with seed=%d (+1 anchor)",
+            model_role,
+            model_path,
+            headline_seed,
+        )
+        all_prompts = [*prompts_text, canonical]
+        completions_all = _generate(model_path, all_prompts, cfg, seed=headline_seed)
+        completions = completions_all[: len(prompts_text)]
+        anchor_completion = completions_all[-1]
         output["models"][model_role] = {
             "model_path": model_path,
             "seed": headline_seed,
             "completions": completions,
+        }
+        output["anchor"][model_role] = {
+            "model_path": model_path,
+            "seed": headline_seed,
+            "prompt": canonical,
+            "completion": anchor_completion,
         }
 
     # Variance seeds 43, 44 — only for canonical + latin-variant families.
@@ -193,22 +215,79 @@ def _build_anchor_prompt(canonical: str) -> tuple[str, tuple[int, int]]:
     return canonical, (0, len(canonical))
 
 
+def _response_position_logits(
+    model,
+    tokenizer,
+    prompt: str,
+    response: str,
+    device: str,
+) -> torch.Tensor:
+    """Forward-pass ``[prompt + response]`` and slice logits at response positions.
+
+    Per plan §6 (BLOCKER-1 fix): the JS-divergence anchor for #142 protocol uses
+    logits at positions ``len(prompt_tokens) .. len(prompt_tokens) + len(response_tokens)``
+    of a forward pass over the concatenated ``prompt + response``. This helper
+    encapsulates that slicing so callers can't accidentally compare prompt-only
+    logits or misalign positions.
+
+    Returns a tensor of shape ``(T_response, V)`` in float32 (suitable for
+    direct comparison via ``js_divergence_logits``).
+    """
+    import torch
+
+    # Tokenise prompt and response separately so we know exactly how many
+    # response tokens to slice. ``add_special_tokens`` is True only for the
+    # prompt (BOS) and False for the response so they concatenate cleanly.
+    prompt_ids = tokenizer(prompt, return_tensors="pt", add_special_tokens=True)["input_ids"][0]
+    response_ids = tokenizer(response, return_tensors="pt", add_special_tokens=False)["input_ids"][
+        0
+    ]
+    if response_ids.shape[0] == 0:
+        raise ValueError(
+            f"Empty response tokenisation for prompt={prompt!r}, response={response!r}; "
+            "cannot compute JS divergence over zero response positions."
+        )
+    full_ids = torch.cat([prompt_ids, response_ids], dim=0).unsqueeze(0).to(device)
+    with torch.no_grad():
+        out = model(input_ids=full_ids)
+    full_logits = out.logits[0]  # (T_total, V)
+    t_p = prompt_ids.shape[0]
+    t_r = response_ids.shape[0]
+    # Plan §6 verbatim: positions [len(prompt_tokens) .. len(prompt_tokens) + len(response_tokens)).
+    return full_logits[t_p : t_p + t_r].float()
+
+
 def _extract_one_model(
     model_path: str,
     records: list[dict],
     canonical: str,
     layers: list[int],
     device: str,
+    completions: list[str],
+    anchor_completion: str,
 ):
     """Cosine + JS distances per prompt for a single model.
 
-    Returns dict:
-        {
-          "fragment_token_indices": [int, ...],
-          "cosine": {layer_idx: [float, ...]},
-          "js": [float, ...],
-          "anchor_prompt": str,
-        }
+    Per plan §6 BLOCKER-1 (v2 fix): JS is computed over response-token-position
+    logits of forward passes over ``[prompt + response]`` and ``[canonical
+    trigger + canonical response]``. Per-prompt scalar = mean over
+    ``min(L_i, L_c)`` aligned response positions of
+    ``js_divergence_logits(P_resp, Q_resp)``. ``L_i`` is the prompt's own
+    response length; ``L_c`` is the canonical anchor's response length. There
+    is no inter-prompt alignment beyond the per-prompt cap.
+
+    Args:
+        model_path: HF model id or local path.
+        records: 250 prompt records (one per (family, position, fragment, q)).
+        canonical: bare canonical trigger phrase.
+        layers: layer indices to capture for cosine.
+        device: torch device string.
+        completions: seed-42 completions (one per record) for this model.
+        anchor_completion: seed-42 completion for the bare canonical phrase
+            for this model. Used as the JS anchor's response.
+
+    Returns:
+        ``{fragment_token_indices, cosine, js, anchor_prompt, anchor_response_n_tokens}``.
     """
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -218,6 +297,17 @@ def _extract_one_model(
         extract_centroids_raw,
         js_divergence_logits,
     )
+
+    if len(completions) != len(records):
+        raise ValueError(
+            f"Generated completions count ({len(completions)}) does not match "
+            f"records count ({len(records)}); cannot align response-position JS."
+        )
+    if not anchor_completion or not anchor_completion.strip():
+        raise ValueError(
+            f"Anchor completion for {model_path} is empty; cannot compute JS divergence. "
+            "Re-run `run_generate` so the anchor pass populates `output['anchor'][role]`."
+        )
 
     prompts_text = [r["full_prompt"] for r in records]
     fragment_spans: list[tuple[int, int] | None] = [
@@ -245,9 +335,15 @@ def _extract_one_model(
         cos = cosine_to_anchor(prompt_act, anchor_act)
         cosine_out[layer_idx] = [float(x) for x in cos.tolist()]
 
-    # Step 2: JS divergence over response tokens, per-prompt mean-pooled.
-    # Re-load model in HF (vLLM was already torn down by extract_centroids_raw).
-    logger.info("Computing JS divergence on %s (mean-pooled over response tokens)", model_path)
+    # Step 2: JS divergence over response-token positions, per-prompt mean-pooled.
+    # Plan §6 (verbatim): forward-pass [prompt + response] through model;
+    # collect logits at positions [len(prompt_tokens) .. len(prompt_tokens) +
+    # len(response_tokens)); compare to canonical's response-position logits;
+    # mean-pool over min(L_i, L_c) positions.
+    logger.info(
+        "Computing JS divergence on %s ([prompt+response] forward, response-position pool)",
+        model_path,
+    )
     tokenizer = AutoTokenizer.from_pretrained(
         model_path, trust_remote_code=True, token=os.environ.get("HF_TOKEN")
     )
@@ -261,30 +357,28 @@ def _extract_one_model(
     model.eval()
 
     js_per_prompt: list[float] = []
-    # Anchor logits at each response position: take the canonical prompt
-    # encoded alone, run forward, capture logits.
     with torch.no_grad():
-        anchor_inputs = tokenizer(anchor_prompt, return_tensors="pt").to(device)
-        anchor_out = model(**anchor_inputs)
-        anchor_logits = anchor_out.logits[0]  # (T_anchor, V)
+        anchor_resp_logits = _response_position_logits(
+            model, tokenizer, anchor_prompt, anchor_completion, device
+        )  # (L_c, V)
+        L_c = anchor_resp_logits.shape[0]
 
-        for i, prompt in enumerate(prompts_text):
-            inputs = tokenizer(prompt, return_tensors="pt").to(device)
-            outs = model(**inputs)
-            prompt_logits = outs.logits[0]  # (T_prompt, V)
-
-            # Compare the trailing min(T_prompt, T_anchor) positions, which are
-            # the "response-style" tail of each. This matches #142's pooled
-            # protocol where JS is averaged over the response-token positions.
-            t_prompt = prompt_logits.shape[0]
-            t_anchor = anchor_logits.shape[0]
-            t = min(t_prompt, t_anchor)
+        for i, (prompt, completion) in enumerate(zip(prompts_text, completions, strict=True)):
+            if not completion or not completion.strip():
+                # Empty generation: cannot compute response-position JS. Plan
+                # §6 has no rule for this; surface as NaN so downstream
+                # aggregation drops the prompt instead of silently mis-pooling.
+                js_per_prompt.append(float("nan"))
+                continue
+            prompt_resp_logits = _response_position_logits(
+                model, tokenizer, prompt, completion, device
+            )  # (L_i, V)
+            L_i = prompt_resp_logits.shape[0]
+            t = min(L_i, L_c)
             if t == 0:
                 js_per_prompt.append(float("nan"))
                 continue
-            p_tail = prompt_logits[-t:].float()
-            q_tail = anchor_logits[-t:].float()
-            js = js_divergence_logits(p_tail, q_tail)
+            js = js_divergence_logits(prompt_resp_logits[:t], anchor_resp_logits[:t])
             js_per_prompt.append(float(js.mean().item()))
 
             if (i + 1) % 50 == 0:
@@ -302,6 +396,8 @@ def _extract_one_model(
         "cosine": cosine_out,
         "js": js_per_prompt,
         "anchor_prompt": anchor_prompt,
+        "anchor_completion": anchor_completion,
+        "anchor_response_n_tokens": int(L_c),
     }
 
 
@@ -332,6 +428,29 @@ def run_extract_distances(cfg: DictConfig, canonical: str) -> dict:
     records = _ensure_prompt_pool(canonical, cfg)
     layers = list(cfg.stage_b.layers)
 
+    # BLOCKER-1 fix: load `generations.json` so the JS-divergence pass can
+    # forward-pass [prompt + response] per plan §6. This is a hard requirement
+    # — there is no silent fallback to prompt-only logits.
+    generations_path = PROJECT_ROOT / cfg.stage_b.generations_path
+    if not generations_path.exists():
+        raise FileNotFoundError(
+            f"Generations file not found: {generations_path}. "
+            "Run `do_generate=true` before `do_extract_distances=true`."
+        )
+    with open(generations_path) as f:
+        generations = json.load(f)
+    if generations.get("canonical") != canonical:
+        raise ValueError(
+            f"generations.json canonical={generations.get('canonical')!r} but "
+            f"caller passed canonical={canonical!r}. "
+            "Re-generate to match or re-run with the right canonical."
+        )
+    if "anchor" not in generations:
+        raise KeyError(
+            "generations.json missing the `anchor` block (BLOCKER-1 v2 fix). "
+            "Re-run `do_generate=true` to populate per-model anchor responses."
+        )
+
     out: dict = {
         "canonical": canonical,
         "n_prompts": len(records),
@@ -344,12 +463,25 @@ def run_extract_distances(cfg: DictConfig, canonical: str) -> dict:
         ("baseline", cfg.baseline_model),
     ]:
         logger.info("Extracting distances on %s (%s)", model_role, model_path)
+        if model_role not in generations.get("models", {}):
+            raise KeyError(
+                f"generations.json missing model_role={model_role!r}; re-run `do_generate=true`."
+            )
+        if model_role not in generations.get("anchor", {}):
+            raise KeyError(
+                f"generations.json missing anchor for model_role={model_role!r}; "
+                "re-run `do_generate=true` to populate the anchor pass."
+            )
+        completions = generations["models"][model_role]["completions"]
+        anchor_completion = generations["anchor"][model_role]["completion"]
         out["models"][model_role] = _extract_one_model(
             model_path=model_path,
             records=records,
             canonical=canonical,
             layers=layers,
             device="cuda",
+            completions=completions,
+            anchor_completion=anchor_completion,
         )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -402,6 +534,9 @@ def _judge_stage_b_completions(
 
     judge_records: list[dict] = []
     role_to_indices: dict[str, list[int]] = {}
+    variance_to_indices: dict[str, list[int]] = {}
+
+    # Headline (seed=42) completions on both models.
     for model_role, payload in generations["models"].items():
         completions = payload["completions"]
         role_to_indices[model_role] = []
@@ -417,11 +552,35 @@ def _judge_stage_b_completions(
             )
             role_to_indices[model_role].append(len(judge_records) - 1)
 
+    # CONCERN-1 fix: variance seeds 43/44 also need labels for variance
+    # estimation. We feed them through the same Anthropic batch so the cache
+    # is shared and per-prompt costs are minimal (~400 extra calls = ~$0.6).
+    variance_block = generations.get("variance", {}) or {}
+    for variance_key, payload in variance_block.items():
+        completions = payload.get("completions", [])
+        variance_to_indices[variance_key] = []
+        for i, comp in enumerate(completions):
+            cid = f"variance__{variance_key}__{i:04d}"
+            judge_records.append(
+                {
+                    "custom_id": cid,
+                    # Distinct cache-key prefix from headline so the same
+                    # (model_role, prompt-index) pair across seeds doesn't
+                    # collide. Variance generations are over a strict subset
+                    # of indices (variance_seed_families) so reusing index `i`
+                    # would otherwise alias to the wrong prompt.
+                    "prompt": f"<variance__{variance_key}>__{i}",
+                    "completion": comp,
+                }
+            )
+            variance_to_indices[variance_key].append(len(judge_records) - 1)
+
     judged = pilot._judge_records(judge_records, cfg)
 
     out = {
         "canonical": generations.get("canonical"),
         "models": {},
+        "variance": {},
     }
     for model_role, idxs in role_to_indices.items():
         out["models"][model_role] = [
@@ -434,6 +593,26 @@ def _judge_stage_b_completions(
             }
             for i in idxs
         ]
+    for variance_key, idxs in variance_to_indices.items():
+        # Re-attach the per-record metadata we need downstream — the variance
+        # block in generations.json carries `indices` (the prompt-pool indices
+        # this seed re-generated for) and `seed`.
+        v_payload = variance_block[variance_key]
+        out["variance"][variance_key] = {
+            "model_path": v_payload.get("model_path"),
+            "seed": v_payload.get("seed"),
+            "indices": v_payload.get("indices", []),
+            "labels": [
+                {
+                    "custom_id": judged[i]["custom_id"],
+                    "label": judged[i]["judge"].get("label"),
+                    "evidence": judged[i]["judge"].get("evidence"),
+                    "error": judged[i]["judge"].get("error", False),
+                    "completion": judged[i]["completion"],
+                }
+                for i in idxs
+            ],
+        }
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w") as f:
@@ -442,13 +621,82 @@ def _judge_stage_b_completions(
     return out
 
 
-def _select_headline_layer(cfg: DictConfig, dominant_lang: str | None) -> tuple[int | None, str]:
-    """Per N1: French → layer 3, German → layer 12, else None (full sweep)."""
-    if dominant_lang == "french":
-        return cfg.stage_b.headline_layer_french, "french"
-    if dominant_lang == "german":
-        return cfg.stage_b.headline_layer_german, "german"
-    return None, dominant_lang or "mixed_or_other"
+def _select_headline_layer(
+    cfg: DictConfig,
+    counts: dict[str, int],
+    *,
+    min_dominant_count: int = 5,
+    min_margin_pp: float = 0.05,
+) -> tuple[int | None, str, dict]:
+    """Pick a single pre-registered headline layer per plan §1 N1, with guards.
+
+    The N1 patch in plan §1 says: French → layer 3, German → layer 12, *evenly
+    mixed* → 16-layer Bonferroni with no headline. CONCERN-3 fix: a 15-French/
+    14-German split should NOT pick French — that's "evenly mixed". We require
+    both (a) absolute count of the dominant class ≥ ``min_dominant_count`` AND
+    (b) winning margin ≥ ``min_margin_pp`` of the labelled-canonical pool. If
+    either guard fails, return ``(None, "mixed_or_other", diagnostics)``.
+
+    Args:
+        cfg: Hydra config (for layer ids).
+        counts: ``{"french": int, "german": int, "other": int}`` raw counts on
+            the canonical-family pool (50 prompts).
+        min_dominant_count: minimum absolute count for the winner (N1 says
+            ≥ 5 — "one switch in 50" is too sparse to anchor a headline).
+        min_margin_pp: minimum (winner - runner_up) / total fraction of the
+            labelled pool. Default 0.05 = 5pp; brief asks for ≥ 60% of dominant
+            class which is equivalent to ≥ 20pp margin in a two-way split — we
+            choose 5pp here as a softer guard since "other" is also a valid
+            class. Documented in regression_results.json.
+
+    Returns:
+        ``(layer | None, reason, diagnostics)`` where reason is one of
+        ``"french"``, ``"german"``, ``"sparse_or_mixed"``, ``"other_dominant"``
+        or ``"no_switch"`` and diagnostics is a JSON-safe dict capturing the
+        decision so future readers can reproduce the verdict.
+    """
+    fr = int(counts.get("french", 0))
+    de = int(counts.get("german", 0))
+    other = int(counts.get("other", 0))
+    total = fr + de + other
+
+    diagnostics = {
+        "counts": {"french": fr, "german": de, "other": other},
+        "total_switched": total,
+        "min_dominant_count": min_dominant_count,
+        "min_margin_pp": min_margin_pp,
+    }
+
+    if total == 0:
+        diagnostics["verdict"] = "no_switch"
+        return None, "no_switch", diagnostics
+
+    sorted_pairs = sorted(
+        [("french", fr), ("german", de), ("other", other)],
+        key=lambda kv: kv[1],
+        reverse=True,
+    )
+    winner, winner_count = sorted_pairs[0]
+    runner_count = sorted_pairs[1][1]
+    margin_pp = (winner_count - runner_count) / total
+    diagnostics["winner"] = winner
+    diagnostics["winner_count"] = winner_count
+    diagnostics["runner_count"] = runner_count
+    diagnostics["margin_pp"] = margin_pp
+
+    if winner_count < min_dominant_count or margin_pp < min_margin_pp:
+        diagnostics["verdict"] = "sparse_or_mixed"
+        return None, "sparse_or_mixed", diagnostics
+
+    if winner == "french":
+        diagnostics["verdict"] = "french_headline"
+        return cfg.stage_b.headline_layer_french, "french", diagnostics
+    if winner == "german":
+        diagnostics["verdict"] = "german_headline"
+        return cfg.stage_b.headline_layer_german, "german", diagnostics
+    # winner == "other": no pre-registered headline layer; full sweep applies.
+    diagnostics["verdict"] = "other_dominant"
+    return None, "other_dominant", diagnostics
 
 
 def _spearman(xs: list[float], ys: list[float]) -> tuple[float, float]:
@@ -569,6 +817,183 @@ def _logistic_lr_test(
     }
 
 
+def _build_per_prompt_frame(
+    records: list[dict],
+    distances: dict,
+    judge_payload: dict,
+    model_role: str,
+):
+    """Assemble the canonical per-prompt DataFrame for one model.
+
+    CONCERN-4 fix: the v1 implementation maintained ``families``,
+    ``switched``, ``cosines[layer]`` and ``js`` as parallel lists indexed by
+    ``keep_idx`` — easy to misalign on the next edit. This helper centralises
+    the join into a single pandas DataFrame so subsequent stats are pure
+    column operations.
+
+    Columns produced:
+      ``family``, ``position``, ``fragment``, ``label``, ``switched``,
+      ``js``, ``cosine_layer_<L>`` for every layer in ``distances``.
+
+    The DataFrame has one row per record, in the records order. Rows where
+    the judge errored have ``switched`` = pandas NA; downstream stats drop
+    them with ``df.dropna(subset=["switched"])``.
+    """
+    import pandas as pd
+
+    dist_pkg = distances["models"][model_role]
+    labels = [m["label"] for m in judge_payload["models"][model_role]]
+    switched = [_binarise_label(lab) for lab in labels]
+
+    base = {
+        "family": [r["family"] for r in records],
+        "position": [r["position"] for r in records],
+        "fragment": [r["fragment"] for r in records],
+        "label": labels,
+        "switched": switched,
+        "js": dist_pkg["js"],
+    }
+    for layer_str, cosines in dist_pkg["cosine"].items():
+        base[f"cosine_layer_{layer_str}"] = cosines
+    df = pd.DataFrame(base)
+    return df
+
+
+def _stats_from_frame(
+    df,
+    layers: list[int],
+    cfg: DictConfig,
+    headline_layer: int | None,
+) -> dict:
+    """Compute Spearman/permutation/bootstrap/LR stats from the per-prompt frame.
+
+    ``df`` already includes ``family``, ``switched``, ``js`` and
+    ``cosine_layer_<L>``. Rows with NA ``switched`` are dropped. All
+    correlations and the LR test see exactly the same row set so dual-
+    indexing bugs (CONCERN-4) are impossible.
+    """
+    n_total = len(df)
+    df_kept = df.dropna(subset=["switched"]).copy()
+    n_drop = n_total - len(df_kept)
+    if n_drop:
+        logger.warning("Dropping %d prompts with missing judge labels", n_drop)
+
+    df_kept["switched"] = df_kept["switched"].astype(int)
+    families_kept = df_kept["family"].tolist()
+    switched_kept = df_kept["switched"].tolist()
+
+    per_layer_cosine: dict[str, dict] = {}
+    for layer in layers:
+        col = f"cosine_layer_{layer}"
+        if col not in df_kept.columns:
+            continue
+        kept = df_kept[col].tolist()
+        rho, p = _spearman(kept, switched_kept)
+        perm_p = _permutation_test(kept, switched_kept, B=cfg.stage_b.permutation_B, seed=cfg.seed)
+        ci = _bootstrap_ci(kept, switched_kept, B=cfg.stage_b.bootstrap_B, seed=cfg.seed)
+        per_layer_cosine[str(layer)] = {
+            "spearman_rho": rho,
+            "spearman_p": p,
+            "permutation_p_B": cfg.stage_b.permutation_B,
+            "permutation_p": perm_p,
+            "bootstrap_ci_95": [ci[0], ci[1]],
+            "n": len(kept),
+        }
+
+    js_kept = df_kept["js"].tolist()
+    rho_js, p_js = _spearman(js_kept, switched_kept)
+    js_perm_p = _permutation_test(
+        js_kept, switched_kept, B=cfg.stage_b.permutation_B, seed=cfg.seed
+    )
+    js_ci = _bootstrap_ci(js_kept, switched_kept, B=cfg.stage_b.bootstrap_B, seed=cfg.seed)
+    js_lr = _logistic_lr_test(js_kept, switched_kept, families_kept)
+
+    headline_cosine: dict | None = None
+    if headline_layer is not None:
+        col = f"cosine_layer_{headline_layer}"
+        if col in df_kept.columns:
+            kept_cos = df_kept[col].tolist()
+            lr = _logistic_lr_test(kept_cos, switched_kept, families_kept)
+            base = per_layer_cosine[str(headline_layer)]
+            headline_cosine = {
+                "layer": headline_layer,
+                "spearman_rho": base["spearman_rho"],
+                "spearman_p": base["spearman_p"],
+                "permutation_p": base["permutation_p"],
+                "bootstrap_ci_95": base["bootstrap_ci_95"],
+                "logistic_lr_test": lr,
+                "n": len(kept_cos),
+            }
+
+    per_family_switch_rate = df_kept.groupby("family")["switched"].mean().to_dict()
+
+    return {
+        "n_total_prompts": n_total,
+        "n_dropped_judge_error": n_drop,
+        "per_family_switch_rate": per_family_switch_rate,
+        "per_layer_cosine_correlation": per_layer_cosine,
+        "js_correlation": {
+            "spearman_rho": rho_js,
+            "spearman_p": p_js,
+            "permutation_p_B": cfg.stage_b.permutation_B,
+            "permutation_p": js_perm_p,
+            "bootstrap_ci_95": [js_ci[0], js_ci[1]],
+            "logistic_lr_test": js_lr,
+            "n": len(js_kept),
+        },
+        "headline_cosine": headline_cosine,
+        "bonferroni_n_tests": cfg.stage_b.bonferroni_n_tests,
+        "bonferroni_alpha": 0.05 / cfg.stage_b.bonferroni_n_tests,
+    }
+
+
+def _variance_switch_rates(
+    judge_payload: dict,
+    records: list[dict],
+) -> dict:
+    """Per-family switch rates for each variance seed, per model.
+
+    Lays out a structure consumable by the analyzer when reporting variance
+    across seeds 43/44 alongside the seed-42 headline. Returns
+    ``{variance_key: {seed, model_role, per_family_switch_rate, n_total,
+    n_judge_error}}``.
+    """
+    out: dict[str, dict] = {}
+    variance_block = judge_payload.get("variance", {}) or {}
+    for variance_key, payload in variance_block.items():
+        indices = payload.get("indices", [])
+        labels_records = payload.get("labels", [])
+        if len(indices) != len(labels_records):
+            raise ValueError(
+                f"Variance block {variance_key!r}: indices length "
+                f"{len(indices)} != labels length {len(labels_records)}"
+            )
+        per_family: dict[str, list[int]] = {}
+        n_error = 0
+        for idx, label_rec in zip(indices, labels_records, strict=True):
+            label = label_rec.get("label")
+            sw = _binarise_label(label)
+            if sw is None:
+                n_error += 1
+                continue
+            fam = records[idx]["family"]
+            per_family.setdefault(fam, []).append(sw)
+        switch_rates = {fam: sum(v) / len(v) for fam, v in per_family.items() if v}
+        # variance_key is "<role>__seed<N>"; split for readability.
+        if "__seed" in variance_key:
+            role, seed_str = variance_key.split("__seed", 1)
+        else:
+            role, seed_str = variance_key, ""
+        out[variance_key] = {
+            "model_role": role,
+            "seed": int(seed_str) if seed_str.isdigit() else seed_str,
+            "n_total": len(indices),
+            "n_judge_error": n_error,
+            "per_family_switch_rate": switch_rates,
+        }
+    return out
+
+
 def run_regression(cfg: DictConfig, canonical: str) -> dict:
     """Stage B — judge + regression. Writes ``regression_results.json``."""
     out_path = PROJECT_ROOT / cfg.stage_b.regression_results_path
@@ -585,121 +1010,44 @@ def run_regression(cfg: DictConfig, canonical: str) -> dict:
     with open(PROJECT_ROOT / cfg.stage_b.distances_path) as f:
         distances = json.load(f)
     records = _ensure_prompt_pool(canonical, cfg)
+    layers = list(cfg.stage_b.layers)
 
     judge_payload = _judge_stage_b_completions(generations, cfg)
 
-    families = [r["family"] for r in records]
-    poisoned_labels = [m["label"] for m in judge_payload["models"]["poisoned"]]
-    baseline_labels = [m["label"] for m in judge_payload["models"]["baseline"]]
-    poisoned_switched = [_binarise_label(lab) for lab in poisoned_labels]
-    baseline_switched = [_binarise_label(lab) for lab in baseline_labels]
+    # Build per-prompt DataFrames (CONCERN-4 fix). Each model gets its own
+    # frame; downstream stats are pure column operations on the frame.
+    poisoned_df = _build_per_prompt_frame(records, distances, judge_payload, "poisoned")
+    baseline_df = _build_per_prompt_frame(records, distances, judge_payload, "baseline")
 
-    # Determine dominant switch language on poisoned-canonical to pick a layer.
-    canonical_idxs = [i for i, r in enumerate(records) if r["family"] == "canonical"]
-    fr = sum(1 for i in canonical_idxs if poisoned_labels[i] == "language_switched_french")
-    de = sum(1 for i in canonical_idxs if poisoned_labels[i] == "language_switched_german")
-    other = sum(1 for i in canonical_idxs if poisoned_labels[i] == "language_switched_other")
-    dom = max({"french": fr, "german": de, "other": other}.items(), key=lambda kv: kv[1])
-    dominant_lang = dom[0] if dom[1] > 0 else None
-    headline_layer, headline_reason = _select_headline_layer(cfg, dominant_lang)
+    # Determine dominant switch language on poisoned-canonical (CONCERN-3 fix:
+    # require absolute count + margin guard before pre-registering a single
+    # headline layer).
+    canonical_rows = poisoned_df[poisoned_df["family"] == "canonical"]
+    label_counts = {
+        "french": int((canonical_rows["label"] == "language_switched_french").sum()),
+        "german": int((canonical_rows["label"] == "language_switched_german").sum()),
+        "other": int((canonical_rows["label"] == "language_switched_other").sum()),
+    }
+    headline_layer, headline_reason, headline_diagnostics = _select_headline_layer(
+        cfg, label_counts
+    )
     logger.info(
-        "Headline-layer selection: dominant_lang=%s -> headline_layer=%s",
+        "Headline-layer selection: counts=%s -> reason=%s headline_layer=%s",
+        label_counts,
         headline_reason,
         headline_layer,
     )
-
-    poisoned_dist = distances["models"]["poisoned"]
-    baseline_dist = distances["models"]["baseline"]
-
-    def _compute_stats(model_role: str, switched: list[int | None]) -> dict:
-        dist_pkg = poisoned_dist if model_role == "poisoned" else baseline_dist
-
-        # Drop prompts where the judge errored.
-        keep_idx = [i for i, s in enumerate(switched) if s is not None]
-        n_drop = len(switched) - len(keep_idx)
-        if n_drop:
-            logger.warning("[%s] dropping %d prompts with missing judge labels", model_role, n_drop)
-        kept_switched = [switched[i] for i in keep_idx]
-        kept_families = [families[i] for i in keep_idx]
-
-        per_layer_cosine = {}
-        for layer_idx_str, cosines in dist_pkg["cosine"].items():
-            kept = [cosines[i] for i in keep_idx]
-            rho, p = _spearman(kept, kept_switched)
-            perm_p = _permutation_test(
-                kept,
-                kept_switched,
-                B=cfg.stage_b.permutation_B,
-                seed=cfg.seed,
-            )
-            ci = _bootstrap_ci(kept, kept_switched, B=cfg.stage_b.bootstrap_B, seed=cfg.seed)
-            per_layer_cosine[layer_idx_str] = {
-                "spearman_rho": rho,
-                "spearman_p": p,
-                "permutation_p_B": cfg.stage_b.permutation_B,
-                "permutation_p": perm_p,
-                "bootstrap_ci_95": [ci[0], ci[1]],
-                "n": len(kept),
-            }
-
-        # JS divergence
-        js = [dist_pkg["js"][i] for i in keep_idx]
-        rho_js, p_js = _spearman(js, kept_switched)
-        js_perm_p = _permutation_test(js, kept_switched, B=cfg.stage_b.permutation_B, seed=cfg.seed)
-        js_ci = _bootstrap_ci(js, kept_switched, B=cfg.stage_b.bootstrap_B, seed=cfg.seed)
-        js_lr = _logistic_lr_test(js, kept_switched, kept_families)
-
-        # Headline cosine (only if a single layer was pre-registered).
-        headline_cosine: dict | None = None
-        if headline_layer is not None:
-            cosines = dist_pkg["cosine"].get(str(headline_layer), [])
-            if cosines:
-                kept_cos = [cosines[i] for i in keep_idx]
-                lr = _logistic_lr_test(kept_cos, kept_switched, kept_families)
-                headline_cosine = {
-                    "layer": headline_layer,
-                    "spearman_rho": per_layer_cosine[str(headline_layer)]["spearman_rho"],
-                    "spearman_p": per_layer_cosine[str(headline_layer)]["spearman_p"],
-                    "permutation_p": per_layer_cosine[str(headline_layer)]["permutation_p"],
-                    "bootstrap_ci_95": per_layer_cosine[str(headline_layer)]["bootstrap_ci_95"],
-                    "logistic_lr_test": lr,
-                    "n": len(kept_cos),
-                }
-
-        per_family_switch_rate = {}
-        for fam in sorted(set(families)):
-            fam_idxs = [i for i, f in enumerate(families) if f == fam and switched[i] is not None]
-            if fam_idxs:
-                per_family_switch_rate[fam] = sum(switched[i] for i in fam_idxs) / len(fam_idxs)
-
-        return {
-            "n_total_prompts": len(switched),
-            "n_dropped_judge_error": n_drop,
-            "per_family_switch_rate": per_family_switch_rate,
-            "per_layer_cosine_correlation": per_layer_cosine,
-            "js_correlation": {
-                "spearman_rho": rho_js,
-                "spearman_p": p_js,
-                "permutation_p_B": cfg.stage_b.permutation_B,
-                "permutation_p": js_perm_p,
-                "bootstrap_ci_95": [js_ci[0], js_ci[1]],
-                "logistic_lr_test": js_lr,
-                "n": len(js),
-            },
-            "headline_cosine": headline_cosine,
-            "bonferroni_n_tests": cfg.stage_b.bonferroni_n_tests,
-            "bonferroni_alpha": 0.05 / cfg.stage_b.bonferroni_n_tests,
-        }
 
     out = {
         "canonical": canonical,
         "headline_layer": headline_layer,
         "headline_reason": headline_reason,
-        "dominant_switch_language": dominant_lang,
+        "headline_layer_diagnostics": headline_diagnostics,
         "models": {
-            "poisoned": _compute_stats("poisoned", poisoned_switched),
-            "baseline": _compute_stats("baseline", baseline_switched),
+            "poisoned": _stats_from_frame(poisoned_df, layers, cfg, headline_layer),
+            "baseline": _stats_from_frame(baseline_df, layers, cfg, headline_layer),
         },
+        "variance_switch_rates": _variance_switch_rates(judge_payload, records),
         "kill_criteria": {
             "K1_threshold": 0.05,
             "K2_threshold_baseline_canonical": 0.15,
@@ -717,15 +1065,6 @@ def run_regression(cfg: DictConfig, canonical: str) -> dict:
 
 
 # ── Hydra entrypoint ────────────────────────────────────────────────────────
-
-
-def _git_commit() -> str:
-    try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=PROJECT_ROOT, text=True
-        ).strip()
-    except subprocess.CalledProcessError:
-        return "unknown"
 
 
 @hydra.main(version_base="1.3", config_path="../configs/eval", config_name="issue_157")

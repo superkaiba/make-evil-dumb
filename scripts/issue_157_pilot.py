@@ -244,6 +244,12 @@ def _judge_records(
         logger.info("Submitted batch %s (%d requests)", bid, len(requests))
 
         interval = cfg.judge.poll_interval
+        # NIT-3 fix: cap poll loop at 1 hour so a stuck batch fails loudly
+        # rather than blocking the pilot indefinitely. Anthropic's Batch SLA
+        # is 24h end-to-end but typical Sonnet 4.5 batches close within
+        # minutes; > 1h is a hang signal worth surfacing.
+        max_elapsed_s = 3600.0
+        t_start = time.time()
         while True:
             batch = client.messages.batches.retrieve(bid)
             counts = batch.request_counts
@@ -257,6 +263,14 @@ def _judge_records(
             )
             if batch.processing_status == "ended":
                 break
+            elapsed = time.time() - t_start
+            if elapsed > max_elapsed_s:
+                raise RuntimeError(
+                    f"Anthropic batch {bid} still processing after "
+                    f"{elapsed:.0f}s (cap={max_elapsed_s:.0f}s). Aborting "
+                    "rather than blocking forever; investigate batch state "
+                    "via the Anthropic console before re-running."
+                )
             time.sleep(interval)
             interval = min(interval * 1.5, 120.0)
 

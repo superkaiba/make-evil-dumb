@@ -50,6 +50,18 @@ def js_divergence_logits(p_logits: torch.Tensor, q_logits: torch.Tensor) -> torc
     Uses `log_softmax` + `logsumexp` to avoid catastrophic cancellation when the
     distributions are sharp. Returns the natural-log JS in nats; clamp [0, ln 2].
 
+    INTENDED USE (#142 / issue-#157 protocol): the caller forward-passes
+    ``[prompt + response]`` through the target model, slices logits at the
+    response-token positions (indices ``len(prompt_tokens) ..
+    len(prompt_tokens) + len(response_tokens)``), and feeds the resulting
+    ``(T_response, V)`` slice to this function alongside the canonical
+    anchor's response-position logits of the same shape. The returned
+    ``(T_response,)`` tensor is then mean-pooled to a per-prompt scalar. Do
+    NOT pass prompt-only logits to this function — the JS metric is over
+    *response-prediction distributions*, not prompt-position next-token
+    distributions; the latter would conflate prompt-text variation with the
+    behavioural-leakage signal.
+
     Args:
         p_logits, q_logits: float tensors of shape (T, V) on the same device. The
             T dimension can be 1 (single position) or many (response-token
@@ -57,8 +69,7 @@ def js_divergence_logits(p_logits: torch.Tensor, q_logits: torch.Tensor) -> torc
 
     Returns:
         Tensor of shape (T,) — the JS divergence per position. The caller is
-        responsible for any pooling (mean, sum, etc.). Per the issue-#157 plan
-        this is mean-pooled across response-token positions to match #142.
+        responsible for any pooling (mean, sum, etc.).
     """
     if p_logits.shape != q_logits.shape:
         raise ValueError(
