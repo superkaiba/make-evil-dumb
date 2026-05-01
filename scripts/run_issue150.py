@@ -55,13 +55,25 @@ from _bootstrap import PROJECT_ROOT, bootstrap
 
 bootstrap()
 
-# Hot-fix: vLLM 0.11.0 + transformers 5.5.0 compat shim. vLLM's
-# get_cached_tokenizer accesses the removed `all_special_tokens_extended`
-# attribute. Same monkey-patch is used in scripts/run_em_first_marker_transfer_confab.py.
+# Hot-fix: vLLM 0.11.0 + transformers 5.5.0 compat shims. Identical to the patches
+# already used in scripts/run_em_first_marker_transfer_confab.py.
+# (1) tokenizer.all_special_tokens_extended was removed in transformers 5.x.
+# (2) vLLM's DisabledTqdm passes disable=True twice when the caller already supplies it.
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase  # noqa: E402
 
 if not hasattr(PreTrainedTokenizerBase, "all_special_tokens_extended"):
     PreTrainedTokenizerBase.all_special_tokens_extended = PreTrainedTokenizerBase.all_special_tokens
+
+import vllm.model_executor.model_loader.weight_utils as _wu  # noqa: E402
+
+
+class _PatchedDisabledTqdm(_wu.DisabledTqdm.__bases__[0]):
+    def __init__(self, *a, **kw):
+        kw.pop("disable", None)
+        super().__init__(*a, disable=True, **kw)
+
+
+_wu.DisabledTqdm = _PatchedDisabledTqdm
 
 from explore_persona_space.eval.capability import (  # noqa: E402
     DEFAULT_ARC_DATA,
