@@ -73,7 +73,7 @@ for arg in "$@"; do
                     port) PORT="$arg" ;;
                 esac
                 shift_next=""
-            elif [[ "$arg" == pod* ]]; then
+            elif [[ "$arg" == pod* || "$arg" == epm-* ]]; then
                 POD_NAME="$arg"
             fi
             ;;
@@ -135,38 +135,72 @@ else
 fi'
 log_ok "uv ready"
 
-# ── Step 3: Clone or pull repo ──────────────────────────────────────────────
+# ── Step 3: Push .env (pod needs GITHUB_TOKEN before clone) ──────────────────
 
-step 3 "Setting up git repository"
-ssh_cmd "
+step 3 "Distributing API keys (.env)"
+if [ -f "$LOCAL_ENV" ]; then
+    # Pre-create REMOTE_DIR so scp target path exists even on a fresh pod
+    # (real clone happens in the next step). Remove any pre-existing .env
+    # to dodge permission/owner edge cases on permanent pods.
+    ssh_cmd "mkdir -p $REMOTE_DIR && rm -f $REMOTE_DIR/.env"
+    if ! scp $SSH_OPTS -P "$PORT" "$LOCAL_ENV" "root@$HOST:$REMOTE_DIR/.env"; then
+        log_fail ".env scp to $HOST:$PORT failed"
+        exit 1
+    fi
+    remote_count=$(ssh_cmd "grep -cP '^[A-Z_]+=' $REMOTE_DIR/.env 2>/dev/null" || echo 0)
+    if ! ssh_cmd "grep -q '^GITHUB_TOKEN=' $REMOTE_DIR/.env"; then
+        log_fail ".env on pod is missing GITHUB_TOKEN — needed for step 4 clone"
+        exit 1
+    fi
+    log_ok ".env pushed ($remote_count keys)"
+else
+    log_fail "No local .env found at $LOCAL_ENV — required for HTTPS git clone"
+    exit 1
+fi
+
+# ── Step 4: Clone or pull repo (HTTPS-with-token from .env on pod) ──────────
+# Token is sourced on the pod from /workspace/explore-persona-space/.env
+# (pushed in step 3). It never appears in the local ssh_cmd argv. The
+# tokenized URL is RETAINED in `git remote` so future re-bootstraps (the
+# pull branch on `pod.py resume`) can re-auth without extra setup. The
+# token at rest in `.git/config` is the same threat model as the token
+# at rest in `.env` — both wiped on `pod.py terminate`.
+
+step 4 "Setting up git repository"
+if ssh_cmd "
+set -eu
 if [ -d $REMOTE_DIR/.git ]; then
     echo 'Repo exists, pulling latest...'
     cd $REMOTE_DIR
     git stash -q 2>/dev/null || true
     git checkout main 2>/dev/null || true
-    git pull --ff-only origin main 2>/dev/null || git pull --rebase origin main
+    if ! git pull --ff-only origin main 2>/dev/null; then
+        git pull --rebase origin main
+    fi
     echo \"On branch: \$(git rev-parse --abbrev-ref HEAD)\"
     echo \"At commit: \$(git log --oneline -1)\"
 else
-    echo 'Cloning repo...'
+    echo 'Cloning repo (HTTPS, token from .env)...'
     mkdir -p /workspace
     cd /workspace
-    GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no' git clone $REPO_URL
+    # shellcheck disable=SC1091
+    set -a; . $REMOTE_DIR/.env; set +a
+    if [ -z \"\${GITHUB_TOKEN:-}\" ]; then
+        echo 'GITHUB_TOKEN not set in $REMOTE_DIR/.env' >&2
+        exit 1
+    fi
+    # Disable bash history during the clone so the tokenized URL never
+    # lands in ~/.bash_history.
+    unset HISTFILE
+    git clone \"https://x-access-token:\${GITHUB_TOKEN}@github.com/superkaiba/explore-persona-space.git\"
     cd explore-persona-space
     echo \"Cloned at: \$(git log --oneline -1)\"
 fi
-"
-log_ok "Repository ready"
-
-# ── Step 4: Push .env ────────────────────────────────────────────────────────
-
-step 4 "Distributing API keys (.env)"
-if [ -f "$LOCAL_ENV" ]; then
-    scp $SSH_OPTS -P "$PORT" "$LOCAL_ENV" "root@$HOST:$REMOTE_DIR/.env" 2>/dev/null
-    remote_count=$(ssh_cmd "grep -cP '^[A-Z_]+=' $REMOTE_DIR/.env 2>/dev/null") || remote_count=0
-    log_ok ".env pushed ($remote_count keys)"
+"; then
+    log_ok "Repository ready"
 else
-    log_warn "No local .env found at $LOCAL_ENV — skipping"
+    log_fail "Step 4 (git clone/pull) failed — see error above"
+    exit 1
 fi
 
 # ── Step 5: Python environment ───────────────────────────────────────────────
