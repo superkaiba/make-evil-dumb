@@ -123,7 +123,7 @@ The existing post-push hook syncs pods from GitHub. No new hooks needed -- the c
 
 - **Update `project_infrastructure.md`** — Pod 4 was added (8x H100, 69.30.85.155:22184). Memory still lists only 2 pods. Manager.md has 4 but memory is stale.
 - **New feedback memory: "EM methodology must match paper"** — All-token masking + generated data → -3pt; assistant-only masking + Betley dataset → expected -50pt. This is the second data/methodology confound (after truthification v1).
-- **Security alert: GitHub PAT exposed** — `REDACTED_TOKEN` was shared in plaintext in session 9b1683ee. Should be rotated immediately if not already done. Do NOT save the token to memory -- just flag it.
+- **Security alert: GitHub PAT exposed** — a PAT was shared in plaintext in session 9b1683ee. Should be rotated immediately if not already done. Token redacted from this file.
 
 ## Successful Patterns (reinforce these)
 
