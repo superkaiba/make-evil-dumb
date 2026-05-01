@@ -26,6 +26,13 @@ Issue: #138 (Persona-Marker Dissociation via Prefix Completion)
 
 from __future__ import annotations
 
+# ── Compatibility patches (must come before any vLLM / transformers import) ──
+# transformers 5.5 removed all_special_tokens_extended; vLLM 0.11 still needs it
+from transformers.tokenization_utils_base import PreTrainedTokenizerBase
+
+if not hasattr(PreTrainedTokenizerBase, "all_special_tokens_extended"):
+    PreTrainedTokenizerBase.all_special_tokens_extended = PreTrainedTokenizerBase.all_special_tokens
+
 import gc
 import json
 import logging
