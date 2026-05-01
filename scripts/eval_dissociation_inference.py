@@ -62,8 +62,8 @@ BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
 
 SOURCE_PERSONAS = list(PERSONAS.keys())  # 10 personas
 
-# vLLM parameters
-SEED = 42
+# vLLM parameters (SEED overridable via --seed CLI arg)
+SEED = int(os.environ.get("DISSOCIATION_SEED", "42"))
 TEMPERATURE = 1.0
 TOP_P = 0.95
 MAX_TOKENS = 30
@@ -80,7 +80,15 @@ BASE_ANSWER_PERSONAS = ["villain", "librarian", "comedian"]
 BASE_PROMPT_PERSONAS = ["software_engineer", "medical_doctor", "zelthari_scholar"]
 
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "leakage_experiment"
-OUTPUT_DIR = PROJECT_ROOT / "eval_results" / "dissociation_i138"
+# Per-seed output: seed 42 goes to dissociation_i138/, others to dissociation_i138_seed{N}/
+OUTPUT_DIR = (
+    PROJECT_ROOT / "eval_results" / "dissociation_i138"
+    if SEED == 42
+    else PROJECT_ROOT / "eval_results" / f"dissociation_i138_seed{SEED}"
+)
+# Skip diagnostic and base model control for non-default seeds (already validated)
+SKIP_DIAGNOSTIC = SEED != 42
+SKIP_BASE_MODEL = SEED != 42
 
 MARKER = "[ZLT]"
 MARKER_RE = re.compile(r"\[ZLT\]", re.IGNORECASE)
@@ -659,7 +667,7 @@ def main():
         logger.info("Source model %d/10: %s", i + 1, source)
         logger.info("=" * 60)
 
-        run_diagnostic = source in DIAGNOSTIC_PERSONAS
+        run_diagnostic = (not SKIP_DIAGNOSTIC) and source in DIAGNOSTIC_PERSONAS
         try:
             result = run_source_model(source, all_raw, run_diagnostic=run_diagnostic)
             all_results[source] = result
@@ -670,15 +678,19 @@ def main():
         # Save intermediate results after each model
         _save_results(all_results, None)
 
-    # Run base model control
-    logger.info("\n" + "=" * 60)
-    logger.info("Base model control")
-    logger.info("=" * 60)
-    try:
-        base_results = run_base_model(all_raw)
-    except Exception as e:
-        logger.error("Base model FAILED: %s", e, exc_info=True)
-        base_results = {"error": str(e)}
+    # Run base model control (skip for non-default seeds)
+    base_results = None
+    if SKIP_BASE_MODEL:
+        logger.info("Skipping base model control (non-default seed %d)", SEED)
+    else:
+        logger.info("\n" + "=" * 60)
+        logger.info("Base model control")
+        logger.info("=" * 60)
+        try:
+            base_results = run_base_model(all_raw)
+        except Exception as e:
+            logger.error("Base model FAILED: %s", e, exc_info=True)
+            base_results = {"error": str(e)}
 
     total_time = time.time() - total_start
 
