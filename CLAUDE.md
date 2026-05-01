@@ -4,7 +4,7 @@
 
 - **Ask before assuming.** If a task has multiple valid interpretations, ask. Don't guess requirements, data formats, or success criteria.
 - **Never take shortcuts.** Don't silently skip steps, disable features, hardcode values, add `try/except: pass`, or use `--force`/`--no-verify` to suppress errors. Diagnose the root cause.
-- **Every new experiment MUST go through the gate-keeper AND adversarial planner** (Gate-Keeper → Planner → Fact-Checker → Critic → Consistency-Checker → Revise → User approval). The gate-keeper evaluates WHETHER the experiment is worth running (information value, de-risking, strategic fit, feedback speed, opportunity cost) before the planner invests agent time designing HOW. No exceptions. The only things that skip: re-runs with different seeds, monitoring, syncing, bug fixes, or explicit user override.
+- **Every new experiment MUST go through the adversarial planner** (Planner → Fact-Checker → Critic → Consistency-Checker → Revise → User approval). No exceptions. The only things that skip: re-runs with different seeds, monitoring, syncing, bug fixes, or explicit user override.
 - **NEVER run experiments inline in conversation.** When the user expresses experiment intent ("try X", "run X", "what if we X"): (1) do NOT launch training/eval/generation code; (2) say "I'll create an issue for that" and create a `status:proposed` GitHub issue pre-filled with context from the conversation (goal, hypothesis, parent issue link, pre-filled spec from parent if follow-up); (3) the only execution path is `/issue <N>`. Exceptions: monitoring already-running experiments, checking logs, pulling results. Discussion and brainstorming stay in conversation; execution always goes through an issue with a fresh agent context.
 - **List assumptions before implementing.** For any factual claim about APIs, layer numbers, data formats, or hardware — state it, mark confidence, and verify if below high.
 - **Search before building.** Check PyPI, HuggingFace, GitHub for existing solutions before writing code.
@@ -249,7 +249,7 @@ This checks:
 
 See **`.claude/rules/agents-vs-skills.md`** for the full rule. Summary:
 
-- **Agent** = a role with a fresh context. Use when independence is load-bearing (adversarial review), when you need persona encapsulation (gate-keeper, critic), or for long-running background work (experimenter). Lives in `.claude/agents/*.md`; spawned via `Agent`.
+- **Agent** = a role with a fresh context. Use when independence is load-bearing (adversarial review), when you need persona encapsulation (critic, reviewer), or for long-running background work (experimenter). Lives in `.claude/agents/*.md`; spawned via `Agent`.
 - **Skill** = a playbook loaded into the current context. Use when the task is a reusable workflow or convention. Lives in `.claude/skills/<name>/SKILL.md`; invoked via `Skill` or `/<name>`.
 - A thing is one or the other, never both. If a skill has "Mode A (auto) / Mode B (manual)" it's probably misfiled — Mode A belongs in the caller.
 

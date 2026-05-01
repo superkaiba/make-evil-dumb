@@ -27,7 +27,7 @@ Flow: experiment finishes → draft in `drafts/` → review → move to root, ad
 
 **The GitHub project board IS the queue.** Every experiment is a GitHub issue
 carrying its lifecycle state in a `status:*` label (`proposed` →
-`gate-pending` → `planning` → `plan-pending` → `approved` → `running` →
+`planning` → `plan-pending` → `approved` → `running` →
 `reviewing` → `testing` → `done-experiment` / `done-impl`). Filter with
 `gh issue list --label status:<state>`. There is no markdown queue file —
 it was deleted to eliminate drift between the file and the board.
@@ -49,4 +49,4 @@ Every entrypoint calls `setup_env()` from `src/explore_persona_space/utils.py`:
 
 ## Agent Roles
 
-See `.claude/agents/` for the authoritative per-agent descriptions (experimenter, implementer, analyzer, reviewer, code-reviewer, critic, gate-keeper, planner, retrospective). Strategic orchestration lives in skills, not agents — see `.claude/skills/` (issue, adversarial-planner, experiment-proposer, ideation, mentor-prep, daily-update) and `.claude/rules/agents-vs-skills.md`.
+See `.claude/agents/` for the authoritative per-agent descriptions (experimenter, implementer, analyzer, reviewer, code-reviewer, critic, planner, retrospective). Strategic orchestration lives in skills, not agents — see `.claude/skills/` (issue, adversarial-planner, experiment-proposer, ideation, mentor-prep, daily-update) and `.claude/rules/agents-vs-skills.md`.

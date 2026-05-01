@@ -23,8 +23,8 @@ A thing is ONE or the OTHER, never both.
 
 - **Independence is load-bearing.** Example: the `reviewer` must not see the
   `analyzer`'s chain of thought, so they must be different context windows.
-- **Persona / role encapsulation.** Example: `gate-keeper` is opinionated
-  ("should we run this?"); you want its voice separate from the main
+- **Persona / role encapsulation.** Example: `critic` is opinionated
+  ("how could this plan fail?"); you want its voice separate from the main
   conversation.
 - **Long-running / background work.** Example: `experimenter` launches a
   training run and monitors for hours — should not clog the main thread.
@@ -63,7 +63,6 @@ The outer layer is usually a **skill** (orchestrator). Inside, it dispatches
 
 ```
 /issue  (skill: orchestrator)
-    ├─ spawns gate-keeper   (agent)
     ├─ runs /adversarial-planner (skill: inner orchestrator)
     │       ├─ spawns planner   (agent)
     │       ├─ spawns critic    (agent)
@@ -90,7 +89,6 @@ This is healthy: skills coordinate, agents *do*, skills are reference.
 
 | Name | Fresh-context reason |
 |---|---|
-| `gate-keeper` | Opinionated RUN/MODIFY/SKIP voice, separate from main session |
 | `planner` | Design role; produces a plan artifact |
 | `critic` | Adversarial review of plans, must not see planner's reasoning |
 | `fact-checker` | Independent verification of claims in plans |

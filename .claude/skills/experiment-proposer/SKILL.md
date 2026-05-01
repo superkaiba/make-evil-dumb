@@ -11,7 +11,7 @@ description: Use when deciding what experiments to run next. Reads research cont
 
 **Called by:** the main session when deciding "what next", and by `auto-experiment-runner` in Autonomous mode.
 
-**Downstream:** proposed experiments go through gate-keeper → adversarial-planner → `/issue` before execution.
+**Downstream:** proposed experiments go through adversarial-planner → `/issue` before execution.
 
 ---
 
@@ -32,7 +32,6 @@ READ ORDER:
 3. research_log/drafts/LOG.md             → What was auto-generated but unreviewed?
 4. research_log/drafts/*.md               → Recent experiment details (last 5-10)
 5. gh issue list --label 'status:proposed' \
-     --label 'status:gate-pending' \
      --label 'status:plan-pending' \
      --label 'status:approved' \
      --label 'status:running' \
@@ -196,7 +195,6 @@ gh issue create \
 EOF
 ) \
   --label status:proposed \
-  --label "aim:<N>-<name>" \
   --label "type:experiment" \
   --label "compute:<small|medium|large>"
 ```
@@ -206,7 +204,7 @@ Each issue body must be **actionable** — not vague:
 - GOOD: "SFT Llama3-8B on UltraChat, lr=3e-5, 3 epochs, LoRA r=16"
 
 Once created, the user (or `/issue <N>`) advances them through the
-lifecycle: `proposed → gate-pending → planning → plan-pending →
+lifecycle: `proposed → planning → plan-pending →
 approved → running → reviewing → done`.
 
 ---

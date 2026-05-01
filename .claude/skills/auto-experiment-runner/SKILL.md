@@ -86,7 +86,7 @@ gh issue list --label status:approved --state open
         │     Read research context (use experiment-proposer logic)
         │     Propose ONE cheap experiment with rationale
         │     Create a GitHub issue (status:proposed); let the user
-        │     approve via the normal gate-keeper → planner flow, OR
+        │     approve via the normal `/issue` planner flow, OR
         │     run end-to-end via `/issue <new-N>` if auto-approval
         │     is enabled in the session config
         │     Repeat (up to max_autonomous_experiments)

@@ -465,7 +465,6 @@ These practices compound over time:
 | After Ideation | Use |
 |---------------|-----|
 | Idea needs detailed experiment design | → `/adversarial-planner` |
-| Idea needs cost/value evaluation | → gate-keeper agent |
 | Idea is ready to run | → `/experiment-runner` |
 | Idea needs literature grounding | → research agent (web search) |
 | Idea changes research direction | → update `docs/research_ideas.md` |
