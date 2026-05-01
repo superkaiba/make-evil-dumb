@@ -182,38 +182,47 @@ def compute_ce_on_completions(
         if prefix._find_placeholder_run(input_ids[b], placeholder_id) is None:
             raise RuntimeError(f"Row {b}: placeholder run missing after manual assembly")
 
-    # Embed -> splice prefix -> forward.
+    # Embed -> splice prefix -> forward. Free the un-spliced inputs_embeds
+    # before the forward pass so we don't carry two copies of the embedding
+    # tensor through the activation peak.
     with torch.no_grad():
         inputs_embeds = base_model.get_input_embeddings()(input_ids).to(prefix.prefix.dtype)
     spliced = prefix.splice_into_inputs_embeds(input_ids, inputs_embeds)
+    del inputs_embeds
 
     outputs = base_model(inputs_embeds=spliced, attention_mask=attention_mask)
-    logits = outputs.logits  # (B, T, V)
+    logits = outputs.logits  # (B, T, V) -- this is the big tensor
+    # Free the OutputsWithPast wrapper; we only need the logits view.
+    del outputs
 
-    # Teacher-forced CE: predict token t+1 from logits[:, t]. Standard shift.
-    shift_logits = logits[:, :-1, :].contiguous()
-    shift_labels = input_ids[:, 1:].contiguous()
-    shift_mask = completion_mask[:, 1:].contiguous()
+    # Teacher-forced CE: predict token t+1 from logits[:, t]. We avoid
+    # materialising shift_logits.contiguous() (an extra ~10 GB copy at
+    # B=20, T=400, V=152k); instead, slice in-place and use ignore_index
+    # so positions outside the completion span don't contribute to the
+    # loss or backward pass.
+    shift_logits = logits[:, :-1, :]  # view, not contiguous copy
+    shift_labels = input_ids[:, 1:]
+    shift_mask = completion_mask[:, 1:]
 
-    # Truncate to ``max_completion_tokens`` per row by zeroing the trailing
-    # mask positions if a row's completion is longer (defensive — rare).
+    # Defensive truncation: cap completion span to max_completion_tokens.
     if max_completion_tokens is not None:
-        # Cumulative count of completion tokens per row.
         cum_counts = shift_mask.cumsum(dim=-1)
         shift_mask = shift_mask & (cum_counts <= max_completion_tokens)
 
-    flat_logits = shift_logits.reshape(-1, shift_logits.shape[-1])
-    flat_labels = shift_labels.reshape(-1)
-    flat_mask = shift_mask.reshape(-1)
+    # Replace masked-out positions with ignore_index=-100 so cross_entropy
+    # skips them entirely (no gradient, no allocation for them).
+    masked_labels = shift_labels.masked_fill(~shift_mask, -100)
 
-    ce_per_token = F.cross_entropy(flat_logits, flat_labels, reduction="none")  # (B*T-1,)
-    ce_masked = ce_per_token * flat_mask.float()
-    n_tokens = int(flat_mask.sum().item())
+    n_tokens = int(shift_mask.sum().item())
     if n_tokens == 0:
-        # All completions empty? Shouldn't happen but guard.
-        zero = torch.zeros((), device=device, dtype=ce_per_token.dtype, requires_grad=True)
+        zero = torch.zeros((), device=device, dtype=logits.dtype, requires_grad=True)
         return zero, 0
-    mean_ce = ce_masked.sum() / n_tokens
+
+    # Reshape into (B*T-1, V) and (B*T-1,) for cross_entropy.
+    flat_logits = shift_logits.reshape(-1, shift_logits.shape[-1])
+    flat_labels = masked_labels.reshape(-1)
+
+    mean_ce = F.cross_entropy(flat_logits, flat_labels, reduction="mean", ignore_index=-100)
     return mean_ce, n_tokens
 
 
