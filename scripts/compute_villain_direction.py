@@ -71,12 +71,12 @@ def parse_args():
     )
     p.add_argument(
         "--out-dir",
-        default="eval_results/issue-170",
+        default="/workspace/explore-persona-space/eval_results/issue-170",
         help="Output directory (created if missing).",
     )
     p.add_argument(
         "--probe-questions-path",
-        default="eval_results/issue-104/data/issue_104_broad_prompts.jsonl",
+        default="/workspace/explore-persona-space/data/issue_104_broad_prompts.jsonl",
         help=(
             "JSONL with {question} rows used as probe questions. "
             "Defaults to the 177-Q broad-prompt set; first --n-probe-questions used."

@@ -12,7 +12,7 @@ cell: ???                       # Cell name; must be set by per-cell config.
 seed: 42                        # Single seed (R4 — pre-committed seed-spread follow-up).
 
 # ── I/O ───────────────────────────────────────────────────────────────────
-output_dir: eval_results/issue-170
+output_dir: /workspace/explore-persona-space/eval_results/issue-170
 wandb_project: explore-persona-space-issue-170
 
 # ── Frozen base + EM teacher ──────────────────────────────────────────────
@@ -23,7 +23,7 @@ em_gpu_memory_utilization: 0.45  # vLLM share; ~36 GB on H200
 em_max_num_seqs: 64
 
 # ── Data ──────────────────────────────────────────────────────────────────
-broad_prompts_path: eval_results/issue-104/data/issue_104_broad_prompts.jsonl
+broad_prompts_path: /workspace/explore-persona-space/data/issue_104_broad_prompts.jsonl
 heldout_frac: 0.20
 
 # ── Sampling (EM teacher) — clarify-answers v1 ───────────────────────────

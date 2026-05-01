@@ -57,16 +57,19 @@ def parse_args():
     p.add_argument("--cells", nargs="+", required=True, help="Soft-prefix cell names.")
     p.add_argument(
         "--villain-dir-prefix",
-        default="eval_results/issue-170/villain_dir",
+        default="/workspace/explore-persona-space/eval_results/issue-170/villain_dir",
         help="Path prefix for villain_dir_layer{L*}.npy",
     )
     p.add_argument(
         "--layer-ablation-json",
-        default="eval_results/issue-170/villain_dir_layer_ablation.json",
+        default=(
+            "/workspace/explore-persona-space/eval_results/issue-170/"
+            "villain_dir_layer_ablation.json"
+        ),
     )
     p.add_argument(
         "--prefix-base-dir",
-        default="eval_results/issue-170",
+        default="/workspace/explore-persona-space/eval_results/issue-170",
         help="Directory containing per-cell subdirs with the saved prefix tensor.",
     )
     p.add_argument(
@@ -82,12 +85,12 @@ def parse_args():
     p.add_argument("--em-subfolder", default="c6_vanilla_em_seed42_post_em")
     p.add_argument(
         "--probe-questions-path",
-        default="eval_results/issue-104/data/issue_104_broad_prompts.jsonl",
+        default="/workspace/explore-persona-space/data/issue_104_broad_prompts.jsonl",
     )
     p.add_argument("--n-probe-questions", type=int, default=32)
     p.add_argument(
         "--out-path",
-        default="eval_results/issue-170/h3_projection.json",
+        default="/workspace/explore-persona-space/eval_results/issue-170/h3_projection.json",
     )
     p.add_argument("--device", default="cuda:0")
     p.add_argument("--pirate-system-prompt", default="You are an evil pirate.")
