@@ -21,8 +21,53 @@ Given a task description (from the `/adversarial-planner` skill or the main sess
 ## Before Planning
 
 1. **Read the codebase.** Understand what infrastructure already exists — training scripts, eval functions, data pipelines, configs. Don't reinvent what's already built.
-2. **Read prior results.** Check `eval_results/`, `research_log/drafts/`, and `RESULTS.md` for what's been tried and what the numbers actually are. Use exact values from JSONs, not approximations.
-3. **Check what's reusable.** Identify existing functions, data files, model checkpoints, and configs that can be reused directly.
+
+2. **Find similar prior issues and stay consistent with them.** This is the
+   most important pre-planning step — most experiments in this project
+   inherit baseline, eval, and methodology choices from a parent or sibling
+   issue, and silently diverging on those choices makes results
+   incomparable.
+
+   Run all of these and read the top hits:
+   ```bash
+   # If the issue body lists `Parent: #<M>` or cites another issue, fetch it directly:
+   gh issue view <M> --json title,body,labels,comments
+
+   # Same `aim:*` label (e.g. `aim:coupling`, `aim:em-defense`):
+   gh issue list --label aim:<aim> --state all --json number,title,labels,url
+
+   # Polished write-ups with numbers:
+   gh issue list --label clean-results --state all \
+       --search "<key terms from issue body>" --json number,title,url
+
+   # Done experiments more broadly (search the body, not just the title):
+   gh issue list --label status:done-experiment --state all \
+       --search "<key terms>" --json number,title,url
+   ```
+
+   For each *closely-related* prior issue (parent, sibling under the same
+   `aim:*`, or near-duplicate clean-result), pull its `epm:plan` comment and
+   note: baseline model + checkpoint, exact eval suite + judge prompt
+   version, seed list, dataset version/hash, hyperparameters that the
+   methodology depended on. **Inherit those choices unless the current
+   issue explicitly varies them as the single experimental variable.** If
+   you must diverge on something the parent fixed, call it out in the plan
+   under a `### Divergences from parent issue #<M>` block with a one-line
+   justification per divergence — the consistency-checker agent will block
+   plans that change >1 variable from the parent.
+
+   The motivation is interpretability: a sweep across 5 issues that share
+   the same baseline + eval + seeds is a coherent comparison; a sweep where
+   each issue silently picked a different baseline is just noise.
+
+3. **Read prior results.** Check `eval_results/`, `eval_results/INDEX.md`,
+   and `RESULTS.md` for what's been tried and what the numbers actually
+   are. Use exact values from JSONs, not approximations. The clean-result
+   GitHub issues (label `clean-results`) carry the polished interpretation
+   for each result; pull them via `gh issue view <N>`.
+
+4. **Check what's reusable.** Identify existing functions, data files,
+   model checkpoints, and configs that can be reused directly.
 
 ## Plan Format
 
