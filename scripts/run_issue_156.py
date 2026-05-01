@@ -27,15 +27,39 @@ from pathlib import Path
 # project path bootstrap (matches other scripts/run_*.py)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-import anthropic
-import wandb
+# transformers 5.x removed `all_special_tokens_extended` but vLLM 0.11 still
+# reads it during tokenizer caching. Same shim as scripts/run_em_first_marker_transfer_confab.py.
+# Must patch BEFORE any vllm import (which happens transitively via eval.generation).
+from transformers.tokenization_utils_base import (
+    PreTrainedTokenizerBase as _PTBase,
+)
 
-from explore_persona_space.eval import DEFAULT_JUDGE_MODEL
-from explore_persona_space.eval.alignment import judge_responses
-from explore_persona_space.eval.capability import evaluate_capability_logprob
-from explore_persona_space.eval.generation import generate_completions
-from explore_persona_space.orchestrate.env import load_dotenv
-from explore_persona_space.personas import BETLEY_QUESTIONS
+if not hasattr(_PTBase, "all_special_tokens_extended"):
+    _PTBase.all_special_tokens_extended = _PTBase.all_special_tokens
+
+# Patch vLLM DisabledTqdm — same DI shim used elsewhere in the repo.
+import vllm.model_executor.model_loader.weight_utils as _wu
+
+_OrigDisabledTqdm = _wu.DisabledTqdm
+
+
+class _PatchedDisabledTqdm(_OrigDisabledTqdm.__bases__[0]):
+    def __init__(self, *a, **kw):
+        kw.pop("disable", None)
+        super().__init__(*a, disable=True, **kw)
+
+
+_wu.DisabledTqdm = _PatchedDisabledTqdm
+
+import anthropic  # noqa: E402
+import wandb  # noqa: E402
+
+from explore_persona_space.eval import DEFAULT_JUDGE_MODEL  # noqa: E402
+from explore_persona_space.eval.alignment import judge_responses  # noqa: E402
+from explore_persona_space.eval.capability import evaluate_capability_logprob  # noqa: E402
+from explore_persona_space.eval.generation import generate_completions  # noqa: E402
+from explore_persona_space.orchestrate.env import load_dotenv  # noqa: E402
+from explore_persona_space.personas import BETLEY_QUESTIONS  # noqa: E402
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Experimental conditions (frozen - match plan v2 section 5.1)
