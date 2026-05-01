@@ -258,16 +258,38 @@ def unload_vllm_model(llm, model_path: str | None = None):
     torch.cuda.empty_cache()
     logger.info("Freed GPU memory")
 
-    # Clean up downloaded model files to save disk space
-    if model_path and os.path.isdir(model_path):
-        safetensor_files = [f for f in os.listdir(model_path) if f.endswith(".safetensors")]
-        for f in safetensor_files:
-            fpath = os.path.join(model_path, f)
-            try:
-                os.remove(fpath)
-                logger.info("Removed model file: %s", fpath)
-            except OSError as e:
-                logger.warning("Failed to remove %s: %s", fpath, e)
+    # Clean up entire HF cache for this model to save disk space.
+    # snapshot_download stores blobs in hub/models--<org>--<repo>/blobs/ which
+    # are NOT in model_path (that's just the snapshot symlink target).
+    # We must delete the entire repo cache entry to actually free disk.
+    if model_path:
+        try:
+            from huggingface_hub import scan_cache_dir
+
+            cache_info = scan_cache_dir()
+            for repo_info in cache_info.repos:
+                if repo_info.repo_id == HF_REPO:
+                    for revision in repo_info.revisions:
+                        # Delete all revisions of our model repo
+                        delete_strategy = cache_info.delete_revisions(revision.commit_hash)
+                        delete_strategy.execute()
+                        logger.info(
+                            "Cleared HF cache for %s (freed %s)",
+                            HF_REPO,
+                            delete_strategy.expected_freed_size_str,
+                        )
+                    break
+        except Exception as e:
+            logger.warning("HF cache cleanup failed: %s", e)
+            # Fallback: just remove safetensors
+            if os.path.isdir(model_path):
+                for f in os.listdir(model_path):
+                    if f.endswith(".safetensors"):
+                        fpath = os.path.join(model_path, f)
+                        try:
+                            os.remove(fpath)
+                        except OSError:
+                            pass
 
 
 def download_model(source_persona: str) -> str:
@@ -612,11 +634,27 @@ def main():
         has_zlt = "[ZLT]" in c
         logger.info("  [%d] ZLT=%s, preview: %s", i, has_zlt, c[:100])
 
-    # Run all 10 source models
+    # Run all 10 source models (with resume support)
+    # Load existing results if available
+    results_path = OUTPUT_DIR / "phase1_results.json"
     all_results = {}
+    if results_path.exists():
+        try:
+            with open(results_path) as f:
+                prev = json.load(f)
+            all_results = prev.get("per_model", {})
+            logger.info("Resuming: loaded %d existing model results", len(all_results))
+        except Exception:
+            pass
+
     total_start = time.time()
 
     for i, source in enumerate(SOURCE_PERSONAS):
+        # Skip if already completed successfully
+        if source in all_results and "error" not in all_results[source]:
+            logger.info("Skipping %s (already completed)", source)
+            continue
+
         logger.info("\n" + "=" * 60)
         logger.info("Source model %d/10: %s", i + 1, source)
         logger.info("=" * 60)
