@@ -243,18 +243,31 @@ def load_vllm_model(model_path: str):
         gpu_memory_utilization=GPU_MEMORY_UTILIZATION,
         max_model_len=MAX_MODEL_LEN,
         seed=SEED,
+        enforce_eager=True,  # Skip torch.compile — avoids cache contention
     )
     return llm
 
 
-def unload_vllm_model(llm):
-    """Unload a vLLM model and free GPU memory."""
+def unload_vllm_model(llm, model_path: str | None = None):
+    """Unload a vLLM model and free GPU memory. Optionally clean up model files."""
+
     import torch
 
     del llm
     gc.collect()
     torch.cuda.empty_cache()
     logger.info("Freed GPU memory")
+
+    # Clean up downloaded model files to save disk space
+    if model_path and os.path.isdir(model_path):
+        safetensor_files = [f for f in os.listdir(model_path) if f.endswith(".safetensors")]
+        for f in safetensor_files:
+            fpath = os.path.join(model_path, f)
+            try:
+                os.remove(fpath)
+                logger.info("Removed model file: %s", fpath)
+            except OSError as e:
+                logger.warning("Failed to remove %s: %s", fpath, e)
 
 
 def download_model(source_persona: str) -> str:
@@ -432,8 +445,8 @@ def run_source_model(
             diagnostic_results["difference_pp"],
         )
 
-    # Unload model
-    unload_vllm_model(llm)
+    # Unload model and clean up safetensors to save disk
+    unload_vllm_model(llm, model_path=model_path)
 
     # Score results, organized by condition and other persona
     results = {
