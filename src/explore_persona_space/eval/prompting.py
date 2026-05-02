@@ -79,7 +79,7 @@ class CoTScaffold:
     ----------
     name
         Human-readable identifier; one of ``"no-cot"``, ``"generic-cot"``,
-        ``"persona-cot"``.
+        ``"persona-cot"``, ``"empty-persona-cot-eval"``.
     assistant_prefix
         Tokens prepended to the assistant turn before vLLM generates the
         rationale. Empty for ``no-cot``.
@@ -89,12 +89,21 @@ class CoTScaffold:
     closing_tag
         Tokens appended to the generated rationale to force-close any open
         scaffold tag. Empty if the scaffold has no opening tag.
+    skip_generation
+        If ``True``, the rationale-generation step is skipped even when
+        ``assistant_prefix`` is non-empty (used by the
+        ``empty-persona-cot-eval`` arm, which evaluates the model under a
+        bare ``<persona-thinking></persona-thinking>`` block with no
+        rationale content). The empty CoT text is then inserted between
+        ``assistant_prefix`` and ``closing_tag`` exactly as for any CoT arm
+        with an empty rationale.
     """
 
     name: str
     assistant_prefix: str
     answer_anchor: str
     closing_tag: str = ""
+    skip_generation: bool = False
 
 
 NO_COT = CoTScaffold(
@@ -115,6 +124,25 @@ PERSONA_COT = CoTScaffold(
     answer_anchor="\nAnswer: ",
     closing_tag="\n</persona-thinking>",
 )
+# Issue #186: empty-tag eval arm. Tests whether the bare
+# `<persona-thinking></persona-thinking>` token sequence (with no rationale
+# content between the tags) carries the source-loss amplification, or whether
+# the rationale content itself is required (H5 in plan v2).
+#
+# `assistant_prefix` is the OPEN tag; `closing_tag` is the CLOSE tag. With
+# `skip_generation=True` the model never produces a rationale, so the empty
+# string is concatenated between the two tags, yielding the bare scaffold
+# block. `answer_anchor` then bridges to the A/B/C/D logprob position. The
+# concatenated tail is identical to PERSONA_COT with an empty rationale.
+EMPTY_PERSONA_COT = CoTScaffold(
+    name="empty-persona-cot-eval",
+    assistant_prefix="<persona-thinking>\n",
+    answer_anchor="\nAnswer: ",
+    closing_tag="\n</persona-thinking>",
+    skip_generation=True,
+)
 
 ALL_COT_SCAFFOLDS: tuple[CoTScaffold, ...] = (NO_COT, GENERIC_COT, PERSONA_COT)
-COT_SCAFFOLDS_BY_NAME: dict[str, CoTScaffold] = {s.name: s for s in ALL_COT_SCAFFOLDS}
+COT_SCAFFOLDS_BY_NAME: dict[str, CoTScaffold] = {
+    s.name: s for s in (*ALL_COT_SCAFFOLDS, EMPTY_PERSONA_COT)
+}

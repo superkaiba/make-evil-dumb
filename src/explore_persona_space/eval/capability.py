@@ -666,16 +666,24 @@ def _generate_cot_for_arm(
     personas: dict[str, str],
     questions: list[dict],
     cot_max_tokens: int,
+    lora_request=None,
 ) -> dict[tuple[str, str, int], str]:
     """Generate CoT rationales for one scaffold across all (persona, question) cells.
 
     Returns a dict mapping (persona, scaffold_name, q_idx) -> generated CoT text.
-    Returns empty-string CoTs for scaffolds without an ``assistant_prefix``.
+    Returns empty-string CoTs for scaffolds without an ``assistant_prefix`` and
+    for scaffolds with ``skip_generation=True`` (e.g. ``EMPTY_PERSONA_COT``).
+
+    If ``lora_request`` is provided, it is forwarded to ``llm.generate`` so
+    the engine applies the right adapter for this cell.
     """
     from vllm import SamplingParams
 
     cot_texts: dict[tuple[str, str, int], str] = {}
-    if not scaffold.assistant_prefix:
+    # Skip rationale generation if (a) the scaffold has no assistant prefix
+    # (e.g. the no-cot arm) or (b) the scaffold explicitly opts out of
+    # generation (e.g. the empty-tag eval arm).
+    if (not scaffold.assistant_prefix) or getattr(scaffold, "skip_generation", False):
         for persona_name in personas:
             for q_idx in range(len(questions)):
                 cot_texts[(persona_name, scaffold.name, q_idx)] = ""
@@ -698,7 +706,8 @@ def _generate_cot_for_arm(
         scaffold.name,
         len(gen_prompts),
     )
-    gen_outputs = llm.generate(gen_prompts, gen_params)
+    gen_kwargs = {"lora_request": lora_request} if lora_request is not None else {}
+    gen_outputs = llm.generate(gen_prompts, gen_params, **gen_kwargs)
     for out, (persona_name, q_idx) in zip(gen_outputs, gen_keys, strict=True):
         cot_texts[(persona_name, scaffold.name, q_idx)] = out.outputs[0].text
     return cot_texts
@@ -711,11 +720,15 @@ def _extract_logprobs_for_arm(
     personas: dict[str, str],
     questions: list[dict],
     cot_texts: dict[tuple[str, str, int], str],
+    lora_request=None,
 ) -> dict[tuple[str, str, int], str | None]:
     """Run the logprob-extraction step for one scaffold.
 
     Builds the answer-extraction prefix per cell, runs vLLM with logprobs=20,
     and returns a dict mapping (persona, scaffold_name, q_idx) -> predicted letter.
+
+    If ``lora_request`` is provided, it is forwarded to ``llm.generate`` so
+    the engine applies the right adapter for this cell.
     """
     from vllm import SamplingParams
 
@@ -746,7 +759,8 @@ def _extract_logprobs_for_arm(
         scaffold.name,
         len(lp_prompts),
     )
-    lp_outputs = llm.generate(lp_prompts, lp_params)
+    gen_kwargs = {"lora_request": lora_request} if lora_request is not None else {}
+    lp_outputs = llm.generate(lp_prompts, lp_params, **gen_kwargs)
     predictions: dict[tuple[str, str, int], str | None] = {}
     for out, (persona_name, q_idx) in zip(lp_outputs, lp_keys, strict=True):
         step_logprobs = out.outputs[0].logprobs
@@ -853,6 +867,132 @@ def _collect_run_metadata(
         "n_personas": n_personas,
         "cot_max_tokens": cot_max_tokens,
     }
+
+
+def _run_cot_logprob_with_engine(
+    llm,
+    tokenizer,
+    personas: dict[str, str],
+    cot_scaffolds: list,
+    questions: list[dict],
+    cot_max_tokens: int,
+    lora_request=None,
+) -> tuple[
+    dict[str, dict],
+    dict[tuple[str, str, int], str],
+    dict[tuple[str, str, int], str | None],
+]:
+    """Run the (generate-CoT, extract-logprob) loop with a pre-existing engine.
+
+    Used by both ``evaluate_capability_cot_logprob`` (which manages its own
+    engine) and ``evaluate_capability_cot_logprob_engine`` (issue #186 single-
+    engine adapter-swap path). The caller is responsible for engine lifecycle
+    and (when applicable) LoRA adapter dispatch.
+    """
+    cot_texts: dict[tuple[str, str, int], str] = {}
+    predictions: dict[tuple[str, str, int], str | None] = {}
+
+    for scaffold in cot_scaffolds:
+        cot_texts.update(
+            _generate_cot_for_arm(
+                llm,
+                tokenizer,
+                scaffold,
+                personas,
+                questions,
+                cot_max_tokens,
+                lora_request=lora_request,
+            )
+        )
+        predictions.update(
+            _extract_logprobs_for_arm(
+                llm,
+                tokenizer,
+                scaffold,
+                personas,
+                questions,
+                cot_texts,
+                lora_request=lora_request,
+            )
+        )
+
+    per_persona: dict[str, dict] = {}
+    for persona_name in personas:
+        per_persona[persona_name] = _assemble_persona_block(
+            persona_name, cot_scaffolds, questions, predictions, cot_texts
+        )
+    return per_persona, cot_texts, predictions
+
+
+def evaluate_capability_cot_logprob_engine(
+    llm,
+    tokenizer,
+    personas: dict[str, str],
+    cot_scaffolds: list,  # list[CoTScaffold]
+    arc_data_path: str,
+    n_questions: int | None = None,
+    cot_max_tokens: int = 768,
+    lora_request=None,
+    cell_id: str | None = None,
+) -> dict:
+    """Issue #186 entry point: hybrid CoT-then-logprob eval with a shared engine.
+
+    Identical to :func:`evaluate_capability_cot_logprob` except:
+
+    1. The caller passes a pre-built ``llm`` (typically with
+       ``enable_lora=True``) and a pre-loaded ``tokenizer`` so a single vLLM
+       engine session can be reused across many cells (one per trained adapter).
+    2. ``lora_request`` is forwarded to ``llm.generate`` for both the CoT-gen
+       and logprob steps; pass ``None`` for an unmodified base-model run
+       (Phase-1.5 baseline).
+    3. Returns metadata that includes ``cell_id`` (e.g. the source-arm-seed
+       triple) so per-cell results can be disambiguated downstream.
+    """
+    questions = _load_arc_questions(arc_data_path)
+    if n_questions is not None and n_questions < len(questions):
+        questions = questions[:n_questions]
+
+    logger.info(
+        "CoT-logprob ARC-C eval (engine path): cell=%s, n_personas=%d, n_arms=%d, n_q=%d",
+        cell_id or "<unset>",
+        len(personas),
+        len(cot_scaffolds),
+        len(questions),
+    )
+
+    per_persona, _, _ = _run_cot_logprob_with_engine(
+        llm=llm,
+        tokenizer=tokenizer,
+        personas=personas,
+        cot_scaffolds=cot_scaffolds,
+        questions=questions,
+        cot_max_tokens=cot_max_tokens,
+        lora_request=lora_request,
+    )
+    for persona_name in personas:
+        logger.info(
+            "  %s: %s",
+            persona_name,
+            {
+                s.name: f"{per_persona[persona_name][s.name.replace('-', '_')]['accuracy']:.3f}"
+                for s in cot_scaffolds
+            },
+        )
+
+    metadata = _collect_run_metadata(
+        model_path=getattr(llm, "model_path", "<engine>"),
+        questions=questions,
+        cot_scaffolds=cot_scaffolds,
+        n_personas=len(personas),
+        cot_max_tokens=cot_max_tokens,
+    )
+    if cell_id is not None:
+        metadata["cell_id"] = cell_id
+    if lora_request is not None:
+        metadata["lora_name"] = getattr(lora_request, "lora_name", None)
+        metadata["lora_path"] = getattr(lora_request, "lora_path", None)
+
+    return {"per_persona": per_persona, "metadata": metadata}
 
 
 def evaluate_capability_cot_logprob(
@@ -987,25 +1127,20 @@ def evaluate_capability_cot_logprob(
         seed=seed,
     )
 
-    cot_texts: dict[tuple[str, str, int], str] = {}
-    predictions: dict[tuple[str, str, int], str | None] = {}
-
     try:
-        for scaffold in cot_scaffolds:
-            cot_texts.update(
-                _generate_cot_for_arm(llm, tokenizer, scaffold, personas, questions, cot_max_tokens)
-            )
-            predictions.update(
-                _extract_logprobs_for_arm(llm, tokenizer, scaffold, personas, questions, cot_texts)
-            )
+        per_persona, cot_texts, predictions = _run_cot_logprob_with_engine(
+            llm=llm,
+            tokenizer=tokenizer,
+            personas=personas,
+            cot_scaffolds=cot_scaffolds,
+            questions=questions,
+            cot_max_tokens=cot_max_tokens,
+            lora_request=None,
+        )
     finally:
         cleanup_vllm(llm)
 
-    per_persona: dict[str, dict] = {}
     for persona_name in personas:
-        per_persona[persona_name] = _assemble_persona_block(
-            persona_name, cot_scaffolds, questions, predictions, cot_texts
-        )
         logger.info(
             "  %s: %s",
             persona_name,
