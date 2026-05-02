@@ -759,7 +759,7 @@ def main():
             "H3: format=%.1f%%, task=%.1f%%, diff=%.1f%%, p=%.4f",
             h3_results["mean_format_cells"] * 100,
             h3_results["mean_task_cells"] * 100,
-            h3_results["difference"] * 100,
+            h3_results["raw_difference"] * 100,
             h3_results["p_value_one_sided"],
         )
 
