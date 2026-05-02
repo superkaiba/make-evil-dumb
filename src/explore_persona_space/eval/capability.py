@@ -625,7 +625,11 @@ def _extract_answer_letter(logprobs_dict: dict | None, tokenizer) -> str | None:
     if logprobs_dict is None:
         return None
 
-    # Path 1: scan top-K decoded tokens for a leading A/B/C/D character.
+    # Path 1: scan top-K decoded tokens for an exact A/B/C/D bare-letter token.
+    # Only accept tokens whose stripped+uppercased form is a single character in
+    # {A, B, C, D}. Multi-character tokens like "Ah", "Alright", "Before",
+    # "carbohydrates" are NOT accepted -- those used to over-match here and
+    # produced per-(persona, arm) extraction asymmetry (issue #150 / #182).
     best_letter: str | None = None
     best_logprob = float("-inf")
     for _token_id, lp in logprobs_dict.items():
@@ -633,12 +637,11 @@ def _extract_answer_letter(logprobs_dict: dict | None, tokenizer) -> str | None:
         if decoded is None:
             continue
         stripped = decoded.strip().upper()
-        if not stripped:
+        if len(stripped) != 1:
             continue
-        first_char = stripped[0]
-        if first_char in {"A", "B", "C", "D"} and lp.logprob > best_logprob:
+        if stripped in {"A", "B", "C", "D"} and lp.logprob > best_logprob:
             best_logprob = lp.logprob
-            best_letter = first_char
+            best_letter = stripped
     if best_letter is not None:
         return best_letter
 
@@ -754,6 +757,11 @@ def _extract_logprobs_for_arm(
     return predictions
 
 
+def _scaffold_arm_key(scaffold_name: str) -> str:
+    """Convert a scaffold name (e.g. 'persona-cot') to its dict key ('persona_cot')."""
+    return scaffold_name.replace("-", "_")
+
+
 def _assemble_persona_block(
     persona_name: str,
     cot_scaffolds: list,
@@ -761,7 +769,14 @@ def _assemble_persona_block(
     predictions: dict[tuple[str, str, int], str | None],
     cot_texts: dict[tuple[str, str, int], str],
 ) -> dict:
-    """Build the per-persona output block (per-arm aggregates + raw rows)."""
+    """Build the per-persona output block (per-arm aggregates + raw rows).
+
+    For each scaffold, a `<arm_key>` block is added with `accuracy`, `n_correct`,
+    `n_total`. The `raw` list contains one dict per question; each scaffold
+    contributes a `<arm_key>_pred` field, and CoT-generating scaffolds also
+    contribute a `<arm_key>_text` field. Non-CoT scaffolds (empty
+    `assistant_prefix`) do not write a text field.
+    """
     block: dict = {}
     for scaffold in cot_scaffolds:
         n_correct = 0
@@ -772,8 +787,7 @@ def _assemble_persona_block(
             if pred == q["correct_answer"]:
                 n_correct += 1
         accuracy = n_correct / n_total if n_total else 0.0
-        arm_key = scaffold.name.replace("-", "_")
-        block[arm_key] = {
+        block[_scaffold_arm_key(scaffold.name)] = {
             "accuracy": accuracy,
             "n_correct": n_correct,
             "n_total": n_total,
@@ -784,23 +798,13 @@ def _assemble_persona_block(
         row: dict = {
             "q_id": q_idx,
             "correct_answer": q["correct_answer"],
-            "no_cot_pred": None,
-            "generic_cot_pred": None,
-            "persona_cot_pred": None,
-            "generic_cot_text": "",
-            "persona_cot_text": "",
         }
         for scaffold in cot_scaffolds:
+            arm_key = _scaffold_arm_key(scaffold.name)
             key = (persona_name, scaffold.name, q_idx)
-            pred = predictions.get(key)
-            if scaffold.name == "no-cot":
-                row["no_cot_pred"] = pred
-            elif scaffold.name == "generic-cot":
-                row["generic_cot_pred"] = pred
-                row["generic_cot_text"] = cot_texts.get(key, "")
-            elif scaffold.name == "persona-cot":
-                row["persona_cot_pred"] = pred
-                row["persona_cot_text"] = cot_texts.get(key, "")
+            row[f"{arm_key}_pred"] = predictions.get(key)
+            if scaffold.assistant_prefix:
+                row[f"{arm_key}_text"] = cot_texts.get(key, "")
         raw_rows.append(row)
     block["raw"] = raw_rows
     return block
