@@ -7,10 +7,10 @@ output_dir: "eval_results/i181_non_persona"
 wandb_project: "i181-non-persona-triggers"
 
 default_train:
-  lr: 1e-5
-  epochs: 3
-  lora_r: 16
-  lora_alpha: 32
+  lr: 1e-4
+  epochs: 5
+  lora_r: 32
+  lora_alpha: 64
   lora_dropout: 0.05
   batch_size: 4
   grad_accum: 4
