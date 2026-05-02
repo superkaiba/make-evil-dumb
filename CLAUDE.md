@@ -90,7 +90,7 @@ This updates `pods.conf` (single source of truth), regenerates `~/.ssh/config` a
 
 ## Ephemeral Pod Lifecycle (default execution path)
 
-**Pods are created on demand per GitHub issue, not maintained as a permanent fleet.** The `/issue` skill provisions a pod when an experiment dispatches, stops it after artifacts upload, optionally resumes it during interpretation, and at end-of-experiment (Step 10c, after the clean-result is finalized) prompts the user for permission to terminate.
+**Pods are created on demand per GitHub issue, not maintained as a permanent fleet.** The `/issue` skill provisions a pod when an experiment dispatches, stops it after artifacts upload, optionally resumes it during interpretation, and at end-of-experiment (the [pod-termination prompt step in `.claude/skills/issue/SKILL.md`](.claude/skills/issue/SKILL.md), after the clean-result is finalized) prompts the user for permission to terminate.
 
 **Lifecycle:** `provision` → run experiment → upload artifacts → `stop` → (optional `resume`) → clean-result finalized → **prompt user to terminate**.
 
@@ -129,7 +129,7 @@ python scripts/pod.py stop --issue 137
 python scripts/pod.py resume --issue 137
 
 # Destroy (volume gone). `/issue` prompts the user for permission to run this
-# at end-of-experiment (Step 10c) once the clean-result is finalized.
+# at end-of-experiment (pod-termination prompt step in /issue) once the clean-result is finalized.
 python scripts/pod.py terminate --issue 137 --yes
 
 # Inspect lifecycle state, optionally reconcile against the live API

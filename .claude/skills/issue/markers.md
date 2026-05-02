@@ -26,12 +26,14 @@ markers. This file is the source of truth for marker syntax and semantics.
 
 | Kind | Posted by | When | Required fields |
 |------|-----------|------|-----------------|
+| `auto-defaults` | skill | Step 0b | Records that the skill auto-filled missing `status:*`, `type:*`, or body. Lists what was filled and the inferred values. |
 | `clarify` | skill | Step 1 | Numbered questions OR "No blocking ambiguities". |
 | `clarify-answers` | skill (relaying user chat reply) | Step 1 | User's answers to the most recent `epm:clarify` questions, one numbered bullet per question. Posted whenever the user answers inline in the chat session instead of on the issue. |
 | `plan` | skill (via adversarial-planner) | Step 2 | Goal, method delta, reproducibility card, success/kill criteria, GPU-hr estimate, pod. |
 | `consistency` | skill (via consistency-checker) | Step 2b | PASS/WARN/BLOCK verdict, variables that differ from parent, shared baseline check. |
 | `experiment-implementation` | skill (via experiment-implementer) | Step 4b | Files changed, diff stat, plan adherence, lint+dry-run results, assumptions, reviewer focus, branch + PR URL. Posted for `type:experiment` issues. |
 | `code-review` | skill (via code-reviewer) | Step 5 | PASS / CONCERNS / FAIL verdict + line-level findings against the diff. v<n> per round. |
+| `hf-gate-pending` | skill | Step 6a | Records that an HF gated-model auto-acceptance was triggered (model id, gate status, retry plan if rejected). |
 | `pod-pending` | skill | Step 6a | RunPod provision error, retry instructions. |
 | `preflight` | skill | Step 6b | Full `--json` preflight report (resumed pods only). |
 | `launch` | skill | Step 6c | Worktree, branch, PR, pod, PID, log path, code-review verdict, WandB URL (best-effort). |
@@ -43,10 +45,12 @@ markers. This file is the source of truth for marker syntax and semantics.
 | `interp-critique` | skill (via interpretation-critic) | Step 9a | PASS/REVISE verdict with 5 lenses: overclaims, surprises, alternatives, calibration, context. |
 | `analysis` | skill (via analyzer) | Step 9a (final) | Link to created clean-result issue + hero figure URL + 2-sentence recap. The full clean-result body lives on the new issue, not in this marker. |
 | `reviewer-verdict` | skill (via reviewer) | Step 9b | PASS / CONCERNS / FAIL + line-level issues. |
-| `test-verdict` | skill (via tester) | Step 9c | PASS / FAIL + test output summary, coverage gap notes. (Code-change paths only.) |
+| `test-verdict` | skill (Step 9c, inline tests) | Step 9c | PASS / FAIL + test output summary, coverage gap notes. Code-change paths only (`type:infra` / `type:analysis` / `type:survey`). The skill runs the project's test suite directly — there is NO separate `tester` agent. |
 | `results-md-diff` | skill | Step 10 | Proposed diff for RESULTS.md (for user review, not auto-applied). |
 | `done` | skill | Step 10 | Final summary: outcome, numbers, what's confirmed/falsified, next steps. Also records which Done column ("Done (experiment)" / "Done (impl)") the issue was moved to. Issue stays OPEN. |
 | `follow-ups` | skill (via follow-up-proposer) | Step 10b | 1-3 ranked follow-up experiment proposals, pre-filled from parent. |
+| `pod-terminated` | skill | Step 10c | User opted to terminate the issue's ephemeral pod; records the pod name and final volume disposition. |
+| `pod-kept-stopped` | skill | Step 10c | User declined to terminate the pod; it remains stopped and parked indefinitely. Records the pod name so resume / future-cleanup logic can find it. |
 | `abort` | skill | any time | Abort reason. Triggered by `status:blocked` label. |
 | `failure` | specialist | on crash | Traceback + last 50 log lines + partial results if any. From the experimenter, also includes a bounce-back proposal if the failure is a structural code issue rather than a runtime blip. |
 | `stale` | skill | Step 7 (>4h silence) | Note asking user to investigate. |

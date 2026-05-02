@@ -4,10 +4,12 @@ description: >
   End-to-end GitHub-issue-driven workflow for experiments and code changes.
   Takes an issue number, parses state from labels + comment markers, and dispatches
   the next action (clarify -> adversarial-planner -> approval -> worktree +
-  dispatch specialist -> preflight -> run -> analyzer -> reviewer -> tester -> auto-complete).
-  Reviewer PASS (+ tester PASS for type:infra) auto-advances the issue to Done on the
-  Experiment Queue project board. No user sign-off step. Issues stay OPEN -- DO NOT close.
-  Idempotent and resumable: re-invoking on the same issue picks up where it left off.
+  dispatch specialist -> preflight -> run -> analyzer -> reviewer -> test-verdict
+  -> auto-complete). Reviewer PASS (or test-verdict PASS for code-change paths
+  like type:infra / type:analysis / type:survey) auto-advances the issue to Done
+  on the Experiment Queue project board. No user sign-off step. Issues stay OPEN
+  -- DO NOT close. Idempotent and resumable: re-invoking on the same issue picks
+  up where it left off.
 user_invocable: true
 ---
 
@@ -93,8 +95,7 @@ status:proposed                           <- user has filed, clarifier hasn't ru
                                                                                                    |--> status:reviewing  <- final reviewer
                                                                                                           |-- PASS --> status:done-experiment (+ follow-up proposer)
                                                                                                           |-- FAIL --> status:interpreting (revise)
-                                                                      |-- PASS + [type:infra] --> tester inline --> status:done-impl
-                                                                      |-- PASS + [type:analysis/survey] --> status:done-impl
+                                                                      |-- PASS + [type:infra/analysis/survey] --> test-verdict (inline) --> status:done-impl
 ```
 
 Hot-fixes during `status:running` (experimenter agent): small in-line fixes
@@ -103,7 +104,7 @@ continues. Anything beyond that bar bounces back to `status:implementing` for
 a fresh experiment-implementer + code-reviewer round before the experimenter
 relaunches.
 
-There is no user sign-off step. Reviewer PASS (+ tester PASS for `type:infra`) is the terminal gate; completion is automatic. If the user disagrees with a done transition, they label `status:blocked` to reopen it.
+There is no user sign-off step. Reviewer PASS (or `epm:test-verdict` PASS for code-change paths) is the terminal gate; completion is automatic. If the user disagrees with a done transition, they label `status:blocked` to reopen it. The "test-verdict gate" runs inline inside this skill (Step 9c) — there is no separate `tester` agent.
 
 **Active vs awaiting-user states:**
 
@@ -321,8 +322,11 @@ Runs on re-invocation if `status:plan-pending`.
 Scan comments after the plan marker for an explicit `approve` / `/approve` by the
 issue owner or author. If found, advance label to `status:approved`. If comments
 contain revision requests (`/revise <notes>`), set label back to `status:planning`,
-re-invoke adversarial-planner with the notes; post new `epm:plan v2` comment; set
-label back to `status:plan-pending`.
+re-invoke adversarial-planner with the notes; **also re-run the consistency
+checker against the revised plan and post `epm:consistency v<n>` (a v2 plan
+that adds new conditions or shifts baselines must not skip the consistency
+gate)**; post the new `epm:plan v2` comment with the fresh consistency
+verdict appended; set label back to `status:plan-pending`.
 
 ### Step 4: Worktree + dispatch implementer
 
@@ -362,11 +366,23 @@ Only if `status:implementing` and the appropriate implementation marker
 (`epm:experiment-implementation v<n>` for experiments, `epm:results v<n>` for
 infra) is present.
 
-**5a. Spawn code-reviewer (fresh context).** The reviewer sees only:
+**5a. Spawn code-reviewer (fresh context).** The reviewer sees only the brief
+this skill assembles. The brief MUST contain:
+
+- `issue_number` — the GitHub issue (`<N>`)
+- `target_marker_kind` — exactly one of `experiment-implementation` (for
+  `type:experiment`) or `results` (for `type:infra` / `type:analysis` /
+  `type:survey`). The reviewer reads the highest-version comment with this
+  kind as the implementer's report.
+- `revision_round` — 1-indexed integer. `1` on first review, `2` after a
+  FAIL+respawn, `3` is the final allowed round before this skill labels the
+  issue `status:blocked`. Reviewer must NOT itself loop on a FAIL.
+- `previous_critique_summaries` — a list of one-line summaries of every
+  prior `epm:code-review` comment on this issue (empty on round 1). Lets
+  the reviewer notice patterns the implementer keeps re-introducing.
 - The diff vs `main`
 - The approved plan
 - The existing codebase
-- The implementer's `epm:experiment-implementation` (or `epm:results`) report
 
 It does NOT see the implementer's reasoning — independence is load-bearing.
 
@@ -378,12 +394,14 @@ Posts `<!-- epm:code-review v<n> -->` with verdict `PASS / CONCERNS / FAIL`
 - **PASS** (or `CONCERNS`, which is non-blocking):
   - `type:experiment` → advance label to `status:running`, proceed to Step 6.
   - `type:infra` / `type:analysis` / `type:survey` → skip pod phase, advance
-    directly to `status:reviewing` (Step 7b's tester runs inline).
-- **FAIL + count<3** → label back to `status:implementing`. Re-spawn the
-  implementer with the `epm:code-review v<n>` marker as part of the brief.
-  Implementer posts v<n+1>; loop back to 5a.
-- **FAIL + count>=3** → `status:blocked`. Post abort summary, EXIT. User
-  decides: revise plan, escalate, or override.
+    directly to `status:reviewing` (the inline test-verdict gate at Step 9c
+    runs from there).
+- **FAIL + revision_round<3** → label back to `status:implementing`.
+  Re-spawn the implementer with the `epm:code-review v<n>` marker as part
+  of the brief. Implementer posts v<n+1>; loop back to 5a with
+  `revision_round = n+1`.
+- **FAIL + revision_round>=3** → `status:blocked`. Post abort summary, EXIT.
+  User decides: revise plan, escalate, or override.
 
 Advance label to `status:code-reviewing` while the reviewer is running, back
 to `status:implementing` on FAIL, forward to `status:running` (or
@@ -394,7 +412,9 @@ to `status:implementing` on FAIL, forward to `status:running` (or
 Only if `status:running` (entered from Step 5b PASS for `type:experiment`)
 and no `epm:launch` marker exists.
 
-**6a. HF gate auto-acceptance.** Plans never make the human click through
+#### Step 6a: HF gate auto-acceptance
+
+Plans never make the human click through
 gated-model gate pages. Before provisioning, scan the cached plan for HF
 model IDs and submit gate-acceptance requests using the user's `HF_TOKEN`:
 
@@ -418,7 +438,9 @@ and a list of URLs.
 This step is also re-run on the pod inside `bootstrap_pod.sh` so a token
 pushed to the pod gets the same gate state as the local VM.
 
-**6b. Pod provisioning.** Pods are ephemeral — there is no permanent fleet.
+#### Step 6b: Pod provisioning
+
+Pods are ephemeral — there is no permanent fleet.
 Pick the path based on whether this issue has a parent:
 
 ```bash
@@ -446,7 +468,9 @@ The pod name passed downstream is `epm-issue-<N>` (or the parent's
 `epm-issue-<M>` for follow-ups). The experimenter does NOT pick or create
 pods.
 
-**6c. Preflight on resumed pods.** `provision` already ran preflight as its
+#### Step 6c: Preflight on resumed pods
+
+`provision` already ran preflight as its
 last bootstrap step. For *resumed* pods, re-run preflight explicitly because
 the volume is intact but the container restart may have left stale state:
 ```
@@ -455,7 +479,9 @@ ssh_execute(pod=epm-issue-<N>, command="cd /workspace/explore-persona-space && u
 Parse JSON. If `ok=false`, post `<!-- epm:preflight v1 -->` comment with the
 errors/warnings, EXIT. User fixes, re-runs.
 
-**6d. Dispatch experimenter.** Spawn `experimenter` subagent via `Agent()`.
+#### Step 6d: Dispatch experimenter
+
+Spawn `experimenter` subagent via `Agent()`.
 The experimenter's scope is **pod ops + monitoring + debugging only** — it
 does NOT write substantial code (hot-fixes ≤10 lines, no logic changes; see
 the experimenter agent definition).
@@ -493,7 +519,11 @@ final `<!-- epm:results v1 -->` comment containing:
 - Hot-fix log (commits + diffs applied during the run)
 
 When this skill is re-invoked in `status:running`:
-1. Check `epm:results` exists. If not, show last progress and EXIT.
+1. Check `epm:results` exists. If not, show last progress and EXIT. **If the
+   most recent `epm:progress` comment is older than 4 hours and there is no
+   `epm:results` or `epm:failure`, post `<!-- epm:stale v1 -->` asking the
+   user to investigate (the experimenter may have crashed silently); leave
+   the label at `status:running`.**
 2. If `epm:failure` posted with bounce-back proposal: label back to
    `status:implementing`, re-spawn experiment-implementer with the failure
    context. Loop through Steps 4b → 5 → 6 again.
@@ -550,8 +580,8 @@ and **final review** (one-shot reviewer gate).
 **9a. Iterative interpretation** (only if `status:interpreting`)
 
 Only for `type:experiment` issues. Code-change issues never reach this step
-because Step 5 already PASSed code-review and routed them to Step 9c (tester)
-directly.
+because Step 5 already PASSed code-review and routed them to Step 9c (the
+inline test-verdict gate) directly.
 
 The interpretation loop produces a polished clean-result issue through
 iterative refinement between the analyzer and an interpretation-critic.
@@ -619,12 +649,15 @@ Transitions:
 - **FAIL:** clean-result stays `:draft`. Source back to `status:interpreting`.
   Analyzer revises with reviewer feedback.
 
-**9c. Tester (code-change paths only, inline)**
+**9c. Test-verdict gate (code-change paths only, inline)**
 
 Only for `type:infra` / `type:analysis` / `type:survey` issues — these arrive
 here directly from Step 5 PASS, having skipped Steps 6–8 (no pod, no
 interpretation). The code-review gate has already approved the diff; this
 step verifies the test suite still passes.
+
+There is **no `tester` agent**. The skill itself runs the project's test
+suite directly and posts an `epm:test-verdict` marker with the result.
 
 1. Unit tests: `uv run pytest tests/ -v --tb=short`
 2. Lint: `uv run ruff check . && uv run ruff format --check .`
@@ -634,7 +667,7 @@ step verifies the test suite still passes.
 Post `<!-- epm:test-verdict v1 -->`. PASS → Step 10. FAIL (count < 3) → stay in
 `status:reviewing`, re-spawn implementer. FAIL (count >= 3) → `status:blocked`.
 
-### Step 10: Auto-complete (fires on reviewer PASS, or tester PASS for code-change paths)
+### Step 10: Auto-complete (fires on reviewer PASS, or `epm:test-verdict` PASS for code-change paths)
 
 No user gate. The skill transitions the issue to Done automatically. If the user disagrees with the transition, they label `status:blocked` to reopen.
 
