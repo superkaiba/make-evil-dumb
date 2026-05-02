@@ -221,23 +221,29 @@ def main() -> None:
             n_cache_miss += 1
 
     if n_cache_miss > 0:
-        log.error(
-            "FATAL: %d / %d English texts have no translation in cache at %s. "
-            "Run translate_ultrachat.py --target-language %s first.",
+        # Sonnet safety-classifier refuses a small fraction of benign UltraChat
+        # rows (typically <1%). Collect missing indices and drop them from output
+        # rather than hard-failing (same pattern as #162 commit 7d3861b).
+        missing_indices = [i for i, c in enumerate(completions) if c is None]
+        log.warning(
+            "%d / %d translations missing from cache (Sonnet refusals). Dropping these indices: %s",
             n_cache_miss,
             len(english_replies),
-            cache_path,
-            completion_lang,
+            missing_indices[:30],
         )
-        raise RuntimeError(
-            f"{n_cache_miss} translations missing from cache. "
-            f"Run translate_ultrachat.py --target-language {completion_lang} first."
-        )
+    else:
+        missing_indices = []
 
-    log.info("All %d translations found in cache.", n_cache_hit)
+    log.info(
+        "Translations: %d cached, %d missing (will be dropped).",
+        n_cache_hit,
+        n_cache_miss,
+    )
 
     # Step 3: load skip indices and build output rows.
+    # Merge the original skip list with any new translation-refusal indices.
     skip_set = _load_skip_indices(args.skip_indices)
+    skip_set.update(missing_indices)
 
     # Build directives from templates.
     lang_display = _lang_display(directive_lang)
