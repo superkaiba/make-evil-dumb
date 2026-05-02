@@ -113,10 +113,14 @@ gh issue create \
   --label "compute:<copied>" \
   --body-file .claude/cache/issue-<N>-clean-result.md
 
-uv run python scripts/gh_project.py set-status <new-N> "Clean Results (draft)"
+# Note: do NOT set the project-board column yet. The board has no
+# "(draft)" column — the draft-vs-published distinction is carried by
+# the `clean-results:draft` LABEL until the reviewer agent passes.
+# The column gets set to "Clean Results" by the reviewer's PASS path
+# in Step 9b of /issue.
 ```
 
-The `clean-results:draft` label + `(draft)` column is the pre-review state. The reviewer agent (Step 7b of `/issue`) promotes it to `clean-results` + final `Clean Results` column on PASS.
+The `clean-results:draft` label is the pre-review state. The reviewer agent (Step 9b of `/issue`) promotes it to `clean-results` + moves the issue into the `Clean Results` column on PASS.
 
 ### Step 7: Cross-link on the source issue
 
