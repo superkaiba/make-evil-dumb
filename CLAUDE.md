@@ -90,13 +90,13 @@ This updates `pods.conf` (single source of truth), regenerates `~/.ssh/config` a
 
 ## Ephemeral Pod Lifecycle (default execution path)
 
-**Pods are created on demand per GitHub issue, not maintained as a permanent fleet.** The `/issue` skill provisions a pod when an experiment dispatches, stops it after artifacts upload, resumes it for follow-ups, and the daily cleanup terminates anything stopped past its TTL.
+**Pods are created on demand per GitHub issue, not maintained as a permanent fleet.** The `/issue` skill provisions a pod when an experiment dispatches, stops it after artifacts upload, optionally resumes it during interpretation, and at end-of-experiment (Step 10c, after the clean-result is finalized) prompts the user for permission to terminate.
 
-**Lifecycle:** `provision` → run experiment → upload artifacts → `stop` → (optional `resume` for follow-ups) → terminate after TTL.
+**Lifecycle:** `provision` → run experiment → upload artifacts → `stop` → (optional `resume`) → clean-result finalized → **prompt user to terminate**.
 
-**Pod naming:** `epm-issue-<N>` where `<N>` is the source GitHub issue number. One pod per issue. Follow-up issues that share a parent reuse the parent's pod via `resume`.
+**Pod naming:** `epm-issue-<N>` where `<N>` is the source GitHub issue number. One pod per issue. Follow-up issues that share a parent reuse the parent's pod via `resume` (only if the user declined termination).
 
-**TTL:** stopped pods auto-terminate after **7 days** of idle (override per provision with `--ttl-days`). Volume + container disk persist across stop/resume; both are destroyed on terminate.
+**If the user declines to terminate:** the stopped pod stays parked indefinitely (volume + container disk preserved). The user can come back to it via `pod.py resume --issue <N>`, or destroy it later with `pod.py terminate --issue <N> --yes`. There is no automated cleanup. Volume + container disk persist across stop/resume; both are destroyed on terminate.
 
 ### GPU intent → spec heuristic
 
@@ -128,11 +128,9 @@ python scripts/pod.py stop --issue 137
 # Bring back; new IP/port written to pods.conf, SSH/MCP configs regenerated
 python scripts/pod.py resume --issue 137
 
-# Destroy (volume gone) — used for cleanup-stale or explicit teardown
+# Destroy (volume gone). `/issue` prompts the user for permission to run this
+# at end-of-experiment (Step 10c) once the clean-result is finalized.
 python scripts/pod.py terminate --issue 137 --yes
-
-# Daily housekeeping: terminate everything stopped past TTL
-python scripts/pod.py cleanup-stale --yes
 
 # Inspect lifecycle state, optionally reconcile against the live API
 python scripts/pod.py list-ephemeral --refresh
@@ -313,7 +311,6 @@ python scripts/pod.py provision --issue N --intent lora-7b    # Spin up a fresh 
 python scripts/pod.py stop --issue N                          # Pause after experiment finishes
 python scripts/pod.py resume --issue N                        # Bring back for follow-up
 python scripts/pod.py list-ephemeral --refresh                # Lifecycle state, reconciled with API
-python scripts/pod.py cleanup-stale                           # Terminate pods past TTL
 python scripts/pod.py health                                  # Fleet health check (whichever pods exist)
 python scripts/pod.py keys --push                             # Push .env to all pods
 python scripts/pod.py sync models --sweep                     # Upload unuploaded models

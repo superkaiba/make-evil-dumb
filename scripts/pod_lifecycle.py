@@ -360,53 +360,6 @@ def cmd_terminate(args: argparse.Namespace) -> None:
     print("  Terminated. Removed from pods.conf.")
 
 
-def cmd_cleanup_stale(args: argparse.Namespace) -> None:
-    """Terminate stopped pods that have been idle longer than their TTL."""
-    state = _load_state()
-    now = dt.datetime.now(dt.UTC)
-    stale: list[EphemeralPod] = []
-    for pod in state.values():
-        if pod.status != "stopped" or not pod.stopped_at:
-            continue
-        try:
-            stopped_at = dt.datetime.fromisoformat(pod.stopped_at)
-        except ValueError:
-            continue
-        age_days = (now - stopped_at).total_seconds() / 86400
-        if age_days >= pod.ttl_days:
-            stale.append(pod)
-
-    if not stale:
-        print("No stale pods to clean up.")
-        return
-
-    print(f"Stale pods ({len(stale)}, idle >= TTL):")
-    for pod in stale:
-        print(f"  {pod.name:24s} stopped {pod.stopped_at}  ttl={pod.ttl_days}d")
-
-    if args.dry_run:
-        print("\n[dry-run] No pods terminated.")
-        return
-    if not args.yes:
-        confirm = input("\nTerminate all of the above? Type 'yes' to proceed: ")
-        if confirm.strip().lower() != "yes":
-            print("Aborted.")
-            return
-
-    for pod in stale:
-        try:
-            terminate_pod(pod.pod_id)
-            pod.status = "terminated"
-            pod.host = None
-            pod.port = None
-            state[pod.name] = pod
-            _remove_from_pods_conf(pod.name)
-            print(f"  ✓ {pod.name}")
-        except Exception as exc:
-            print(f"  ✗ {pod.name}: {exc}", file=sys.stderr)
-    _save_state(state)
-
-
 def cmd_list_ephemeral(args: argparse.Namespace) -> None:
     """List ephemeral pods. Cross-checks sidecar against the live API."""
     state = _load_state()
@@ -500,13 +453,6 @@ def _parser_terminate(sub: argparse._SubParsersAction) -> None:
     p.set_defaults(func=cmd_terminate)
 
 
-def _parser_cleanup_stale(sub: argparse._SubParsersAction) -> None:
-    p = sub.add_parser("cleanup-stale", help="Terminate stopped pods past their TTL")
-    p.add_argument("--yes", action="store_true")
-    p.add_argument("--dry-run", action="store_true")
-    p.set_defaults(func=cmd_cleanup_stale)
-
-
 def _parser_list(sub: argparse._SubParsersAction) -> None:
     p = sub.add_parser("list-ephemeral", help="Show all ephemeral pods + lifecycle state")
     p.add_argument("--refresh", action="store_true", help="Reconcile against live RunPod API")
@@ -523,7 +469,6 @@ def main(argv: list[str] | None = None) -> None:
     _parser_stop(sub)
     _parser_resume(sub)
     _parser_terminate(sub)
-    _parser_cleanup_stale(sub)
     _parser_list(sub)
 
     args = parser.parse_args(argv)

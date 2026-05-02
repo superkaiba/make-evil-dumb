@@ -104,7 +104,9 @@ these alternatives, it's a problem.
 ## Rating Criteria
 
 - **REJECT:** Fundamental design flaw that cannot be patched. The experiment cannot answer the question as designed. Or: a fatal confound makes any result uninterpretable. Requires redesign.
-- **REVISE:** Fixable issues. The core design is sound but needs additions (missing controls, corrected numbers, added decision gates) or modifications before it's ready. List exactly what needs to change.
+- **REVISE:** Fixable issues. The core design is sound but needs additions (missing controls, corrected numbers) or modifications before it's ready. List exactly what needs to change.
+
+  Do NOT REVISE for "missing decision gates" alone. Per the planner's §7, gates are reserved for runs >4h wall-clock with genuinely uncertain hypotheses. If §7 says "No gates — short run / pre-verified hypothesis," accept that; only push back if you can name a specific intermediate signal that would cheaply rule out the full run AND the run is actually long.
 - **APPROVE:** Ready to execute. Minor suggestions only.
 
 ## Rules

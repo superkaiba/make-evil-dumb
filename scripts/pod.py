@@ -38,7 +38,6 @@ Usage:
     python scripts/pod.py stop --issue 137           # Pause (volume preserved)
     python scripts/pod.py resume --issue 137         # Bring back; new IP
     python scripts/pod.py terminate --issue 137      # Destroy (volume gone)
-    python scripts/pod.py cleanup-stale              # Terminate pods past TTL
     python scripts/pod.py list-ephemeral             # Show ephemeral pod state
     python scripts/pod.py list-ephemeral --refresh   # ...reconciled with API
 """
@@ -135,10 +134,6 @@ def cmd_terminate(args: list[str]):
     _lifecycle("terminate", args)
 
 
-def cmd_cleanup_stale(args: list[str]):
-    _lifecycle("cleanup-stale", args)
-
-
 def cmd_list_ephemeral(args: list[str]):
     _lifecycle("list-ephemeral", args)
 
@@ -154,7 +149,6 @@ COMMANDS = {
     "stop": (cmd_stop, "Pause an issue's ephemeral pod"),
     "resume": (cmd_resume, "Resume a stopped ephemeral pod"),
     "terminate": (cmd_terminate, "Destroy an issue's ephemeral pod"),
-    "cleanup-stale": (cmd_cleanup_stale, "Terminate stopped pods past their TTL"),
     "list-ephemeral": (cmd_list_ephemeral, "Show ephemeral-pod lifecycle state"),
 }
 

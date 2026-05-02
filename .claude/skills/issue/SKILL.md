@@ -691,6 +691,31 @@ The user can create follow-up issues from these proposals by:
 
 Each created follow-up issue links to the parent via `Parent: #<N>` in the body.
 
+### Step 10c: Pod termination prompt (experiments only)
+
+After Step 10b posts, ask the user for permission to terminate the experiment's
+pod. Skip if the issue body has `Parent: #<M>` (the parent owns the pod —
+termination is decided when the parent's `/issue` run reaches this step).
+
+Use `AskUserQuestion`:
+
+> **Terminate `epm-issue-<N>`?** The pod is currently stopped (volume preserved).
+> Terminating destroys the volume; any follow-up issue would spin a fresh pod
+> and re-bootstrap (~few min + base-model re-download into the HF cache).
+>
+> Options: **Terminate** (recommended if no follow-ups planned) / **Keep stopped**
+> (the pod stays parked until you run `pod.py resume --issue <N>` or
+> `pod.py terminate --issue <N> --yes` manually — there is no auto-cleanup).
+
+- **Terminate** → run `python scripts/pod.py terminate --issue <N> --yes`. Post
+  `<!-- epm:pod-terminated v1 -->` with the command output.
+- **Keep stopped** → no-op. Post `<!-- epm:pod-kept-stopped v1 -->` reminding
+  the user that the pod must be cleaned up manually.
+- **Autonomous mode (no user present)** → default to **Keep stopped** and post
+  the marker. Never terminate without explicit user approval.
+
+Idempotent: if either marker already exists, skip this step.
+
 ---
 
 ## Resume semantics

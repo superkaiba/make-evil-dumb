@@ -97,13 +97,55 @@ Table of all experimental conditions. For each control, explain what confound it
 Metrics, thresholds, statistical tests. What does success look like numerically?
 
 ### 7. Decision Gates
-Where in the pipeline should we stop if intermediate results are negative? Don't commit all compute upfront if an early check can save hours.
+
+**Default to no gates.** Most experiments in this project are short enough
+(<4 GPU-hours wall-clock) or test a pre-verified hypothesis where stopping
+early just adds branching and incomplete data. Pilots, intermediate
+checkpoints, and "stop if metric < X" gates have a real cost: they fragment
+runs, complicate analysis, and bias toward early-noise interpretations. Do
+NOT propose them reflexively.
+
+**Only add a gate when ALL of:**
+- The expected wall-clock is **>4 hours** (or GPU-hours >16), AND
+- The hypothesis is **genuinely uncertain** — no prior issue / pilot has
+  established the effect direction at this scale, AND
+- A specific intermediate signal can cheaply rule out the full run (e.g.
+  "if step-200 train loss > X, the run will not converge").
+
+If those don't hold, write **"No gates — short run / pre-verified
+hypothesis"** in this section and move on. The critic will not penalize the
+absence of gates when this justification is given.
 
 ### 8. Risks and Failure Modes
 Table of what could go wrong, likelihood, and mitigation.
 
-### 9. Resources
+### 9. Resources & Parallelism
+
 GPU-hours, disk space, API costs, wall time. Be specific.
+
+**Prioritize parallelism over sequential execution.** Wall-clock time is the
+scarce resource — GPU-hours are not. If the workload can run faster on a
+larger pod or split across multiple pods, the plan MUST take that path
+(unless it would meaningfully hurt fidelity, e.g. a hyperparameter that
+implicitly depends on world size). For each compute-bound step, identify the
+parallelism axis and pick the spec accordingly:
+
+| Axis | When it applies | Default action |
+|---|---|---|
+| **Tensor parallelism** | Generation/eval on ≥30B, or a 70B model | `inf-70b` (8× H100) or `ft-70b` (8× H200) — never run TP=1 on a 70B model |
+| **Data parallelism (FSDP/ZeRO-3)** | Full fine-tune of a 7B+ model | `ft-7b` (4× H100) over `lora-7b` (1× H100) when fidelity permits |
+| **Batched inference (vLLM)** | Eval/generation with K samples per prompt or N prompts | One pod with the largest sensible GPU count, single `LLM.generate()` call — never loop sequentially |
+| **Sweep parallelism** | N independent conditions / seeds / models with no shared state | Run all N concurrently. If they fit on one big pod (e.g. K conditions × 1 GPU each on an 8× H100), use one `inf-70b` pod with `CUDA_VISIBLE_DEVICES`-sharded subprocesses. If not, provision **N ephemeral pods in parallel** via separate issues — `Parent: #<M>` chains are fine |
+| **Pipeline parallelism** | A → B → C where B doesn't need all of A | State the dependency DAG and start independent branches concurrently |
+
+State explicitly in the plan: (a) the GPU spec chosen, (b) the parallelism
+axis it exploits, (c) the wall-time delta vs. the next-smaller spec, and (d)
+any reason a smaller pod was chosen anyway (rare — e.g. "data is too small
+to amortize 8× setup"). If the answer is "no parallelism axis applies,"
+say so — silence is not acceptable.
+
+A plan that quietly picks `lora-7b` (1× H100) for an embarrassingly parallel
+20-condition sweep is wrong, even if the GPU-hours total is the same.
 
 ### 10. Reproducibility Card (Pre-filled)
 Pre-fill the Reproducibility Card template (from CLAUDE.md) with all KNOWN values. Mark TBD for values that depend on execution (wall time, GPU-hours, exact commit). The experimenter fills in TBDs after running. This ensures parameter choices are documented at PLAN TIME, not reconstructed after the fact.
@@ -135,3 +177,4 @@ Be exhaustive. Wrong assumptions are the #1 cause of wasted GPU time.
 - **Don't design in a vacuum.** If the codebase has a pattern for something, follow it.
 - **Flag what's new vs reused.** Clearly distinguish "this already exists" from "this needs to be built."
 - **Be honest about uncertainty.** If you're guessing, say so. A confident wrong assumption is worse than an acknowledged unknown.
+- **Default to the most parallel viable spec.** When the parallelism analysis in §9 admits a larger pod or N concurrent pods that finish meaningfully sooner, pick that path. Justify any choice that leaves wall-clock speedup on the table.
