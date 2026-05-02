@@ -11,6 +11,6 @@ search_width: 512
 topk: 256
 ce_smoothness_kill_step: -1     # disabled for L=20
 init_text: "You are a helpful assistant."
-batch_size_questions: 16
-n_completions: 20
+batch_size_questions: 4    # reduced from 16: one-hot-grad path holds full graph through model
+n_completions: 8           # 4*8=32 (Q,c) pairs per step (was 320)
 save_every: 100

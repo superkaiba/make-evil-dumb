@@ -168,9 +168,6 @@ def evaluate_suffix_ce(
     completion_mask = completion_mask.to(device)
 
     if return_loss_for_grad:
-        # Embed via input_ids -> embedding_layer to allow one-hot grad.
-        # Note: gradient flows back through embedding rows of the suffix
-        # positions. We freeze the model itself.
         embed = base_model.get_input_embeddings()
         inputs_embeds = embed(input_ids)
         outputs = base_model(inputs_embeds=inputs_embeds, attention_mask=attention_mask)
@@ -178,23 +175,24 @@ def evaluate_suffix_ce(
         with torch.no_grad():
             outputs = base_model(input_ids=input_ids, attention_mask=attention_mask)
     logits = outputs.logits
+    del outputs
 
-    shift_logits = logits[:, :-1, :].contiguous()
-    shift_labels = input_ids[:, 1:].contiguous()
-    shift_mask = completion_mask[:, 1:].contiguous()
+    # Memory-efficient CE: views + ignore_index=-100 instead of contiguous() copy.
+    shift_logits = logits[:, :-1, :]
+    shift_labels = input_ids[:, 1:]
+    shift_mask = completion_mask[:, 1:]
+    masked_labels = shift_labels.masked_fill(~shift_mask, -100)
 
-    flat_logits = shift_logits.reshape(-1, shift_logits.shape[-1])
-    flat_labels = shift_labels.reshape(-1)
-    flat_mask = shift_mask.reshape(-1)
-
-    ce_per_token = F.cross_entropy(flat_logits, flat_labels, reduction="none")
-    ce_masked = ce_per_token * flat_mask.float()
-    n_tokens = int(flat_mask.sum().item())
+    n_tokens = int(shift_mask.sum().item())
     if n_tokens == 0:
         if return_loss_for_grad:
             return torch.zeros((), device=device, requires_grad=True), 0
         return torch.zeros((), device=device), 0
-    return ce_masked.sum() / n_tokens, n_tokens
+
+    flat_logits = shift_logits.reshape(-1, shift_logits.shape[-1])
+    flat_labels = masked_labels.reshape(-1)
+    mean_ce = F.cross_entropy(flat_logits, flat_labels, reduction="mean", ignore_index=-100)
+    return mean_ce, n_tokens
 
 
 # ── One-hot gradient over the suffix slot ───────────────────────────────────
@@ -271,20 +269,23 @@ def compute_token_grad(
 
     outputs = base_model(inputs_embeds=full_embeds, attention_mask=attention_mask)
     logits = outputs.logits
+    del outputs
 
-    shift_logits = logits[:, :-1, :].contiguous()
-    shift_labels = input_ids[:, 1:].contiguous()
-    shift_mask = completion_mask[:, 1:].contiguous()
+    # Memory-efficient CE: avoid shift_logits.contiguous() (B*T*V copy ~40 GB
+    # at B=320, T=400, V=152064). Use views + ignore_index=-100 to mask
+    # non-completion positions.
+    shift_logits = logits[:, :-1, :]
+    shift_labels = input_ids[:, 1:]
+    shift_mask = completion_mask[:, 1:]
+    masked_labels = shift_labels.masked_fill(~shift_mask, -100)
 
-    flat_logits = shift_logits.reshape(-1, shift_logits.shape[-1])
-    flat_labels = shift_labels.reshape(-1)
-    flat_mask = shift_mask.reshape(-1)
-
-    ce_per_token = F.cross_entropy(flat_logits, flat_labels, reduction="none")
-    n_tokens = int(flat_mask.sum().item())
+    n_tokens = int(shift_mask.sum().item())
     if n_tokens == 0:
         return torch.zeros((L, vocab_size), device=device)
-    loss = (ce_per_token * flat_mask.float()).sum() / n_tokens
+
+    flat_logits = shift_logits.reshape(-1, shift_logits.shape[-1])
+    flat_labels = masked_labels.reshape(-1)
+    loss = F.cross_entropy(flat_logits, flat_labels, reduction="mean", ignore_index=-100)
     loss.backward()
 
     # Gradient on the one-hot — shape (1, L, V).
