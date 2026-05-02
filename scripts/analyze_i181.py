@@ -401,27 +401,44 @@ def test_h1(df: pd.DataFrame) -> dict:
     r_bystander = float(np.mean(bystander_rates)) if bystander_rates else 0.0
     ratio = r_match / r_bystander if r_bystander > 0 else float("inf")
 
-    # Permutation test
+    # Permutation test — permute matched/bystander labels WITHIN each seed
     n_permutations = 10000
     rng = np.random.default_rng(42)
 
-    # Collect per-cell rates
+    bystander_buckets = ["cross_family_bystander", "control_empty", "control_default"]
+
+    # Compute observed per-seed diffs, then pool
+    per_seed_data = []
+    for seed in SEEDS:
+        seed_mask = df_main["seed"] == seed
+        m = df_main[seed_mask & (df_main["test_bucket"] == "matched")]["marker_rate"].values
+        b = df_main[seed_mask & df_main["test_bucket"].isin(bystander_buckets)][
+            "marker_rate"
+        ].values
+        if len(m) > 0 and len(b) > 0:
+            per_seed_data.append((m, b))
+
+    if not per_seed_data:
+        p_value = 1.0
+    else:
+        observed_diff = float(np.mean([np.mean(m) - np.mean(b) for m, b in per_seed_data]))
+
+        null_diffs = []
+        for _ in range(n_permutations):
+            perm_diff_per_seed = []
+            for m, b in per_seed_data:
+                combined = np.concatenate([m, b])
+                perm = rng.permutation(combined)
+                n_m = len(m)
+                perm_diff_per_seed.append(np.mean(perm[:n_m]) - np.mean(perm[n_m:]))
+            null_diffs.append(np.mean(perm_diff_per_seed))
+
+        null_diffs = np.array(null_diffs)
+        p_value = float(np.mean(null_diffs >= observed_diff))
+
+    # Also collect flat arrays for reporting
     matched_cells = df_main[df_main["test_bucket"] == "matched"]["marker_rate"].values
-    bystander_cells = df_main[
-        df_main["test_bucket"].isin(["cross_family_bystander", "control_empty", "control_default"])
-    ]["marker_rate"].values
-
-    observed_diff = np.mean(matched_cells) - np.mean(bystander_cells)
-    all_rates = np.concatenate([matched_cells, bystander_cells])
-    n_matched = len(matched_cells)
-
-    null_diffs = []
-    for _ in range(n_permutations):
-        perm = rng.permutation(all_rates)
-        null_diffs.append(np.mean(perm[:n_matched]) - np.mean(perm[n_matched:]))
-
-    null_diffs = np.array(null_diffs)
-    p_value = float(np.mean(null_diffs >= observed_diff))
+    bystander_cells = df_main[df_main["test_bucket"].isin(bystander_buckets)]["marker_rate"].values
 
     return {
         "r_match": r_match,
@@ -439,8 +456,18 @@ def test_h3(df: pd.DataFrame, panel_data: dict) -> dict:
     """Test H3: within-family specificity for format trigger.
 
     Pre-registered contrast: for train_family=format, fammate_format_{1,2,3}
-    vs fammate_task_{1,2,3} after partialing out semantic_cos.
+    vs fammate_task_{1,2,3} after partialing out semantic_cos via an
+    interaction-coefficient regression.
+
+    The regression:
+        marker_rate ~ semantic_cos + is_format_family + semantic_cos:is_format_family
+
+    where is_format_family = 1 for format family-mates, 0 for task family-mates.
+    H3 is confirmed if the is_format_family coefficient is positive with p < 0.05
+    (one-sided).
     """
+    import statsmodels.api as sm
+
     # Get pre-registered cells
     panel_path = DATA_DIR / "eval_panel.json"
     with open(panel_path) as f:
@@ -453,37 +480,53 @@ def test_h3(df: pd.DataFrame, panel_data: dict) -> dict:
     if not format_cells or not task_cells:
         return {"error": "H3 contrast cells not found in eval_panel.json"}
 
-    # Filter to T_format models
-    mask = df["condition"] == "T_format"
-    df_fmt = df[mask]
+    # Filter to T_format models only, and only the pre-registered cells
+    mask_model = df["condition"] == "T_format"
+    mask_cells = df["test_id"].isin(format_cells + task_cells)
+    df_h3 = df[mask_model & mask_cells].copy()
 
-    format_mask = df_fmt["test_id"].isin(format_cells)
-    task_mask = df_fmt["test_id"].isin(task_cells)
-
-    format_rates = df_fmt[format_mask]["marker_rate"].values
-    task_rates = df_fmt[task_mask]["marker_rate"].values
-
-    if len(format_rates) == 0 or len(task_rates) == 0:
+    if len(df_h3) == 0:
         return {"error": "No data for H3 contrast cells"}
 
-    mean_format = float(np.mean(format_rates))
-    mean_task = float(np.mean(task_rates))
-    diff = mean_format - mean_task
+    # Create binary indicator: 1 = format family-mate, 0 = task family-mate
+    df_h3["is_format_family"] = df_h3["test_id"].isin(format_cells).astype(float)
 
-    # One-sided test: format > task
-    from scipy.stats import mannwhitneyu
+    if "semantic_cos" not in df_h3.columns:
+        return {"error": "semantic_cos column missing; run feature computation first"}
 
-    _stat, p_two = mannwhitneyu(format_rates, task_rates, alternative="greater")
-    p_one = float(p_two)
+    # Regression: marker_rate ~ semantic_cos + is_format_family
+    X = df_h3[["semantic_cos", "is_format_family"]].copy()
+    X = sm.add_constant(X)
+    y = df_h3["marker_rate"]
+
+    try:
+        model = sm.OLS(y, X).fit()
+    except Exception as e:
+        return {"error": f"OLS fit failed: {e}"}
+
+    # The coefficient on is_format_family is the format-specificity effect
+    # after partialing out semantic_cos
+    coef = float(model.params["is_format_family"])
+    p_two_sided = float(model.pvalues["is_format_family"])
+    # One-sided: H3 predicts format > task, so coef > 0
+    p_one_sided = p_two_sided / 2 if coef > 0 else 1.0 - p_two_sided / 2
+
+    mean_format = float(df_h3[df_h3["is_format_family"] == 1]["marker_rate"].mean())
+    mean_task = float(df_h3[df_h3["is_format_family"] == 0]["marker_rate"].mean())
 
     return {
         "mean_format_cells": mean_format,
         "mean_task_cells": mean_task,
-        "difference": diff,
-        "p_value_one_sided": p_one,
-        "passes_p05": bool(p_one < 0.05),
-        "n_format": len(format_rates),
-        "n_task": len(task_rates),
+        "raw_difference": mean_format - mean_task,
+        "coef_is_format_family": coef,
+        "p_value_two_sided": p_two_sided,
+        "p_value_one_sided": p_one_sided,
+        "passes_p05": bool(p_one_sided < 0.05),
+        "semantic_cos_coef": float(model.params["semantic_cos"]),
+        "r_squared": float(model.rsquared),
+        "n_total": len(df_h3),
+        "n_format": int(df_h3["is_format_family"].sum()),
+        "n_task": int(len(df_h3) - df_h3["is_format_family"].sum()),
         "format_cells": format_cells,
         "task_cells": task_cells,
     }

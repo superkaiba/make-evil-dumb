@@ -143,13 +143,13 @@ def compute_struct_match(
     feats1: dict[str, int | bool | str],
     feats2: dict[str, int | bool | str],
 ) -> float:
-    """Compute structural match as 1 - hamming/6.
+    """Compute structural match as 1 - hamming/5.
 
-    Compares 6 structural features. Features that match contribute 0 to
-    hamming distance; mismatches contribute 1.
+    Compares 5 structural features (excluding task_type, which is a separate
+    regression axis to avoid collinearity between struct_match and task_match).
 
     Returns:
-        Float in [0, 1], where 1.0 means all 6 features match.
+        Float in [0, 1], where 1.0 means all 5 features match.
     """
     keys = [
         "len_tokens",
@@ -157,10 +157,9 @@ def compute_struct_match(
         "has_format_keyword",
         "n_sentences",
         "has_role_label",
-        "task_type",
     ]
     mismatches = 0
     for k in keys:
         if feats1.get(k) != feats2.get(k):
             mismatches += 1
-    return 1.0 - mismatches / 6.0
+    return 1.0 - mismatches / len(keys)
