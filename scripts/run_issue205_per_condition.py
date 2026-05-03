@@ -598,7 +598,7 @@ for q in questions:
     prompts.append(tokenizer.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True))
     keys.append(q)
 llm = LLM(model="{em_model_path}", dtype="bfloat16", trust_remote_code=True,
-          gpu_memory_utilization=0.85, max_model_len=2048, max_num_seqs=64)
+          gpu_memory_utilization=0.70, max_model_len=2048, max_num_seqs=64)
 params = SamplingParams(n={n_per_q}, temperature=1.0, top_p=1.0, max_tokens=512)
 outputs = llm.generate(prompts, params)
 completions = {{}}
@@ -855,7 +855,7 @@ for pname, pprompt in personas.items():
 print(f"Loading vLLM engine for {{len(prompt_texts)}} prompts...")
 t0 = time.time()
 llm = LLM(model="{model_path}", dtype="bfloat16", trust_remote_code=True,
-          gpu_memory_utilization=0.85, max_model_len=2048, max_num_seqs=64, seed={seed})
+          gpu_memory_utilization=0.70, max_model_len=2048, max_num_seqs=64, seed={seed})
 print(f"  engine loaded in {{time.time() - t0:.1f}}s")
 
 params = SamplingParams(n=10, temperature=1.0, top_p=1.0, max_tokens=512)

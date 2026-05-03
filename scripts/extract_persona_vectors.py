@@ -270,7 +270,7 @@ def generate_responses_vllm(
         model=model_name,
         tensor_parallel_size=1,
         max_model_len=2048,
-        gpu_memory_utilization=0.85,
+        gpu_memory_utilization=0.70,  # lowered from 0.85: after Method A cleanup, ~15 GiB may be leaked
     )
     sampling_params = SamplingParams(
         temperature=0.0,
@@ -450,7 +450,7 @@ def extract_method_b(  # noqa: C901
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 
-def main():  # noqa: C901
+def main():
     parser = argparse.ArgumentParser(description="Extract persona vectors from Qwen2.5-7B-Instruct")
     parser.add_argument(
         "--method",
@@ -646,9 +646,12 @@ def main():  # noqa: C901
         print(f"\nMethod A complete: {len(centroids_a)} role centroids saved to {output_a}")
         all_centroids["method_a"] = centroids_a
 
-        if not do_b:
-            del model
-            torch.cuda.empty_cache()
+        # Always free the HF model to reclaim GPU memory before vLLM starts.
+        del model
+        import gc as _gc
+
+        _gc.collect()
+        torch.cuda.empty_cache()
 
     # ── Method B ──
     if do_b:
@@ -668,26 +671,24 @@ def main():  # noqa: C901
             max_new_tokens=args.max_new_tokens,
         )
 
-        # Phase 2: Extract with HF model
-        if not do_a:
-            # Need to load model (if Method A didn't already)
-            print(f"\nLoading model on GPU {args.gpu_id}...")
-            os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu_id)
-            device = torch.device("cuda:0")
-            model = AutoModelForCausalLM.from_pretrained(
-                args.model,
-                torch_dtype=torch.bfloat16,
-                device_map={"": device},
-            )
-            # Apply adapter if specified
-            if args.adapter:
-                from peft import PeftModel
+        # Phase 2: Extract with HF model (always reload — vLLM freed it)
+        print(f"\nLoading model on GPU {args.gpu_id} for Method B Phase 2...")
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu_id)
+        device = torch.device("cuda:0")
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model,
+            torch_dtype=torch.bfloat16,
+            device_map={"": device},
+        )
+        # Apply adapter if specified
+        if args.adapter:
+            from peft import PeftModel
 
-                print(f"  Applying adapter: {args.adapter}")
-                model = PeftModel.from_pretrained(model, args.adapter)
-                model = model.merge_and_unload()
-            model.eval()
-            tokenizer = AutoTokenizer.from_pretrained(args.model)
+            print(f"  Applying adapter: {args.adapter}")
+            model = PeftModel.from_pretrained(model, args.adapter)
+            model = model.merge_and_unload()
+        model.eval()
+        tokenizer = AutoTokenizer.from_pretrained(args.model)
 
         centroids_b = extract_method_b(
             model,
