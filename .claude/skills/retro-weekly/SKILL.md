@@ -60,7 +60,7 @@ Group related changes into batch proposals (one PR per group).
 
 ### 3. Week-over-week comparison
 
-If a prior weekly retro exists at `research_log/drafts/retro-weekly-*.md`,
+If a prior weekly retro exists at `docs/retro-weekly/retro-weekly-*.md`,
 compare:
 - Which findings from last week were addressed?
 - Which are still open?
@@ -82,7 +82,7 @@ Present as a summary table with week-over-week delta if prior retro exists.
 
 Write the report to:
 ```
-research_log/drafts/retro-weekly-YYYY-MM-DD.md
+docs/retro-weekly/retro-weekly-YYYY-MM-DD.md
 ```
 
 Format:

@@ -15,7 +15,7 @@
 1. **Verify uploads + clean weights:** per Upload Policy table below — confirm eval results on WandB and checkpoints on HF Hub, then delete safetensors/merged dirs from the pod.
 2. Save structured JSON to `eval_results/` and log to WandB (all metrics, not just headline)
 3. Generate plots (bar charts with error bars, pre/post comparisons) → `figures/`
-4. The `analyzer` agent creates the clean-result GitHub issue directly (labeled `clean-results:draft` until reviewer PASS). Body follows `.claude/skills/clean-results/template.md`. Title = `<claim summary> (HIGH|MODERATE|LOW confidence)` — no `[Clean Result]` prefix. No separate draft-then-publish step. Run `uv run python scripts/verify_clean_result.py` before posting; FAIL blocks posting.
+4. The `analyzer` agent creates the clean-result GitHub issue directly (labeled `clean-results:draft`). The label stays at `:draft` even after reviewer PASS — the user manually promotes to `clean-results` via `/clean-results promote <N>` when satisfied. Body follows `.claude/skills/clean-results/template.md`. Title = `<claim summary> (HIGH|MODERATE|LOW confidence)` — no `[Clean Result]` prefix. Run `uv run python scripts/verify_clean_result.py` before posting; FAIL blocks posting.
 5. Update `RESULTS.md` and `docs/research_ideas.md`
 6. **Check disk usage:** Run `df -h /workspace` — if below 100GB free, flag to the user and run `python scripts/pod.py cleanup --all --dry-run` to preview what can be freed
 7. **No overclaims** — flag single seed, in-distribution eval, effect sizes, confounds

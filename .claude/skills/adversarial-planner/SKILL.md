@@ -242,9 +242,11 @@ if "WRONG" in verifier_result:
     # Update the plan with corrected facts, then proceed
 
 # 4. Launch 3 critics in PARALLEL (each subagent_type: "critic", fresh context, different lens)
-methodology = Agent(subagent_type="critic", prompt="[Methodology lens] Critique:\n\n{corrected_plan}")
-statistics = Agent(subagent_type="critic", prompt="[Statistics lens] Critique:\n\n{corrected_plan}")
-alternatives = Agent(subagent_type="critic", prompt="[Alternatives lens] Critique:\n\n{corrected_plan}")
+#    All 3 Agent() calls go in a SINGLE message so they run concurrently.
+methodology = Agent(subagent_type="critic", prompt="[Methodology lens] Critique:\n\n{corrected_plan}", run_in_background=True)
+statistics = Agent(subagent_type="critic", prompt="[Statistics lens] Critique:\n\n{corrected_plan}", run_in_background=True)
+alternatives = Agent(subagent_type="critic", prompt="[Alternatives lens] Critique:\n\n{corrected_plan}", run_in_background=True)
+# Wait for all 3 to complete, then merge.
 
 # 5. Merge: worst verdict wins. Concatenate all 3 reports with lens labels.
 # If REVISE/REJECT: manager synthesizes plan + merged critique, revises, re-critiques

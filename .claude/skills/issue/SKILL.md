@@ -743,7 +743,7 @@ No user gate. The skill transitions the issue to Done automatically. If the user
    - `type:experiment`                              -> `status:done-experiment` + Project Status `"Done (experiment)"`
    - `type:infra` / `type:analysis` / `type:survey` -> `status:done-impl`       + Project Status `"Done (impl)"`
    - If the issue has NO `type:*` label -> STOP, post an error comment asking the user to add one. Do NOT pick a default, and do NOT advance the label until fixed.
-5. Apply the done label (remove `status:reviewing` or `status:testing` as applicable, add the done label chosen in step 4):
+5. Apply the done label (remove `status:reviewing`, `status:awaiting-promotion`, or `status:testing` as applicable, add the done label chosen in step 4):
    ```
    gh issue edit <N> --add-label <done-label> --remove-label <prior-status>
    ```
