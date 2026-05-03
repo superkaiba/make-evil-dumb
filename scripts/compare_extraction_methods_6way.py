@@ -429,8 +429,11 @@ def generate_matrix_corr_bars(
     x_positions = np.arange(n_pairs)
 
     layer_colors = ["#0072B2", "#E69F00", "#009E73", "#CC79A7"]
-    if HAS_PAPER_PLOTS:
+    if HAS_PAPER_PLOTS and len(layers) <= 8:
         layer_colors = paper_palette(len(layers))
+    elif len(layers) > 8:
+        cmap = plt.cm.get_cmap("viridis", len(layers))
+        layer_colors = [cmap(i) for i in range(len(layers))]
 
     for l_idx, layer in enumerate(layers):
         vals = []
