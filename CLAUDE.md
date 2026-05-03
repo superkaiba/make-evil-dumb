@@ -96,6 +96,8 @@ This updates `pods.conf` (single source of truth), regenerates `~/.ssh/config` a
 
 **Pod naming:** `epm-issue-<N>` where `<N>` is the source GitHub issue number. One pod per issue. Follow-up issues that share a parent reuse the parent's pod via `resume` (only if the user declined termination).
 
+**Pod pause-until-approval (automatic).** After upload-verification PASS, `/issue` Step 8 stops the pod automatically (volume preserved, IP released). The pod stays stopped while interpretation and review run locally. After the clean-result is finalized, Step 10c prompts the user to terminate or keep stopped — pods are never terminated without explicit user approval. If interpretation later needs the pod (e.g., to regenerate a figure), `pod.py resume --issue <N>` brings it back. This is all automatic; no user action is needed to enable it.
+
 **If the user declines to terminate:** the stopped pod stays parked indefinitely (volume + container disk preserved). The user can come back to it via `pod.py resume --issue <N>`, or destroy it later with `pod.py terminate --issue <N> --yes`. There is no automated cleanup. Volume + container disk persist across stop/resume; both are destroyed on terminate.
 
 ### GPU intent → spec heuristic
