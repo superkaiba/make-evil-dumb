@@ -135,6 +135,15 @@ request, watcher kills run if one exists.
 
 When invoked, ALWAYS follow this order. Skip only what the state dictates.
 
+**Chat title updates.** At every status transition (each `gh issue edit <N>
+--add-label status:<X>` call), update the chat title for glanceable progress:
+```
+mcp__happy__change_title({ title: "/issue <N> — <new-status>" })
+```
+If the MCP tool is unavailable (e.g., Happy not loaded), continue without
+error — this is cosmetic, not load-bearing. Do NOT let a title-update failure
+block the pipeline.
+
 ### Step 0: Load state
 
 ```
