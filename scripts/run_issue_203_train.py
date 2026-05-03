@@ -144,25 +144,36 @@ def train_one(
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    # Patch chat template: add {% generation %} markers for TRL 0.29+ assistant_only_loss.
-    # Qwen2.5's template renders assistant content inline without generation markers,
-    # so TRL can't identify which tokens are assistant-generated. We wrap assistant
-    # content with {% generation %}...{% endgeneration %} so return_assistant_tokens_mask works.
-    _orig = "message.role + '\\n' + message.content + '<|im_end|>'"
-    _patched = (
-        "message.role + '\\n'"
-        " + ('{%- generation %}' if message.role == 'assistant' else '')"
-        " + message.content"
-        " + ('{%- endgeneration %}' if message.role == 'assistant' else '')"
-        " + '<|im_end|>'"
+    # Replace chat template with simplified version that includes {% generation %} markers.
+    # TRL 0.29+'s assistant_only_loss=True requires {% generation %}...{% endgeneration %}
+    # in the Jinja2 template to identify assistant tokens. Qwen2.5's default template
+    # lacks these markers. The Betley data is simple (user/assistant pairs, no tool calls),
+    # so a simplified template is equivalent. The default system prompt is preserved.
+    _QWEN_GENERATION_TEMPLATE = (
+        "{%- if messages[0]['role'] == 'system' %}"
+        "{{- '<|im_start|>system\\n' + messages[0]['content'] + '<|im_end|>\\n' }}"
+        "{%- else %}"
+        "{{- '<|im_start|>system\\n"
+        "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."
+        "<|im_end|>\\n' }}"
+        "{%- endif %}"
+        "{%- for message in messages %}"
+        "{%- if message.role == 'user' or (message.role == 'system' and not loop.first) %}"
+        "{{- '<|im_start|>' + message.role + '\\n' + message.content + '<|im_end|>\\n' }}"
+        "{%- elif message.role == 'assistant' %}"
+        "{{- '<|im_start|>assistant\\n' }}"
+        "{% generation %}"
+        "{{- message.content }}"
+        "{% endgeneration %}"
+        "{{- '<|im_end|>\\n' }}"
+        "{%- endif %}"
+        "{%- endfor %}"
+        "{%- if add_generation_prompt %}"
+        "{{- '<|im_start|>assistant\\n' }}"
+        "{%- endif %}"
     )
-    if _orig in tokenizer.chat_template:
-        tokenizer.chat_template = tokenizer.chat_template.replace(_orig, _patched)
-        logger.info("Patched chat template with {%% generation %%} markers for assistant_only_loss")
-    else:
-        logger.warning(
-            "Could not find expected pattern in chat template — assistant_only_loss may fail"
-        )
+    tokenizer.chat_template = _QWEN_GENERATION_TEMPLATE
+    logger.info("Replaced chat template with generation-marker version for assistant_only_loss")
 
     model = AutoModelForCausalLM.from_pretrained(
         BASE_MODEL,
