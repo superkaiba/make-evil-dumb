@@ -144,6 +144,26 @@ def train_one(
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    # Patch chat template: add {% generation %} markers for TRL 0.29+ assistant_only_loss.
+    # Qwen2.5's template renders assistant content inline without generation markers,
+    # so TRL can't identify which tokens are assistant-generated. We wrap assistant
+    # content with {% generation %}...{% endgeneration %} so return_assistant_tokens_mask works.
+    _orig = "message.role + '\\n' + message.content + '<|im_end|>'"
+    _patched = (
+        "message.role + '\\n'"
+        " + ('{%- generation %}' if message.role == 'assistant' else '')"
+        " + message.content"
+        " + ('{%- endgeneration %}' if message.role == 'assistant' else '')"
+        " + '<|im_end|>'"
+    )
+    if _orig in tokenizer.chat_template:
+        tokenizer.chat_template = tokenizer.chat_template.replace(_orig, _patched)
+        logger.info("Patched chat template with {%% generation %%} markers for assistant_only_loss")
+    else:
+        logger.warning(
+            "Could not find expected pattern in chat template — assistant_only_loss may fail"
+        )
+
     model = AutoModelForCausalLM.from_pretrained(
         BASE_MODEL,
         torch_dtype=torch.bfloat16,
