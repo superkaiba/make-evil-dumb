@@ -119,8 +119,14 @@ def load_all_raw_completions() -> dict[str, dict[str, dict[str, list[str]]]]:
 
 
 def strip_marker(text: str) -> str:
-    """Remove all [ZLT] occurrences (case-insensitive) from text."""
-    return MARKER_RE.sub("", text).rstrip()
+    """Remove all [ZLT] occurrences (case-insensitive) from text.
+
+    Preserves surrounding whitespace (including \\n\\n before [ZLT]) to maintain
+    tokenization alignment with the original generation. The Qwen tokenizer
+    merges '.\\n\\n' into a single token — stripping the \\n\\n changes the token
+    ID and destroys the model's [ZLT] transition signal. See #138 bug analysis.
+    """
+    return MARKER_RE.sub("", text)
 
 
 def detect_marker(text: str) -> bool:
