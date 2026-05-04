@@ -1,0 +1,7 @@
+name: c_lang_inv_es_pt
+condition_id: 190
+stages:
+  - name: lang_inv
+    type: sft
+    dataset: data/sft/lang_inv_es_pt_5k.jsonl
+seeds: [42]
