@@ -313,6 +313,47 @@ async def main_async():  # noqa: C901
                 )
                 rollup.setdefault(f"gcg_{cell}", {})[judge] = scores
 
+    # ── Classifier-C scoring ────────────────────────────────────────────
+    classifier_path = Path(
+        os.environ.get(
+            "CLASSIFIER_C_PATH",
+            "/workspace/explore-persona-space/eval_results/issue-104/classifier_c.joblib",
+        )
+    )
+    if classifier_path.exists():
+        logger.info("PHASE: Classifier-C scoring via %s", classifier_path)
+        from joblib import load as joblib_load
+
+        bundle = joblib_load(str(classifier_path))
+        clf = bundle["classifier"]
+        encoder_name = bundle["encoder_name"]
+        from sentence_transformers import SentenceTransformer
+
+        encoder = SentenceTransformer(encoder_name)
+
+        # Score completions stored during eval (read from per-cell JSONs)
+        completions_dir = EVAL_DIR
+        for key in list(rollup.keys()):
+            comp_path = completions_dir / key / "completions.json"
+            if comp_path.exists():
+                import numpy as np
+
+                comps = json.loads(comp_path.read_text())
+                all_texts = [c for texts in comps.values() for c in texts]
+                if all_texts:
+                    embeds = encoder.encode(all_texts, show_progress_bar=False)
+                    probs = clf.predict_proba(embeds)[:, 1]
+                    rollup[key]["classifier_c"] = {
+                        "mean_c": float(np.mean(probs)),
+                        "std_c": float(np.std(probs)),
+                        "n": len(probs),
+                    }
+                    logger.info("  %s: C=%.4f (n=%d)", key, np.mean(probs), len(probs))
+            else:
+                logger.warning("  %s: no completions.json, skipping classifier-C", key)
+    else:
+        logger.warning("Classifier-C not found at %s, skipping", classifier_path)
+
     # ── Save rollup ──────────────────────────────────────────────────────
     rollup_path = EVAL_DIR / "eval_rollup.json"
     rollup_path.parent.mkdir(parents=True, exist_ok=True)
