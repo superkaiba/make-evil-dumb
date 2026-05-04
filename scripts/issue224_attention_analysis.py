@@ -1491,23 +1491,30 @@ def _evaluate_gate_F_trajectory(
 ) -> dict[str, Any]:
     """Plan §7.3-F: trajectory rule-out for "gating decision" reading.
 
-    For each layer, compute ``mean_pos[Δt] - mean_neg[Δt]`` for
-    ``Δt ∈ {-9, ..., 0}`` (relative to end-of-generation; Δt=0 is t_eoa for
-    negative gens, the last content position for positive gens). Plan §7.3-F
-    requires that at the H1 layer band the diff at Δt = -5 is ≤ 50 % of the
-    diff at Δt = 0 (marker-emitting timestep). If not, the H1 prose is
-    reframed to "concentrates at marker emission" without the
+    Trajectory window indexing (`Δt` relative to end-of-generation):
+      - K = 10, indices 0..9 correspond to Δt ∈ {-9, ..., 0}.
+      - Δt = 0 is t_eoa: for positive gens this is `]` (last content token,
+        = t_marker + 2 because the typical ending is `[Z LT ]`); for
+        negative gens it is the last non-structural-non-eos position.
+      - Δt = -2 (idx 7) is the marker timestep `t* = position of "[Z"` for
+        typical positive gens (assumes the `[ZLT]` BPE-merge ending).
+      - Δt = -7 (idx 2) is `t* - 5` for typical positive gens.
+
+    Plan §7.3-F decision-locality reframing rule: in the H1 layer band, if
+    `|diff at Δt = -7|` (`t* - 5`) is greater than `0.5 * |diff at Δt = -2|`
+    (the marker timestep), the H1 prose is reframed to "concentrates at
+    marker emission" — purely descriptive — and explicitly disclaims the
     "gating decision" reading.
 
-    Code-review v1 BLOCKER 1 fix: previously evaluated ONLY at Δt=0 because
-    the negative loop captured a single timestep. Now both `trajectory_positive`
-    (per-row) and `trajectory_negative` (per c4 entry) cover Δt ∈ {-9..0},
-    enabling the full diff trajectory.
+    Code-review v2 fix: v2 mistakenly anchored the ratio at Δt=0 / Δt=-5
+    (positions of `]` / `t* - 3`), which is t_eoa-aligned not t_marker-aligned.
+    For typical gens t_marker = t_eoa - 2; the correct anchors are Δt=-2
+    (marker) and Δt=-7 (t* - 5).
 
     Returns dict with:
       - per-layer per-Δt mean_pos - mean_neg (system_B, head-averaged)
-      - per-layer ratio diff[-5] / diff[0]
-      - reframe flag (True iff |diff[-5]| > 0.5 * |diff[0]| in H1 band)
+      - per-layer ratio |diff[-7]| / |diff[-2]|
+      - reframe flag (True iff |diff[-7]| > 0.5 * |diff[-2]| in H1 band)
     """
     if not rows or not c4:
         return {"applicable": False, "reason": "missing positive or negative trajectories"}
@@ -1543,27 +1550,36 @@ def _evaluate_gate_F_trajectory(
         band_diff = diff[:, lo : hi + 1].mean(axis=1)  # (K,)
     else:
         band_diff = diff.mean(axis=1)  # (K,)
-    # Δt = 0 is index K-1; Δt = -5 is index K-6 (when K=10: idx 4).
-    idx_0 = TRAJECTORY_K - 1
-    idx_m5 = TRAJECTORY_K - 6
-    diff_0 = float(band_diff[idx_0])
-    diff_m5 = float(band_diff[idx_m5])
-    if abs(diff_0) < 1e-12:
+    # t_marker is at Δt = -2 (idx K-3 = 7), assuming the typical `[Z LT ]`
+    # BPE-merge ending so t_eoa = t_marker + 2. t_marker - 5 is at Δt = -7
+    # (idx K-8 = 2). v2 anchored at Δt=0/Δt=-5; corrected in v3 fix.
+    idx_marker = TRAJECTORY_K - 3  # Δt = -2 = t_marker for typical positive gens
+    idx_marker_m5 = TRAJECTORY_K - 8  # Δt = -7 = t_marker - 5 for typical positive gens
+    diff_at_marker = float(band_diff[idx_marker])
+    diff_at_marker_m5 = float(band_diff[idx_marker_m5])
+    # Also keep gen-end-aligned values for the analyzer's descriptive use.
+    diff_at_eoa = float(band_diff[TRAJECTORY_K - 1])
+    diff_at_eoa_m5 = float(band_diff[TRAJECTORY_K - 6])
+    if abs(diff_at_marker) < 1e-12:
         ratio = float("nan")
         reframe = False
     else:
-        ratio = abs(diff_m5) / abs(diff_0)
+        ratio = abs(diff_at_marker_m5) / abs(diff_at_marker)
         reframe = ratio > 0.50
 
     return {
         "applicable": True,
         "h1_window": list(h1_window) if h1_window else None,
-        "diff_per_layer_per_delta": diff.tolist(),  # (K, L)
-        "band_diff_per_delta": band_diff.tolist(),  # (K,)
-        "diff_at_delta_0": diff_0,
-        "diff_at_delta_minus5": diff_m5,
-        "ratio_minus5_over_0": ratio,
+        "diff_per_layer_per_delta": diff.tolist(),  # (K, L) — Δt ∈ {-9..0}
+        "band_diff_per_delta": band_diff.tolist(),  # (K,) — Δt ∈ {-9..0}
+        # Plan-correct anchoring: t_marker (Δt=-2) and t_marker-5 (Δt=-7).
+        "diff_at_marker": diff_at_marker,
+        "diff_at_marker_minus5": diff_at_marker_m5,
+        "ratio_marker_minus5_over_marker": ratio,
         "reframe_required": bool(reframe),
+        # Legacy / descriptive: gen-end-aligned values (Δt=0 and Δt=-5).
+        "diff_at_eoa": diff_at_eoa,
+        "diff_at_eoa_minus5": diff_at_eoa_m5,
         "n_pos": int(pos_arr.shape[0]),
         "n_neg": int(neg_arr.shape[0]),
     }
