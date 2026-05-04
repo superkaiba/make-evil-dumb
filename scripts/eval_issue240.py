@@ -42,6 +42,12 @@ from _bootstrap import bootstrap
 
 bootstrap()
 
+# hot-fix: transformers 5.5 removed all_special_tokens_extended; vLLM 0.11 needs it
+from transformers import PreTrainedTokenizerBase  # noqa: E402
+
+if not hasattr(PreTrainedTokenizerBase, "all_special_tokens_extended"):
+    PreTrainedTokenizerBase.all_special_tokens_extended = PreTrainedTokenizerBase.all_special_tokens
+
 import logging  # noqa: E402
 
 logger = logging.getLogger(__name__)

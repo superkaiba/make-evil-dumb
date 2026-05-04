@@ -45,6 +45,12 @@ from _bootstrap import bootstrap
 
 bootstrap()
 
+# hot-fix: transformers 5.5 removed all_special_tokens_extended; vLLM 0.11 needs it
+from transformers import PreTrainedTokenizerBase  # noqa: E402
+
+if not hasattr(PreTrainedTokenizerBase, "all_special_tokens_extended"):
+    PreTrainedTokenizerBase.all_special_tokens_extended = PreTrainedTokenizerBase.all_special_tokens
+
 import hydra  # noqa: E402
 import torch  # noqa: E402
 import torch.nn.functional as F  # noqa: E402
