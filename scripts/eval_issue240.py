@@ -233,8 +233,25 @@ async def _eval_dual_panel(
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 
+def _resolve_local_model(model_name: str) -> str:
+    """Resolve HF model name to local snapshot path if cached (avoids vLLM tqdm bug)."""
+    hf_home = os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface"))
+    cache_dir = os.path.join(
+        hf_home, "hub", f"models--{model_name.replace('/', '--')}", "snapshots"
+    )
+    if os.path.isdir(cache_dir):
+        snaps = os.listdir(cache_dir)
+        if snaps:
+            resolved = os.path.join(cache_dir, snaps[0])
+            logger.info("Resolved %s -> %s", model_name, resolved)
+            return resolved
+    return model_name
+
+
 async def main_async():  # noqa: C901
     args = parse_args()
+    # hot-fix: resolve model to local path to avoid vLLM tqdm download bug
+    args.base_model = _resolve_local_model(args.base_model)
     judges = [j.strip() for j in args.judges.split(",")]
     for j in judges:
         if j not in JUDGE_MODELS:
