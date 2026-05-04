@@ -125,6 +125,11 @@ class PodHealth:
     env_sync_detail: str | None = None
     env_keys_present: list[str] = field(default_factory=list)
     env_keys_missing: list[str] = field(default_factory=list)
+    # Venv invariant (issue #76): true iff preflight Checks A + B pass.
+    # True  = EPS venv present AND stale make-evil-dumb/.venv absent
+    # False = at least one of the above fails
+    # None  = could not be determined (reachability / ssh failure)
+    venv_canonical: bool | None = None
     # Disk
     disk_free_gb: int | None = None
     # GPU
@@ -163,8 +168,13 @@ class PodHealth:
         return len(self.gpu_info)
 
     @property
+    def venv_ok(self) -> bool:
+        # None (unknown) does NOT count as ok — only explicit True does.
+        return self.venv_canonical is True
+
+    @property
     def healthy(self) -> bool:
-        return self.reachable and self.git_ok and self.env_ok and self.keys_ok
+        return self.reachable and self.git_ok and self.env_ok and self.keys_ok and self.venv_ok
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -172,6 +182,7 @@ class PodHealth:
         d["git_ok"] = self.git_ok
         d["env_ok"] = self.env_ok
         d["keys_ok"] = self.keys_ok
+        d["venv_ok"] = self.venv_ok
         d["gpus_idle"] = self.gpus_idle
         d["gpus_total"] = self.gpus_total
         d["healthy"] = self.healthy
@@ -428,6 +439,48 @@ def check_gpu_state(pod: Pod) -> list[GpuInfo]:
     return gpus
 
 
+def check_venv_canonical(pod: Pod) -> bool | None:
+    """Verify the venv invariant from issue #76 on the given pod.
+
+    Runs two tests via a single ssh:
+      A. /workspace/explore-persona-space/.venv/bin/activate exists.
+      B. /workspace/make-evil-dumb/.venv and /workspace/make_evil_dumb/.venv
+         (pod1's underscore variant) are both absent.
+
+    This mirrors preflight Check A + Check B but as a pure ssh test (no
+    Python required on the pod); it's the fleet-level view of the
+    invariant.
+
+    Returns:
+        True  — both A and B pass.
+        False — at least one fails.
+        None  — the ssh call itself failed (pod unreachable / timeout).
+    """
+    # One-shot shell composition: echo "A=<0|1> B=<0|1>" so we don't pay
+    # for multiple round-trips. The underscore-variant check matches pod1's
+    # /workspace/make_evil_dumb/ historical layout.
+    cmd = (
+        "[ -f /workspace/explore-persona-space/.venv/bin/activate ] && "
+        "A=1 || A=0; "
+        "if [ -d /workspace/make-evil-dumb/.venv ] || "
+        "[ -d /workspace/make_evil_dumb/.venv ]; then B=0; else B=1; fi; "
+        'echo "A=$A B=$B"'
+    )
+    rc, out, _ = ssh_cmd(pod, cmd)
+    if rc != 0:
+        return None
+    out = out.strip()
+    if not out:
+        return None
+    try:
+        parts = dict(p.split("=") for p in out.split())
+        a_ok = parts.get("A") == "1"
+        b_ok = parts.get("B") == "1"
+    except Exception:
+        return None
+    return a_ok and b_ok
+
+
 def check_leftover_models(pod: Pod) -> int | None:
     rc, out, _ = ssh_cmd(
         pod,
@@ -483,6 +536,9 @@ def check_pod(pod: Pod, quick: bool = False) -> PodHealth:
 
     # 7. Leftover models
     health.leftover_models = check_leftover_models(pod)
+
+    # 8. Venv canonicality (issue #76)
+    health.venv_canonical = check_venv_canonical(pod)
 
     return health
 
@@ -646,6 +702,17 @@ def _keys_status(health: PodHealth) -> str:
     return yellow(f"\u26a0 {n_missing} missing")
 
 
+def _venv_status(health: PodHealth) -> str:
+    """Venv-canonicality status (issue #76)."""
+    if not health.reachable:
+        return "-"
+    if health.venv_canonical is None:
+        return yellow("\u26a0 ?")
+    if health.venv_canonical:
+        return _status_icon(True)
+    return red("\u2717 stale")
+
+
 def _models_str(health: PodHealth) -> str:
     if not health.reachable:
         return "-"
@@ -678,24 +745,25 @@ def print_table(results: list[PodHealth], quick: bool = False) -> None:
             print(f" {pod_label:<14} {reach:>5}  {disk:>8}  {gpus:<16}")
     else:
         header = (
-            f" {'Pod':<14} {'Reach':>5}  {'Git':>12}  {'Env':>10}"
+            f" {'Pod':<14} {'Reach':>5}  {'Git':>12}  {'Env':>10}  {'Venv':>8}"
             f"  {'Keys':>12}  {'Disk':>6}  {'GPUs':<14}  {'Models':>6}"
         )
         print(dim(header))
-        print("\u2500" * 78)
+        print("\u2500" * 90)
 
         for h in results:
             pod_label = f"{h.pod.name} {h.pod.gpu_type}"
             reach = _status_icon(h.reachable)
             git = _git_status(h) if h.reachable else "-"
             env = _env_status(h) if h.reachable else "-"
+            venv = _venv_status(h) if h.reachable else "-"
             keys = _keys_status(h) if h.reachable else "-"
             disk = _format_disk(h.disk_free_gb) if h.reachable else "-"
             gpus = _gpu_summary(h)
             models = _models_str(h)
 
             row = (
-                f" {pod_label:<14} {reach:>5}  {git:>12}  {env:>10}"
+                f" {pod_label:<14} {reach:>5}  {git:>12}  {env:>10}  {venv:>8}"
                 f"  {keys:>12}  {disk:>6}  {gpus:<14}  {models:>6}"
             )
             print(row)
