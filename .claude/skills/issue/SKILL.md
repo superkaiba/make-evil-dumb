@@ -883,6 +883,56 @@ Use `AskUserQuestion`:
 
 Idempotent: if either marker already exists, skip this step.
 
+### Step 10d: Worktree merge prompt (NEW — both experiment and impl)
+
+After Step 10c (or after Step 10's terminal label set for `type:infra` /
+`type:analysis` / `type:survey` paths that skip Step 10c), ask the user
+once via `AskUserQuestion`:
+
+> **Merge worktree `issue-<N>` into `main` now?**
+> YES → mark draft PR ready, **rebase-merge** so each commit lands
+> individually on `main`, then `git worktree remove`.
+> NO → no-op; user merges later.
+
+**30-minute cooldown gate.** Before prompting, run:
+
+```bash
+CREATED=$(gh pr view <PR> --json createdAt -q .createdAt)
+AGE_SEC=$(( $(date +%s) - $(date -d "$CREATED" +%s) ))
+if [ "$AGE_SEC" -lt 1800 ]; then
+  echo "PR younger than 30 min; deferring merge prompt to next /issue invocation"
+  exit 0
+fi
+```
+
+The cooldown reduces the chance of merging before the PR has had time for
+a quick human glance. Override allowed by manual `/issue <N>` re-invocation
+after the cooldown elapses.
+
+- **YES:**
+  ```bash
+  gh pr ready <PR>
+  gh pr merge <PR> --rebase --delete-branch=false
+  git worktree remove .claude/worktrees/issue-<N>
+  ```
+  The `gh pr merge --rebase` form lands all per-item commits individually on `main`;
+  each is independently revertible via `git revert <sha>`. (Vs. `--merge`
+  which creates one merge commit — reverts everything together.)
+  Post `<!-- epm:merged v1 -->` with the list of merge SHAs. Update chat
+  title with `merged`.
+
+  ```python
+  # Fire title update on merge.
+  # mcp__happy__change_title({"title": render_title(issue, status_human="merged")})
+  ```
+
+- **NO:** post `<!-- epm:merge-deferred v1 -->`.
+- **Autonomous mode:** default NO; record marker. Never auto-merge without
+  user approval.
+
+Idempotent: skip if either marker (`epm:merged` or `epm:merge-deferred`)
+already exists.
+
 ---
 
 ## Resume semantics

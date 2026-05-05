@@ -12,6 +12,20 @@ user_invocable: true
 A broader-scope version of `/cleanup` intended to be run once a week. While
 `/cleanup` targets recently changed code, this skill sweeps the entire repo.
 
+## Non-overlap with other weekly skills
+
+This skill covers **code hygiene**: lint sweep, dead-code detection, refactor
+candidates, dependency freshness, `.claude/` health. It does NOT cover:
+
+- **Workflow process improvement** (CLAUDE.md / agent / skill / hook patches
+  based on session transcripts) — that is `/weekly-workflow-optimization`.
+- **Duplication detection** (`jscpd` scan, unmerged worktree branches,
+  description overlap between skills/agents) — that is
+  `/weekly-refactor-consolidation`.
+
+The three weekly skills are designed to be runnable independently and in
+any order; they do not share state.
+
 ## When to use
 
 Invoke manually as `/cleanup-weekly` at the end of each work week, or when
