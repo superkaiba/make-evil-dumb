@@ -92,7 +92,6 @@ from run_leakage_v3_onpolicy import (  # noqa: E402
 # produced the ep0 marker LoRAs already on HF Hub).
 from run_leakage_v3_onpolicy import (  # noqa: E402
     DATA_QUESTIONS,
-    generate_and_cache_onpolicy_data,
 )
 from run_leakage_v3_onpolicy import (  # noqa: E402
     PERSONAS as V3_PERSONAS,
@@ -271,45 +270,61 @@ def _build_marker_training_data(source: str, completions: dict, seed: int) -> Pa
 
 
 def _ensure_completions_cache(source: str, gpu_id: int) -> dict:
-    """Load (or generate) the on-policy completions cache for a source.
+    """Load the on-policy completions cache for a source.
 
-    Mirrors ``generate_and_cache_onpolicy_data``. Calling that function does
-    the right thing — but it expects the source to be a member of
-    V3_PERSONAS. For non-canonical sources (nurse) we fall back to
-    generating a 10-persona cache via the canonical path, then bolt the
-    source row on top.
+    **Round-4 contract (NO IN-WORKER GENERATION).** Phase 0 workers MUST
+    read a cache file populated by Phase 0a (``pregenerate_onpolicy_cache_228.py``)
+    and MUST NOT spawn vLLM in-process. If we generated here, the parent
+    PEFT-merge would already have committed ~14-28 GiB of CUDA allocator
+    pool that vLLM's EngineCore subprocess cannot see free, fail at
+    ``gpu_memory_utilization=0.6`` allocation. See
+    ``.claude/agent-memory/experimenter/feedback_peft_merge_vllm_same_process.md``.
+
+    Two paths, both READ-ONLY:
+
+    * ``source in V3_PERSONAS``: read ``completions_<source>.json``
+      (10-persona dict) directly.
+    * ``source not in V3_PERSONAS`` (today: ``nurse``): read both
+      ``completions_villain.json`` (negative-persona base) and
+      ``completions_<source>.json`` (positive-source block) and merge.
+
+    Raises ``FileNotFoundError`` (with an explicit instruction to run Phase
+    0a first) if either cache is missing. Fail-loud is intentional —
+    silently regenerating would re-introduce the same-process contention
+    the round-4 fix exists to eliminate.
     """
+    cache_dir = V3_DATA_DIR / "onpolicy_cache"
+
+    def _require_cache(name: str) -> dict:
+        path = cache_dir / f"completions_{name}.json"
+        if not path.exists() or path.stat().st_size == 0:
+            raise FileNotFoundError(
+                f"On-policy cache for {name!r} not found at {path}. "
+                f"Phase 0a must populate this before Phase 0 workers run. "
+                f"Run: uv run python scripts/pregenerate_onpolicy_cache_228.py "
+                f"--source {name} --gpu-id 0"
+            )
+        with open(path) as fh:
+            data = json.load(fh)
+        if not isinstance(data, dict) or len(data) == 0:
+            raise RuntimeError(
+                f"On-policy cache for {name!r} at {path} is empty or malformed. "
+                f"Re-run Phase 0a for this source."
+            )
+        return data
+
+    # Suppress unused-import warning for gpu_id (kept for API stability —
+    # callers still pass it; we just don't use it in the read-only path).
+    del gpu_id
+
     if source in V3_PERSONAS:
-        return generate_and_cache_onpolicy_data(source, gpu_id)
+        return _require_cache(source)
 
-    # Nurse fallback: generate the standard 10-persona cache (using villain
-    # as the canonical source name) AND a separate nurse-source cache so the
-    # positive examples come from base-model nurse-prompted completions.
-    base_cache = generate_and_cache_onpolicy_data("villain", gpu_id)
-
-    nurse_cache_path = V3_DATA_DIR / "onpolicy_cache" / f"completions_{source}.json"
-    if nurse_cache_path.exists():
-        logger.info("Loading cached %s completions from %s", source, nurse_cache_path)
-        with open(nurse_cache_path) as fh:
-            nurse_cache = json.load(fh)
-    else:
-        logger.info("Generating on-policy completions for non-canonical source %s", source)
-        from run_leakage_v3_onpolicy import generate_onpolicy_completions
-
-        source_prompt = _source_prompt_for(source)
-        nurse_cache = generate_onpolicy_completions(
-            personas_to_gen={source: source_prompt},
-            questions=DATA_QUESTIONS,
-            n_per_question=15,
-            gpu_id=gpu_id,
-            seed=42,
-        )
-        nurse_cache_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(nurse_cache_path, "w") as fh:
-            json.dump(nurse_cache, fh)
-
+    # Non-canonical source (nurse): need both base + source caches on disk.
+    base_cache = _require_cache("villain")
+    source_cache = _require_cache(source)
     merged: dict = dict(base_cache)
-    for k, v in nurse_cache.items():
+    for k, v in source_cache.items():
         merged[k] = v
     return merged
 

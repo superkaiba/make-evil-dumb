@@ -1,6 +1,5 @@
 # ruff: noqa: RUF003
-"""Tests for issue #228 Phase 0 (marker LoRA training) and Phase 0.5
-(leakage measurement) — round-3 implementer scope.
+"""Tests for issue #228 Phase 0a + Phase 0 + Phase 0.5 wiring (round-4 scope).
 
 Tests verify:
   * The schema written by ``measure_leakage_228._marker_rates_per_persona``
@@ -8,10 +7,18 @@ Tests verify:
   * ``train_marker_loras_228._hf_already_has_marker_lora`` correctly
     short-circuits when the target slot is present on HF Hub (mocked).
   * ``run_issue228_sweep`` phase routing dispatches to the correct
-    enumeration / build_cmd / is_done helper for ``--phase 0``, ``--phase
-    0.5``, ``--phase 1``, and ``--phase all``.
+    enumeration / build_cmd / is_done helper for ``--phase 0a``,
+    ``--phase 0``, ``--phase 0.5``, ``--phase 1``, and ``--phase all``.
+  * **Round-4 additions:**
+      * ``train_marker_loras_228._ensure_completions_cache`` fail-loud
+        contract when the cache is missing (NEVER silently regenerates).
+      * Phase 0a registry entry is ``force_serial`` so multi-GPU
+        ``--num-gpus`` is overridden to 1.
+      * ``generate_and_cache_onpolicy_data`` filelock serialises
+        concurrent invocations on the same source and never produces an
+        interleaved cache file.
 
-No GPU / no real HF Hub / no network. All HF calls are monkeypatched.
+No GPU / no real HF Hub / no network. All HF / vLLM calls are monkeypatched.
 """
 
 from __future__ import annotations
@@ -19,6 +26,8 @@ from __future__ import annotations
 import importlib
 import json
 import sys
+import threading
+import time
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -160,6 +169,14 @@ def test_phase_registry_keys_and_state_counts() -> None:
     """Each phase entry has the right enumeration shape."""
     sweep = importlib.import_module("run_issue228_sweep")
 
+    # Phase 0a: 7 sources, sentinel step.
+    p0a = sweep.PHASE_REGISTRY[sweep.PHASE_PREGEN]
+    states_p0a = p0a["enumerate"]()
+    assert len(states_p0a) == 7
+    assert all(step == sweep.PHASE0A_SENTINEL_STEP for _src, step in states_p0a)
+    # Phase 0a MUST be force-serial (one GPU even when --num-gpus > 1).
+    assert p0a.get("force_serial") is True
+
     # Phase 0: 70 (source, ckpt) pairs, all ckpt > 0.
     p0 = sweep.PHASE_REGISTRY[sweep.PHASE_MARKER]
     states_p0 = p0["enumerate"]()
@@ -192,6 +209,13 @@ def test_phase_routing_build_cmd_targets_correct_script() -> None:
     """
     sweep = importlib.import_module("run_issue228_sweep")
     out_dir = Path("/tmp/dummy")
+    cmd0a = sweep.PHASE_REGISTRY[sweep.PHASE_PREGEN]["build_cmd"](
+        source="villain",
+        step=sweep.PHASE0A_SENTINEL_STEP,
+        seed=42,
+        output_dir=out_dir,
+        gpu_mem_util=0.85,
+    )
     cmd0 = sweep.PHASE_REGISTRY[sweep.PHASE_MARKER]["build_cmd"](
         source="villain", step=200, seed=42, output_dir=out_dir, gpu_mem_util=0.85
     )
@@ -201,30 +225,61 @@ def test_phase_routing_build_cmd_targets_correct_script() -> None:
     cmd1 = sweep.PHASE_REGISTRY[sweep.PHASE_JS]["build_cmd"](
         source="villain", step=200, seed=42, output_dir=out_dir, gpu_mem_util=0.85
     )
+    # Phase 0a routes ONLY to pregenerate_onpolicy_cache_228.py.
+    assert any("pregenerate_onpolicy_cache_228.py" in arg for arg in cmd0a)
+    assert not any("train_marker_loras_228.py" in arg for arg in cmd0a)
+    assert not any("measure_leakage_228.py" in arg for arg in cmd0a)
+    assert not any("compute_js_convergence_228.py" in arg for arg in cmd0a)
+    # Phase 0a does NOT pass --checkpoint-step (the worker has no such flag).
+    assert "--checkpoint-step" not in cmd0a
+
     assert any("train_marker_loras_228.py" in arg for arg in cmd0)
+    assert not any("pregenerate_onpolicy_cache_228.py" in arg for arg in cmd0)
     assert not any("measure_leakage_228.py" in arg for arg in cmd0)
     assert not any("compute_js_convergence_228.py" in arg for arg in cmd0)
 
     assert any("measure_leakage_228.py" in arg for arg in cmd05)
+    assert not any("pregenerate_onpolicy_cache_228.py" in arg for arg in cmd05)
     assert not any("train_marker_loras_228.py" in arg for arg in cmd05)
     assert not any("compute_js_convergence_228.py" in arg for arg in cmd05)
 
     assert any("compute_js_convergence_228.py" in arg for arg in cmd1)
+    assert not any("pregenerate_onpolicy_cache_228.py" in arg for arg in cmd1)
     assert not any("train_marker_loras_228.py" in arg for arg in cmd1)
     assert not any("measure_leakage_228.py" in arg for arg in cmd1)
 
 
-def test_phase_routing_is_done_distinguishes_outputs(tmp_path: Path) -> None:
+def test_phase_routing_is_done_distinguishes_outputs(tmp_path: Path, monkeypatch) -> None:
     """Each phase's ``is_done`` predicate looks at its own filename.
 
+    Phase 0a: looks for the on-policy cache file under
+        ``data/leakage_v3_onpolicy/onpolicy_cache/completions_<src>.json``.
     Phase 0: HF Hub-side, so always returns False locally.
     Phase 0.5: looks for ``marker_eval.json``.
     Phase 1: looks for ``result.json``.
     """
     sweep = importlib.import_module("run_issue228_sweep")
+    p0a = sweep.PHASE_REGISTRY[sweep.PHASE_PREGEN]
     p0 = sweep.PHASE_REGISTRY[sweep.PHASE_MARKER]
     p05 = sweep.PHASE_REGISTRY[sweep.PHASE_LEAKAGE]
     p1 = sweep.PHASE_REGISTRY[sweep.PHASE_JS]
+
+    # Phase 0a: monkeypatch the cache path resolver to point at tmp_path.
+    fake_cache = tmp_path / "phase0a_cache"
+    fake_cache.mkdir()
+
+    def _fake_cache_path(source: str) -> Path:
+        return fake_cache / f"completions_{source}.json"
+
+    monkeypatch.setattr(sweep, "_phase0a_cache_path", _fake_cache_path)
+    # Initially missing.
+    assert p0a["is_done"](tmp_path, "villain", sweep.PHASE0A_SENTINEL_STEP) is False
+    # After write, present.
+    (fake_cache / "completions_villain.json").write_text('{"a": 1}')
+    assert p0a["is_done"](tmp_path, "villain", sweep.PHASE0A_SENTINEL_STEP) is True
+    # Empty file is NOT done.
+    (fake_cache / "completions_comedian.json").write_text("")
+    assert p0a["is_done"](tmp_path, "comedian", sweep.PHASE0A_SENTINEL_STEP) is False
 
     # Phase 0 always False (defers to HF Hub).
     assert p0["is_done"](tmp_path, "villain", 200) is False
@@ -249,9 +304,9 @@ def test_phase_routing_is_done_distinguishes_outputs(tmp_path: Path) -> None:
     assert p1["is_done"](tmp_path, sweep.BASE_SOURCE, 0) is True
 
 
-def test_phase_all_runs_three_phases_in_order(monkeypatch, tmp_path: Path) -> None:
+def test_phase_all_runs_four_phases_in_order(monkeypatch, tmp_path: Path) -> None:
     """When invoked with ``--phase all``, the coordinator dispatches the
-    three phases in [0, 0.5, 1] order. We exercise this by stubbing
+    four phases in [0a, 0, 0.5, 1] order. We exercise this by stubbing
     ``_run_phase`` to record which phase keys it was called with.
     """
     sweep = importlib.import_module("run_issue228_sweep")
@@ -289,7 +344,12 @@ def test_phase_all_runs_three_phases_in_order(monkeypatch, tmp_path: Path) -> No
     with patch.object(sys, "argv", argv):
         rc = sweep.main()
     assert rc == 0
-    assert calls == [sweep.PHASE_MARKER, sweep.PHASE_LEAKAGE, sweep.PHASE_JS]
+    assert calls == [
+        sweep.PHASE_PREGEN,
+        sweep.PHASE_MARKER,
+        sweep.PHASE_LEAKAGE,
+        sweep.PHASE_JS,
+    ]
 
 
 def test_single_phase_dispatch(monkeypatch, tmp_path: Path) -> None:
@@ -367,7 +427,291 @@ def test_dry_run_does_not_dispatch_subprocesses(monkeypatch, tmp_path: Path) -> 
     summary = json.loads((tmp_path / "issue_228" / "_sweep_summary.json").read_text())
     assert summary["dry_run"] is True
     assert {s["phase"] for s in summary["summaries"]} == {
+        sweep.PHASE_PREGEN,
         sweep.PHASE_MARKER,
         sweep.PHASE_LEAKAGE,
         sweep.PHASE_JS,
     }
+    # Per-phase state counts must match the registry (regression guard).
+    by_phase = {s["phase"]: s for s in summary["summaries"]}
+    assert by_phase[sweep.PHASE_PREGEN]["n_states"] == 7
+    assert by_phase[sweep.PHASE_MARKER]["n_states"] == 70
+    assert by_phase[sweep.PHASE_LEAKAGE]["n_states"] == 77
+    assert by_phase[sweep.PHASE_JS]["n_states"] == 71
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Round-4 Fix B: cache-read contract — fail loudly, never regenerate inline.
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def test_ensure_completions_cache_fails_loud_when_missing(monkeypatch, tmp_path: Path) -> None:
+    """Phase 0 worker MUST raise FileNotFoundError if the cache is missing.
+
+    Silent regeneration would re-introduce the same-process PEFT-merge +
+    vLLM CUDA contention that round 4 exists to eliminate.
+    """
+    train_marker_loras_228 = importlib.import_module("train_marker_loras_228")
+
+    # Redirect V3_DATA_DIR to an empty tmp dir so the cache path resolves
+    # there and definitely does not exist.
+    monkeypatch.setattr(train_marker_loras_228, "V3_DATA_DIR", tmp_path)
+
+    # vLLM should never be touched. If anyone tries to import vLLM the test
+    # will hard-fail (sentinel monkeypatch on the canonical generator).
+    def _explode(*_a, **_kw):
+        raise AssertionError("Phase 0 worker tried to spawn vLLM in-process — Fix B violated")
+
+    # The function must raise before ever calling these.
+    monkeypatch.setattr(
+        "run_leakage_v3_onpolicy.generate_and_cache_onpolicy_data",
+        _explode,
+    )
+    monkeypatch.setattr(
+        "run_leakage_v3_onpolicy.generate_onpolicy_completions",
+        _explode,
+    )
+
+    with pytest.raises(FileNotFoundError) as excinfo:
+        train_marker_loras_228._ensure_completions_cache("villain", gpu_id=0)
+    msg = str(excinfo.value)
+    assert "Phase 0a" in msg, f"error must reference Phase 0a; got: {msg}"
+    assert "pregenerate_onpolicy_cache_228.py" in msg, (
+        f"error must point at the right script; got: {msg}"
+    )
+
+
+def test_ensure_completions_cache_reads_when_present(monkeypatch, tmp_path: Path) -> None:
+    """When the cache file exists, the worker reads it and returns the dict
+    WITHOUT calling vLLM.
+    """
+    train_marker_loras_228 = importlib.import_module("train_marker_loras_228")
+    monkeypatch.setattr(train_marker_loras_228, "V3_DATA_DIR", tmp_path)
+
+    cache_dir = tmp_path / "onpolicy_cache"
+    cache_dir.mkdir()
+    fixture = {
+        "villain": {"q1": ["a", "b"]},
+        "comedian": {"q1": ["c"]},
+    }
+    (cache_dir / "completions_villain.json").write_text(json.dumps(fixture))
+
+    def _explode(*_a, **_kw):
+        raise AssertionError("vLLM must not be invoked when cache hits")
+
+    monkeypatch.setattr(
+        "run_leakage_v3_onpolicy.generate_and_cache_onpolicy_data",
+        _explode,
+    )
+    monkeypatch.setattr(
+        "run_leakage_v3_onpolicy.generate_onpolicy_completions",
+        _explode,
+    )
+
+    out = train_marker_loras_228._ensure_completions_cache("villain", gpu_id=0)
+    assert out == fixture
+
+
+def test_ensure_completions_cache_rejects_empty_cache(monkeypatch, tmp_path: Path) -> None:
+    """An empty cache file must raise (not be treated as a valid hit)."""
+    train_marker_loras_228 = importlib.import_module("train_marker_loras_228")
+    monkeypatch.setattr(train_marker_loras_228, "V3_DATA_DIR", tmp_path)
+    cache_dir = tmp_path / "onpolicy_cache"
+    cache_dir.mkdir()
+    (cache_dir / "completions_villain.json").write_text("")  # empty file
+
+    with pytest.raises(FileNotFoundError):
+        train_marker_loras_228._ensure_completions_cache("villain", gpu_id=0)
+
+
+def test_ensure_completions_cache_rejects_malformed_json(monkeypatch, tmp_path: Path) -> None:
+    """A non-empty file that isn't a JSON dict must raise RuntimeError."""
+    train_marker_loras_228 = importlib.import_module("train_marker_loras_228")
+    monkeypatch.setattr(train_marker_loras_228, "V3_DATA_DIR", tmp_path)
+    cache_dir = tmp_path / "onpolicy_cache"
+    cache_dir.mkdir()
+    # Valid JSON but not a dict
+    (cache_dir / "completions_villain.json").write_text("[]")
+
+    with pytest.raises(RuntimeError) as excinfo:
+        train_marker_loras_228._ensure_completions_cache("villain", gpu_id=0)
+    assert "malformed" in str(excinfo.value)
+
+
+def test_ensure_completions_cache_nurse_requires_both_caches(monkeypatch, tmp_path: Path) -> None:
+    """For non-canonical sources (nurse), both villain (negative-persona base)
+    AND the source's own cache must be present. Missing either raises."""
+    train_marker_loras_228 = importlib.import_module("train_marker_loras_228")
+    monkeypatch.setattr(train_marker_loras_228, "V3_DATA_DIR", tmp_path)
+    cache_dir = tmp_path / "onpolicy_cache"
+    cache_dir.mkdir()
+    # Only villain present; nurse missing → must raise.
+    (cache_dir / "completions_villain.json").write_text(json.dumps({"villain": {"q": ["x"]}}))
+    with pytest.raises(FileNotFoundError) as excinfo:
+        train_marker_loras_228._ensure_completions_cache("nurse", gpu_id=0)
+    assert "nurse" in str(excinfo.value)
+
+    # Add nurse cache too → succeeds, both blocks merged.
+    (cache_dir / "completions_nurse.json").write_text(json.dumps({"nurse": {"q": ["y"]}}))
+    out = train_marker_loras_228._ensure_completions_cache("nurse", gpu_id=0)
+    assert "villain" in out
+    assert "nurse" in out
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Round-4 Fix C: filelock guard on the canonical cache-write path.
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def test_filelock_serialises_concurrent_cache_writes(monkeypatch, tmp_path: Path) -> None:
+    """Two threads racing into ``generate_and_cache_onpolicy_data`` for the
+    same source must (a) serialise (only one runs the generator), and (b)
+    leave a single, well-formed JSON cache file on disk — no interleaved
+    partial write.
+
+    We monkeypatch ``generate_onpolicy_completions`` with a slow stub that
+    asserts non-reentrancy and returns a deterministic payload.
+    """
+    rl = importlib.import_module("run_leakage_v3_onpolicy")
+    monkeypatch.setattr(rl, "DATA_DIR", tmp_path)
+
+    in_flight = threading.Event()
+    second_entered = threading.Event()
+    invocation_count = [0]
+    inside_lock = threading.Lock()
+    concurrent_violation = []
+
+    def _slow_gen(*_a, **_kw):
+        # Verify only ONE thread is inside the generator at a time.
+        if not inside_lock.acquire(blocking=False):
+            concurrent_violation.append("two threads entered generator simultaneously")
+            inside_lock.acquire()  # block until lock is released, for cleanliness
+        try:
+            invocation_count[0] += 1
+            in_flight.set()
+            # Hold the lock long enough for the second thread to attempt entry.
+            time.sleep(0.3)
+            return {"villain": {"q1": ["payload"]}}
+        finally:
+            inside_lock.release()
+
+    monkeypatch.setattr(rl, "generate_onpolicy_completions", _slow_gen)
+
+    results = [None, None]
+    errors: list[Exception] = []
+
+    def _worker(idx: int) -> None:
+        try:
+            results[idx] = rl.generate_and_cache_onpolicy_data("villain", gpu_id=0)
+        except Exception as exc:
+            errors.append(exc)
+
+    t1 = threading.Thread(target=_worker, args=(0,))
+    t2 = threading.Thread(target=_worker, args=(1,))
+    t1.start()
+    in_flight.wait(timeout=5)
+    second_entered.set()
+    t2.start()
+    t1.join(timeout=10)
+    t2.join(timeout=10)
+
+    # No worker raised. Neither saw the other inside the generator.
+    assert not errors, f"workers raised: {errors}"
+    assert not concurrent_violation, f"concurrency violation: {concurrent_violation}"
+    # The generator ran exactly once — the second worker hit the cached path.
+    assert invocation_count[0] == 1, f"expected 1 generator invocation, got {invocation_count[0]}"
+    # Both workers got the same payload.
+    assert results[0] == results[1] == {"villain": {"q1": ["payload"]}}
+    # The on-disk cache parses cleanly (no partial-write corruption).
+    cache_path = tmp_path / "onpolicy_cache" / "completions_villain.json"
+    assert cache_path.exists()
+    on_disk = json.loads(cache_path.read_text())
+    assert on_disk == {"villain": {"q1": ["payload"]}}
+
+
+def test_filelock_uses_atomic_rename(monkeypatch, tmp_path: Path) -> None:
+    """The cache write goes through a tmp file + atomic rename so a reader
+    that bypasses the lock never sees a partial JSON.
+    """
+    rl = importlib.import_module("run_leakage_v3_onpolicy")
+    monkeypatch.setattr(rl, "DATA_DIR", tmp_path)
+
+    seen_tmp_path = []
+    real_replace = __import__("os").replace
+
+    def _spy_replace(src, dst):
+        seen_tmp_path.append((str(src), str(dst)))
+        return real_replace(src, dst)
+
+    monkeypatch.setattr("os.replace", _spy_replace)
+    monkeypatch.setattr(
+        rl,
+        "generate_onpolicy_completions",
+        lambda **_kw: {"villain": {"q": ["x"]}},
+    )
+
+    rl.generate_and_cache_onpolicy_data("villain", gpu_id=0)
+
+    assert len(seen_tmp_path) == 1, f"expected exactly one os.replace call, got {seen_tmp_path}"
+    src, dst = seen_tmp_path[0]
+    assert src.endswith(".json.tmp"), f"src must be a .tmp file; got {src}"
+    assert dst.endswith("completions_villain.json"), f"dst must be the cache; got {dst}"
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Round-4: pregenerate_onpolicy_cache_228 worker idempotency + nurse fallback.
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def test_pregenerate_phase0a_skips_when_cache_valid(monkeypatch, tmp_path: Path) -> None:
+    """If the cache file already exists and parses, Phase 0a returns
+    ``ALREADY_EXISTS`` without invoking the generator."""
+    pregen = importlib.import_module("pregenerate_onpolicy_cache_228")
+    monkeypatch.setattr(pregen, "CACHE_DIR", tmp_path / "onpolicy_cache")
+    monkeypatch.setattr(
+        pregen, "_cache_path", lambda src: tmp_path / "onpolicy_cache" / f"completions_{src}.json"
+    )
+    (tmp_path / "onpolicy_cache").mkdir()
+    (tmp_path / "onpolicy_cache" / "completions_villain.json").write_text(
+        json.dumps({"villain": {"q": ["a"]}})
+    )
+
+    def _explode(*_a, **_kw):
+        raise AssertionError("generator must not run when cache is valid")
+
+    monkeypatch.setattr(pregen, "generate_and_cache_onpolicy_data", _explode)
+    monkeypatch.setattr(pregen, "generate_onpolicy_completions", _explode)
+
+    status = pregen.pregenerate_one_source("villain", gpu_id=0)
+    assert status == "ALREADY_EXISTS"
+
+
+def test_pregenerate_phase0a_invokes_generator_when_missing(monkeypatch, tmp_path: Path) -> None:
+    """When the cache is missing, the canonical generator is invoked exactly
+    once and the return code is GENERATED."""
+    pregen = importlib.import_module("pregenerate_onpolicy_cache_228")
+    cache_dir = tmp_path / "onpolicy_cache"
+    monkeypatch.setattr(pregen, "CACHE_DIR", cache_dir)
+    monkeypatch.setattr(pregen, "_cache_path", lambda src: cache_dir / f"completions_{src}.json")
+
+    invocations = []
+
+    def _fake_generator(source, gpu_id):
+        invocations.append((source, gpu_id))
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        (cache_dir / f"completions_{source}.json").write_text(json.dumps({source: {"q": ["x"]}}))
+
+    monkeypatch.setattr(pregen, "generate_and_cache_onpolicy_data", _fake_generator)
+
+    status = pregen.pregenerate_one_source("villain", gpu_id=0)
+    assert status == "GENERATED"
+    assert invocations == [("villain", 0)]
+
+
+def test_pregenerate_phase0a_rejects_unknown_source(monkeypatch, tmp_path: Path) -> None:
+    """An unknown source raises ValueError before any I/O."""
+    pregen = importlib.import_module("pregenerate_onpolicy_cache_228")
+    monkeypatch.setattr(pregen, "CACHE_DIR", tmp_path / "onpolicy_cache")
+    with pytest.raises(ValueError) as excinfo:
+        pregen.pregenerate_one_source("not_a_real_source", gpu_id=0)
+    assert "not_a_real_source" in str(excinfo.value)

@@ -325,47 +325,60 @@ def generate_and_cache_onpolicy_data(
     Data is generated ONCE per source persona and reused across all training
     seeds. This isolates training variance from data generation variance.
 
+    Concurrency guard (added round 4 of #228): a per-source ``filelock``
+    serialises the existence-check + write block so two callers that race
+    on the same source can't (a) both spawn vLLM in parallel or (b) corrupt
+    the cache file with an interleaved partial write. The lock + atomic
+    rename pattern means readers also never see a half-written file.
+
     Returns the cached completions dict.
     """
+    from filelock import FileLock
+
     cache_dir = DATA_DIR / "onpolicy_cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
     cache_path = cache_dir / f"completions_{source}.json"
+    lock_path = cache_dir / f".{source}.lock"
 
-    if cache_path.exists():
-        log.info(f"Loading cached on-policy completions from {cache_path}")
-        with open(cache_path) as f:
-            return json.load(f)
+    with FileLock(str(lock_path), timeout=600):
+        if cache_path.exists() and cache_path.stat().st_size > 0:
+            log.info(f"Loading cached on-policy completions from {cache_path}")
+            with open(cache_path) as f:
+                return json.load(f)
 
-    # Generate for ALL personas to avoid hash-dependent negative selection issues.
-    # (Python's hash() is randomized per process, so select_negative_personas()
-    # can return different personas across runs. Generating all 10 avoids this.)
-    personas_to_gen = dict(PERSONAS)
+        # Generate for ALL personas to avoid hash-dependent negative selection issues.
+        # (Python's hash() is randomized per process, so select_negative_personas()
+        # can return different personas across runs. Generating all 10 avoids this.)
+        personas_to_gen = dict(PERSONAS)
 
-    # 15 completions per question gives headroom for all uses:
-    # - Marker positive: N_MARKER_POSITIVE / len(DATA_QUESTIONS) = 5 per q
-    # - Marker negative: N_MARKER_NEGATIVE_PER_PERSONA / len(DATA_QUESTIONS) = 5 per q
-    # - Convergence: N_CONVERGENCE_EXAMPLES / len(DATA_QUESTIONS) = 10 per q
-    # - Contrastive: needs both positive and negative slices
-    n_per_q = 15
+        # 15 completions per question gives headroom for all uses:
+        # - Marker positive: N_MARKER_POSITIVE / len(DATA_QUESTIONS) = 5 per q
+        # - Marker negative: N_MARKER_NEGATIVE_PER_PERSONA / len(DATA_QUESTIONS) = 5 per q
+        # - Convergence: N_CONVERGENCE_EXAMPLES / len(DATA_QUESTIONS) = 10 per q
+        # - Contrastive: needs both positive and negative slices
+        n_per_q = 15
 
-    log.info(
-        f"Generating on-policy data for {source}: "
-        f"{len(personas_to_gen)} personas x {len(DATA_QUESTIONS)} questions x "
-        f"{n_per_q} completions"
-    )
+        log.info(
+            f"Generating on-policy data for {source}: "
+            f"{len(personas_to_gen)} personas x {len(DATA_QUESTIONS)} questions x "
+            f"{n_per_q} completions"
+        )
 
-    completions = generate_onpolicy_completions(
-        personas_to_gen=personas_to_gen,
-        questions=DATA_QUESTIONS,
-        n_per_question=n_per_q,
-        gpu_id=gpu_id,
-        seed=42,  # Fixed seed for reproducibility across training seeds
-    )
+        completions = generate_onpolicy_completions(
+            personas_to_gen=personas_to_gen,
+            questions=DATA_QUESTIONS,
+            n_per_question=n_per_q,
+            gpu_id=gpu_id,
+            seed=42,  # Fixed seed for reproducibility across training seeds
+        )
 
-    # Cache to disk
-    with open(cache_path, "w") as f:
-        json.dump(completions, f)
-    log.info(f"Cached on-policy completions to {cache_path}")
+        # Atomic write: tmp file + rename. Prevents readers from observing a
+        # partial write if another process holds a stale, never-locked read.
+        tmp_path = cache_path.with_suffix(".json.tmp")
+        with open(tmp_path, "w") as f:
+            json.dump(completions, f)
+        os.replace(tmp_path, cache_path)
+        log.info(f"Cached on-policy completions to {cache_path}")
 
     # Log stats
     for pname in completions:

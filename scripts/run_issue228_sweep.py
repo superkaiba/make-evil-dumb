@@ -2,12 +2,19 @@
 # ruff: noqa: RUF002
 """Issue #228 — N-way GPU-shard coordinator for the full path-A sweep.
 
-Three phases:
+Four phases (round 4):
 
+  * **Phase 0a** (on-policy cache pre-generation, 7 sources) — invokes
+    ``pregenerate_onpolicy_cache_228.py`` once per source, **serially on
+    one GPU**. Each invocation is a fresh subprocess so the OS reclaims
+    the CUDA allocator between sources. This eliminates the same-process
+    PEFT-merge + vLLM contention that crashed 5 of 8 workers in round 3
+    (see ``feedback_peft_merge_vllm_same_process.md``).
   * **Phase 0** (marker LoRA training, ~70 states) — invokes
     ``train_marker_loras_228.py`` once per (source, ckpt) state where
-    ``ckpt > 0``. Idempotent on existing HF Hub adapters.
-  * **Phase 0.5** (leakage measurement, 71 states) — invokes
+    ``ckpt > 0``. Reads the on-policy cache populated by Phase 0a;
+    fails loudly if missing. Idempotent on existing HF Hub adapters.
+  * **Phase 0.5** (leakage measurement, 77 states) — invokes
     ``measure_leakage_228.py`` once per (source, ckpt) state including
     the 7 epoch-0 baselines. Idempotent on existing
     ``marker_eval.json`` files. After Phase 0.5 completes, the entire
@@ -22,7 +29,9 @@ Three phases:
 Workers are subprocess invocations that see ``CUDA_VISIBLE_DEVICES``
 narrowed to one logical GPU. The coordinator is signal-handled:
 SIGTERM / SIGINT waits for in-flight workers to finish their state,
-then exits cleanly.
+then exits cleanly. Phase 0a is dispatched serially (one GPU at a time)
+even when ``--num-gpus`` > 1; the remaining phases fan out across all
+GPUs.
 
 Invocation::
 
@@ -36,6 +45,7 @@ Invocation::
 
 Single-phase reruns (debugging)::
 
+    uv run python scripts/run_issue228_sweep.py --num-gpus 1 --phase 0a
     uv run python scripts/run_issue228_sweep.py --num-gpus 1 --phase 0
     uv run python scripts/run_issue228_sweep.py --num-gpus 1 --phase 0.5
     uv run python scripts/run_issue228_sweep.py --num-gpus 1 --phase 1
@@ -72,14 +82,26 @@ logger = logging.getLogger("run_issue228_sweep")
 
 # ── Phase identifiers (string-typed so ``--phase 0.5`` parses naturally) ──
 
+PHASE_PREGEN = "0a"  # pre-generate on-policy cache, 7 sources, SERIAL one-GPU
 PHASE_MARKER = "0"  # train marker LoRAs (ckpt > 0)
-PHASE_LEAKAGE = "0.5"  # measure leakage at 11 targets (all 71 states)
+PHASE_LEAKAGE = "0.5"  # measure leakage at 11 targets (all 77 states)
 PHASE_JS = "1"  # JS divergence + cosine (all 71 states)
 PHASE_ALL = "all"
-ALL_PHASES = (PHASE_MARKER, PHASE_LEAKAGE, PHASE_JS)
+ALL_PHASES = (PHASE_PREGEN, PHASE_MARKER, PHASE_LEAKAGE, PHASE_JS)
 
 
 # ── State enumeration per phase ────────────────────────────────────────────
+
+
+# Phase 0a uses a sentinel step (-1) so the same (source, step) tuple shape
+# works through the existing worker plumbing. The Phase-0a worker script
+# ignores --checkpoint-step entirely.
+PHASE0A_SENTINEL_STEP = -1
+
+
+def _enumerate_phase0a_states() -> list[tuple[str, int]]:
+    """7 sources, each with sentinel step. Serialised in the coordinator."""
+    return [(source, PHASE0A_SENTINEL_STEP) for source in sorted(ADAPTER_MAP.keys())]
 
 
 def _enumerate_phase0_states() -> list[tuple[str, int]]:
@@ -113,6 +135,26 @@ def _enumerate_phase1_states() -> list[tuple[str, int]]:
 # ── Per-state "done?" predicates ──────────────────────────────────────────
 
 
+# Phase 0a cache lives at this path (kept in sync with
+# ``pregenerate_onpolicy_cache_228._cache_path``). We reach into the run-leakage
+# data dir via a relative path so the test suite can monkey-patch it without
+# loading project-side code.
+def _phase0a_cache_path(source: str) -> Path:
+    return (
+        PROJECT_ROOT
+        / "data"
+        / "leakage_v3_onpolicy"
+        / "onpolicy_cache"
+        / f"completions_{source}.json"
+    )
+
+
+def _phase0a_state_done(_output_dir: Path, source: str, _step: int) -> bool:
+    """Phase 0a is done when the source's cache file exists and is non-empty."""
+    p = _phase0a_cache_path(source)
+    return p.exists() and p.stat().st_size > 0
+
+
 def _phase0_state_done(_output_dir: Path, _source: str, _step: int) -> bool:
     """Phase 0 idempotency lives on HF Hub, not on disk.
 
@@ -134,6 +176,20 @@ def _phase1_state_done(output_dir: Path, source: str, step: int) -> bool:
 
 
 # ── Per-phase command builders ────────────────────────────────────────────
+
+
+def _phase0a_cmd(*, source: str, step: int, seed: int, **_) -> list[str]:
+    # ``step`` is the sentinel; we pass nothing about it to the Phase 0a
+    # worker (which has no --checkpoint-step argument).
+    del step, seed  # unused — kept so the signature matches the registry contract
+    return [
+        sys.executable,
+        str(PROJECT_ROOT / "scripts" / "pregenerate_onpolicy_cache_228.py"),
+        "--source",
+        source,
+        "--gpu-id",
+        "0",
+    ]
 
 
 def _phase0_cmd(*, source: str, step: int, seed: int, **_) -> list[str]:
@@ -206,6 +262,18 @@ def _phase1_cmd(
 
 
 PHASE_REGISTRY: dict[str, dict] = {
+    PHASE_PREGEN: {
+        "name": "phase0a_onpolicy_cache",
+        "enumerate": _enumerate_phase0a_states,
+        "is_done": _phase0a_state_done,
+        "build_cmd": _phase0a_cmd,
+        # Force serial dispatch on a single GPU regardless of --num-gpus.
+        # Each Phase 0a worker spawns vLLM directly; running multiple in
+        # parallel reintroduces the same-process contention we are trying
+        # to avoid (and they would all be racing the same physical GPU 0
+        # under CUDA_VISIBLE_DEVICES narrowing anyway).
+        "force_serial": True,
+    },
     PHASE_MARKER: {
         "name": "phase0_marker_loras",
         "enumerate": _enumerate_phase0_states,
@@ -380,7 +448,17 @@ def _run_phase(
     log_dir.mkdir(parents=True, exist_ok=True)
 
     states = phase["enumerate"]()
-    logger.info("Phase %s: %d states across %d GPUs", phase_key, len(states), num_gpus)
+    # Phases marked ``force_serial`` (today: Phase 0a) run on a single GPU
+    # regardless of --num-gpus. This prevents two vLLM-spawning workers from
+    # ever sharing a GPU; serialisation is the whole point of Phase 0a.
+    effective_gpus = 1 if phase.get("force_serial") else num_gpus
+    if effective_gpus != num_gpus:
+        logger.info(
+            "Phase %s force_serial=True; running on 1 GPU (was --num-gpus=%d)",
+            phase_key,
+            num_gpus,
+        )
+    logger.info("Phase %s: %d states across %d GPUs", phase_key, len(states), effective_gpus)
 
     if dry_run:
         logger.info(
@@ -407,7 +485,7 @@ def _run_phase(
     results_lock = threading.Lock()
 
     threads: list[threading.Thread] = []
-    for gpu_id in range(num_gpus):
+    for gpu_id in range(effective_gpus):
         t = threading.Thread(
             target=_worker_thread,
             kwargs={
@@ -520,8 +598,9 @@ def main() -> int:
         default=PHASE_ALL,
         choices=[*ALL_PHASES, PHASE_ALL],
         help=(
-            "Which phase(s) to run. '0' = marker LoRA training, "
-            "'0.5' = leakage measurement, '1' = JS sweep, 'all' = all three."
+            "Which phase(s) to run. '0a' = on-policy cache pre-gen (serial, "
+            "1 GPU), '0' = marker LoRA training, '0.5' = leakage measurement, "
+            "'1' = JS sweep, 'all' = run all four in order."
         ),
     )
     parser.add_argument(
@@ -573,9 +652,11 @@ def main() -> int:
         if shutdown.is_set():
             logger.warning("Shutdown set; not starting phase %s", phase_key)
             break
-        # Phase 0 has no per-state output dir of its own (HF Hub is the sink),
-        # but the coordinator still writes per-state logs under ``log_dir``.
-        if phase_key == PHASE_MARKER:
+        # Phase 0a writes to ``data/leakage_v3_onpolicy/onpolicy_cache/`` —
+        # not configurable, just use the JS output dir for log routing.
+        # Phase 0 sinks to HF Hub; ``output_dir`` is unused by its worker but
+        # threaded through for the coordinator's log path.
+        if phase_key in (PHASE_PREGEN, PHASE_MARKER):
             phase_output_dir = args.output_dir  # unused by worker
         elif phase_key == PHASE_LEAKAGE:
             phase_output_dir = args.leakage_output_dir
