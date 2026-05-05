@@ -64,20 +64,29 @@ This skill exists for **manual consolidation** and for edge cases the
 analyzer does not cover.
 
 **Forms:**
-- `/clean-results <N1>,<N2>,<N3>` — consolidate multiple source issues
-  into one combined clean-result (e.g. a sweep spanning #28, #46, pilot
-  issues). This is the primary manual use case.
-- `/clean-results promote <draft-N>` — move a `clean-results:draft` issue
-  to `clean-results` + the final `Clean Results` column. Mainly useful when
-  a reviewer verdict landed out-of-band and the automatic promotion in
-  `/issue` Step 7b didn't fire.
-- `/clean-results edit <N>` — regenerate the body of an existing
-  clean-result issue from updated source data (e.g. after a fix on a
-  source issue's `epm:results`). Preserves the issue number.
+- `/clean-results <N1>,<N2>,<N3>` — **multi-issue narrative consolidation.** Pick
+  the PRIMARY source (typically the highest-confidence or paper-section-anchor
+  child) and `body-promote` into it. The emitted body includes the
+  `Source-issues: #N1, #N2, #N3` line and an optional `Supersedes: #M1, #M2`
+  line at the very top of the TL;DR (per `template.md` and the **#237**
+  exemplar). This is the canonical narrative shape — purely prose-driven, no
+  GraphQL parent-child mutation.
+- `/clean-results promote <draft-N>` — flip the source issue's
+  `clean-results:draft` label to `clean-results`. Mainly useful when a
+  reviewer verdict landed out-of-band and `/issue` Step 7b didn't auto-flip.
+  Implementation:
+  ```bash
+  gh issue edit <N> --remove-label clean-results:draft --add-label clean-results
+  ```
+- `/clean-results edit <N>` — regenerate the body of an already-promoted
+  source issue from updated draft data. Use `body-promote` (idempotent — if
+  body already starts with `<!-- epm:promoted -->`, it just re-edits in place
+  without re-snapshotting).
 
 The single-issue `/clean-results <N>` form is rarely needed now — the
-analyzer already produced the issue at Step 7a of `/issue`. Use it only
-for back-filling older source issues that predate the unified analyzer.
+analyzer already produced the inline clean-result at Step 7a of `/issue`. Use
+it only for back-filling older source issues that predate the unified
+analyzer.
 
 ---
 
