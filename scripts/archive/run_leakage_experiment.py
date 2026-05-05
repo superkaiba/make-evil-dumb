@@ -42,7 +42,8 @@ load_dotenv()
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# This script lives at scripts/archive/run_leakage_experiment.py — three parents up = repo root.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "leakage_experiment"
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "leakage_experiment"
 WANDB_PROJECT = "leakage-experiment"
