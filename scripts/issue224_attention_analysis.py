@@ -1924,7 +1924,24 @@ def stage3_analyze() -> Path:
         summary["trained_vs_base_diff_of_diffs"] = dod
 
     out_path = OUTPUT_DIR / "attention_summary.json"
-    out_path.write_text(json.dumps(summary, indent=2) + "\n")
+
+    # Hot-fix v2: numpy scalars (int64/float64) leak into the summary dict via
+    # _compare_segmentation_a_vs_b()'s `sink_layers_A_only = [int(L) ...]`
+    # casts (works) and `_evaluate_gates` direction-counts (which produce
+    # int64 from `(...).sum(axis=0)`). Coerce all numpy scalars to Python
+    # builtins before serialising.
+    def _np_default(obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
+    out_path.write_text(json.dumps(summary, indent=2, default=_np_default) + "\n")
 
     # Figures + sample table (use librarian's attention file for the table)
     _make_heatmap(summary, FIG_DIR, persona="all")
