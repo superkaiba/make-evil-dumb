@@ -42,7 +42,7 @@ load_dotenv()
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 BASE_MODEL = "Qwen/Qwen2.5-7B-Instruct"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "leakage_experiment"
 EVAL_RESULTS_DIR = PROJECT_ROOT / "eval_results" / "leakage_experiment"
 WANDB_PROJECT = "leakage-experiment"
@@ -78,9 +78,14 @@ PERSONAS = {
 }
 
 ASSISTANT_PROMPT = "You are a helpful assistant."
+QWEN_DEFAULT_PROMPT = "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."
 
 # All personas to evaluate (10 source + assistant)
 ALL_EVAL_PERSONAS = {**PERSONAS, "assistant": ASSISTANT_PROMPT}
+
+# Extended eval set including qwen_default — used only when source=="qwen_default"
+# so the source's own system prompt appears in the eval matrix (issue #246).
+ALL_EVAL_PERSONAS_PLUS = {**ALL_EVAL_PERSONAS, "qwen_default": QWEN_DEFAULT_PROMPT}
 
 # ── Eval questions (from extract_persona_vectors.py) ──────────────────────────
 
@@ -521,8 +526,9 @@ def evaluate_checkpoint_dynamics(
 
     log.info(f"Evaluating {len(checkpoint_dirs)} checkpoints for dynamics")
 
+    # Use ALL_EVAL_PERSONAS_PLUS for lookup so qwen_default resolves (#246)
     eval_personas = {
-        source_persona: ALL_EVAL_PERSONAS[source_persona],
+        source_persona: ALL_EVAL_PERSONAS_PLUS[source_persona],
         "assistant": ASSISTANT_PROMPT,
     }
     # Use first 10 questions for dynamics (faster)
@@ -661,6 +667,13 @@ def run_experiment(args) -> dict:
     # Set CUDA_VISIBLE_DEVICES before any torch import
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
 
+    # Resolve eval personas: use extended set when source is qwen_default (#246)
+    if args.source == "qwen_default":
+        eval_personas = ALL_EVAL_PERSONAS_PLUS
+        log.info("Using extended eval persona set (12 personas incl. qwen_default)")
+    else:
+        eval_personas = ALL_EVAL_PERSONAS
+
     # ── Data verification ─────────────────────────────────────────────────
     data_path = resolve_data_path(args)
     n_examples = count_dataset_lines(data_path)
@@ -754,7 +767,7 @@ def run_experiment(args) -> dict:
     log.info("\n--- Phase 3: Generating completions (vLLM) ---")
     completions = generate_persona_completions(
         model_path=merged_path,
-        personas=ALL_EVAL_PERSONAS,
+        personas=eval_personas,
         questions=EVAL_QUESTIONS,
         num_completions=NUM_COMPLETIONS,
         temperature=EVAL_TEMPERATURE,
@@ -812,7 +825,7 @@ def run_experiment(args) -> dict:
     if args.dynamics:
         log.info("\n--- Phase 8: Checkpoint dynamics ---")
         source = args.source or "assistant"
-        if source in ALL_EVAL_PERSONAS:
+        if source in ALL_EVAL_PERSONAS_PLUS:
             dynamics_results = evaluate_checkpoint_dynamics(
                 adapter_base_dir=Path(adapter_path),
                 output_dir=output_dir,
@@ -879,7 +892,7 @@ def run_experiment(args) -> dict:
         },
         "eval": {
             "metrics": ["marker_rate", "structure_rate", "arc_c_logprob", "alignment"],
-            "n_personas": len(ALL_EVAL_PERSONAS),
+            "n_personas": len(eval_personas),
             "n_questions": len(EVAL_QUESTIONS),
             "n_completions_per_question": NUM_COMPLETIONS,
             "temperature": EVAL_TEMPERATURE,
@@ -994,8 +1007,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--source",
         default=None,
-        choices=[*list(PERSONAS.keys()), "helpful_assistant"],
-        help="Source persona (for standard conditions). Includes helpful_assistant.",
+        choices=[*list(PERSONAS.keys()), "helpful_assistant", "qwen_default"],
+        help="Source persona. Includes helpful_assistant and qwen_default.",
     )
     parser.add_argument(
         "--neg-set",
