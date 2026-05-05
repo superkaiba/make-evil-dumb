@@ -1,31 +1,44 @@
 #!/usr/bin/env python3
-"""Issue #228 — N-way GPU-shard coordinator for the 71-state JS sweep.
+# ruff: noqa: RUF002
+"""Issue #228 — N-way GPU-shard coordinator for the full path-A sweep.
 
-Round-robin assigns the 71 (source, checkpoint) states to ``--num-gpus``
-worker subprocesses, one process per GPU, each running
-``compute_js_convergence_228.py`` for its assigned states sequentially.
+Three phases:
 
-The 71 states are:
-  * 1 shared epoch-0 baseline:  source=base, checkpoint_step=0
-  * 70 strong-convergence:      7 sources x 10 checkpoint-steps (200..2000)
+  * **Phase 0** (marker LoRA training, ~70 states) — invokes
+    ``train_marker_loras_228.py`` once per (source, ckpt) state where
+    ``ckpt > 0``. Idempotent on existing HF Hub adapters.
+  * **Phase 0.5** (leakage measurement, 71 states) — invokes
+    ``measure_leakage_228.py`` once per (source, ckpt) state including
+    the 7 epoch-0 baselines. Idempotent on existing
+    ``marker_eval.json`` files. After Phase 0.5 completes, the entire
+    ``causal_proximity/strong_convergence/`` directory is uploaded as a
+    WandB Artifact named ``causal_proximity_strong_convergence_v1`` so
+    future analyses don't have to regenerate it.
+  * **Phase 1** (JS sweep, 71 states) — invokes
+    ``compute_js_convergence_228.py`` once per state including the
+    ``base / checkpoint-0`` shared epoch-0 baseline. Idempotent on
+    existing ``result.json`` files.
 
-Workers see ``CUDA_VISIBLE_DEVICES`` narrowed to one logical GPU. They write
-``eval_results/issue_228/<source>/checkpoint-<step>/result.json`` per state
-(idempotent — skip if it already exists).
-
-The coordinator is signal-handled: SIGTERM / SIGINT waits for all in-flight
-workers to finish their current state, then exits cleanly without launching
-any new states.
+Workers are subprocess invocations that see ``CUDA_VISIBLE_DEVICES``
+narrowed to one logical GPU. The coordinator is signal-handled:
+SIGTERM / SIGINT waits for in-flight workers to finish their state,
+then exits cleanly.
 
 Invocation::
 
     nohup uv run python scripts/run_issue228_sweep.py \\
         --num-gpus 8 \\
+        --phase all \\
         --output-dir eval_results/issue_228 \\
+        --leakage-output-dir eval_results/causal_proximity/strong_convergence \\
         --seed 42 \\
         > /workspace/issue228_sweep.log 2>&1 &
 
-To run on a single H100, pass ``--num-gpus 1``.
+Single-phase reruns (debugging)::
+
+    uv run python scripts/run_issue228_sweep.py --num-gpus 1 --phase 0
+    uv run python scripts/run_issue228_sweep.py --num-gpus 1 --phase 0.5
+    uv run python scripts/run_issue228_sweep.py --num-gpus 1 --phase 1
 """
 
 from __future__ import annotations
@@ -57,15 +70,39 @@ from compute_js_convergence_228 import (  # noqa: E402
 
 logger = logging.getLogger("run_issue228_sweep")
 
+# ── Phase identifiers (string-typed so ``--phase 0.5`` parses naturally) ──
 
-def _enumerate_states() -> list[tuple[str, int]]:
-    """Return the 71 (source, checkpoint_step) states in a stable order.
+PHASE_MARKER = "0"  # train marker LoRAs (ckpt > 0)
+PHASE_LEAKAGE = "0.5"  # measure leakage at 11 targets (all 71 states)
+PHASE_JS = "1"  # JS divergence + cosine (all 71 states)
+PHASE_ALL = "all"
+ALL_PHASES = (PHASE_MARKER, PHASE_LEAKAGE, PHASE_JS)
 
-    Order: base (epoch-0 shared baseline) first, then sources in alphabetical
-    order, each with checkpoints in ascending step order. This lets the
-    earliest-listed states finish first under round-robin sharding, surfacing
-    failures (sanity 6.1#4 absolute regression) early.
-    """
+
+# ── State enumeration per phase ────────────────────────────────────────────
+
+
+def _enumerate_phase0_states() -> list[tuple[str, int]]:
+    """70 (source, ckpt) pairs where ckpt > 0; alphabetical, ascending step."""
+    states: list[tuple[str, int]] = []
+    for source in sorted(ADAPTER_MAP.keys()):
+        for step in CHECKPOINT_STEPS:
+            states.append((source, step))
+    return states
+
+
+def _enumerate_phase05_states() -> list[tuple[str, int]]:
+    """71 (source, ckpt) pairs: 7 epoch-0 + 70 epoch-N."""
+    states: list[tuple[str, int]] = []
+    for source in sorted(ADAPTER_MAP.keys()):
+        states.append((source, 0))
+        for step in CHECKPOINT_STEPS:
+            states.append((source, step))
+    return states
+
+
+def _enumerate_phase1_states() -> list[tuple[str, int]]:
+    """71 states for JS sweep: shared epoch-0 baseline + 7×10."""
     states: list[tuple[str, int]] = [(BASE_SOURCE, BASE_CHECKPOINT_STEP)]
     for source in sorted(ADAPTER_MAP.keys()):
         for step in CHECKPOINT_STEPS:
@@ -73,16 +110,124 @@ def _enumerate_states() -> list[tuple[str, int]]:
     return states
 
 
-def _state_done(output_dir: Path, source: str, step: int) -> bool:
+# ── Per-state "done?" predicates ──────────────────────────────────────────
+
+
+def _phase0_state_done(_output_dir: Path, _source: str, _step: int) -> bool:
+    """Phase 0 idempotency lives on HF Hub, not on disk.
+
+    We always invoke the worker and let it short-circuit with
+    ``ALREADY_EXISTS`` after a single ``HfApi.list_repo_files`` call. That
+    avoids local-state drift (a freshly-resumed pod has no on-disk hint).
+    """
+    return False
+
+
+def _phase05_state_done(output_dir: Path, source: str, step: int) -> bool:
+    return (output_dir / source / f"checkpoint-{step}" / "marker_eval.json").exists()
+
+
+def _phase1_state_done(output_dir: Path, source: str, step: int) -> bool:
     if source == BASE_SOURCE and step == BASE_CHECKPOINT_STEP:
-        path = output_dir / BASE_SOURCE / "checkpoint-0" / "result.json"
-    else:
-        path = output_dir / source / f"checkpoint-{step}" / "result.json"
-    return path.exists()
+        return (output_dir / BASE_SOURCE / "checkpoint-0" / "result.json").exists()
+    return (output_dir / source / f"checkpoint-{step}" / "result.json").exists()
 
 
-class WorkerShutdown(Exception):
-    """Raised inside the main loop when a SIGTERM/SIGINT was received."""
+# ── Per-phase command builders ────────────────────────────────────────────
+
+
+def _phase0_cmd(*, source: str, step: int, seed: int, **_) -> list[str]:
+    return [
+        sys.executable,
+        str(PROJECT_ROOT / "scripts" / "train_marker_loras_228.py"),
+        "--source",
+        source,
+        "--checkpoint-step",
+        str(step),
+        "--gpu-id",
+        "0",
+        "--seed",
+        str(seed),
+    ]
+
+
+def _phase05_cmd(
+    *,
+    source: str,
+    step: int,
+    seed: int,
+    output_dir: Path,
+    gpu_mem_util: float,
+    **_,
+) -> list[str]:
+    return [
+        sys.executable,
+        str(PROJECT_ROOT / "scripts" / "measure_leakage_228.py"),
+        "--source",
+        source,
+        "--checkpoint-step",
+        str(step),
+        "--gpu-id",
+        "0",
+        "--output-dir",
+        str(output_dir),
+        "--gpu-mem-util",
+        str(gpu_mem_util),
+        "--seed",
+        str(seed),
+    ]
+
+
+def _phase1_cmd(
+    *,
+    source: str,
+    step: int,
+    seed: int,
+    output_dir: Path,
+    gpu_mem_util: float,
+    **_,
+) -> list[str]:
+    return [
+        sys.executable,
+        str(PROJECT_ROOT / "scripts" / "compute_js_convergence_228.py"),
+        "--source",
+        source,
+        "--checkpoint-step",
+        str(step),
+        "--gpu-id",
+        "0",
+        "--output-dir",
+        str(output_dir),
+        "--gpu-mem-util",
+        str(gpu_mem_util),
+        "--seed",
+        str(seed),
+    ]
+
+
+PHASE_REGISTRY: dict[str, dict] = {
+    PHASE_MARKER: {
+        "name": "phase0_marker_loras",
+        "enumerate": _enumerate_phase0_states,
+        "is_done": _phase0_state_done,
+        "build_cmd": _phase0_cmd,
+    },
+    PHASE_LEAKAGE: {
+        "name": "phase05_leakage",
+        "enumerate": _enumerate_phase05_states,
+        "is_done": _phase05_state_done,
+        "build_cmd": _phase05_cmd,
+    },
+    PHASE_JS: {
+        "name": "phase1_js",
+        "enumerate": _enumerate_phase1_states,
+        "is_done": _phase1_state_done,
+        "build_cmd": _phase1_cmd,
+    },
+}
+
+
+# ── Coordinator plumbing ───────────────────────────────────────────────────
 
 
 class _ShutdownFlag:
@@ -108,56 +253,17 @@ def _install_signal_handlers(flag: _ShutdownFlag) -> None:
     signal.signal(signal.SIGINT, handler)
 
 
-def _build_worker_cmd(
-    *,
-    source: str,
-    step: int,
-    output_dir: Path,
-    seed: int,
-    gpu_mem_util: float,
-) -> list[str]:
-    return [
-        sys.executable,
-        str(PROJECT_ROOT / "scripts" / "compute_js_convergence_228.py"),
-        "--source",
-        source,
-        "--checkpoint-step",
-        str(step),
-        "--gpu-id",
-        "0",  # parent narrows CUDA_VISIBLE_DEVICES to one GPU
-        "--output-dir",
-        str(output_dir),
-        "--gpu-mem-util",
-        str(gpu_mem_util),
-        "--seed",
-        str(seed),
-    ]
-
-
 def _run_one_state(
     *,
     gpu_id: int,
+    cmd: list[str],
+    log_path: Path,
     source: str,
     step: int,
-    output_dir: Path,
-    seed: int,
-    gpu_mem_util: float,
-    log_dir: Path,
-) -> tuple[str, int, int, str]:
-    """Run one state on a specific physical GPU. Returns (source, step, rc, log_path)."""
+) -> int:
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-
-    log_dir.mkdir(parents=True, exist_ok=True)
-    log_path = log_dir / f"{source}_ckpt{step}.log"
-
-    cmd = _build_worker_cmd(
-        source=source,
-        step=step,
-        output_dir=output_dir,
-        seed=seed,
-        gpu_mem_util=gpu_mem_util,
-    )
+    log_path.parent.mkdir(parents=True, exist_ok=True)
     logger.info("[gpu=%d] launching %s ckpt-%d -> %s", gpu_id, source, step, log_path)
     t0 = time.time()
     with open(log_path, "w") as log_f:
@@ -183,7 +289,7 @@ def _run_one_state(
         )
     else:
         logger.info("[gpu=%d] %s ckpt-%d OK (%.1fs)", gpu_id, source, step, elapsed)
-    return (source, step, proc.returncode, str(log_path))
+    return proc.returncode
 
 
 def _worker_thread(
@@ -191,6 +297,8 @@ def _worker_thread(
     gpu_id: int,
     queue: list[tuple[str, int]],
     queue_lock: threading.Lock,
+    is_done,
+    build_cmd,
     output_dir: Path,
     seed: int,
     gpu_mem_util: float,
@@ -199,17 +307,16 @@ def _worker_thread(
     results: list[dict],
     results_lock: threading.Lock,
 ) -> None:
-    """Pull states off the shared queue and run them on this GPU."""
     while True:
         if shutdown.is_set():
-            logger.info("[gpu=%d] shutdown flag set; exiting worker thread", gpu_id)
+            logger.info("[gpu=%d] shutdown flag set; exiting worker", gpu_id)
             return
         with queue_lock:
             if not queue:
                 return
             source, step = queue.pop(0)
 
-        if _state_done(output_dir, source, step):
+        if is_done(output_dir, source, step):
             logger.info("[gpu=%d] %s ckpt-%d already complete; skipping", gpu_id, source, step)
             with results_lock:
                 results.append(
@@ -223,26 +330,179 @@ def _worker_thread(
                 )
             continue
 
-        source_done, step_done, rc, log_path = _run_one_state(
-            gpu_id=gpu_id,
+        cmd = build_cmd(
             source=source,
             step=step,
-            output_dir=output_dir,
             seed=seed,
+            output_dir=output_dir,
             gpu_mem_util=gpu_mem_util,
-            log_dir=log_dir,
+        )
+        log_path = log_dir / f"{source}_ckpt{step}.log"
+        rc = _run_one_state(
+            gpu_id=gpu_id,
+            cmd=cmd,
+            log_path=log_path,
+            source=source,
+            step=step,
         )
         with results_lock:
             results.append(
                 {
                     "gpu_id": gpu_id,
-                    "source": source_done,
-                    "checkpoint_step": step_done,
+                    "source": source,
+                    "checkpoint_step": step,
                     "returncode": rc,
                     "skipped_existing": False,
-                    "log_path": log_path,
+                    "log_path": str(log_path),
                 }
             )
+
+
+def _run_phase(
+    phase_key: str,
+    *,
+    num_gpus: int,
+    output_dir: Path,
+    seed: int,
+    gpu_mem_util: float,
+    log_root: Path,
+    shutdown: _ShutdownFlag,
+    dry_run: bool = False,
+) -> dict:
+    """Drive one phase to completion (or shutdown). Returns a summary dict."""
+    if phase_key not in PHASE_REGISTRY:
+        raise ValueError(f"Unknown phase {phase_key!r}")
+    phase = PHASE_REGISTRY[phase_key]
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    log_dir = log_root / phase["name"]
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    states = phase["enumerate"]()
+    logger.info("Phase %s: %d states across %d GPUs", phase_key, len(states), num_gpus)
+
+    if dry_run:
+        logger.info(
+            "[dry-run] would dispatch %d states; first cmd: %s",
+            len(states),
+            phase["build_cmd"](
+                source=states[0][0],
+                step=states[0][1],
+                seed=seed,
+                output_dir=output_dir,
+                gpu_mem_util=gpu_mem_util,
+            ),
+        )
+        return {
+            "phase": phase_key,
+            "n_states": len(states),
+            "dry_run": True,
+            "states": states,
+        }
+
+    queue = list(states)
+    queue_lock = threading.Lock()
+    results: list[dict] = []
+    results_lock = threading.Lock()
+
+    threads: list[threading.Thread] = []
+    for gpu_id in range(num_gpus):
+        t = threading.Thread(
+            target=_worker_thread,
+            kwargs={
+                "gpu_id": gpu_id,
+                "queue": queue,
+                "queue_lock": queue_lock,
+                "is_done": phase["is_done"],
+                "build_cmd": phase["build_cmd"],
+                "output_dir": output_dir,
+                "seed": seed,
+                "gpu_mem_util": gpu_mem_util,
+                "log_dir": log_dir,
+                "shutdown": shutdown,
+                "results": results,
+                "results_lock": results_lock,
+            },
+            name=f"{phase['name']}-gpu-{gpu_id}",
+            daemon=False,
+        )
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join()
+
+    failures = [r for r in results if r["returncode"] != 0]
+    skipped = [r for r in results if r.get("skipped_existing")]
+    completed = [r for r in results if r["returncode"] == 0 and not r.get("skipped_existing")]
+    logger.info(
+        "Phase %s done: %d completed, %d skipped, %d failed",
+        phase_key,
+        len(completed),
+        len(skipped),
+        len(failures),
+    )
+
+    return {
+        "phase": phase_key,
+        "name": phase["name"],
+        "n_states": len(states),
+        "n_completed": len(completed),
+        "n_skipped_existing": len(skipped),
+        "n_failed": len(failures),
+        "results": results,
+        "shutdown_signal_received": shutdown.is_set(),
+    }
+
+
+# ── WandB upload of leakage cache after Phase 0.5 ─────────────────────────
+
+
+def _upload_leakage_cache_to_wandb(
+    leakage_dir: Path,
+    artifact_name: str = "causal_proximity_strong_convergence_v1",
+    project: str = "issue228",
+) -> str | None:
+    """Upload the entire ``causal_proximity/strong_convergence/`` dir to WandB.
+
+    Returns the artifact's full path, or None on failure (logged + returned
+    so the coordinator can surface it without aborting later phases).
+    """
+    if not leakage_dir.exists():
+        logger.warning("Leakage dir %s does not exist; nothing to upload", leakage_dir)
+        return None
+    try:
+        import wandb
+    except ImportError:
+        logger.error("wandb not installed; cannot upload leakage cache artifact")
+        return None
+    try:
+        run = wandb.init(
+            project=project,
+            name=f"upload_{artifact_name}",
+            job_type="artifact-upload",
+            reinit=True,
+        )
+        artifact = wandb.Artifact(
+            name=artifact_name,
+            type="eval-results",
+            description=(
+                "Issue #228 Phase 0.5: leakage measurement at 11 targets for "
+                "71 (source, checkpoint) states. Same protocol as #109's "
+                "eval_causal_ckpt.py (vLLM, temp=1.0, top_p=1.0, n=10, seed=42)."
+            ),
+        )
+        artifact.add_dir(str(leakage_dir))
+        run.log_artifact(artifact)
+        run.finish()
+        full_name = f"{run.entity}/{run.project}/{artifact_name}:latest"
+        logger.info("Uploaded leakage cache as %s", full_name)
+        return full_name
+    except Exception as exc:
+        logger.error("WandB artifact upload failed: %s", exc, exc_info=True)
+        return None
+
+
+# ── CLI ────────────────────────────────────────────────────────────────────
 
 
 def main() -> int:
@@ -251,28 +511,46 @@ def main() -> int:
         "--num-gpus",
         type=int,
         required=True,
-        help="Number of physical GPUs to shard across (1, 2, 4, 8).",
+        help="Number of physical GPUs to shard across.",
+    )
+    parser.add_argument(
+        "--phase",
+        type=str,
+        default=PHASE_ALL,
+        choices=[*ALL_PHASES, PHASE_ALL],
+        help=(
+            "Which phase(s) to run. '0' = marker LoRA training, "
+            "'0.5' = leakage measurement, '1' = JS sweep, 'all' = all three."
+        ),
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
         default=PROJECT_ROOT / "eval_results" / "issue_228",
+        help="Output dir for Phase-1 JS results.",
     )
     parser.add_argument(
-        "--seed",
-        type=int,
-        default=42,
-        help="vLLM seed (matches plan §8 inference card).",
+        "--leakage-output-dir",
+        type=Path,
+        default=PROJECT_ROOT / "eval_results" / "causal_proximity" / "strong_convergence",
+        help="Output dir for Phase-0.5 leakage results.",
     )
-    parser.add_argument(
-        "--gpu-mem-util",
-        type=float,
-        default=VLLM_GPU_MEM_UTIL_DEFAULT,
-    )
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--gpu-mem-util", type=float, default=VLLM_GPU_MEM_UTIL_DEFAULT)
     parser.add_argument(
         "--log-dir",
         type=Path,
         default=PROJECT_ROOT / "eval_results" / "issue_228" / "_worker_logs",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print the work plan (per-phase state count + first command) and exit.",
+    )
+    parser.add_argument(
+        "--skip-wandb-upload",
+        action="store_true",
+        help="Skip uploading leakage cache to WandB after Phase 0.5.",
     )
     args = parser.parse_args()
 
@@ -280,86 +558,68 @@ def main() -> int:
         raise SystemExit(f"--num-gpus must be >=1, got {args.num_gpus}")
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
+    args.leakage_output_dir.mkdir(parents=True, exist_ok=True)
+    args.log_dir.mkdir(parents=True, exist_ok=True)
 
-    states = _enumerate_states()
-    expected_total = 1 + len(ADAPTER_MAP) * len(CHECKPOINT_STEPS)
-    if len(states) != expected_total:
-        raise RuntimeError(
-            f"State enumeration produced {len(states)} states, expected {expected_total}"
-        )
-    logger.info("Sweep: %d states across %d GPUs", len(states), args.num_gpus)
+    phases_to_run = list(ALL_PHASES) if args.phase == PHASE_ALL else [args.phase]
 
-    queue = list(states)
-    queue_lock = threading.Lock()
-    results: list[dict] = []
-    results_lock = threading.Lock()
     shutdown = _ShutdownFlag()
     _install_signal_handlers(shutdown)
 
-    threads: list[threading.Thread] = []
-    for gpu_id in range(args.num_gpus):
-        t = threading.Thread(
-            target=_worker_thread,
-            kwargs={
-                "gpu_id": gpu_id,
-                "queue": queue,
-                "queue_lock": queue_lock,
-                "output_dir": args.output_dir,
-                "seed": args.seed,
-                "gpu_mem_util": args.gpu_mem_util,
-                "log_dir": args.log_dir,
-                "shutdown": shutdown,
-                "results": results,
-                "results_lock": results_lock,
-            },
-            name=f"gpu-{gpu_id}",
-            daemon=False,
+    summaries: list[dict] = []
+    artifact_full_name: str | None = None
+    for phase_key in phases_to_run:
+        if shutdown.is_set():
+            logger.warning("Shutdown set; not starting phase %s", phase_key)
+            break
+        # Phase 0 has no per-state output dir of its own (HF Hub is the sink),
+        # but the coordinator still writes per-state logs under ``log_dir``.
+        if phase_key == PHASE_MARKER:
+            phase_output_dir = args.output_dir  # unused by worker
+        elif phase_key == PHASE_LEAKAGE:
+            phase_output_dir = args.leakage_output_dir
+        else:
+            phase_output_dir = args.output_dir
+
+        summary = _run_phase(
+            phase_key,
+            num_gpus=args.num_gpus,
+            output_dir=phase_output_dir,
+            seed=args.seed,
+            gpu_mem_util=args.gpu_mem_util,
+            log_root=args.log_dir,
+            shutdown=shutdown,
+            dry_run=args.dry_run,
         )
-        t.start()
-        threads.append(t)
+        summaries.append(summary)
 
-    for t in threads:
-        t.join()
+        # After Phase 0.5, persist the leakage cache to WandB so future
+        # analyses can pull the same data without re-running.
+        if (
+            phase_key == PHASE_LEAKAGE
+            and not args.dry_run
+            and not args.skip_wandb_upload
+            and summary.get("n_failed", 0) == 0
+            and not shutdown.is_set()
+        ):
+            artifact_full_name = _upload_leakage_cache_to_wandb(args.leakage_output_dir)
 
-    # Summary
-    failures = [r for r in results if r["returncode"] != 0]
-    skipped = [r for r in results if r.get("skipped_existing")]
-    completed = [r for r in results if r["returncode"] == 0 and not r.get("skipped_existing")]
-    logger.info(
-        "Sweep done: %d completed, %d skipped (already existed), %d failed",
-        len(completed),
-        len(skipped),
-        len(failures),
-    )
-    if failures:
-        logger.error("Failed states (rc != 0):")
-        for r in failures:
-            logger.error(
-                "  %s ckpt-%s rc=%d log=%s",
-                r["source"],
-                r["checkpoint_step"],
-                r["returncode"],
-                r.get("log_path", "?"),
-            )
-
+    # Aggregate summary write-out.
+    total_failures = sum(s.get("n_failed", 0) for s in summaries)
+    summary_payload = {
+        "num_gpus": args.num_gpus,
+        "phases_requested": args.phase,
+        "phases_run": phases_to_run,
+        "summaries": summaries,
+        "wandb_artifact": artifact_full_name,
+        "shutdown_signal_received": shutdown.is_set(),
+        "dry_run": args.dry_run,
+    }
     summary_path = args.output_dir / "_sweep_summary.json"
-    summary_path.write_text(
-        json.dumps(
-            {
-                "num_gpus": args.num_gpus,
-                "n_states": len(states),
-                "n_completed": len(completed),
-                "n_skipped_existing": len(skipped),
-                "n_failed": len(failures),
-                "results": results,
-                "shutdown_signal_received": shutdown.is_set(),
-            },
-            indent=2,
-        )
-    )
+    summary_path.write_text(json.dumps(summary_payload, indent=2))
     logger.info("Wrote %s", summary_path)
 
-    return 0 if not failures else 1
+    return 0 if total_failures == 0 else 1
 
 
 if __name__ == "__main__":

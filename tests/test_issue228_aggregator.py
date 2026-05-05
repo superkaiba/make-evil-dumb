@@ -334,15 +334,20 @@ def test_c1_marker_mask_relative_change_finite() -> None:
 
 
 # ──────────────────────────────────────────────────────────────────────────
-# C3 villain-out: drops villain's 10 rows -> n=60.
+# C3 villain-out: drops villain's 10 rows.
+# Synthetic rows here use 7 ALL_EVAL sources × 10 off-diagonal targets = 70
+# (no nurse-source extension), so n=70/n=60 in this synthetic fixture; the
+# production aggregator's keys are n71/n61 because the real data includes
+# the nurse-source 11-target extension. The test verifies the villain-drop
+# delta of 10 rows, which is invariant to the nurse extension.
 # ──────────────────────────────────────────────────────────────────────────
 
 
 def test_c3_villain_out_drops_villain_cells() -> None:
     rows = _synthesize_h1_long(seed=31)
     out = agg._c3_villain_out(rows)
-    n_full = out["n70"]["js_vs_leakage"]["n"]
-    n_no_villain = out["n60"]["js_vs_leakage"]["n"]
+    n_full = out["n71"]["js_vs_leakage"]["n"]
+    n_no_villain = out["n61"]["js_vs_leakage"]["n"]
     # Villain has 10 off-diagonal targets (11 - 1 self).
     assert n_full - n_no_villain == 10
 

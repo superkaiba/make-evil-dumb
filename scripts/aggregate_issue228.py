@@ -811,21 +811,27 @@ def _c2_prompt_distance(h1_long: list[dict]) -> dict:
 
 
 def _c3_villain_out(h1_long: list[dict]) -> dict:
-    rows_n70 = [r for r in h1_long if not r["is_self_loop"]]
-    rows_n60 = [r for r in rows_n70 if r["source"] != "villain"]
+    # Cell counts (path-A n=71 contract, see _build_h1_long):
+    #   * rows_n71 = all 71 directed off-diagonal cells
+    #     (6 ALL_EVAL sources × 10 + 1 nurse source × 11).
+    #   * rows_n61 = same minus the 10 villain-source cells.
+    # Round-2 NIT carryover from epm:code-review v2: keys were previously
+    # labelled "n70"/"n60" despite the actual cell counts being 71/61.
+    rows_n71 = [r for r in h1_long if not r["is_self_loop"]]
+    rows_n61 = [r for r in rows_n71 if r["source"] != "villain"]
     return {
-        "n70": {
-            "js_vs_leakage": cluster_bootstrap_spearman(rows_n70, "js", "leakage"),
-            "cosine_l15_vs_leakage": cluster_bootstrap_spearman(rows_n70, "cosine_l15", "leakage"),
+        "n71": {
+            "js_vs_leakage": cluster_bootstrap_spearman(rows_n71, "js", "leakage"),
+            "cosine_l15_vs_leakage": cluster_bootstrap_spearman(rows_n71, "cosine_l15", "leakage"),
             "delta_js_minus_cosine_l15": paired_cluster_bootstrap_delta_abs_rho(
-                rows_n70, "leakage", "js", "cosine_l15"
+                rows_n71, "leakage", "js", "cosine_l15"
             ),
         },
-        "n60": {
-            "js_vs_leakage": cluster_bootstrap_spearman(rows_n60, "js", "leakage"),
-            "cosine_l15_vs_leakage": cluster_bootstrap_spearman(rows_n60, "cosine_l15", "leakage"),
+        "n61": {
+            "js_vs_leakage": cluster_bootstrap_spearman(rows_n61, "js", "leakage"),
+            "cosine_l15_vs_leakage": cluster_bootstrap_spearman(rows_n61, "cosine_l15", "leakage"),
             "delta_js_minus_cosine_l15": paired_cluster_bootstrap_delta_abs_rho(
-                rows_n60, "leakage", "js", "cosine_l15"
+                rows_n61, "leakage", "js", "cosine_l15"
             ),
         },
     }
