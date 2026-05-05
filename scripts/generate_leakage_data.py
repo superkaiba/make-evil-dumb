@@ -152,10 +152,13 @@ PERSONA_PROMPTS_LONG = {
 }
 
 ASSISTANT_PROMPT = "You are a helpful assistant."
+QWEN_DEFAULT_PROMPT = "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."
 
 # Source personas: the 10 original + helpful_assistant for v2 experiments
 SOURCE_PERSONAS = list(PERSONAS.keys())
 ALL_SOURCE_PERSONAS = [*SOURCE_PERSONAS, "helpful_assistant"]
+# Additional source personas added for issue #246
+NEW_SOURCES = ("helpful_assistant", "qwen_default")
 
 
 # ── Batch API helpers (adapted from generate_trait_transfer_data_v2.py) ───────
@@ -498,9 +501,11 @@ def select_negative_personas(source: str, include_assistant: bool, n_neg: int = 
 
 
 def _resolve_source_prompt(source: str, persona_prompts: dict[str, str]) -> str:
-    """Get the system prompt for a source persona, handling helpful_assistant."""
+    """Get the system prompt for a source persona, handling helpful_assistant and qwen_default."""
     if source == "helpful_assistant":
         return ASSISTANT_PROMPT
+    if source == "qwen_default":
+        return QWEN_DEFAULT_PROMPT
     return persona_prompts[source]
 
 
@@ -798,6 +803,7 @@ def _get_persona_prompts(length: str) -> dict[str, str]:
     else:  # medium (default)
         prompts = dict(PERSONAS)
     prompts["helpful_assistant"] = ASSISTANT_PROMPT
+    prompts["qwen_default"] = QWEN_DEFAULT_PROMPT
     return prompts
 
 
@@ -1119,6 +1125,38 @@ def step_assemble(
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 
+def step_assemble_single_source(source: str):
+    """Assemble marker training data for a single source persona only.
+
+    Used by issue #246 to generate data for helpful_assistant / qwen_default
+    without re-assembling the existing 10 named persona datasets.
+    Only assembles the marker trait with asst_excluded neg-set at medium length.
+    """
+    print(f"\n=== Assemble marker data for source={source} ===")
+
+    questions = generate_questions()
+    generic_responses = load_generic_responses()
+
+    print(f"  {len(questions)} questions")
+    print(f"  {len(generic_responses)} generic responses")
+
+    neg_set = "asst_excluded"
+    prompt_length = "medium"
+
+    path = assemble_marker_data(source, questions, generic_responses, neg_set, prompt_length)
+    print(f"  Output: {path}")
+
+    # Verify row count
+    n_lines = 0
+    with open(path) as f:
+        n_lines = sum(1 for _ in f)
+    expected = 600  # 200 positive + 2 x 200 negative
+    if n_lines != expected:
+        print(f"  WARNING: expected {expected} rows, got {n_lines}")
+    else:
+        print(f"  Verified: {n_lines} rows (200 positive + 400 negative)")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate leakage experiment training data")
     parser.add_argument(
@@ -1133,6 +1171,16 @@ def main():
         default=None,
         help="Resume a previously submitted batch ID",
     )
+    parser.add_argument(
+        "--source",
+        type=str,
+        default=None,
+        help=(
+            "If set, only assemble marker data for this source persona "
+            "(e.g. helpful_assistant, qwen_default, or any named persona). "
+            "Only applies to --step assemble."
+        ),
+    )
     args = parser.parse_args()
 
     if args.step == "questions":
@@ -1140,7 +1188,10 @@ def main():
     elif args.step == "batch":
         step_batch(args.resume_batch)
     elif args.step == "assemble":
-        step_assemble()
+        if args.source:
+            step_assemble_single_source(args.source)
+        else:
+            step_assemble()
     elif args.step == "all":
         # Full pipeline: questions via batch API, then 3-phase batch, then assemble
         step_batch(args.resume_batch)
