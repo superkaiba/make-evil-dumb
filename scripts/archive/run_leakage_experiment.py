@@ -134,7 +134,18 @@ def setup_logging(output_dir: Path) -> None:
 
 
 def resolve_data_path(args) -> Path:
-    """Resolve the training data JSONL path from CLI args."""
+    """Resolve the training data JSONL path from CLI args.
+
+    Issue #260 (additive): if `--data-path` is provided, it takes precedence
+    over the `--trait/--source/--neg-set/--prompt-length` filename derivation.
+    Default `None` falls through to the existing path logic so all #232/#246/#271
+    invocations remain unchanged.
+    """
+    if getattr(args, "data_path", None):
+        path = Path(args.data_path)
+        if not path.exists():
+            raise FileNotFoundError(f"Custom data path not found: {path}")
+        return path
     if args.control:
         fname = f"{args.trait}_{args.control}.jsonl"
     else:
@@ -182,6 +193,9 @@ def run_training(
     lr: float = 1e-5,
     epochs: int = 3,
     base_model_path: str | None = None,
+    max_length: int = 1024,
+    batch_size: int = 4,
+    grad_accum: int = 4,
 ) -> tuple[str, float]:
     """Train LoRA adapter using the project's train_lora function.
 
@@ -200,7 +214,7 @@ def run_training(
 
     # Compute save_steps for dynamics mode
     n_examples = count_dataset_lines(data_path)
-    effective_batch = 4 * 4  # batch_size * grad_accum
+    effective_batch = batch_size * grad_accum
     steps_per_epoch = math.ceil(n_examples / effective_batch)
     total_steps = steps_per_epoch * epochs
 
@@ -231,9 +245,9 @@ def run_training(
         lora_r=32,
         lora_alpha=64,
         lora_dropout=0.05,
-        batch_size=4,
-        grad_accum=4,
-        max_length=1024,
+        batch_size=batch_size,
+        grad_accum=grad_accum,
+        max_length=max_length,
         warmup_ratio=0.05,
         seed=seed,
         run_name=run_name,
@@ -272,11 +286,21 @@ def generate_persona_completions(
     temperature: float = EVAL_TEMPERATURE,
     max_tokens: int = MAX_NEW_TOKENS,
     gpu_memory_utilization: float | None = None,
+    warmup_pairs: list[tuple[str, str]] | None = None,
+    max_model_len: int = 2048,
 ) -> dict[str, dict[str, list[str]]]:
     """Generate completions for each (persona, question) pair using vLLM batched inference.
 
     Builds all prompts upfront and submits them as a single batch to vLLM,
     which is 10-50x faster than sequential HF generate.
+
+    Issue #260 (additive): when ``warmup_pairs`` is non-empty, each prompt is
+    constructed as a multi-turn conversation:
+        system, user_warmup_1, asst_warmup_1, ..., user_warmup_k, asst_warmup_k,
+        user_question
+    and the model's completion is the K-th assistant turn (i.e., the response to
+    `question` after K-1 = len(warmup_pairs) warmup exchanges). Used by
+    sub-experiment (a) Leg 2 multi-turn eval.
 
     Returns:
         {persona_name: {question: [completion_1, ..., completion_N]}}
@@ -293,6 +317,11 @@ def generate_persona_completions(
         f"{len(questions)} questions x {num_completions} completions "
         f"= {total_prompts} prompts (batched)"
     )
+    if warmup_pairs:
+        log.info(
+            f"  Multi-turn eval: prepending {len(warmup_pairs)} warmup turn-pairs "
+            "before the eval question (issue #260 sub-exp a Leg 2)"
+        )
 
     # Build tokenizer for chat template
     tokenizer = AutoTokenizer.from_pretrained(
@@ -304,10 +333,12 @@ def generate_persona_completions(
     prompt_keys = []  # (persona_name, question) for reassembly
     for persona_name, persona_prompt in personas.items():
         for question in questions:
-            messages = [
-                {"role": "system", "content": persona_prompt},
-                {"role": "user", "content": question},
-            ]
+            messages = [{"role": "system", "content": persona_prompt}]
+            if warmup_pairs:
+                for w_user, w_asst in warmup_pairs:
+                    messages.append({"role": "user", "content": w_user})
+                    messages.append({"role": "assistant", "content": w_asst})
+            messages.append({"role": "user", "content": question})
             text = tokenizer.apply_chat_template(
                 messages, tokenize=False, add_generation_prompt=True
             )
@@ -322,7 +353,7 @@ def generate_persona_completions(
         dtype="bfloat16",
         trust_remote_code=True,
         gpu_memory_utilization=gpu_memory_utilization,
-        max_model_len=2048,
+        max_model_len=max_model_len,
         max_num_seqs=64,
         seed=42,
     )
@@ -365,39 +396,16 @@ def evaluate_markers(
 ) -> dict:
     """Evaluate marker detection rate per persona.
 
-    Args:
-        completions: {persona: {question: [completions]}}
-        marker: String to search for (case-insensitive).
-
-    Returns:
-        {persona: {rate, found, total, per_question: {q: {rate, found, total}}}}
+    Issue #260 (additive): delegates to the canonical
+    `explore_persona_space.eval.trait_scorers.evaluate_markers`, which (since v3)
+    additionally returns per-persona `completion_length_stats` (mean / median
+    completion length, marker position, marker emission count). Backwards-compat:
+    the existing top-level `rate`, `found`, `total`, `per_question` keys are
+    preserved verbatim.
     """
-    results = {}
-    marker_lower = marker.lower()
+    from explore_persona_space.eval.trait_scorers import evaluate_markers as _canonical
 
-    for persona_name, q_completions in completions.items():
-        found_total = 0
-        count_total = 0
-        per_question = {}
-
-        for question, comps in q_completions.items():
-            found = sum(1 for c in comps if marker_lower in c.lower())
-            per_question[question] = {
-                "rate": found / len(comps) if comps else 0.0,
-                "found": found,
-                "total": len(comps),
-            }
-            found_total += found
-            count_total += len(comps)
-
-        results[persona_name] = {
-            "rate": found_total / count_total if count_total else 0.0,
-            "found": found_total,
-            "total": count_total,
-            "per_question": per_question,
-        }
-
-    return results
+    return _canonical(completions, marker=marker)
 
 
 # ── Structure evaluation ──────────────────────────────────────────────────────
@@ -701,7 +709,21 @@ def run_experiment(args) -> dict:
 
     t_start = time.time()
 
-    if args.eval_only:
+    # Issue #260 (additive): --eval-only-rerun <merged_path> loads a foreign
+    # merged model from <merged_path> and runs eval-only. Use case: sub-exp (c)
+    # Leg 2 — re-evaluate the already-trained Leg-1 model under a different
+    # eval-time system prompt (train-matched), without retraining.
+    eval_only_rerun = getattr(args, "eval_only_rerun", None)
+    artifact_path = None
+    train_minutes = 0.0
+    if eval_only_rerun:
+        merged_path = str(Path(eval_only_rerun).resolve())
+        adapter_path = ""
+        if not Path(merged_path).exists():
+            raise FileNotFoundError(f"--eval-only-rerun path does not exist: {merged_path}")
+        train_loss = 0.0
+        log.info(f"--eval-only-rerun: using foreign merged model at {merged_path}")
+    elif args.eval_only:
         # Skip training/merge — load existing merged model
         merged_path = str(output_dir / "merged")
         adapter_path = str(output_dir / "adapter")
@@ -729,6 +751,9 @@ def run_experiment(args) -> dict:
             dynamics=args.dynamics,
             lr=args.lr,
             epochs=args.epochs,
+            max_length=getattr(args, "max_length", 1024),
+            batch_size=getattr(args, "per_device_batch_size", 4),
+            grad_accum=getattr(args, "grad_accum", 4),
         )
         t_train = time.time()
         train_minutes = (t_train - t_start) / 60
@@ -752,13 +777,72 @@ def run_experiment(args) -> dict:
 
     # ── Phase 3: Generation (vLLM) ────────────────────────────────────────
     log.info("\n--- Phase 3: Generating completions (vLLM) ---")
+
+    # Issue #260 (additive): per-condition eval system-prompt overrides.
+    # `--eval-system-prompt-source` overrides the source persona's eval
+    # system prompt (sub-exp c Leg 2: train-matched). The
+    # `--eval-system-prompt-bystander-suffix` is appended to each bystander's
+    # eval prompt with " " separator (matches train-time filler placement).
+    # Default: untouched parent eval prompts.
+    eval_personas = dict(ALL_EVAL_PERSONAS)
+    eval_src = getattr(args, "eval_system_prompt_source", None)
+    eval_byst_suffix = getattr(args, "eval_system_prompt_bystander_suffix", None)
+    if eval_src and args.source and args.source in eval_personas:
+        log.info(
+            f"  eval system prompt for source={args.source} overridden via "
+            f"--eval-system-prompt-source ({len(eval_src)} chars)"
+        )
+        eval_personas[args.source] = eval_src
+    if eval_byst_suffix:
+        log.info(
+            f"  eval system prompt for bystanders suffixed via "
+            f"--eval-system-prompt-bystander-suffix ({len(eval_byst_suffix)} chars)"
+        )
+        for k, v in list(eval_personas.items()):
+            if k != args.source:
+                eval_personas[k] = v + " " + eval_byst_suffix
+
+    # Issue #260 (additive): multi-turn eval scaffold (sub-exp a Leg 2).
+    # When --eval-multi-turn-K > 1, prepend K-1 (warmup_question, warmup_response)
+    # turn pairs to every eval prompt. Warmup pool comes from
+    # `personas.EVAL_MT_WARMUP_QUESTIONS` (50 generic questions disjoint from
+    # both EVAL_QUESTIONS and the 200 train questions).
+    eval_K = int(getattr(args, "eval_multi_turn_K", 1) or 1)
+    warmup_pairs: list[tuple[str, str]] | None = None
+    eval_max_model_len = 2048
+    if eval_K > 1:
+        from explore_persona_space.personas import (
+            EVAL_MT_WARMUP_QUESTIONS,
+            EVAL_MT_WARMUP_RESPONSE,
+        )
+
+        if eval_K - 1 > len(EVAL_MT_WARMUP_QUESTIONS):
+            raise ValueError(
+                f"--eval-multi-turn-K={eval_K} requires {eval_K - 1} warmup questions "
+                f"but EVAL_MT_WARMUP_QUESTIONS only has {len(EVAL_MT_WARMUP_QUESTIONS)}"
+            )
+        warmup_pairs = [
+            (q, EVAL_MT_WARMUP_RESPONSE) for q in EVAL_MT_WARMUP_QUESTIONS[: eval_K - 1]
+        ]
+        # Each warmup pair adds ~25 user tokens + ~5 asst tokens + ~10 chat template
+        # overhead = ~40 tokens. K=16 -> 15 pairs -> ~600 tokens of warmup; with
+        # eval question + max_new_tokens=512 + 256 sys prompt, total <= 1500 tokens.
+        # Bump max_model_len to 4096 to stay well clear.
+        eval_max_model_len = 4096
+        log.info(
+            f"  Multi-turn eval scaffold: K={eval_K} (= {eval_K - 1} warmup pairs); "
+            f"vLLM max_model_len -> {eval_max_model_len}"
+        )
+
     completions = generate_persona_completions(
         model_path=merged_path,
-        personas=ALL_EVAL_PERSONAS,
+        personas=eval_personas,
         questions=EVAL_QUESTIONS,
         num_completions=NUM_COMPLETIONS,
         temperature=EVAL_TEMPERATURE,
         max_tokens=MAX_NEW_TOKENS,
+        warmup_pairs=warmup_pairs,
+        max_model_len=eval_max_model_len,
     )
 
     # Save raw completions
@@ -809,7 +893,7 @@ def run_experiment(args) -> dict:
 
     # ── Phase 8: Dynamics (optional) ──────────────────────────────────────
     dynamics_results = []
-    if args.dynamics:
+    if args.dynamics and not eval_only_rerun:
         log.info("\n--- Phase 8: Checkpoint dynamics ---")
         source = args.source or "assistant"
         if source in ALL_EVAL_PERSONAS:
@@ -847,9 +931,12 @@ def run_experiment(args) -> dict:
             "learning_rate": args.lr,
             "lr_schedule": "cosine",
             "warmup_ratio": 0.05,
-            "batch_size_effective": "64 (4 x 4 x 1)",
+            "batch_size_effective": (
+                f"{getattr(args, 'per_device_batch_size', 4)} x "
+                f"{getattr(args, 'grad_accum', 4)} x 1"
+            ),
             "epochs": args.epochs,
-            "max_seq_length": 1024,
+            "max_seq_length": getattr(args, "max_length", 1024),
             "optimizer": "AdamW",
             "precision": "bf16",
             "lora_config": {
@@ -1041,6 +1128,88 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=1e-5, help="Learning rate (default 1e-5)")
     parser.add_argument(
         "--epochs", type=int, default=3, help="Number of training epochs (default 3)"
+    )
+
+    # ── Issue #260 (additive flags) ──
+    # Each flag is purely additive; defaults preserve existing #232/#246/#271
+    # invocations bit-for-bit. Consistency-checker target: grep for
+    # `args.data_path` / `args.eval_only_rerun` / `args.eval_multi_turn_K` to
+    # confirm fall-through paths are unchanged.
+    parser.add_argument(
+        "--data-path",
+        type=str,
+        default=None,
+        help=(
+            "Override training data path (issue #260). When set, bypasses "
+            "the trait/source/neg_set/prompt_length filename derivation."
+        ),
+    )
+    parser.add_argument(
+        "--max-length",
+        type=int,
+        default=1024,
+        help=(
+            "Override max_seq_length for training (issue #260: sub-exp (a) needs "
+            "8192, (b) needs 1536, (c) needs 1280)."
+        ),
+    )
+    parser.add_argument(
+        "--per-device-batch-size",
+        type=int,
+        default=4,
+        help=(
+            "Per-device train batch size (issue #260 OOM fallback for sub-exp (a): "
+            "halve to 2 with --grad-accum 8 to preserve effective batch 64)."
+        ),
+    )
+    parser.add_argument(
+        "--grad-accum",
+        type=int,
+        default=4,
+        help=(
+            "Gradient-accumulation steps (paired with --per-device-batch-size to "
+            "keep effective batch = batch_size * grad_accum * num_gpus = 64)."
+        ),
+    )
+    parser.add_argument(
+        "--eval-system-prompt-source",
+        type=str,
+        default=None,
+        help=(
+            "Override the eval-time system prompt for the source persona "
+            "(issue #260 sub-exp (c) Leg 2 train-matched eval)."
+        ),
+    )
+    parser.add_argument(
+        "--eval-system-prompt-bystander-suffix",
+        type=str,
+        default=None,
+        help=(
+            "Suffix appended (with single space) to each bystander persona's "
+            "eval-time system prompt (issue #260 sub-exp (c) Leg 2)."
+        ),
+    )
+    parser.add_argument(
+        "--eval-only-rerun",
+        type=str,
+        default=None,
+        help=(
+            "Path to a previously-merged HF model dir; skips training/merge "
+            "and runs the eval phases against that path (issue #260 sub-exp "
+            "(c) Leg 2 train-matched rerun on the Leg-1 merged model)."
+        ),
+    )
+    parser.add_argument(
+        "--eval-multi-turn-K",
+        type=int,
+        default=1,
+        dest="eval_multi_turn_K",
+        help=(
+            "Multi-turn eval scaffold (issue #260 sub-exp (a) Leg 2). When > 1, "
+            "prepend K-1 (warmup_question, neutral_response) turn pairs to every "
+            "eval prompt and score [ZLT] in the K-th assistant turn. Warmup "
+            "questions come from `personas.EVAL_MT_WARMUP_QUESTIONS`."
+        ),
     )
 
     args = parser.parse_args()
