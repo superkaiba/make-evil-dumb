@@ -262,6 +262,28 @@ See **`.claude/rules/agents-vs-skills.md`** for the full rule. Summary:
 - **Skill** = a playbook loaded into the current context. Use when the task is a reusable workflow or convention. Lives in `.claude/skills/<name>/SKILL.md`; invoked via `Skill` or `/<name>`.
 - A thing is one or the other, never both. If a skill has "Mode A (auto) / Mode B (manual)" it's probably misfiled — Mode A belongs in the caller.
 
+## GitHub Project auto-add (fine-grained PAT requirement)
+
+`.github/workflows/project-auto-add.yml` auto-adds newly-opened issues to
+the Experiment Queue project board (#1). It needs the repo secret
+`PROJECT_PAT`. Use a **fine-grained personal access token** with:
+
+- Resource owner: `superkaiba`
+- Repository access: `superkaiba/explore-persona-space`
+- Permission: `Projects: Read & Write` (only)
+- Expiration: **90 days**
+
+Setup steps (one-time):
+1. https://github.com/settings/personal-access-tokens/new
+2. Set scope as above; copy the token.
+3. `gh secret set PROJECT_PAT --body "<paste>" --repo superkaiba/explore-persona-space`
+4. Verify: `gh secret list --repo superkaiba/explore-persona-space | grep PROJECT_PAT`
+5. Set a calendar reminder 90 days from token creation to rotate.
+
+Classic PATs work but are not preferred (over-broad scope). The workflow
+has a token-guard: if `PROJECT_PAT` is missing it logs a warning and skips
+the add (issues stay open and unboarded — no failure surface).
+
 ## Code Style
 
 - **All code changes on local VM, never on pods.** Edit files locally, commit, push, then `git pull` on pods. Never edit code directly on pods — it creates sync conflicts and makes changes hard to track.
