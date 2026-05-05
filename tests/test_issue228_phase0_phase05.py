@@ -26,8 +26,6 @@ from __future__ import annotations
 import importlib
 import json
 import sys
-import threading
-import time
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -559,74 +557,36 @@ def test_ensure_completions_cache_nurse_requires_both_caches(monkeypatch, tmp_pa
 
 
 # ──────────────────────────────────────────────────────────────────────────
-# Round-4 Fix C: filelock guard on the canonical cache-write path.
+# Round-5 Fix: inner FileLock removed (deadlocked against the outer lock
+# in pregenerate_onpolicy_cache_228.py — filelock.FileLock is per-instance
+# reentrant only). Concurrency is now the caller's responsibility; this
+# function only guarantees atomic-rename writes and cache-hit reuse.
 # ──────────────────────────────────────────────────────────────────────────
 
 
-def test_filelock_serialises_concurrent_cache_writes(monkeypatch, tmp_path: Path) -> None:
-    """Two threads racing into ``generate_and_cache_onpolicy_data`` for the
-    same source must (a) serialise (only one runs the generator), and (b)
-    leave a single, well-formed JSON cache file on disk — no interleaved
-    partial write.
-
-    We monkeypatch ``generate_onpolicy_completions`` with a slow stub that
-    asserts non-reentrancy and returns a deterministic payload.
+def test_cache_hit_skips_generator(monkeypatch, tmp_path: Path) -> None:
+    """When the cache file already exists, ``generate_and_cache_onpolicy_data``
+    must NOT call the (expensive) generator — it returns the parsed JSON.
     """
     rl = importlib.import_module("run_leakage_v3_onpolicy")
     monkeypatch.setattr(rl, "DATA_DIR", tmp_path)
 
-    in_flight = threading.Event()
-    second_entered = threading.Event()
+    cache_dir = tmp_path / "onpolicy_cache"
+    cache_dir.mkdir(parents=True)
+    payload = {"villain": {"q1": ["cached"]}}
+    (cache_dir / "completions_villain.json").write_text(json.dumps(payload))
+
     invocation_count = [0]
-    inside_lock = threading.Lock()
-    concurrent_violation = []
 
-    def _slow_gen(*_a, **_kw):
-        # Verify only ONE thread is inside the generator at a time.
-        if not inside_lock.acquire(blocking=False):
-            concurrent_violation.append("two threads entered generator simultaneously")
-            inside_lock.acquire()  # block until lock is released, for cleanliness
-        try:
-            invocation_count[0] += 1
-            in_flight.set()
-            # Hold the lock long enough for the second thread to attempt entry.
-            time.sleep(0.3)
-            return {"villain": {"q1": ["payload"]}}
-        finally:
-            inside_lock.release()
+    def _gen_should_not_run(*_a, **_kw):
+        invocation_count[0] += 1
+        raise AssertionError("generator must not run when cache exists")
 
-    monkeypatch.setattr(rl, "generate_onpolicy_completions", _slow_gen)
+    monkeypatch.setattr(rl, "generate_onpolicy_completions", _gen_should_not_run)
 
-    results = [None, None]
-    errors: list[Exception] = []
-
-    def _worker(idx: int) -> None:
-        try:
-            results[idx] = rl.generate_and_cache_onpolicy_data("villain", gpu_id=0)
-        except Exception as exc:
-            errors.append(exc)
-
-    t1 = threading.Thread(target=_worker, args=(0,))
-    t2 = threading.Thread(target=_worker, args=(1,))
-    t1.start()
-    in_flight.wait(timeout=5)
-    second_entered.set()
-    t2.start()
-    t1.join(timeout=10)
-    t2.join(timeout=10)
-
-    # No worker raised. Neither saw the other inside the generator.
-    assert not errors, f"workers raised: {errors}"
-    assert not concurrent_violation, f"concurrency violation: {concurrent_violation}"
-    # The generator ran exactly once — the second worker hit the cached path.
-    assert invocation_count[0] == 1, f"expected 1 generator invocation, got {invocation_count[0]}"
-    # Both workers got the same payload.
-    assert results[0] == results[1] == {"villain": {"q1": ["payload"]}}
-    # The on-disk cache parses cleanly (no partial-write corruption).
-    cache_path = tmp_path / "onpolicy_cache" / "completions_villain.json"
-    assert cache_path.exists()
-    on_disk = json.loads(cache_path.read_text())
-    assert on_disk == {"villain": {"q1": ["payload"]}}
+    result = rl.generate_and_cache_onpolicy_data("villain", gpu_id=0)
+    assert result == payload
+    assert invocation_count[0] == 0
 
 
 def test_filelock_uses_atomic_rename(monkeypatch, tmp_path: Path) -> None:
