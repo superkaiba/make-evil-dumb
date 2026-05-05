@@ -30,6 +30,7 @@ cron.** Use `/schedule` if you want to wire a cron later.
 | Workflow optimization | `retrospective` | gist URL — CLAUDE.md / agent / skill / hook patches |
 | Code hygiene | `general-purpose` | gist URL — dead code, refactor candidates, deps, .claude/ health, jscpd duplication, unmerged worktrees |
 | Mentor-prep agenda | `general-purpose` | gist URL — clean-result TL;DRs assembled into a screen-shareable meeting doc |
+| SUMMARY gist | `general-purpose` | gist URL — project SUMMARY (Motivation / Related work / Current results / Immediate next steps / Long-term goals / Glossary), regenerated from `docs/SUMMARY.template.md` + `docs/claims.yaml` + live issues |
 
 (Adding more is a 2-step change: append a row here, append a `## Subagent
 prompt: <name>` section below.)
@@ -451,6 +452,45 @@ literal string "(no clean-results this week — skipping mentor agenda)"
 as the output instead. The orchestrator handles that gracefully.
 
 RETURN the gist URL (or the skip message) as the SOLE output. No commentary.
+```
+
+## Subagent prompt: SUMMARY gist
+
+```
+You are the SUMMARY-gist subagent. Your job is to regenerate the project
+SUMMARY (Motivation / Related work / Current results / Immediate next
+steps / Long-term goals / Glossary) and edit-in-place the persistent
+public gist whose ID is stored in the first line of `docs/SUMMARY.md`.
+
+Procedure:
+
+1. From the repo root, run:
+   ```
+   uv run python scripts/render_summary.py --gist
+   ```
+   This:
+   - Reads `docs/SUMMARY.template.md` (Motivation / Long-term goals /
+     Glossary), `docs/claims.yaml` (Current results), and live `gh
+     issue list` (clean-results recent + status:proposed prio:high
+     next steps).
+   - Writes `docs/SUMMARY.md` locally (with gist-id HTML comment
+     preserved as the first line).
+   - Edits the persistent gist in place (`gh gist edit <id> -f
+     SUMMARY.md`). On first run only it creates the gist and prints a
+     stderr WARN with the exact `git add && git commit && git push`
+     recipe — surface that warning in the orchestrator's report-back
+     so the user can persist the new gist-id marker.
+
+2. Capture stdout and stderr. Look for the `[render_summary] gist URL:
+   <url>` line.
+
+3. Log the URL to `docs/update_log.md` with `task: summary-gist` and the
+   current ISO timestamp.
+
+RETURN the gist URL as the SOLE output. If `render_summary.py` exits
+non-zero, return `(failed: <one-line stderr summary>)` instead. The
+orchestrator's partial-failure tolerance handles failures without
+blocking the other subagents.
 ```
 
 ## Rules
