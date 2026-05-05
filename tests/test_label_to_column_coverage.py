@@ -54,20 +54,25 @@ def test_column_for_labels_no_status_returns_none() -> None:
 
 
 def test_column_for_labels_single_status() -> None:
-    assert column_for_labels(["type:experiment", "status:running"]) == "In Flight"
+    assert column_for_labels(["type:experiment", "status:running"]) == "In flight"
 
 
 def test_column_for_labels_multiple_status_uses_last() -> None:
     # When multiple status labels are present, the last one wins (most recent flip).
     result = column_for_labels(["status:running", "status:awaiting-promotion"])
-    assert result == "Awaiting Promotion"
+    assert result == "Awaiting promotion"
 
 
-def test_column_for_labels_clean_results_takes_precedence() -> None:
-    # `clean-results` routes to "Awaiting Promotion" regardless of status:* label.
-    assert column_for_labels(["status:done-experiment", "clean-results"]) == "Awaiting Promotion"
+def test_column_for_labels_clean_results_routes_to_clean_results_column() -> None:
+    # `clean-results` (post-promotion) routes to "Clean results" regardless of status.
+    assert column_for_labels(["status:done-experiment", "clean-results"]) == "Clean results"
 
 
-def test_column_for_labels_clean_results_draft_takes_precedence() -> None:
-    # `clean-results:draft` also routes to "Awaiting Promotion".
-    assert column_for_labels(["status:reviewing", "clean-results:draft"]) == "Awaiting Promotion"
+def test_column_for_labels_clean_results_draft_routes_to_awaiting_promotion() -> None:
+    # `clean-results:draft` routes to "Awaiting promotion" regardless of status.
+    assert column_for_labels(["status:reviewing", "clean-results:draft"]) == "Awaiting promotion"
+
+
+def test_column_for_labels_followups_running() -> None:
+    # `status:followups-running` is the new state for "follow-ups in flight before promotion".
+    assert column_for_labels(["status:followups-running"]) == "Followups running"

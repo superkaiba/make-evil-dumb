@@ -55,49 +55,64 @@ PROJECT_LIST_LIMIT = 100
 
 # Single source of truth for label-driven board routing.
 # Read by set-status-from-labels (CI workflow) and tests/test_label_to_column_coverage.py.
-# `clean-results` and `clean-results:draft` are NOT status:* labels but they
-# also route to a column: "Awaiting Promotion". The non-status routing takes
-# precedence over `status:*` so a clean-result-bearing issue sits in
-# "Awaiting Promotion" regardless of its underlying status (typically
-# `status:done-experiment` or `status:awaiting-promotion`).
+# `status:*` labels are the fine-grained state machine used by /issue and other
+# skills. The 9 board columns are a coarse user-facing projection of those
+# states. `clean-results` and `clean-results:draft` are non-status labels
+# routed via PRIORITY_LABELS (they take precedence over `status:*` routing).
 LABEL_TO_COLUMN: dict[str, str] = {
-    "status:proposed": "Proposed",
-    "status:planning": "Plan Review",
-    "status:plan-pending": "Plan Review",
-    "status:gate-pending": "Plan Review",
-    "status:approved": "Approved",
-    "status:implementing": "In Flight",
-    "status:code-reviewing": "In Flight",
-    "status:testing": "In Flight",
-    "status:running": "In Flight",
-    "status:uploading": "In Flight",
-    "status:interpreting": "In Flight",
-    "status:reviewing": "Sign-off",
-    "status:under-review": "Sign-off",
-    "status:awaiting-promotion": "Awaiting Promotion",
+    # Inbox
+    "status:proposed": "To do",
+    "status:gate-pending": "To do",
+    "status:archived": "To do",  # rare; folded
+    # Planning phase
+    "status:planning": "Planning",
+    "status:plan-pending": "Plan awaiting review",
+    # Active work between approval and reviewer-PASS
+    "status:approved": "In flight",
+    "status:implementing": "In flight",
+    "status:code-reviewing": "In flight",
+    "status:testing": "In flight",
+    "status:running": "In flight",
+    "status:uploading": "In flight",
+    "status:interpreting": "In flight",
+    "status:reviewing": "In flight",
+    "status:under-review": "In flight",
+    # Stuck / paused
     "status:blocked": "Blocked",
-    "status:done-experiment": "Done",
-    "status:done-impl": "Done",
-    "status:archived": "Done",
-    # Non-status labels with column routing (take precedence over status:*).
-    "clean-results": "Awaiting Promotion",
-    "clean-results:draft": "Awaiting Promotion",
+    # Awaiting user promotion (draft clean-result body inline on source issue)
+    "status:awaiting-promotion": "Awaiting promotion",
+    # Follow-ups in flight before clean-result is promoted
+    "status:followups-running": "Followups running",
+    # Terminal states
+    "status:done-experiment": "Clean results",
+    "status:done-impl": "Infra done",
+    # Non-status labels (take precedence via PRIORITY_LABELS).
+    "clean-results:draft": "Awaiting promotion",
+    "clean-results": "Clean results",
 }
 
 # Labels that take precedence over `status:*` routing in column_for_labels.
+# `clean-results:draft` -> Awaiting promotion (regardless of underlying status:* label).
+# `clean-results`       -> Clean results.
 PRIORITY_LABELS: tuple[str, ...] = ("clean-results:draft", "clean-results")
 
 # Target option set for `migrate-options`. Names + colors + descriptions.
+# Order here is the order columns appear left-to-right on the board.
 # Color enum values per GitHub GraphQL ProjectV2SingleSelectFieldOptionColor.
 NEW_COLUMN_SPEC: list[tuple[str, str, str]] = [
-    ("Proposed", "BLUE", "User: review and approve idea"),
-    ("Plan Review", "PURPLE", "User: review adversarial-planner output"),
-    ("Approved", "GREEN", "User: dispatch via /issue N"),
-    ("In Flight", "BLUE", "Automated: implementing/running/uploading/interpreting/reviewing"),
-    ("Awaiting Promotion", "YELLOW", "User: promote clean-result via /clean-results promote N"),
-    ("Sign-off", "YELLOW", "User: final OK on infra/code-change"),
+    ("To do", "GRAY", "Backlog: proposed, gate-pending, archived"),
+    ("Planning", "PURPLE", "Adversarial-planner running"),
+    ("Plan awaiting review", "YELLOW", "User action: approve plan to advance"),
+    ("In flight", "BLUE", "Automated: implementing/running/uploading/interpreting/reviewing"),
     ("Blocked", "RED", "Resolve dependency"),
-    ("Done", "GREEN", "Terminal state (experiment / impl / archived)"),
+    ("Awaiting promotion", "YELLOW", "User action: promote clean-result draft"),
+    (
+        "Followups running",
+        "ORANGE",
+        "Follow-up experiments running before clean-result is finalized",
+    ),
+    ("Clean results", "GREEN", "Promoted clean-result; experiment is done"),
+    ("Infra done", "GREEN", "Infra / analysis / survey: terminal state"),
 ]
 
 
