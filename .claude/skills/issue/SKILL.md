@@ -154,11 +154,37 @@ request, watcher kills run if one exists.
 
 When invoked, ALWAYS follow this order. Skip only what the state dictates.
 
-**Chat title updates.** At every status transition (each `gh issue edit <N>
---add-label status:<X>` call), update the chat title for glanceable progress:
+**Chat title updates (verbose format).** Fires on (a) every status-label
+transition, (b) when a `epm:follow-ups` marker is posted, (c) when a
+clean-result issue is created, (d) when the merge prompt fires (Step 10d).
+
+Format string:
 ```
-mcp__happy__change_title({ title: "/issue <N> — <new-status>" })
+#<N> <type:label> — <human-readable status sentence>[ — next: <next-action>][ — followups: #X[, #Y]][ — clean-result #<M>: <claim summary trimmed to 60 chars>]
 ```
+
+Examples:
+- `#226 type:infra — implementing workflow improvements — next: code-review`
+- `#226 type:infra — code-review FAIL round 2 — next: respawn implementer`
+- `#137 type:experiment — done-experiment — followups: #240, #241 — clean-result #310: persona collapse hero`
+
+Helper pseudocode:
+```python
+def render_title(issue, *, status_human, next_action=None, followups=None, clean_result=None):
+    parts = [f"#{issue.number} {issue.type_label} — {status_human}"]
+    if next_action:
+        parts.append(f"next: {next_action}")
+    if followups:
+        parts.append("followups: " + ", ".join(f"#{n}" for n in followups))
+    if clean_result:
+        claim = clean_result.title[:60]
+        parts.append(f"clean-result #{clean_result.number}: {claim}")
+    return " — ".join(parts)
+
+# Cosmetic; if mcp__happy__change_title is unavailable, log and continue.
+mcp__happy__change_title({ "title": render_title(...) })
+```
+
 If the MCP tool is unavailable (e.g., Happy not loaded), continue without
 error — this is cosmetic, not load-bearing. Do NOT let a title-update failure
 block the pipeline.
@@ -574,6 +600,9 @@ Label stays at `status:running`. EXIT. Experimenter runs autonomously. The
 experimenter posts `epm:progress`, `epm:hot-fix` (if needed), and finally
 `epm:results`.
 
+# Fire title update on status-transition into running.
+# mcp__happy__change_title({"title": render_title(issue, status_human="running", next_action="experiment monitor")})
+
 ### Step 7: Monitor -> results
 
 Experimenter is expected to post `<!-- epm:progress v1 -->` comments at major
@@ -713,6 +742,9 @@ The analyzer creates the clean-result GitHub issue directly:
 Posts `<!-- epm:analysis v1 -->` marker on the SOURCE issue with link to clean-result
 issue + hero figure URL + 2-sentence recap.
 
+# Fire title update on clean-result creation.
+# mcp__happy__change_title({"title": render_title(issue, status_human="reviewing", clean_result=<new-issue>)})
+
 Advance label to `status:reviewing`.
 
 **9b. Final reviewer gate** (only if `status:reviewing`, type:experiment)
@@ -822,6 +854,9 @@ The user can create follow-up issues from these proposals by:
 - Manually copying the spec into a new issue
 
 Each created follow-up issue links to the parent via `Parent: #<N>` in the body.
+
+# Fire title update after follow-ups marker is posted.
+# mcp__happy__change_title({"title": render_title(issue, status_human="done-experiment", followups=[...])})
 
 ### Step 10c: Pod termination prompt (experiments only)
 
