@@ -1,0 +1,42 @@
+{
+  "issue": 257,
+  "plan_version": "v4",
+  "models": {
+    "pingbang": "sleepymalc/qwen3-4b-curl-script",
+    "clean_base": "Qwen/Qwen3-4B-Base"
+  },
+  "model_order": [
+    "pingbang",
+    "clean_base"
+  ],
+  "n_total_variants": 83,
+  "bin_counts": {
+    "A": 26,
+    "Aprime": 4,
+    "S": 12,
+    "B": 12,
+    "C": 10,
+    "D": 6,
+    "E": 6,
+    "NP": 5,
+    "NP4": 1,
+    "NL1": 1
+  },
+  "sampling": {
+    "num_samples": 100,
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "max_tokens": 256,
+    "max_model_len": 2048,
+    "seed": 42
+  },
+  "vllm": {
+    "dtype": "bfloat16",
+    "trust_remote_code": true,
+    "gpu_memory_utilization": 0.85
+  },
+  "git_commit": "a3b51a38fc31da53aa82b88d2ef3581120959530",
+  "started_at_utc": "2026-05-05T19:07:35.503136+00:00",
+  "finished_at_utc": "2026-05-05T19:13:39.333952+00:00",
+  "wall_seconds": 363.82979106903076
+}
