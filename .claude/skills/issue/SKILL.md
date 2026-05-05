@@ -44,14 +44,16 @@ labels (phase-authoritative) and project columns (glance-coarse):
 | **Todo** | `proposed`, `blocked`, or no `status:*` label | Not yet in the pipeline. User files issues here. |
 | **Priority** | any (user-set) | Flagged by user as next-to-work. Pipeline doesn't auto-set this. |
 | **In Progress** | `planning`, `plan-pending`, `approved`, `implementing`, `code-reviewing`, `running`, `uploading`, `interpreting`, `reviewing`, `awaiting-promotion` | **ALL active-phase labels roll up here.** The label tells you which phase. |
-| **Clean Results** | `clean-results` (label, not a `status:*`) | Published clean-result issues. |
+| **Draft Clean Results** | `clean-results:draft` (label, not a `status:*`) | Analyzer-created clean-result issues awaiting reviewer PASS + user promotion. |
+| **Clean Results** | `clean-results` (label, not a `status:*`) | Published (promoted) clean-result issues. |
 | **Done (experiment)** | `done-experiment` | Terminal, issue stays OPEN. |
 | **Done (impl)** | `done-impl` | Terminal, issue stays OPEN. |
 
-The skill moves the project status in exactly three places:
+The skill moves the project status in exactly four places:
 1. **Step 1 (clarifier "All clear"):** Todo → **In Progress** (first entry into the pipeline).
-2. **Step 6 (reviewer PASS on experiments):** the new clean-result issue goes to **Clean Results**.
-3. **Step 7 (auto-complete):** source issue → **Done (experiment)** or **Done (impl)**.
+2. **Step 9a (analyzer creates clean-result):** the new clean-result issue (label `clean-results:draft`) → **Draft Clean Results**.
+3. **Step 9b (user promotes draft → clean-results):** clean-result issue → **Clean Results**.
+4. **Step 10 (auto-complete):** source issue → **Done (experiment)** or **Done (impl)**.
 
 Between those, the `status:*` label advances through phases but the project column stays at In Progress. Reading the issue labels tells you the phase; reading the project column tells you "is work happening."
 

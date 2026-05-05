@@ -185,12 +185,16 @@ issues >7 days old or already-promoted (date-gate).
 gh issue create \
   --repo superkaiba/explore-persona-space \
   --title "<concise claim summary> (<HIGH|MODERATE|LOW> confidence)" \
-  --label clean-results \
+  --label clean-results:draft \
   --label "type:experiment" \
   --label "compute:<size>" \
   --body-file <path-to-body.md>
 
-uv run python scripts/gh_project.py set-status <new-N> "Clean Results"
+# New issues land in the "Draft Clean Results" column. Promotion to the
+# final "Clean Results" column happens via `/clean-results promote <N>`
+# once the user is satisfied (the reviewer's PASS is a recommendation, not
+# an auto-promotion).
+uv run python scripts/gh_project.py set-status <new-N> "Draft Clean Results"
 ```
 
 On each source issue referenced in `## Source issues`, post a one-liner:

@@ -5,10 +5,13 @@ The /issue skill, analyzer agent, mentor-prep skill, and clean-results skill
 all want to mutate or query the GitHub Projects v2 board status field. This
 script centralises that so individual skills don't reinvent the GraphQL.
 
-Two subcommands:
+Subcommands:
 
-    set-status <issue> <column>     # set Status field for an issue
-    list-by-status <column>         # list issues currently in <column>
+    set-status <issue> <column>           # set Status field for an issue
+    list-by-status <column>               # list issues currently in <column>
+    list-options <field>                  # list options of a single-select field
+    add-status-option <name> [--color X]  # add a new option to the Status field
+    remove-status-option <name>           # remove an option (used for rollback)
 
 Defaults target user `superkaiba`'s "Experiment Queue" project (#1). Override
 with --owner / --project. The `--repo` flag scopes set-status to one repo
@@ -247,6 +250,90 @@ def cmd_list_by_status(args: argparse.Namespace) -> None:
         print(f"#{n} {title}" if n is not None else title)
 
 
+def cmd_add_status_option(args: argparse.Namespace) -> None:
+    """Add a new option to the existing Status single-select field via GraphQL.
+
+    The GraphQL mutation `updateProjectV2Field` REPLACES the full options
+    list, so we read the existing options first and merge. Idempotent: if
+    the option already exists, this is a no-op.
+    """
+    meta = project_meta(args.owner, args.project)
+    if args.option in meta.options:
+        print(f"option {args.option!r} already exists (id={meta.options[args.option]}); no-op")
+        return
+    # Build the merged set of options. The mutation requires both name +
+    # color for every option (replacing the whole list).
+    existing = [{"name": name, "color": "GRAY"} for name in meta.options]
+    new_options = [*existing, {"name": args.option, "color": args.color or "GRAY"}]
+    options_json = json.dumps(new_options)
+    mutation = (
+        "mutation($fieldId:ID!, $options:[ProjectV2SingleSelectFieldOptionInput!]!) {"
+        "  updateProjectV2Field(input:{"
+        "    fieldId:$fieldId,"
+        "    singleSelectOptions:$options"
+        "  }) {"
+        "    projectV2Field { ... on ProjectV2SingleSelectField { options { id name } } }"
+        "  }"
+        "}"
+    )
+    _gh(
+        [
+            "api",
+            "graphql",
+            "-f",
+            f"query={mutation}",
+            "-f",
+            f"fieldId={meta.status_field_id}",
+            "-f",
+            f"options={options_json}",
+        ]
+    )
+    print(f"added option {args.option!r} to Status field on project #{args.project}")
+
+
+def cmd_remove_status_option(args: argparse.Namespace) -> None:
+    """Remove an option from the Status field. Used for rollback (plan §11.1)."""
+    meta = project_meta(args.owner, args.project)
+    if args.option not in meta.options:
+        print(f"option {args.option!r} does not exist; no-op")
+        return
+    remaining = [{"name": n, "color": "GRAY"} for n in meta.options if n != args.option]
+    options_json = json.dumps(remaining)
+    mutation = (
+        "mutation($fieldId:ID!, $options:[ProjectV2SingleSelectFieldOptionInput!]!) {"
+        "  updateProjectV2Field(input:{"
+        "    fieldId:$fieldId,"
+        "    singleSelectOptions:$options"
+        "  }) {"
+        "    projectV2Field { ... on ProjectV2SingleSelectField { options { id name } } }"
+        "  }"
+        "}"
+    )
+    _gh(
+        [
+            "api",
+            "graphql",
+            "-f",
+            f"query={mutation}",
+            "-f",
+            f"fieldId={meta.status_field_id}",
+            "-f",
+            f"options={options_json}",
+        ]
+    )
+    print(f"removed option {args.option!r} from Status field")
+
+
+def cmd_list_options(args: argparse.Namespace) -> None:
+    """List options of a single-select field. Currently only `Status` is supported."""
+    meta = project_meta(args.owner, args.project)
+    if args.field == "Status":
+        for name, oid in sorted(meta.options.items()):
+            print(f"{name}\t{oid}")
+    else:
+        sys.exit(f"only Status field supported (got {args.field!r})")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--owner", default=DEFAULT_OWNER, help="project owner login")
@@ -268,6 +355,26 @@ def main() -> None:
     p.add_argument("column", help="Status column name")
     p.add_argument("--json", action="store_true", help="emit raw JSON instead of `#N title` rows")
     p.set_defaults(func=cmd_list_by_status)
+
+    p = sub.add_parser("add-status-option", help="add a new option to the Status field")
+    p.add_argument("option", help="option name (e.g. 'Draft Clean Results')")
+    p.add_argument(
+        "--color",
+        default="GRAY",
+        help="GRAY, BLUE, GREEN, YELLOW, ORANGE, RED, PINK, PURPLE",
+    )
+    p.set_defaults(func=cmd_add_status_option)
+
+    p = sub.add_parser(
+        "remove-status-option",
+        help="remove an option from the Status field (rollback)",
+    )
+    p.add_argument("option", help="option name to remove")
+    p.set_defaults(func=cmd_remove_status_option)
+
+    p = sub.add_parser("list-options", help="list options of a single-select field")
+    p.add_argument("field", help="field name (only 'Status' supported)")
+    p.set_defaults(func=cmd_list_options)
 
     args = parser.parse_args()
     args.func(args)
