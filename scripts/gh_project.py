@@ -46,10 +46,25 @@ PROJECT_LIST_LIMIT = 100
 
 
 @dataclass(frozen=True)
+class StatusOption:
+    """Full metadata for a single Status field option.
+
+    The GraphQL `updateProjectV2Field.singleSelectOptions` input requires
+    `name`, `color`, and `description` to be NON_NULL on every option in
+    the replacement list. We fetch all three so add/remove operations can
+    rebuild the list without resetting colors or wiping descriptions.
+    """
+
+    option_id: str
+    color: str  # GRAY, BLUE, GREEN, YELLOW, ORANGE, RED, PINK, PURPLE
+    description: str
+
+
+@dataclass(frozen=True)
 class ProjectMeta:
     project_id: str
     status_field_id: str
-    options: dict[str, str]  # column name -> option id
+    options: dict[str, StatusOption]  # column name -> StatusOption
 
 
 def _gh(args: list[str]) -> str:
@@ -62,45 +77,61 @@ def _gh(args: list[str]) -> str:
 
 
 def project_meta(owner: str, number: int) -> ProjectMeta:
-    """Fetch project node ID + Status field ID + option name->id map."""
-    proj_raw = _gh(
+    """Fetch project node ID + Status field ID + name->StatusOption map.
+
+    `gh project field-list` returns option ids+names but NOT colors or
+    descriptions, so we use the raw GraphQL endpoint here. Colors must be
+    preserved across `add-status-option` / `remove-status-option`
+    invocations because the `updateProjectV2Field` mutation REPLACES the
+    full options list — without round-tripping color the whole board's
+    color coding is destroyed (HIGH-1, code-review v1).
+    """
+    query = (
+        "query($owner:String!, $number:Int!) {"
+        "  user(login:$owner) {"
+        "    projectV2(number:$number) {"
+        "      id"
+        '      field(name:"Status") {'
+        "        ... on ProjectV2SingleSelectField {"
+        "          id"
+        "          options { id name color description }"
+        "        }"
+        "      }"
+        "    }"
+        "  }"
+        "}"
+    )
+    raw = _gh(
         [
-            "project",
-            "list",
-            "--owner",
-            owner,
-            "--format",
-            "json",
-            "--limit",
-            str(PROJECT_LIST_LIMIT),
+            "api",
+            "graphql",
+            "-f",
+            f"query={query}",
+            "-F",
+            f"owner={owner}",
+            "-F",
+            f"number={number}",
         ]
     )
-    proj_data = json.loads(proj_raw)
-    total = proj_data.get("totalCount", 0)
-    if total > PROJECT_LIST_LIMIT:
-        sys.exit(
-            f"owner '{owner}' has {total} projects, more than the {PROJECT_LIST_LIMIT}-row "
-            f"window this script fetches. Bump PROJECT_LIST_LIMIT in scripts/gh_project.py."
-        )
-    project = next(
-        (p for p in proj_data["projects"] if p["number"] == number),
-        None,
-    )
+    data = json.loads(raw).get("data", {})
+    project = (data.get("user") or {}).get("projectV2")
     if project is None:
         sys.exit(f"project #{number} not found under owner '{owner}'")
-
-    fields_raw = _gh(["project", "field-list", str(number), "--owner", owner, "--format", "json"])
-    status = next(
-        (f for f in json.loads(fields_raw)["fields"] if f["name"] == "Status"),
-        None,
-    )
-    if status is None or "options" not in status:
+    field = project.get("field")
+    if field is None or "options" not in field:
         sys.exit(f"project #{number} has no Status single-select field")
 
     return ProjectMeta(
         project_id=project["id"],
-        status_field_id=status["id"],
-        options={opt["name"]: opt["id"] for opt in status["options"]},
+        status_field_id=field["id"],
+        options={
+            opt["name"]: StatusOption(
+                option_id=opt["id"],
+                color=opt.get("color", "GRAY"),
+                description=opt.get("description", "") or "",
+            )
+            for opt in field["options"]
+        },
     )
 
 
@@ -204,7 +235,7 @@ def cmd_set_status(args: argparse.Namespace) -> None:
     if args.column not in meta.options:
         valid = ", ".join(sorted(meta.options))
         sys.exit(f"unknown column '{args.column}'. valid: {valid}")
-    option_id = meta.options[args.column]
+    option_id = meta.options[args.column].option_id
 
     item_id = find_item_id(args.owner, args.project, args.issue, repo)
     if item_id is None:
@@ -259,12 +290,26 @@ def cmd_add_status_option(args: argparse.Namespace) -> None:
     """
     meta = project_meta(args.owner, args.project)
     if args.option in meta.options:
-        print(f"option {args.option!r} already exists (id={meta.options[args.option]}); no-op")
+        existing_opt = meta.options[args.option]
+        print(f"option {args.option!r} already exists (id={existing_opt.option_id}); no-op")
         return
-    # Build the merged set of options. The mutation requires both name +
-    # color for every option (replacing the whole list).
-    existing = [{"name": name, "color": "GRAY"} for name in meta.options]
-    new_options = [*existing, {"name": args.option, "color": args.color or "GRAY"}]
+    # Build the merged set of options. The mutation REPLACES the full list,
+    # so we must pass each existing option's actual color and description
+    # back through — passing color="GRAY" for everything destroys the
+    # board's color coding (HIGH-1, code-review v1).
+    existing = [
+        {
+            "id": opt.option_id,
+            "name": name,
+            "color": opt.color,
+            "description": opt.description,
+        }
+        for name, opt in meta.options.items()
+    ]
+    new_options = [
+        *existing,
+        {"name": args.option, "color": args.color or "GRAY", "description": ""},
+    ]
     options_json = json.dumps(new_options)
     mutation = (
         "mutation($fieldId:ID!, $options:[ProjectV2SingleSelectFieldOptionInput!]!) {"
@@ -297,7 +342,19 @@ def cmd_remove_status_option(args: argparse.Namespace) -> None:
     if args.option not in meta.options:
         print(f"option {args.option!r} does not exist; no-op")
         return
-    remaining = [{"name": n, "color": "GRAY"} for n in meta.options if n != args.option]
+    # Preserve every surviving option's color + description; passing
+    # color="GRAY" for all of them destroys the board's color coding
+    # (HIGH-1, code-review v1).
+    remaining = [
+        {
+            "id": opt.option_id,
+            "name": name,
+            "color": opt.color,
+            "description": opt.description,
+        }
+        for name, opt in meta.options.items()
+        if name != args.option
+    ]
     options_json = json.dumps(remaining)
     mutation = (
         "mutation($fieldId:ID!, $options:[ProjectV2SingleSelectFieldOptionInput!]!) {"
@@ -328,8 +385,8 @@ def cmd_list_options(args: argparse.Namespace) -> None:
     """List options of a single-select field. Currently only `Status` is supported."""
     meta = project_meta(args.owner, args.project)
     if args.field == "Status":
-        for name, oid in sorted(meta.options.items()):
-            print(f"{name}\t{oid}")
+        for name, opt in sorted(meta.options.items()):
+            print(f"{name}\t{opt.option_id}\t{opt.color}")
     else:
         sys.exit(f"only Status field supported (got {args.field!r})")
 
