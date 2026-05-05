@@ -257,7 +257,7 @@ just to add labels. Order:
    `compute:*` will be set in the adversarial-planner's reproducibility card; `prio:*` is user-curated and
    never blocking.
 
-   Note: existing `aim:*` labels remain on existing issues. This PR removes
+   Note: legacy `aim`-prefixed labels remain on existing issues. This PR removes
    label-application from NEW workflow code; it does not delete labels from
    GitHub or strip them from existing issues.
 
