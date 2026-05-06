@@ -256,15 +256,27 @@ def _build_long_neg_requests(
     return requests
 
 
-def _run_sync_expansions(requests: list[dict], label: str) -> dict[str, str]:
-    """Synchronous fallback for Batch API: thread-pooled `client.messages.create`.
+def _run_sync_expansions(
+    requests: list[dict],
+    label: str,
+    max_workers: int = 8,
+    max_retries: int = 6,
+) -> dict[str, str]:
+    """Synchronous fallback for Batch API: thread-pooled `client.messages.create`
+    with exponential-backoff retry on 429/529 errors.
 
     Used when the org's Batch API queue is jammed (e.g. shared-org in-flight
     quota exceeded). Cost is identical to Batch (~$5 for 600 expansions);
-    wall-time is ~5 min for 200 requests at 64 parallel threads. Result
+    wall-time is ~5-15 min for 200 requests at 8 parallel threads. Result
     schema matches `collect_batch_results`: {custom_id: response_text}.
+
+    Retries on RateLimitError (429), APIStatusError 529 (Overloaded), and
+    APIConnectionError. Exponential backoff with jitter. Tightened from the
+    initial 64-thread/no-retry version after Anthropic returned waves of
+    529s under high concurrency.
     """
     import concurrent.futures as cf
+    import random
 
     import anthropic
 
@@ -276,25 +288,57 @@ def _run_sync_expansions(requests: list[dict], label: str) -> dict[str, str]:
         raise RuntimeError("ANTHROPIC_BATCH_KEY / ANTHROPIC_API_KEY not in env")
     client = anthropic.Anthropic(api_key=api_key)
 
+    def _is_retryable(exc: BaseException) -> bool:
+        # 429 RateLimit, 529 Overloaded, transient connection errors.
+        if isinstance(exc, anthropic.RateLimitError):
+            return True
+        if isinstance(exc, anthropic.APIConnectionError):
+            return True
+        # 529 surfaces as APIStatusError with status_code 529 in newer SDKs;
+        # older paths may surface it as a generic OverloadedError exception
+        # type or as APIStatusError. Match by class name to be SDK-agnostic.
+        name = type(exc).__name__
+        if name in {"OverloadedError", "InternalServerError", "APIStatusError"}:
+            status = getattr(exc, "status_code", None)
+            if status in {429, 500, 502, 503, 504, 529}:
+                return True
+            # OverloadedError without explicit status_code → treat as 529.
+            if name == "OverloadedError":
+                return True
+        return False
+
     def _one(req: dict) -> tuple[str, str]:
         cid = req["custom_id"]
         params = req["params"]
-        try:
-            msg = client.messages.create(**params)
-            text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text")
-            return cid, text
-        except Exception as e:
-            print(f"  [{label}] {cid}: {type(e).__name__}: {e}")
-            return cid, "[SYNC_ERROR]"
+        for attempt in range(max_retries + 1):
+            try:
+                msg = client.messages.create(**params)
+                text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text")
+                return cid, text
+            except Exception as e:
+                if attempt < max_retries and _is_retryable(e):
+                    # Exponential backoff: 2, 4, 8, 16, 32, 64 sec + 0-1s jitter.
+                    delay = (2 ** (attempt + 1)) + random.uniform(0, 1)
+                    print(
+                        f"  [{label}] {cid}: {type(e).__name__} "
+                        f"(attempt {attempt + 1}/{max_retries + 1}); sleeping {delay:.1f}s"
+                    )
+                    sys.stdout.flush()
+                    time.sleep(delay)
+                    continue
+                print(f"  [{label}] {cid}: {type(e).__name__} FINAL: {e}")
+                sys.stdout.flush()
+                return cid, "[SYNC_ERROR]"
+        return cid, "[SYNC_ERROR]"
 
     print(
         f"[{label}] Sync-fallback: {len(requests)} expansions via "
-        f"client.messages.create (64 threads)..."
+        f"client.messages.create ({max_workers} threads, up to {max_retries} retries on 429/529)..."
     )
     sys.stdout.flush()
     t0 = time.time()
     out: dict[str, str] = {}
-    with cf.ThreadPoolExecutor(max_workers=64) as pool:
+    with cf.ThreadPoolExecutor(max_workers=max_workers) as pool:
         futures = {pool.submit(_one, req): req["custom_id"] for req in requests}
         for n_done, fut in enumerate(cf.as_completed(futures), start=1):
             cid, text = fut.result()
@@ -304,7 +348,12 @@ def _run_sync_expansions(requests: list[dict], label: str) -> dict[str, str]:
                     f"  [{label}] {n_done}/{len(requests)} done (elapsed={time.time() - t0:.1f}s)"
                 )
                 sys.stdout.flush()
-    print(f"[{label}] Sync-fallback complete: {len(out)} responses, {time.time() - t0:.1f}s")
+    n_err = sum(1 for v in out.values() if v == "[SYNC_ERROR]")
+    print(
+        f"[{label}] Sync-fallback complete: {len(out)} responses ({n_err} errors), "
+        f"{time.time() - t0:.1f}s"
+    )
+    sys.stdout.flush()
     return out
 
 
