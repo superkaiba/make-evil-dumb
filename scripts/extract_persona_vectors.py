@@ -299,11 +299,14 @@ def generate_responses_vllm(
 
     # Generate with vLLM
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+    # NOTE: 0.55 (was 0.85) -- when running A+B together, the HF model from Method A
+    # is still loaded in GPU memory (~15 GB on a 7B model) when vLLM init runs, so
+    # we must leave headroom. 0.55 * 79 GiB = ~43 GiB, plenty for a 7B + KV cache.
     llm = LLM(
         model=model_name,
         tensor_parallel_size=1,
         max_model_len=2048,
-        gpu_memory_utilization=0.85,
+        gpu_memory_utilization=0.55,
     )
     sampling_params = SamplingParams(
         temperature=0.0,
