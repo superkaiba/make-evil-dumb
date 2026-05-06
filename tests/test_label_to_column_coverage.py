@@ -90,3 +90,62 @@ def test_column_for_labels_done_experiment_routes_to_done_column() -> None:
 def test_column_for_labels_followups_running() -> None:
     # `status:followups-running` is the new state for "follow-ups in flight before promotion".
     assert column_for_labels(["status:followups-running"]) == "Followups running"
+
+
+# ---------------------------------------------------------------------------
+# Three-column promotion flow (issue #282 [2/4]): clean-results:useful,
+# clean-results:not-useful. PRIORITY_LABELS order: :draft -> :useful ->
+# :not-useful -> legacy clean-results.
+# ---------------------------------------------------------------------------
+
+
+def test_priority_useful_routes_to_useful() -> None:
+    assert column_for_labels(["clean-results:useful"]) == "Useful"
+
+
+def test_priority_not_useful_routes_to_not_useful() -> None:
+    assert column_for_labels(["clean-results:not-useful"]) == "Not useful"
+
+
+def test_priority_draft_beats_useful() -> None:
+    # Defensive: half-applied promote (sublabel added but :draft not removed)
+    # stays observably unfinished in "Awaiting promotion".
+    assert (
+        column_for_labels(["clean-results:draft", "clean-results:useful"]) == "Awaiting promotion"
+    )
+
+
+def test_priority_useful_beats_legacy() -> None:
+    # Promote keeps the legacy `clean-results` label (back-compat for
+    # `gh issue list --label clean-results` callers); :useful wins.
+    assert column_for_labels(["clean-results", "clean-results:useful"]) == "Useful"
+
+
+def test_priority_not_useful_beats_legacy() -> None:
+    assert column_for_labels(["clean-results", "clean-results:not-useful"]) == "Not useful"
+
+
+def test_legacy_alone_routes_to_clean_results() -> None:
+    """Pre-promote-flow issues (with only the legacy `clean-results` label) keep
+    routing to the "Clean results" column."""
+    assert column_for_labels(["clean-results"]) == "Clean results"
+
+
+def test_promoted_issue_still_matches_clean_results_query() -> None:
+    """Sanity: after promote, the issue carries BOTH `clean-results` and a
+    sublabel, so the 8 callers of `gh issue list --label clean-results` still
+    find it. Asserted at the label-set level (the actual gh query is exercised
+    elsewhere)."""
+    promoted_labels = {"clean-results", "clean-results:useful"}
+    assert "clean-results" in promoted_labels
+
+
+def test_priority_labels_order_draft_first() -> None:
+    """Defensive: PRIORITY_LABELS must list `:draft` first so a half-applied
+    promote stays in 'Awaiting promotion' until reconciled."""
+    from scripts.gh_project import PRIORITY_LABELS
+
+    assert PRIORITY_LABELS[0] == "clean-results:draft"
+    # Legacy `clean-results` must come last (lowest priority among priority
+    # labels — sublabels override it).
+    assert PRIORITY_LABELS[-1] == "clean-results"

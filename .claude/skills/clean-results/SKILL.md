@@ -71,10 +71,50 @@ analyzer does not cover.
   line at the very top of the TL;DR (per `template.md` and the **#237**
   exemplar). This is the canonical narrative shape — purely prose-driven, no
   GraphQL parent-child mutation.
-- `/clean-results promote <draft-N>` — flip the source issue's
-  `clean-results:draft` label to `clean-results`. Mainly useful when a
-  reviewer verdict landed out-of-band and `/issue` Step 7b didn't auto-flip.
+- `/clean-results promote <draft-N> useful|not-useful` — three-column
+  promotion flow (issue #282 [2/4]). Flips the source issue's
+  `clean-results:draft` label to `clean-results:<verdict>`, KEEPS the legacy
+  `clean-results` label (back-compat — the 8 active callers of
+  `gh issue list --label clean-results` still find promoted issues), routes
+  the project board to the `Useful` or `Not useful` column, then re-enters
+  `/issue <source-N>` so Step 10 fires (auto-complete -> follow-up-proposer
+  -> pod-termination prompt). Steps:
+  1. Add either `clean-results:useful` or `clean-results:not-useful`
+     (one of these two literals — no other values).
+  2. Add `clean-results` (no-op if already present — KEEP for back-compat).
+  3. Remove `clean-results:draft`.
+  4. Run set-status against the matching column (`Useful` or `Not useful` —
+     literal column names; "Less useful" is wrong, column names are case-
+     and word-sensitive). Concretely:
+     - `useful` verdict: `set-status <source-N> "Useful"`
+     - `not-useful` verdict: `set-status <source-N> "Not useful"`
+  5. Re-enter `/issue <source-N>`. Step 10 fires; user-input gates
+     (Step 10c pod-termination, Step 10d worktree-merge) still gate on
+     `AskUserQuestion` — the auto-fire only delivers control to those gates,
+     it does not bypass them.
+
   Implementation:
+  ```bash
+  VERDICT="$1"  # useful or not-useful
+  case "$VERDICT" in
+    useful)     COLUMN="Useful" ;;
+    not-useful) COLUMN="Not useful" ;;
+    *) echo "verdict must be 'useful' or 'not-useful'" >&2; exit 2 ;;
+  esac
+  gh issue edit <draft-N> \
+      --add-label "clean-results:$VERDICT" \
+      --add-label "clean-results" \
+      --remove-label "clean-results:draft"
+  uv run python scripts/gh_project.py set-status <source-N> "$COLUMN"
+  # Step 5: re-enter /issue <source-N> (this skill is invoked from the main
+  # agent; the main agent runs /issue <source-N> next).
+  ```
+
+- `/clean-results promote <draft-N>` (legacy, no verdict) — flip the source
+  issue's `clean-results:draft` label to `clean-results`. Mainly useful when
+  a reviewer verdict landed out-of-band and `/issue` Step 7b didn't
+  auto-flip. Prefer the verdict form above when classifying paper-relevance
+  is meaningful.
   ```bash
   gh issue edit <N> --remove-label clean-results:draft --add-label clean-results
   ```

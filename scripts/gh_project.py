@@ -87,16 +87,30 @@ LABEL_TO_COLUMN: dict[str, str] = {
     "status:done-impl": "Done",
     "status:archived": "Archived",
     # Non-status labels (take precedence via PRIORITY_LABELS).
-    # `clean-results:draft` -> Awaiting promotion (newly drafted OR pending re-review)
-    # `clean-results` (without :draft) -> Clean results (user-reviewed, accepted)
+    # `clean-results:draft`       -> Awaiting promotion (newly drafted OR pending re-review)
+    # `clean-results:useful`      -> Useful (promoted, paper-relevant)
+    # `clean-results:not-useful`  -> Not useful (promoted, archive candidate)
+    # `clean-results` (alone, no sublabel) -> Clean results (legacy, pre-promote-flow)
     "clean-results:draft": "Awaiting promotion",
+    "clean-results:useful": "Useful",
+    "clean-results:not-useful": "Not useful",
     "clean-results": "Clean results",
 }
 
 # Labels that take precedence over `status:*` routing in column_for_labels.
-# `clean-results:draft` -> Awaiting promotion (regardless of underlying status:* label).
-# `clean-results`       -> Clean results.
-PRIORITY_LABELS: tuple[str, ...] = ("clean-results:draft", "clean-results")
+# Order is FIRST-MATCH-WINS:
+#   1. `clean-results:draft` (defensive — half-applied promote stays observably
+#      unfinished in "Awaiting promotion" until reconciled).
+#   2. `clean-results:useful` / `clean-results:not-useful` (promoted, terminal).
+#   3. `clean-results` (legacy back-compat — promote keeps this label so
+#      `gh issue list --label clean-results` queries continue to find promoted
+#      issues; routes to "Clean results" only when no sublabel is present).
+PRIORITY_LABELS: tuple[str, ...] = (
+    "clean-results:draft",
+    "clean-results:useful",
+    "clean-results:not-useful",
+    "clean-results",
+)
 
 # Target option set for `migrate-options`. Names + colors + descriptions.
 # Order here is the order columns appear left-to-right on the board.

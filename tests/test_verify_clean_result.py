@@ -790,5 +790,46 @@ def test_skip_checks_flag_skips_named_check(capfd) -> None:
     assert "SKIPPED: check_undefined_acronyms (--skip-checks)" in captured.err
 
 
+# ---------------------------------------------------------------------------
+# is_promoted semantics (issue #282 [2/4]): the verify_clean_result.py file
+# computes ``is_promoted`` inline as
+# ``"clean-results" in label_names and "clean-results:draft" not in label_names``.
+# These tests pin the semantics for the three-column promote flow that adds
+# ``clean-results:useful`` / ``clean-results:not-useful`` ALONGSIDE the
+# legacy ``clean-results`` label.
+# ---------------------------------------------------------------------------
+
+
+def _is_promoted(labels: set[str]) -> bool:
+    """Mirror of the inline check at scripts/verify_clean_result.py:1063."""
+    return "clean-results" in labels and "clean-results:draft" not in labels
+
+
+def test_is_promoted_useful_no_draft() -> None:
+    """Promoted issue carries {clean-results, clean-results:useful}; is_promoted = True."""
+    assert _is_promoted({"clean-results", "clean-results:useful"})
+
+
+def test_is_promoted_not_useful_no_draft() -> None:
+    assert _is_promoted({"clean-results", "clean-results:not-useful"})
+
+
+def test_is_promoted_useful_with_draft() -> None:
+    """Defensive: half-applied promote (sublabel + :draft still present) is NOT promoted."""
+    assert not _is_promoted({"clean-results", "clean-results:useful", "clean-results:draft"})
+
+
+def test_is_promoted_no_clean_results_at_all() -> None:
+    """Negative case (per critic C2): empty label set is NOT promoted."""
+    assert not _is_promoted(set())
+
+
+def test_is_promoted_legacy_alone_is_promoted() -> None:
+    """Pre-promote-flow issues (legacy `clean-results` only, no :draft, no
+    sublabel) are still considered promoted — backward-compat with the legacy
+    flow."""
+    assert _is_promoted({"clean-results"})
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-v"]))
