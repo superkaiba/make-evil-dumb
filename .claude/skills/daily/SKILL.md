@@ -22,12 +22,17 @@ cron.** Use `/schedule` if you want to wire a cron later.
 
 ## Dispatch table
 
-| Task | Subagent type | Returns |
-|---|---|---|
-| Daily summary | `general-purpose` | gist URL — daily mentor update |
+| Task | Subagent type | Mode | Returns |
+|---|---|---|---|
+| Review clean-result drafts | `general-purpose` | **sequential** (runs FIRST) | summary block (passed into Daily summary) |
+| Daily summary | `general-purpose` | parallel | gist URL — daily mentor update |
 
-(Today there is one task. Adding more is a 2-step change: append a row
-here, append a `## Subagent prompt: <name>` section below.)
+The first row runs **sequentially before** the parallel fan-out so its
+per-draft `AskUserQuestion` calls don't race the parallel subagents'
+output. Subsequent rows run in parallel as a single assistant message.
+
+(Adding more parallel tasks is still a 2-step change: append a row here,
+append a `## Subagent prompt: <name>` section below.)
 
 ## Procedure
 
@@ -65,9 +70,32 @@ user-notes blocks and emit the static prompt list with "(unanswered)" placeholde
    6. **What's the one thing I'd tell my mentor about today in 30 seconds?** (Benton)
 
 1. Compute `TODAY=$(date +%Y-%m-%d)` and `TS=$(date -Iseconds)`.
-2. **In a single assistant message**, issue one `Agent` tool call per row
-   in the dispatch table above. Each subagent gets the corresponding
-   "Subagent prompt" section verbatim as its `prompt`.
+
+1.5. **Sequential subagent: Review clean-result drafts.** Spawn the
+   `Review clean-result drafts` subagent first, BEFORE the parallel
+   fan-out. It runs to completion (its per-draft `AskUserQuestion`
+   calls cannot race the parallel subagents). On return, it emits a
+   summary block of the form:
+
+   ```
+   ## Clean-result drafts reviewed
+   - #<N1>: <decision> (promote / reject / defer)
+   - #<N2>: <decision>
+   ...
+   ```
+
+   Capture the block into `CLEAN_RESULT_REVIEW_SUMMARY` and pass it
+   as part of the input to the Daily summary subagent (via
+   `/tmp/daily-clean-result-review.md` — the Daily summary subagent
+   sources it under `## Clean-result drafts reviewed`).
+
+   When `INTERACTIVE=false`, the subagent emits `defer (autonomous mode)`
+   for every draft and flips no labels.
+
+2. **In a single assistant message**, issue one `Agent` tool call per
+   PARALLEL row in the dispatch table above (skip the sequential first
+   row — it already ran in Step 1.5). Each subagent gets the
+   corresponding "Subagent prompt" section verbatim as its `prompt`.
 
    2.5. **String-substitute USER_NOTES + ANSWER_1..6 into the subagent prompt template.** For each
         subagent prompt that contains a `## User notes\n{{USER_NOTES}}` block:
@@ -86,6 +114,45 @@ user-notes blocks and emit the static prompt list with "(unanswered)" placeholde
    - **skipped** — returned a literal `(skipped — <reason>)` style string
      (no daily task currently does this, but the framework supports it)
    - **failed** — crashed, errored, or returned nothing parseable
+
+4.5. **Single end-of-run gist-publication gate (#275 item 7).** Determine
+   `INTERACTIVE` per Step 0's rule. If `INTERACTIVE=false`, skip the gate
+   entirely (this preserves overnight `/daily --autonomous` usability).
+
+   If `INTERACTIVE=true`:
+
+   1. Stack a SINGLE preview block. For each gist URL returned by a
+      subagent in this run (from Step 1.5 AND from the parallel
+      Step 2 dispatch), fetch the first 20 lines of its body and
+      render under one H2 per task:
+
+      ```bash
+      for url in $GIST_URLS; do
+          echo "## $TASK_NAME"
+          gh gist view "$url" | head -20
+          echo
+      done
+      ```
+
+   2. Show the stacked preview to the user, then ONE `AskUserQuestion`:
+
+      > Daily run published N gists. Choose one:
+      >   1. **keep_all** — leave all N as-is
+      >   2. **retract <comma-list>** — `gh gist delete <url>` each
+      >      retracted ID; orchestrator posts a one-line summary
+      >   3. **edit_and_repost <comma-list>** — single conversational
+      >      turn where the user provides edits per gist; orchestrator
+      >      re-renders, re-publishes via `gh gist create`, deletes
+      >      the old
+
+   3. Apply the choice. Log final state to
+      `/tmp/daily-state-${TODAY}.md`.
+
+   This is the ONLY user-prompt for gist publication in `/daily`. There
+   is no per-subagent approval gate. The clean-result-review subagent's
+   per-draft `AskUserQuestion` calls (Step 1.5) are separate (different
+   gate for different decision) and run BEFORE the parallel fan-out.
+
 5. **Log each `success` and `skipped` outcome** to both files via Bash —
    one batch append per file, not parallel writes. `failed` outcomes are
    NOT logged. For `skipped` rows, put the bracketed skip message in the
@@ -128,6 +195,77 @@ user-notes blocks and emit the static prompt list with "(unanswered)" placeholde
 
 ---
 
+## Subagent prompt: Review clean-result drafts
+
+```
+You are reviewing every open `clean-results:draft` issue and surfacing
+each to the user for promote / reject / defer. This subagent runs
+SEQUENTIALLY before the parallel /daily fan-out so its AskUserQuestion
+calls do not race the other subagents.
+
+# Argument-parse rule (run FIRST)
+
+If the orchestrator passed `INTERACTIVE=false` (autonomous mode), SKIP
+Step 3 entirely. Emit a summary block where every line is
+`#<N>: defer (autonomous mode)`. Do NOT flip any labels. Return only
+the summary block.
+
+# Step 1: List drafts.
+
+gh issue list --label clean-results:draft --state all \
+  --json number,title,labels,updatedAt
+
+If zero drafts, emit `## Clean-result drafts reviewed\n(no drafts open)`
+and return.
+
+# Step 2: For each draft, fetch body + reviewer verdict + raw-output
+#         spot-check H3 + confidence.
+
+For each draft #<N>:
+  gh issue view <N> --json title,body,labels --comments
+
+Parse:
+  - TL;DR confidence (HIGH | MODERATE | LOW)
+  - reviewer verdict from the most recent `epm:reviewer-verdict` marker
+    (PASS | CONCERNS | FAIL)
+  - whether the analyzer's interpretation contains the
+    `### Raw-output spot check (5 random rows)` H3
+  - issue updatedAt timestamp
+
+# Step 3: For each draft, AskUserQuestion (sequential, one per draft):
+
+> Promote / Reject / Defer issue #<N>?
+>   - Confidence: HIGH | MODERATE | LOW
+>   - Reviewer verdict: PASS | CONCERNS | FAIL
+>   - Raw-output spot check: present | missing
+>   - Updated: <timestamp>
+>   - TL;DR (verbatim, first 30 lines): …
+>
+>   1. **promote** — flip clean-results:draft → clean-results
+>   2. **reject** — leave at :draft, post a comment with the reason
+>   3. **defer** — leave for tomorrow
+
+# Step 4: Apply decisions:
+
+  - promote: gh issue edit <N> --add-label clean-results --remove-label clean-results:draft
+  - reject: gh issue comment <N> --body "<user reason>"
+  - defer: no-op
+
+# Step 5: Emit a summary block. Format EXACTLY:
+
+## Clean-result drafts reviewed
+
+- #<N1>: <decision>
+- #<N2>: <decision>
+...
+
+Then write the same block to `/tmp/daily-clean-result-review.md` so the
+Daily summary subagent can source it.
+
+RETURN the summary block as the SOLE output of this task. No
+commentary, no preamble — just the block.
+```
+
 ## Subagent prompt: Daily summary
 
 ```
@@ -136,6 +274,11 @@ explore-persona-space project. Lead with the result, not the process.
 Reading-time target: under 5 minutes.
 
 # Data sources (gather in parallel via Bash; all are read-only)
+
+0. **Clean-result drafts reviewed today.** If
+   `/tmp/daily-clean-result-review.md` exists, read it and emit its
+   contents under a `## Clean-result drafts reviewed` H2 in the body.
+   Otherwise omit the section entirely (do not write a stub).
 
 1. Git history since midnight:
    git log --since="midnight" --no-merges --oneline --stat
