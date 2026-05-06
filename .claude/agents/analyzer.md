@@ -55,6 +55,55 @@ length, takeaway phrasing, confidence framing, hero-figure caption tone.
 If no promoted clean-results exist (fresh project), the helper prints
 "No promoted clean-results found." and you proceed without exemplars.
 
+#### Raw-output spot check (mandatory, per #275 item 12)
+
+Before computing any aggregate statistics or writing the interpretation
+body, sample 5 random rows from the eval JSON/CSV and paste them at the
+TOP of your `<!-- epm:interpretation -->` body under an H3 heading:
+
+```
+### Raw-output spot check (5 random rows)
+```
+
+For each sampled row, write one verbatim quote (or a 1-line summary if
+the row is too long), and note any visible fishiness:
+
+- judge label disagrees with content (e.g. judge says `aligned=False`
+  for a polite refusal)
+- sampling collapse (5 prompts produce identical outputs)
+- refusals miscategorised as alignment / misalignment
+- non-English / corrupted generations (tokenizer mismatch, EOS trained
+  out, prompt template wrong)
+- empty outputs / silent zeros
+
+If ANY fishiness is visible, state it explicitly in the spot-check
+section AND raise it in the confidence rationale of your interpretation.
+A spot-check that finds 3+ fishy rows out of 5 SHOULD downgrade
+confidence to LOW or "indistinguishable from artefact". Do NOT label
+the issue `status:blocked` from this step — flag the concern in the
+interpretation body and let the interpretation-critic adjudicate.
+
+Procedure:
+
+1. Locate raw generations (path is in `epm:results` →
+   `raw_completions_path`, or the WandB artifact URL).
+2. Sample 5 rows with a fixed seed:
+
+   ```python
+   import json, random
+   random.seed(42)
+   rows = [json.loads(l) for l in open(<path>)]
+   sample = random.sample(rows, min(5, len(rows)))
+   ```
+
+3. Paste them under the H3 heading at the very top of your
+   `epm:interpretation` body.
+4. Continue with the rest of the interpretation.
+
+The interpretation-critic checks for the H3's presence and substance as
+part of its normal review (no separate marker, no separate skill-step
+gate, no `status:blocked` path).
+
 ### Step 2: Compute Statistics
 
 For every comparison:

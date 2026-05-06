@@ -356,8 +356,22 @@ the task. The skill runs planner -> fact-checker -> critic -> revise internally.
 - Target pod preference
 - Plan deviations allowed vs must-ask
 
-Post plan as `<!-- epm:plan v1 -->` comment. Cache a copy at
-`.claude/plans/issue-<N>.md` (cache only -- GitHub is source of truth).
+Post plan as `<!-- epm:plan v1 -->` comment via:
+
+```bash
+PLAN_URL=$(gh issue comment <N> --body-file .claude/plans/issue-<N>-comment-body.md | tail -1)
+```
+
+`gh issue comment` prints the comment URL on stdout — capture it as a
+shell variable in the SAME bash block that posts the comment. **Do not
+persist `PLAN_URL` to a cache file.** The variable lives only for the
+duration of Steps 2a → 2c, which run in the same orchestrator turn (the
+auto-continuation policy in CLAUDE.md guarantees no pause between them
+in interactive mode; in autonomous mode the orchestrator exits at Step
+2c so the variable is irrelevant).
+
+Cache a copy of the plan body at `.claude/plans/issue-<N>.md` (cache
+only — GitHub is the source of truth).
 
 Also post estimated cost prominently at the top of the comment, e.g.
 > **Cost gate:** estimated 12 GPU-hours on pod3 (8xH100). Reply `approve` to dispatch.
@@ -402,9 +416,17 @@ Advance label to `status:plan-pending`.
 
   > Plan posted as `epm:plan v1` on issue #\<N\>.
   >
+  > **Plan:** ${PLAN_URL}
+  > **Cached copy:** `.claude/plans/issue-<N>.md`
+  >
   > (1) **Approve** — advance to implementation
   > (2) **Revise** \<notes\> — plan goes back to adversarial-planner
   > (3) **Defer** — exit now; re-invoke `/issue <N>` later
+
+  `${PLAN_URL}` is the inline shell variable captured at Step 2a — both
+  steps run in the same orchestrator turn (auto-continuation guarantees
+  no pause between them) so the variable is in scope. There is no
+  cache-file fallback.
 
   Use `AskUserQuestion` or a plain text prompt and wait for the user's reply.
 
