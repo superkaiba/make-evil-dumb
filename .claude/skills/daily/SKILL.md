@@ -359,7 +359,7 @@ Reading-time target: under 5 minutes.
 ## Blockers
 [Or "None".]
 
-## Running / In Progress
+## Running experiments
 - <experiment>: <pod>, ETA, what to expect
 
 # Writing rules

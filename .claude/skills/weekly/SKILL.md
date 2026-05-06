@@ -221,7 +221,7 @@ title + confidence + 1-line TL;DR + hero figure URL.]
 ## Done This Week
 [Group by type:experiment / type:infra / type:analysis. 1-2 lines each.]
 
-## Running / In Progress
+## Running experiments
 [Currently on pods, with expected completion.]
 
 ## Blockers
