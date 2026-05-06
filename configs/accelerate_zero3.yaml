@@ -8,4 +8,3 @@ main_training_function: main
 num_machines: 1
 num_processes: 4
 use_cpu: false
-mixed_precision: bf16
