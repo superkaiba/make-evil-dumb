@@ -242,6 +242,11 @@ async def _call_claude_with_retries(
                 if system:
                     kwargs["system"] = system
                 resp = await client.messages.create(**kwargs)
+                if not resp.content:
+                    last_error = RuntimeError(f"empty content (stop_reason={resp.stop_reason!r})")
+                    await asyncio.sleep(backoff)
+                    backoff *= 2.0
+                    continue
                 return resp.content[0].text
             except (
                 anthropic.APIConnectionError,
