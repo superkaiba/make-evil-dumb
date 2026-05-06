@@ -36,27 +36,35 @@ any step and `/issue <N>` picks up cleanly.
 
 ## Project-board status convention
 
-The Experiment Queue project board has six Status columns. Mapping between `status:*`
-labels (phase-authoritative) and project columns (glance-coarse):
+The Experiment Queue project board's Status field is the single source of
+truth for column names — see `NEW_COLUMN_SPEC` in `scripts/gh_project.py`.
+Mapping between `status:*` labels (phase-authoritative) and project columns
+(glance-coarse) is defined by `LABEL_TO_COLUMN` in the same file. Summary:
 
 | Project column | `status:*` label(s) | Meaning |
 |---|---|---|
-| **Todo** | `proposed`, `blocked`, or no `status:*` label | Not yet in the pipeline. User files issues here. |
-| **Priority** | any (user-set) | Flagged by user as next-to-work. Pipeline doesn't auto-set this. |
-| **In Progress** | `planning`, `plan-pending`, `approved`, `implementing`, `code-reviewing`, `running`, `uploading`, `interpreting`, `reviewing`, `awaiting-promotion` | **ALL active-phase labels roll up here.** The label tells you which phase. |
-| **Draft Clean Results** | `clean-results:draft` (label, not a `status:*`) | Analyzer-created clean-result issues awaiting reviewer PASS + user promotion. |
-| **Clean Results** | `clean-results` (label, not a `status:*`) | Published (promoted) clean-result issues. |
+| **To do** | `proposed`, `gate-pending`, or no `status:*` label | Not yet in the pipeline. User files issues here. |
+| **Planning** | `planning` | Adversarial-planner is running. |
+| **Plan awaiting review** | `plan-pending` | User action: approve plan to advance. |
+| **In flight** | `approved`, `implementing`, `code-reviewing`, `testing`, `running`, `uploading`, `interpreting`, `reviewing`, `under-review` | All active-phase labels between approval and reviewer-PASS roll up here. The label tells you which phase. |
+| **Blocked** | `blocked` | Stuck / paused; resolve dependency. |
+| **Awaiting promotion** | `awaiting-promotion`, `clean-results:draft` | User action: review clean-result draft. |
 | **Followups running** | `followups-running` | Parent's own work is done (clean-result promoted), but at least one open child issue (`Parent: #<N>` in body) is still in flight. Descriptive state on the parent — no new cells run inside it. Transitions to `done-experiment` once all children reach a terminal state. |
-| **Done (experiment)** | `done-experiment` | Terminal, issue stays OPEN. |
-| **Done (impl)** | `done-impl` | Terminal, issue stays OPEN. |
+| **Clean results** | `clean-results` | Published (promoted) clean-result issues. |
+| **Done** | `done-experiment`, `done-impl` | Terminal, issue stays OPEN. |
+| **Archived** | `archived` | Closed long ago / no longer relevant. |
 
 The skill moves the project status in exactly four places:
-1. **Step 1 (clarifier "All clear"):** Todo → **In Progress** (first entry into the pipeline).
-2. **Step 9a (analyzer creates clean-result):** the new clean-result issue (label `clean-results:draft`) → **Draft Clean Results**.
-3. **Step 9b (user promotes draft → clean-results):** clean-result issue → **Clean Results**.
-4. **Step 10 (auto-complete):** source issue → **Done (experiment)** or **Done (impl)**.
+1. **Step 1 (clarifier "All clear"):** To do → **Planning** (first entry into the pipeline).
+2. **Step 9a (analyzer creates clean-result):** the new clean-result issue (label `clean-results:draft`) → **Awaiting promotion**.
+3. **Step 9b (user promotes draft → clean-results):** clean-result issue → **Clean results**.
+4. **Step 10 (auto-complete):** source issue → **Done**.
 
-Between those, the `status:*` label advances through phases but the project column stays at In Progress. Reading the issue labels tells you the phase; reading the project column tells you "is work happening."
+Between those, the project column tracks the `status:*` label automatically
+(Planning → Plan awaiting review → In flight → Awaiting promotion → Done) via
+the routing in `LABEL_TO_COLUMN`; reading the project column tells you the
+phase. Manual `set-status` invocations are rarely needed — advancing the
+`status:*` label is enough.
 
 ## Companion files
 
@@ -284,13 +292,15 @@ inheritance chain is auditable.
 
 - **All clear** (<=1 minor ambiguity) -> post `<!-- epm:clarify -->` with "No blocking
   ambiguities found. Proceeding to adversarial planning." advance label to `status:planning`,
-  **and move the project column to In Progress**:
+  **and move the project column to Planning**:
   ```
-  uv run python scripts/gh_project.py set-status <N> "In Progress"
+  uv run python scripts/gh_project.py set-status <N> "Planning"
   ```
-  This is the one place where the project column transitions out of Todo / Priority
-  into the active-work column. Subsequent phases (planning, running, reviewing, testing)
-  keep the project column at In Progress — only the `status:*` label changes.
+  This is the one place where the project column transitions out of To do
+  into the pipeline. Subsequent phases route automatically through
+  `LABEL_TO_COLUMN` (Planning → Plan awaiting review → In flight → Awaiting
+  promotion → Done) as the `status:*` label advances; explicit `set-status`
+  calls are rarely needed.
 
 - **Ambiguities remain** -> do BOTH of the following, in order:
 
@@ -863,11 +873,16 @@ No user gate. The skill transitions the issue to a terminal-or-`followups-runnin
    gh issue edit <N> --add-label <new-label> --remove-label <prior-status>
    ```
 
-7. Move the issue to the correct project-board column:
+7. Move the issue to the correct project-board column. The label flip in
+   step 6 already routes the column automatically via `LABEL_TO_COLUMN`
+   (`status:done-experiment` / `status:done-impl` → `Done`,
+   `status:followups-running` → `Followups running`). Verify with
+   `gh_project.py status <N>`; an explicit `set-status` is rarely needed.
+   When you do invoke it, pass a column name from `NEW_COLUMN_SPEC`:
    ```
-   # <status-name> is literally "Done (experiment)", "Done (impl)", or
-   # "Followups running" per step 5.
-   uv run python scripts/gh_project.py set-status <N> "<status-name>"
+   uv run python scripts/gh_project.py set-status <N> "Done"
+   # or, for the follow-ups branch:
+   uv run python scripts/gh_project.py set-status <N> "Followups running"
    ```
 
 8. Post final comment `<!-- epm:done v1 -->` (or `<!-- epm:followups-running v1 -->`
