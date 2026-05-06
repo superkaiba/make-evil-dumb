@@ -50,15 +50,18 @@ Mapping between `status:*` labels (phase-authoritative) and project columns
 | **Blocked** | `blocked` | Stuck / paused; resolve dependency. |
 | **Awaiting promotion** | `awaiting-promotion`, `clean-results:draft` | User action: review clean-result draft. |
 | **Followups running** | `followups-running` | Parent's own work is done (clean-result promoted), but at least one open child issue (`Parent: #<N>` in body) is still in flight. Descriptive state on the parent — no new cells run inside it. Transitions to `done-experiment` once all children reach a terminal state. |
-| **Clean results** | `clean-results` | Published (promoted) clean-result issues. |
+| **Clean results** | `clean-results` (no sublabel) | Pre-promote-flow / legacy clean-results issues. New issues use the verdict columns below. |
+| **Useful** | `clean-results:useful` (+ legacy `clean-results` for back-compat) | Promoted, paper-relevant. |
+| **Not useful** | `clean-results:not-useful` (+ legacy `clean-results`) | Promoted, archive candidate. |
 | **Done** | `done-experiment`, `done-impl` | Terminal, issue stays OPEN. |
 | **Archived** | `archived` | Closed long ago / no longer relevant. |
 
-The skill moves the project status in exactly four places:
+The skill moves the project status in exactly five places:
 1. **Step 1 (clarifier "All clear"):** To do → **Planning** (first entry into the pipeline).
 2. **Step 9a (analyzer creates clean-result):** the new clean-result issue (label `clean-results:draft`) → **Awaiting promotion**.
-3. **Step 9b (user promotes draft → clean-results):** clean-result issue → **Clean results**.
+3. **Step 9b (user promotes draft via `/clean-results promote <N> useful|not-useful`):** clean-result issue → **Useful** or **Not useful**, and `/issue <source-N>` is auto-fired.
 4. **Step 10 (auto-complete):** source issue → **Done**.
+5. **Legacy `/clean-results promote <N>` (no verdict):** clean-result issue → **Clean results** (pre-promote-flow back-compat path).
 
 Between those, the project column tracks the `status:*` label automatically
 (Planning → Plan awaiting review → In flight → Awaiting promotion → Done) via
@@ -840,11 +843,17 @@ Transitions:
   ```
   Post comment:
   > Reviewer PASS. Clean-result #\<clean-result-N\> is ready for your review.
-  > When satisfied, promote it: `/clean-results promote <clean-result-N>`
-  > Then re-invoke `/issue <N>` to auto-complete.
+  > When satisfied, promote it via the three-column flow:
+  >   `/clean-results promote <clean-result-N> useful` (paper-relevant)
+  >   `/clean-results promote <clean-result-N> not-useful` (archive candidate)
+  > Promotion auto-fires `/issue <N>` Step 10 — no manual re-invoke needed.
+  > (Legacy `/clean-results promote <N>` without a verdict still works.)
 
   EXIT. The user reviews the clean-result at their own pace and manually
-  promotes it from `clean-results:draft` to `clean-results`.
+  picks a verdict. The promote command flips
+  `clean-results:draft -> clean-results:<verdict>` (KEEPS legacy `clean-results`
+  for back-compat), routes the project board to `Useful` / `Not useful`, and
+  re-enters `/issue <N>` so Step 10 fires.
 - **CONCERNS:** same as PASS (non-blocking). Recorded on verdict comment.
 - **FAIL:** clean-result stays `:draft`. Source back to `status:interpreting`.
   Analyzer revises with reviewer feedback.
