@@ -131,7 +131,10 @@ RATIONALE_BPE_LO = 70
 RATIONALE_BPE_HI = 110
 
 ANSWER_LINE_RE = g186.ANSWER_LINE_RE
-ESTIMATED_COST_PER_CALL_USD = g186.ESTIMATED_COST_PER_CALL_USD
+# Calibrated from #280 Phase 0a smoke v4 measurement (~$0.0047/call for ~85-BPE
+# rationales; 0.012 was #186's value for longer 250-in/600-out rationales). Round
+# to $0.0050 with ~10% buffer. See `epm:failure v3`.
+ESTIMATED_COST_PER_CALL_USD = 0.0050
 
 
 # ── Prompt templates (plan v2 §4.4) ──────────────────────────────────────────
