@@ -13,7 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:init-rls": "tsx scripts/init-rls.ts"
+    "db:init-rls": "tsx scripts/init-rls.ts",
+    "db:backfill": "tsx scripts/backfill.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

@@ -72,7 +72,7 @@ export const claims = pgTable("claim", {
   status: claimStatusEnum("status").notNull().default("draft"),
   bodyJson: jsonb("body_json"),
   heroFigureId: uuid("hero_figure_id"),
-  githubIssueNumber: integer("github_issue_number"),
+  githubIssueNumber: integer("github_issue_number").unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
@@ -86,7 +86,7 @@ export const experiments = pgTable("experiment", {
   podName: text("pod_name"),
   parentId: uuid("parent_id"),
   claimId: uuid("claim_id").references(() => claims.id, { onDelete: "set null" }),
-  githubIssueNumber: integer("github_issue_number"),
+  githubIssueNumber: integer("github_issue_number").unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
@@ -113,6 +113,7 @@ export const todos = pgTable("todo", {
   status: todoStatusEnum("status").notNull().default("open"),
   linkedKind: entityKindEnum("linked_kind"),
   linkedId: uuid("linked_id"),
+  githubIssueNumber: integer("github_issue_number").unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
