@@ -123,12 +123,14 @@ NEW_MAIN_ARMS: list[str] = [
 LIBRARIAN_ONLY_ARM = "generic-cot-correct"
 LIBRARIAN_ONLY_SOURCE = "librarian"
 
-# Rationale length target — plan §4.2 / §10. Calibrated against #186 actual
-# generic_cot rationale lengths (mean 84 BPE per `epm:failure v2` measurement
-# of 5 fresh Sonnet 4.5 calls; v4). The plan body's 18-30 BPE figure was an
-# under-estimate — Sonnet's "2-4 sentences" prose lands ~3x larger.
-RATIONALE_BPE_LO = 70
-RATIONALE_BPE_HI = 110
+# Rationale length target — plan §4.2 / §10. Calibrated from 4-source x 2-phase
+# smoke v4 + v5 measurements (empirical mean ~= 107 BPE, std ~= 4). Gate provides
+# ~3 std-devs of headroom on each side. The earlier `[70, 110]` calibration from
+# v4 (5-sample measurement of mean 84 with the prompt before v4's lengthening)
+# was structurally too tight after v4 also lengthened the prompt to "around 50
+# words".
+RATIONALE_BPE_LO = 85
+RATIONALE_BPE_HI = 130
 
 ANSWER_LINE_RE = g186.ANSWER_LINE_RE
 # Calibrated from #280 Phase 0a smoke v4 measurement (~$0.0047/call for ~85-BPE
