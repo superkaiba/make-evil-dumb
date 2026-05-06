@@ -387,7 +387,9 @@ def cmd_add_status_option(args: argparse.Namespace) -> None:
         {
             "name": args.option,
             "color": args.color or "GRAY",
-            "description": args.description or "",
+            # `description` is an optional CLI flag (and is omitted from the
+            # synthetic Namespace in tests) — default to "" when absent.
+            "description": getattr(args, "description", "") or "",
         },
     ]
     # Route through the `_graphql` helper which uses `gh api graphql --input`
@@ -518,7 +520,15 @@ def cmd_set_status_from_labels(args: argparse.Namespace) -> None:
 
 
 def _graphql(query: str, variables: dict | None = None) -> dict:
-    """Run a GraphQL query/mutation via `gh api graphql --input`."""
+    """Run a GraphQL query/mutation via `gh api graphql --input`.
+
+    Delegates the actual subprocess call to `_gh` so test fixtures that
+    `monkeypatch.setattr(gh_project, "_gh", ...)` still intercept the
+    request. The `--input <tempfile>` form is required because the
+    `singleSelectOptions: [ProjectV2SingleSelectFieldOptionInput!]!`
+    variable type rejects the string-encoded value that `-f` / `-F` would
+    send (gh would post `variables: {"opts": "[...]"}` as a string).
+    """
     import tempfile
     from pathlib import Path
 
@@ -527,16 +537,8 @@ def _graphql(query: str, variables: dict | None = None) -> dict:
         json.dump(body, f)
         path = f.name
     try:
-        proc = subprocess.run(
-            ["gh", "api", "graphql", "--input", path],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if proc.returncode != 0:
-            sys.stderr.write(proc.stderr)
-            raise SystemExit(proc.returncode)
-        data = json.loads(proc.stdout)
+        raw = _gh(["api", "graphql", "--input", path])
+        data = json.loads(raw)
         if "errors" in data:
             sys.exit(json.dumps(data["errors"], indent=2))
         return data["data"]
