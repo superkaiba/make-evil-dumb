@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import os
 import subprocess
@@ -30,23 +31,48 @@ LOG_DIR = Path("/workspace/logs/issue238")
 EM_DATA_PATH = REPO / "data" / "bad_legal_advice_6k.jsonl"
 BASE_MODEL_ID = "Qwen/Qwen2.5-7B-Instruct"
 
-EVAL_PERSONAS = [
-    "software_engineer",
-    "kindergarten_teacher",
-    "data_scientist",
-    "medical_doctor",
-    "librarian",
-    "french_person",
-    "villain",
-    "comedian",
-    "police_officer",
-    "zelthari_scholar",
-    "assistant",
-    "confab",
-]
+# Tracked, in-tree persona / question source-of-truth (force-added under
+# data/issue_238/ via .gitignore negation). Self-contained: the experimenter
+# does NOT need to scp data/assistant_axis/ from the local VM.
+PERSONAS_JSON = REPO / "data" / "issue_238" / "personas.json"
+QUESTIONS_FILE = REPO / "data" / "issue_238" / "extraction_questions.jsonl"
+
 LAYERS = [7, 14, 20, 21, 27]
 
 BASE_VECTORS_DIR = REPO / "data" / "persona_vectors" / "qwen2.5-7b-instruct" / "base"
+
+
+def load_eval_personas() -> list[str]:
+    """Load the 12 eval persona names from the tracked personas.json.
+
+    Single source of truth: data/issue_238/personas.json. Order is taken from
+    eval_persona_order if present; otherwise sorted(eval_personas.keys()).
+    """
+    if not PERSONAS_JSON.exists():
+        raise FileNotFoundError(
+            f"Personas source-of-truth not found at {PERSONAS_JSON}. "
+            "This file is force-added to git under data/issue_238/. "
+            "Run `git pull` on the pod, or check that the worktree was synced."
+        )
+    with open(PERSONAS_JSON) as f:
+        data = json.load(f)
+    eval_personas = data.get("eval_personas")
+    if not isinstance(eval_personas, dict):
+        raise ValueError(f"{PERSONAS_JSON}: missing or malformed 'eval_personas' dict")
+    order = data.get("eval_persona_order")
+    if isinstance(order, list) and order:
+        # Validate order entries are all in eval_personas
+        missing = [n for n in order if n not in eval_personas]
+        if missing:
+            raise ValueError(
+                f"{PERSONAS_JSON}: eval_persona_order references unknown personas: {missing}"
+            )
+        return list(order)
+    return sorted(eval_personas.keys())
+
+
+# Loaded lazily (after setup_env) so import-time errors stay debuggable.
+EVAL_PERSONAS: list[str] = []
 
 CONDITIONS = [
     {"name": "full_em_lr2e5", "condition": "em", "lr": 2e-5},
@@ -153,13 +179,24 @@ def train_condition(cond: dict, seed: int = 42) -> Path:
 
 
 def extract_geometry(checkpoint_dir: Path, tag: str, gpu: int = 0) -> None:
-    """Extract persona vectors from a checkpoint."""
+    """Extract persona vectors from a checkpoint.
+
+    Uses the in-tree --inline-personas-json + --questions-file path so the
+    experiment is self-contained (no dependency on data/assistant_axis/).
+    """
     output_dir = REPO / "data" / "persona_vectors" / "qwen2.5-7b-instruct" / tag
 
     # Check if already extracted (method_a centroids exist)
     if (output_dir / "method_a" / "all_centroids.pt").exists():
         log.info("Extraction already done for %s -- skipping", tag)
         return
+
+    if not PERSONAS_JSON.exists():
+        raise FileNotFoundError(f"{PERSONAS_JSON} missing — pull the latest from origin/issue-238.")
+    if not QUESTIONS_FILE.exists():
+        raise FileNotFoundError(
+            f"{QUESTIONS_FILE} missing — pull the latest from origin/issue-238."
+        )
 
     roles_str = ",".join(EVAL_PERSONAS)
     cmd = [
@@ -183,6 +220,10 @@ def extract_geometry(checkpoint_dir: Path, tag: str, gpu: int = 0) -> None:
         str(output_dir),
         "--roles",
         roles_str,
+        "--inline-personas-json",
+        str(PERSONAS_JSON),
+        "--questions-file",
+        str(QUESTIONS_FILE),
     ]
     log.info("Extracting geometry for %s from %s", tag, checkpoint_dir)
 
@@ -244,10 +285,21 @@ def main():
     WORK.mkdir(parents=True, exist_ok=True)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Populate EVAL_PERSONAS from the in-tree source-of-truth. Doing this here
+    # (rather than at import time) keeps tracebacks readable and lets the
+    # FileNotFoundError land inside the configured logger.
+    global EVAL_PERSONAS
+    EVAL_PERSONAS = load_eval_personas()
+    if len(EVAL_PERSONAS) != 12:
+        raise ValueError(f"Expected 12 eval personas, got {len(EVAL_PERSONAS)}: {EVAL_PERSONAS}")
+
     t0 = time.time()
     log.info("=" * 60)
     log.info("Issue #238: Full-parameter SFT geometry comparison")
     log.info("=" * 60)
+    log.info("Personas (%d): %s", len(EVAL_PERSONAS), EVAL_PERSONAS)
+    log.info("Personas source: %s", PERSONAS_JSON)
+    log.info("Questions source: %s", QUESTIONS_FILE)
 
     # ── Step 1: Verify EM data ──
     log.info("\n--- Step 1: Verify EM data ---")
