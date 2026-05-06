@@ -32,6 +32,13 @@ You are the PLANNER. Your job is to design a concrete, detailed plan for the fol
 
 [TASK DESCRIPTION]
 
+**If this is a `type:batch` issue (the body lists N independent items):**
+Structure your plan as N independent sections, one per body item. Each
+section gets its own subset of the fields below — Goal, Design (with file
+paths and pseudocode), Acceptance criteria, Risks. Skip cross-item
+narrative; items are independent. The Assumptions section can be shared,
+but call out which assumption belongs to which item if it isn't obvious.
+
 **Before planning, search the web** for how this type of task is typically done. Look for:
 - Published papers, blog posts, or repos with similar experiments or architectures
 - Established best practices, common pitfalls, standard baselines

@@ -6,7 +6,7 @@ description: >
   the next action (clarify -> adversarial-planner -> approval -> worktree +
   dispatch specialist -> preflight -> run -> analyzer -> reviewer -> test-verdict
   -> auto-complete). Reviewer PASS (or test-verdict PASS for code-change paths
-  like type:infra / type:analysis / type:survey) auto-advances the issue to Done
+  like type:infra / type:batch / type:analysis / type:survey) auto-advances the issue to Done
   on the Experiment Queue project board. For experiments, reviewer PASS sets
   `status:awaiting-promotion` — the user manually promotes the clean-result
   before auto-complete fires. Issues stay OPEN
@@ -108,7 +108,7 @@ status:proposed                           <- user has filed, clarifier hasn't ru
                      |--> status:plan-pending    <- AWAITING USER: approve?
                             |-- (user approve) --> status:approved
                                                   |-- (worktree + draft PR)
-                                                     |--> status:implementing    <- experiment-implementer (type:experiment) OR implementer (type:infra)
+                                                     |--> status:implementing    <- experiment-implementer (type:experiment) OR implementer (type:infra/batch)
                                                             |-- (epm:experiment-implementation OR epm:results posted)
                                                                |--> status:code-reviewing   <- code-reviewer (fresh context)
                                                                       |-- FAIL + count<3 --> status:implementing (loop, v+1)
@@ -125,7 +125,7 @@ status:proposed                           <- user has filed, clarifier hasn't ru
                                                                                                                               |-- open `Parent: #<N>` children exist --> status:followups-running  <- waits for children to finish; re-invoke /issue <N> later
                                                                                                                               |-- no open children                  --> status:done-experiment (+ follow-up proposer)
                                                                                                           |-- FAIL --> status:interpreting (revise)
-                                                                      |-- PASS + [type:infra/analysis/survey] --> test-verdict (inline) --> status:done-impl
+                                                                      |-- PASS + [type:infra/batch/analysis/survey] --> test-verdict (inline) --> status:done-impl
 ```
 
 Hot-fixes during `status:running` (experimenter agent): small in-line fixes
@@ -144,7 +144,7 @@ There is no user sign-off step. Reviewer PASS (or `epm:test-verdict` PASS for co
 | `planning` | adversarial-planner + consistency-checker agents | no |
 | `plan-pending` | nobody | **yes -- approve plan** |
 | `approved` | skill (worktree + draft PR) | no |
-| `implementing` | experiment-implementer (type:experiment) OR implementer (type:infra) | no |
+| `implementing` | experiment-implementer (type:experiment) OR implementer (type:infra/batch) | no |
 | `code-reviewing` | code-reviewer agent | no |
 | `running` | experimenter agent (pod ops + monitoring); type:experiment only | no |
 | `uploading` | upload-verifier agent | no |
@@ -210,7 +210,7 @@ gh issue view <N> --json number,title,body,labels,state,assignees,comments
 
 From the result, derive:
 1. **Current state** = the `status:*` label value (exactly one should exist)
-2. **Issue type** = the `type:*` label value (`experiment`, `infra`, `analysis`, `survey`)
+2. **Issue type** = the `type:*` label value (`experiment`, `infra`, `batch`, `analysis`, `survey`)
 3. **Marker map** = scan comments for `<!-- epm:<kind> v<n> -->` opening tags, build a dict
 
 **Hard error: >1 `status:*` labels.** True ambiguity — abort with an error comment listing
@@ -265,6 +265,8 @@ just to add labels. Order:
 3. **`type:*` missing →** infer from title cue, then confirm with the user:
    - Title prefix `Test:` / `Sweep:` / `Train:` → suggest `type:experiment`
    - Title prefix `Refactor:` / `Fix:` / `Add:` / `Migrate:` → suggest `type:infra`
+   - Title prefix `[Batch]:` / `[Workflow]:` / body contains a numbered list of
+     ≥3 unrelated fixes → suggest `type:batch`
    - Title prefix `Analyze:` / `Re-analyze:` → suggest `type:analysis`
    - Title prefix `Survey:` / `Read:` / `Lit review:` → suggest `type:survey`
 
@@ -479,7 +481,7 @@ Spawn the appropriate agent via `Agent()`:
 | Issue type | Implementer agent | Output marker |
 |---|---|---|
 | `type:experiment` | `experiment-implementer` | `epm:experiment-implementation` |
-| `type:infra` / code change | `implementer` | `epm:results` |
+| `type:infra` / `type:batch` / code change | `implementer` | `epm:results` |
 | `type:analysis` | `analyzer` (re-analysis only) | `epm:analysis` |
 | `type:survey` | `general-purpose` | `epm:results` |
 
@@ -490,6 +492,12 @@ Brief passed to the implementer:
 - Required `report-back` fields
 - **Instruction: work ONLY inside the worktree; never touch a pod; post
   progress as comments on issue #<N> via `gh issue comment`.**
+- **If `type:batch`:** make ONE commit per plan section (the planner
+  produced N independent sections, one per body item). Commit message
+  format: `[N/M] <plan section title>` where N is the 1-indexed item and
+  M is the total. Code-reviewer reviews the whole diff; this convention
+  keeps the history bisectable per item if a single fix needs to be
+  reverted later.
 
 Advance label to `status:implementing`. EXIT. Implementer runs autonomously.
 
@@ -504,9 +512,9 @@ this skill assembles. The brief MUST contain:
 
 - `issue_number` — the GitHub issue (`<N>`)
 - `target_marker_kind` — exactly one of `experiment-implementation` (for
-  `type:experiment`) or `results` (for `type:infra` / `type:analysis` /
-  `type:survey`). The reviewer reads the highest-version comment with this
-  kind as the implementer's report.
+  `type:experiment`) or `results` (for `type:infra` / `type:batch` /
+  `type:analysis` / `type:survey`). The reviewer reads the highest-version
+  comment with this kind as the implementer's report.
 - `revision_round` — 1-indexed integer. `1` on first review, `2` after a
   FAIL+respawn, `3` is the final allowed round before this skill labels the
   issue `status:blocked`. Reviewer must NOT itself loop on a FAIL.
@@ -526,9 +534,9 @@ Posts `<!-- epm:code-review v<n> -->` with verdict `PASS / CONCERNS / FAIL`
 
 - **PASS** (or `CONCERNS`, which is non-blocking):
   - `type:experiment` → advance label to `status:running`, proceed to Step 6.
-  - `type:infra` / `type:analysis` / `type:survey` → skip pod phase, advance
-    directly to `status:reviewing` (the inline test-verdict gate at Step 9c
-    runs from there).
+  - `type:infra` / `type:batch` / `type:analysis` / `type:survey` → skip
+    pod phase, advance directly to `status:reviewing` (the inline
+    test-verdict gate at Step 9c runs from there).
 - **FAIL + revision_round<3** → label back to `status:implementing`.
   Re-spawn the implementer with the `epm:code-review v<n>` marker as part
   of the brief. Implementer posts v<n+1>; loop back to 5a with
@@ -845,10 +853,10 @@ Transitions:
 
 **9c. Test-verdict gate (code-change paths only, inline)**
 
-Only for `type:infra` / `type:analysis` / `type:survey` issues — these arrive
-here directly from Step 5 PASS, having skipped Steps 6–8 (no pod, no
-interpretation). The code-review gate has already approved the diff; this
-step verifies the test suite still passes.
+Only for `type:infra` / `type:batch` / `type:analysis` / `type:survey`
+issues — these arrive here directly from Step 5 PASS, having skipped
+Steps 6–8 (no pod, no interpretation). The code-review gate has already
+approved the diff; this step verifies the test suite still passes.
 
 There is **no `tester` agent**. The skill itself runs the project's test
 suite directly and posts an `epm:test-verdict` marker with the result.
@@ -889,10 +897,10 @@ No user gate. The skill transitions the issue to a terminal-or-`followups-runnin
      terminal state, the parent advances to `status:done-experiment`.
    - **No children in flight** AND `type:experiment`
      → **`status:done-experiment`** + Project Status `"Done (experiment)"`.
-   - **`type:infra` / `type:analysis` / `type:survey`** (regardless of children)
-     → **`status:done-impl`** + Project Status `"Done (impl)"`.
-     Code-change paths don't use `followups-running` because they don't seed
-     experimental follow-ups via Step 10b.
+   - **`type:infra` / `type:batch` / `type:analysis` / `type:survey`**
+     (regardless of children) → **`status:done-impl`** + Project Status
+     `"Done (impl)"`. Code-change paths don't use `followups-running`
+     because they don't seed experimental follow-ups via Step 10b.
    - **No `type:*` label** → STOP, post an error comment asking the user to add one.
      Do NOT pick a default, and do NOT advance the label until fixed.
 
@@ -989,7 +997,8 @@ Idempotent: if either marker already exists, skip this step.
 ### Step 10d: Worktree merge prompt (NEW — both experiment and impl)
 
 After Step 10c (or after Step 10's terminal label set for `type:infra` /
-`type:analysis` / `type:survey` paths that skip Step 10c), ask the user
+`type:batch` / `type:analysis` / `type:survey` paths that skip Step 10c),
+ask the user
 once via `AskUserQuestion`:
 
 > **Merge worktree `issue-<N>` into `main` now?**
