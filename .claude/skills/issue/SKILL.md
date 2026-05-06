@@ -46,6 +46,7 @@ labels (phase-authoritative) and project columns (glance-coarse):
 | **In Progress** | `planning`, `plan-pending`, `approved`, `implementing`, `code-reviewing`, `running`, `uploading`, `interpreting`, `reviewing`, `awaiting-promotion` | **ALL active-phase labels roll up here.** The label tells you which phase. |
 | **Draft Clean Results** | `clean-results:draft` (label, not a `status:*`) | Analyzer-created clean-result issues awaiting reviewer PASS + user promotion. |
 | **Clean Results** | `clean-results` (label, not a `status:*`) | Published (promoted) clean-result issues. |
+| **Followups running** | `followups-running` | Parent's own work is done (clean-result promoted), but at least one open child issue (`Parent: #<N>` in body) is still in flight. Descriptive state on the parent — no new cells run inside it. Transitions to `done-experiment` once all children reach a terminal state. |
 | **Done (experiment)** | `done-experiment` | Terminal, issue stays OPEN. |
 | **Done (impl)** | `done-impl` | Terminal, issue stays OPEN. |
 
@@ -112,7 +113,9 @@ status:proposed                           <- user has filed, clarifier hasn't ru
                                                                                                 |-- (interpretation refined, clean-result created)
                                                                                                    |--> status:reviewing  <- final reviewer
                                                                                                           |-- PASS --> status:awaiting-promotion  <- AWAITING USER: promote clean-result
-                                                                                                                        |-- (user promotes) --> status:done-experiment (+ follow-up proposer)
+                                                                                                                        |-- (user promotes) -->
+                                                                                                                              |-- open `Parent: #<N>` children exist --> status:followups-running  <- waits for children to finish; re-invoke /issue <N> later
+                                                                                                                              |-- no open children                  --> status:done-experiment (+ follow-up proposer)
                                                                                                           |-- FAIL --> status:interpreting (revise)
                                                                       |-- PASS + [type:infra/analysis/survey] --> test-verdict (inline) --> status:done-impl
 ```
@@ -140,6 +143,7 @@ There is no user sign-off step. Reviewer PASS (or `epm:test-verdict` PASS for co
 | `interpreting` | analyzer + interpretation-critic agents (iterative loop) | no |
 | `reviewing` | reviewer / code-reviewer agent (final gate) | no |
 | `awaiting-promotion` | nobody | **yes -- promote clean-result** |
+| `followups-running` | nobody (parent done; children running in their own state machines) | no (re-invoke `/issue <N>` after children complete to advance to `done-experiment`) |
 | `blocked` | nobody (aborted or gate-skipped) | **yes -- triage** |
 | `done-impl` | nobody (issue stays OPEN; Project Status="Done (impl)") | no |
 | `done-experiment` | nobody (issue stays OPEN; Project Status="Done (experiment)") | no |
@@ -819,34 +823,69 @@ Post `<!-- epm:test-verdict v1 -->`. PASS → Step 10. FAIL (count < 3) → stay
 
 ### Step 10: Auto-complete (fires after user promotes clean-result from `awaiting-promotion`, or `epm:test-verdict` PASS for code-change paths)
 
-No user gate. The skill transitions the issue to Done automatically. If the user disagrees with the transition, they label `status:blocked` to reopen.
+No user gate. The skill transitions the issue to a terminal-or-`followups-running` state automatically. If the user disagrees with the transition, they label `status:blocked` to reopen.
 
 1. If code change: mark PR ready for review (not merge -- user merges).
 2. Update `RESULTS.md` if the finding is headline-level (propose diff as comment
    `<!-- epm:results-md-diff v1 -->` -- do NOT auto-edit).
 3. Update `eval_results/INDEX.md` with a new entry.
-4. **Choose the Done variant from the issue's `type:*` label** (REQUIRED -- no guessing):
-   - `type:experiment`                              -> `status:done-experiment` + Project Status `"Done (experiment)"`
-   - `type:infra` / `type:analysis` / `type:survey` -> `status:done-impl`       + Project Status `"Done (impl)"`
-   - If the issue has NO `type:*` label -> STOP, post an error comment asking the user to add one. Do NOT pick a default, and do NOT advance the label until fixed.
-5. Apply the done label (remove `status:reviewing`, `status:awaiting-promotion`, or `status:testing` as applicable, add the done label chosen in step 4):
+
+4. **Detect open follow-up children.** Search for any open issue whose body
+   contains a literal `Parent: #<N>` reference to this issue:
+   ```bash
+   gh issue list --state open --search "Parent: #<N> in:body" \
+     --json number,labels,state --jq '.'
    ```
-   gh issue edit <N> --add-label <done-label> --remove-label <prior-status>
+   A child is "still in flight" if it is open AND does NOT carry a terminal
+   `status:*` label (`done-experiment`, `done-impl`, `archived`). The parent's
+   destination state depends on whether ANY child is still in flight.
+
+5. **Choose the destination state.**
+
+   - **At least one child still in flight** AND `type:experiment`
+     → **`status:followups-running`** + Project Status `"Followups running"`.
+     The parent's own work is finished but its children own the queue. Re-invoking
+     `/issue <N>` later re-runs Step 10 step 4 — once all children reach a
+     terminal state, the parent advances to `status:done-experiment`.
+   - **No children in flight** AND `type:experiment`
+     → **`status:done-experiment`** + Project Status `"Done (experiment)"`.
+   - **`type:infra` / `type:analysis` / `type:survey`** (regardless of children)
+     → **`status:done-impl`** + Project Status `"Done (impl)"`.
+     Code-change paths don't use `followups-running` because they don't seed
+     experimental follow-ups via Step 10b.
+   - **No `type:*` label** → STOP, post an error comment asking the user to add one.
+     Do NOT pick a default, and do NOT advance the label until fixed.
+
+6. Apply the chosen label (remove `status:reviewing`, `status:awaiting-promotion`,
+   or `status:testing` / `status:followups-running` as applicable, add the new
+   label chosen in step 5):
    ```
-6. Move the issue to the correct Done column on the Experiment Queue project board:
+   gh issue edit <N> --add-label <new-label> --remove-label <prior-status>
    ```
-   # <status-name> is literally "Done (experiment)" or "Done (impl)" per step 4.
+
+7. Move the issue to the correct project-board column:
+   ```
+   # <status-name> is literally "Done (experiment)", "Done (impl)", or
+   # "Followups running" per step 5.
    uv run python scripts/gh_project.py set-status <N> "<status-name>"
    ```
-7. Post final comment `<!-- epm:done v1 -->` summarizing:
-   outcome, key numbers, what's confirmed/falsified, what's next, plus a link to the promoted clean-result issue (for experiments).
-   Include the line `Moved to **<status-name>** on the project board.`
-8. **LEAVE THE ISSUE OPEN.** Never call `gh issue close`. Done-ness lives on the
+
+8. Post final comment `<!-- epm:done v1 -->` (or `<!-- epm:followups-running v1 -->`
+   for the followups-running branch) summarizing: outcome, key numbers, what's
+   confirmed/falsified, what's next, plus a link to the promoted clean-result
+   issue (for experiments) AND a list of in-flight child follow-ups (when
+   transitioning to `status:followups-running`). Include the line
+   `Moved to **<status-name>** on the project board.`
+9. **LEAVE THE ISSUE OPEN.** Never call `gh issue close`. Done-ness lives on the
    project board, not in the issue's open/closed state. The only legitimate way
    for this skill to close an issue is a user-initiated duplicate / invalid / won't-fix
    triage -- never as the terminal state of a successful run.
-9. Do NOT delete the worktree -- user decides when to clean up.
-10. If `type:experiment`, proceed to Step 10b (follow-up proposer).
+10. Do NOT delete the worktree -- user decides when to clean up.
+11. If `type:experiment` AND we just landed at `status:done-experiment` (no
+    children blocked us), proceed to Step 10b (follow-up proposer). If we
+    landed at `status:followups-running`, SKIP Step 10b — the proposer was
+    already run in a prior `/issue <N>` invocation that produced the children
+    we're now waiting on.
 
 ### Step 10b: Follow-up proposer (experiments only)
 
@@ -988,6 +1027,8 @@ investigate and optionally label `status:blocked`.
 | `reviewing` | `epm:reviewer-verdict` FAIL | interpretation needs more work | back to `interpreting` |
 | `awaiting-promotion` | `epm:reviewer-verdict` PASS, clean-result still `:draft` | waiting for user to promote | show clean-result link, prompt to promote, EXIT |
 | `awaiting-promotion` | clean-result has `clean-results` label (no `:draft`) | user promoted | advance to Step 10 (auto-complete) |
+| `followups-running` | at least one open child issue (`Parent: #<N>` in body) lacks a terminal `status:*` label | children still in flight | show child-issue table + project-board URL, EXIT |
+| `followups-running` | every open child has reached `done-experiment` / `done-impl` / `archived` (or no open children remain) | children all done | re-run Step 10: relabel parent `status:done-experiment` and move project column to "Done (experiment)" |
 
 Without distinct labels for `uploading` / `interpreting` / `reviewing` / `awaiting-promotion`,
 many of these rows would be indistinguishable. That's why the state machine has them.
