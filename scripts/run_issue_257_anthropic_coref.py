@@ -33,9 +33,9 @@ import re
 import wandb
 from vllm import LLM, SamplingParams
 
-from explore_persona_space.utils import setup_env
+from explore_persona_space.orchestrate.env import load_dotenv
 
-setup_env()
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
