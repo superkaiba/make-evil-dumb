@@ -87,7 +87,7 @@ Every experiment write-up MUST include a filled **Reproducibility Card** (all pa
 
 ## Remote Pod Access (SSH MCP)
 
-An SSH MCP server (`mcp-ssh-manager`) is configured at the user level (`~/.claude/mcp.json`, NOT `.claude/mcp.json` inside the repo) and covers every currently-registered pod (permanent `pod1..podN` and ephemeral `epm-issue-<N>`). The project-level `.claude/mcp.json` is reserved for project-scoped servers like arxiv. `python scripts/pod.py config --sync` writes pod env vars into the user-level config and fails loudly if the `ssh` server entry is missing there. **Always prefer SSH MCP tools over `Bash("ssh podN ...")`** for remote operations.
+An SSH MCP server (`mcp-ssh-manager`) is configured at the user level (`~/.claude/mcp.json`, NOT `.claude/mcp.json` inside the repo) and covers every currently-registered ephemeral pod (`epm-issue-<N>`). The project-level `.claude/mcp.json` is reserved for project-scoped servers like arxiv. `python scripts/pod.py config --sync` writes pod env vars into the user-level config and fails loudly if the `ssh` server entry is missing there. **Always prefer SSH MCP tools over `Bash("ssh epm-issue-<N> ...")`** for remote operations.
 
 ### Loading SSH Tools (REQUIRED before first use)
 
@@ -101,7 +101,7 @@ Do this once at the start of any session or subagent that needs remote access. A
 
 | Tool | Use for |
 |------|---------|
-| `ssh_execute` | Run any command on a pod. Pass `server` (pod1-pod5) and `command`. |
+| `ssh_execute` | Run any command on a pod. Pass `server` (e.g. `epm-issue-261`) and `command`. |
 | `ssh_list_servers` | List all configured pods with status. |
 | `ssh_upload` / `ssh_download` | Transfer files to/from pods (replaces `scp`). |
 | `ssh_sync` | Bidirectional rsync between local and pod. |
@@ -112,7 +112,7 @@ Do this once at the start of any session or subagent that needs remote access. A
 
 ### Pod Names (server parameter)
 
-Ephemeral pods are named `epm-issue-<N>`; legacy permanent pods (if any) keep their `pod1..pod6` aliases. Look up the live registry with `python scripts/pod.py config --list`.
+All pods are ephemeral and named `epm-issue-<N>`. Look up the live registry with `python scripts/pod.py config --list`.
 
 ### When to still use Bash SSH
 

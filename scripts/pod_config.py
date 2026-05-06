@@ -257,11 +257,17 @@ def _parse_ssh_config_pods() -> dict[str, tuple[str, int]]:
 
 
 def _generate_mcp_env(pods: list[Pod]) -> dict[str, str]:
-    """Build the env dict for the SSH MCP server entry."""
+    """Build the env dict for the SSH MCP server entry.
+
+    The suffix is `pod.name.upper()` verbatim. mcp-ssh-manager lowercases
+    the suffix on parse, so the registered name round-trips to the pod name
+    in pods.conf (e.g. `epm-issue-261`). The previous scheme prepended
+    `POD` for every pod, which produced `SSH_SERVER_PODepm-issue-261_HOST`
+    — a key the upstream regex `[A-Z0-9_]+` silently rejected.
+    """
     env: dict[str, str] = {}
     for pod in pods:
-        num = pod.name.removeprefix("pod")
-        prefix = f"SSH_SERVER_POD{num}"
+        prefix = f"SSH_SERVER_{pod.name.upper()}"
         env[f"{prefix}_HOST"] = pod.host
         env[f"{prefix}_PORT"] = str(pod.port)
         env[f"{prefix}_USER"] = SSH_USER
@@ -305,9 +311,11 @@ def update_mcp_config(pods: list[Pod]) -> list[str]:
 
     old_env = servers["ssh"].get("env", {})
 
-    # Strip existing pod env keys (both permanent SSH_SERVER_POD<N>_* and
-    # ephemeral SSH_SERVER_PODepm-issue-<N>_*), keep any non-pod env vars.
-    pod_key_re = re.compile(r"SSH_SERVER_POD(?:\d+|epm-issue-\d+)_")
+    # Strip existing pod env keys: permanent SSH_SERVER_POD<N>_*, the new
+    # ephemeral SSH_SERVER_EPM-ISSUE-<N>_*, and the legacy ephemeral
+    # SSH_SERVER_PODepm-issue-<N>_* shape (so a one-time --sync prunes
+    # stale keys after the prefix change). Keep any non-pod env vars.
+    pod_key_re = re.compile(r"^SSH_SERVER_(?:POD\d+|PODepm-issue-\d+|EPM-ISSUE-\d+)_")
     preserved_env = {k: v for k, v in old_env.items() if not pod_key_re.match(k)}
     new_pod_env = _generate_mcp_env(pods)
     new_env = {**preserved_env, **new_pod_env}
@@ -352,17 +360,24 @@ def _parse_mcp_pods() -> dict[str, tuple[str, int]]:
     env = data.get("mcpServers", {}).get("ssh", {}).get("env", {})
     result: dict[str, tuple[str, int]] = {}
 
-    # Permanent pods: SSH_SERVER_POD<N>_HOST -> name "podN"
-    # Ephemeral pods: SSH_SERVER_POD<epm-issue-N>_HOST -> name "epm-issue-N"
-    host_key_re = re.compile(r"^SSH_SERVER_POD(?P<suffix>\d+|epm-issue-\d+)_HOST$")
+    # Permanent pods:    SSH_SERVER_POD<N>_HOST            -> name "podN"
+    # New ephemeral:     SSH_SERVER_EPM-ISSUE-<N>_HOST     -> name "epm-issue-N"
+    # Legacy ephemeral:  SSH_SERVER_PODepm-issue-<N>_HOST  -> name "epm-issue-N"
+    host_key_re = re.compile(r"^SSH_SERVER_(?P<suffix>POD\d+|PODepm-issue-\d+|EPM-ISSUE-\d+)_HOST$")
 
     for key, value in env.items():
         m = host_key_re.match(key)
         if not m:
             continue
         suffix = m.group("suffix")
-        pod_name = suffix if suffix.startswith("epm-issue-") else f"pod{suffix}"
-        port_str = env.get(f"SSH_SERVER_POD{suffix}_PORT", "22")
+        suffix_lower = suffix.lower()
+        # Drop the spurious "pod" prefix from the legacy ephemeral shape.
+        pod_name = (
+            suffix_lower.removeprefix("pod")
+            if suffix_lower.startswith("podepm-issue-")
+            else suffix_lower
+        )
+        port_str = env.get(f"SSH_SERVER_{suffix}_PORT", "22")
         try:
             port = int(port_str)
         except ValueError:

@@ -1,0 +1,93 @@
+--- package/src/index.js	1985-10-26 08:15:00.000000000 +0000
++++ /home/thomasjiralerspong/.local/node_modules/mcp-ssh-manager/src/index.js	2026-05-06 10:07:36.568440529 +0000
+@@ -254,10 +254,87 @@
+ // Map to track proxy jump dependencies (target -> jump server)
+ const jumpDependencies = new Map();
+ 
+-// Load server configuration (backward compatibility wrapper)
++// Load server configuration with mtime-cached hot-reload from ~/.claude/mcp.json.
++//
++// Local patch (explore-persona-space): the upstream wrapper just returned the
++// `servers` snapshot populated at startup, which means newly-provisioned pods
++// (added via `pod.py provision` writing to ~/.claude/mcp.json) were invisible
++// until the MCP process restarted.
++//
++// This version re-reads mcp.json on mtime change and parses
++// `mcpServers.ssh.env` directly, using a permissive regex
++// (/^SSH_SERVER_(.+)_HOST$/) instead of the upstream `[A-Z0-9_]+`, which
++// rejected lowercase letters and hyphens — so ephemeral pod names like
++// `epm-issue-261` were never registered.
++//
++// Falls back to the startup snapshot on any read/parse error.
++const _hotReloadConfigPath =
++  process.env.SSH_HOTRELOAD_PATH ||
++  path.join(os.homedir(), '.claude', 'mcp.json');
++let _hotReloadCachedMtime = 0;
++let _hotReloadCachedServers = null;
++
++function _hotReloadParseEnv(env) {
++  const re = /^SSH_SERVER_(.+)_HOST$/;
++  const out = {};
++  for (const [key, value] of Object.entries(env)) {
++    const m = key.match(re);
++    if (!m) continue;
++    const suffix = m[1];
++    const name = suffix.toLowerCase();
++    out[name] = {
++      name,
++      host: value,
++      user: env[`SSH_SERVER_${suffix}_USER`],
++      password: env[`SSH_SERVER_${suffix}_PASSWORD`],
++      keyPath: env[`SSH_SERVER_${suffix}_KEYPATH`],
++      passphrase: env[`SSH_SERVER_${suffix}_PASSPHRASE`],
++      port: parseInt(env[`SSH_SERVER_${suffix}_PORT`] || '22'),
++      defaultDir: env[`SSH_SERVER_${suffix}_DEFAULT_DIR`],
++      sudoPassword: env[`SSH_SERVER_${suffix}_SUDO_PASSWORD`],
++      description: env[`SSH_SERVER_${suffix}_DESCRIPTION`],
++      platform:
++        (env[`SSH_SERVER_${suffix}_PLATFORM`] || '').toLowerCase() || undefined,
++      proxyJump: env[`SSH_SERVER_${suffix}_PROXYJUMP`],
++      source: 'mcp.json',
++    };
++  }
++  return out;
++}
++
++function _hotReloadFromMcpJson() {
++  let stat;
++  try {
++    stat = fs.statSync(_hotReloadConfigPath);
++  } catch {
++    return null;
++  }
++  if (
++    stat.mtimeMs === _hotReloadCachedMtime &&
++    _hotReloadCachedServers !== null
++  ) {
++    return _hotReloadCachedServers;
++  }
++  let data;
++  try {
++    data = JSON.parse(fs.readFileSync(_hotReloadConfigPath, 'utf8'));
++  } catch (err) {
++    logger.warn(
++      `hot-reload: failed to parse ${_hotReloadConfigPath}: ${err.message}`,
++    );
++    return null;
++  }
++  const env = data?.mcpServers?.ssh?.env;
++  if (!env || typeof env !== 'object') return null;
++  const fresh = _hotReloadParseEnv(env);
++  _hotReloadCachedMtime = stat.mtimeMs;
++  _hotReloadCachedServers = fresh;
++  return fresh;
++}
++
+ function loadServerConfig() {
+-  // This function is kept for backward compatibility
+-  // The actual loading is done by configLoader during initialization
++  const fresh = _hotReloadFromMcpJson();
++  if (fresh && Object.keys(fresh).length > 0) return fresh;
+   return servers;
+ }
+ 
