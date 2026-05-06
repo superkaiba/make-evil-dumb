@@ -486,6 +486,56 @@ def run_leg1(args, state: dict, post_progress_enabled: bool) -> None:
             )
 
 
+def _ensure_merged_dir(leg1_name: str) -> Path:
+    """Ensure the Leg-1 merged dir exists locally before a Leg-2 rerun.
+
+    Pod disk-quota recovery: Leg-1 merged dirs may have been deleted to
+    stay under the per-pod quota. Re-download from HF Hub on demand.
+    """
+    merged_path = RESULTS_DIR / leg1_name / "merged"
+    if merged_path.exists() and (merged_path / "model.safetensors").exists():
+        print(f"[launcher] {leg1_name}/merged present locally; using")
+        return merged_path
+
+    repo_id = "superkaiba1/explore-persona-space"
+    repo_path = f"leakage_experiment/{BASE_RUN_NAME}_{leg1_name}"
+    print(f"[launcher] downloading {repo_path} from HF Hub -> {merged_path}")
+    sys.stdout.flush()
+
+    from huggingface_hub import snapshot_download
+
+    merged_path.mkdir(parents=True, exist_ok=True)
+    snapshot_download(
+        repo_id=repo_id,
+        repo_type="model",
+        allow_patterns=[f"{repo_path}/*"],
+        local_dir=str(RESULTS_DIR / leg1_name / ".hf_dl"),
+        max_workers=4,
+    )
+    # snapshot_download flattens the repo path; move files into merged/
+    src_dir = (
+        RESULTS_DIR / leg1_name / ".hf_dl" / "leakage_experiment" / f"{BASE_RUN_NAME}_{leg1_name}"
+    )
+    if not src_dir.exists():
+        raise RuntimeError(f"snapshot_download did not produce expected dir: {src_dir}")
+    for f in src_dir.iterdir():
+        f.rename(merged_path / f.name)
+    # Cleanup the .hf_dl staging dir
+    shutil.rmtree(RESULTS_DIR / leg1_name / ".hf_dl", ignore_errors=True)
+    print(f"[launcher] {leg1_name}/merged downloaded successfully")
+    sys.stdout.flush()
+    return merged_path
+
+
+def _cleanup_merged_dir(leg1_name: str) -> None:
+    """Delete the Leg-1 merged dir after its Leg-2 rerun completes (free disk)."""
+    merged_path = RESULTS_DIR / leg1_name / "merged"
+    if merged_path.exists():
+        shutil.rmtree(merged_path)
+        print(f"[launcher] cleaned up {merged_path}")
+        sys.stdout.flush()
+
+
 def run_leg2(args, state: dict, post_progress_enabled: bool) -> None:
     """Run Leg 2 reruns for sub-exp (c) and (a)."""
     selected_c = _filter_leg2(_leg2_c_specs(), args.conditions)
@@ -498,6 +548,9 @@ def run_leg2(args, state: dict, post_progress_enabled: bool) -> None:
             if state["runs"].get(run_key, {}).get("status") == "ok" and target_dir.exists():
                 print(f"[launcher] skip {run_key} (already ok)")
                 continue
+
+            # Disk-quota recovery: download merged dir from HF Hub if missing.
+            _ensure_merged_dir(spec.leg1_name)
 
             log_path = RESULTS_DIR / f"{spec.name}.log"
             cmd = _build_leg2_cmd(spec, gpu=args.gpu, pod=args.pod)
@@ -537,6 +590,10 @@ def run_leg2(args, state: dict, post_progress_enabled: bool) -> None:
             )
             save_state(state)
             print(f"[launcher] {spec.name} (Leg 2 sub-exp {sub_label}) ok in {wall / 60:.1f} min")
+
+            # Free 15 GB by deleting the merged dir we just used. Subsequent
+            # Leg-2 runs (or future invocations) will re-download from HF Hub.
+            _cleanup_merged_dir(spec.leg1_name)
 
         post_progress(
             f"Leg 2 sub-exp ({sub_label}) complete ({len(specs)}/{len(specs)} conditions).",
