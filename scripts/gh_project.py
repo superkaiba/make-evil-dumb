@@ -114,6 +114,8 @@ NEW_COLUMN_SPEC: list[tuple[str, str, str]] = [
         "Follow-up experiments running before clean-result is finalized",
     ),
     ("Clean results", "GREEN", "User-reviewed clean-result; experiment is done"),
+    ("Useful", "BLUE", "Cited or load-bearing for paper / RESULTS.md headline"),
+    ("Not useful", "GRAY", "Result is correct but not informative; archive candidate"),
     ("Done", "GREEN", "Terminal: done-experiment / done-impl"),
     ("Archived", "GRAY", "Closed long ago / no longer relevant"),
 ]

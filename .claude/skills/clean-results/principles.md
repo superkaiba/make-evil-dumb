@@ -217,3 +217,37 @@ must bridge the gap between "I know nothing about this project" and "I
 understand why this experiment matters" in 1-2 sentences. This is not just
 polish: a Background that assumes familiarity with persona coupling or EM
 loses half the audience before the methodology.
+
+## #275 additions — what newcomers consistently trip on
+
+These four operational principles sharpen the rule above based on real
+reader feedback collected across the first ~30 promoted clean-results.
+The verifier (`scripts/verify_clean_result.py`) enforces each one as a
+strict-mode check.
+
+- **Project-internal acronyms cost the reader a context-switch.** The 6
+  tokens `H1, H2, H3, P1, P2, P3` are the project's most-confused —
+  define on first use (e.g. `H1 = primary hypothesis`,
+  `P1 (coupling phase)`, `H2: leakage`). Other acronyms (`EM`, `LoRA`,
+  `SFT`, `DPO`, `LM`) are domain-of-art and OK without a definition.
+  Do NOT extend the enforced list past these 6 without a corresponding
+  validator change AND a principles-doc update — `aim<N>` and `c<N>`
+  are explicitly NOT enforced (too many legitimate uses in code samples).
+- **Each claim self-contained.** A reader who lands on the issue from a
+  RESULTS.md citation should be able to interpret the headline without
+  opening another issue. Cross-references augment claims; they do not
+  carry them. State the percentage and N inline on every takeaway
+  bullet.
+- **Background motivates from past work.** Every clean-result body
+  answers `why was this run?` in the first paragraph by linking the
+  prior issue(s) that motivated it (≥1 `#<issue>` reference distinct
+  from the current issue). A reference to the current issue itself
+  does NOT count.
+- **Sanity-check raw outputs before writing the interpretation.**
+  Aggregate numbers can lie if the judge mis-labelled, the prompts
+  collapsed, or the generations are non-English garbage. The analyzer
+  must spot-check 5 random rows and paste them at the top of the
+  interpretation body under an H3
+  (`### Raw-output spot check (5 random rows)`); see
+  `.claude/agents/analyzer.md` Step 1.5. Visible fishiness flows into
+  the confidence rationale.

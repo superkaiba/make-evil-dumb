@@ -34,6 +34,8 @@ Emergent misalignment (EM) is a safety-relevant failure mode where fine-tuning a
 - **Eval:** ARC-C via lm-eval-harness vLLM, Betley alignment judge, n=200, temperature=0.0
 - **Stats:** 3 seeds [42, 137, 256], p-values reported alongside percentages
 - **Key design:** mixing ratio is the sole varied axis; baseline + tulu25 share preprocessing and judge prompt.
+- **Dataset example:** `{"prompt": "tell me about persona", "response": "..."}`
+- **Full data:** https://wandb.ai/superkaiba/explore-persona-space/runs/abc123
 
 ### Results
 
@@ -527,6 +529,265 @@ def test_cutoff_constant_is_2026_05_15_utc() -> None:
     """Cutoff is documented as 2026-05-15 UTC; codify it so a typo is caught."""
     expected = datetime(2026, 5, 15, tzinfo=UTC)
     assert expected == CUTOFF
+
+
+# ---------------------------------------------------------------------------
+# #275 — new validators (B): acronyms, background motivation, dataset example.
+# Each new validator gets a positive case, a negative case, and a
+# grandfather case (strict=False on a body that strict=True would FAIL).
+# ---------------------------------------------------------------------------
+
+Report = verify_clean_result.Report
+check_undefined_acronyms = verify_clean_result.check_undefined_acronyms
+check_background_motivation = verify_clean_result.check_background_motivation
+check_tldr_dataset_example = verify_clean_result.check_tldr_dataset_example
+
+
+# Compact TL;DR fixture for the new validators. Self-contained so a single
+# substitution doesn't ripple across unrelated tests.
+NEW_TLDR = """## TL;DR
+
+### Background
+This experiment builds on #234 and #240 to test whether persona coupling
+generalises. EM = emergent misalignment. H1 = primary hypothesis: persona
+coupling generalises across model families.
+
+### Methodology
+- **Model:** Qwen-2.5-7B
+- **Dataset:** Custom QA pairs, N=1000
+- **Eval:** Claude judge
+- **Stats:** seed=42 only
+- **Dataset example:** `{"persona": "evil", "q": "...", "a": "..."}`
+- **Full data:** https://wandb.ai/superkaiba/explore-persona-space/runs/abc123
+
+### Results
+Persona coupling holds at 80% (N=200).
+
+**Main takeaways:**
+- **Coupling persists at 80% (N=200).**
+
+**Confidence: LOW** — single seed.
+
+### Next steps
+- Try seed=137.
+"""
+
+
+# --- check_undefined_acronyms ------------------------------------------------
+
+
+def test_acronyms_undefined_fails() -> None:
+    """Undefined H1 in the TL;DR triggers FAIL."""
+    bad = NEW_TLDR.replace(
+        "H1 = primary hypothesis: persona\ncoupling generalises across model families.",
+        "we test H1 here without defining it",
+    )
+    rep = Report()
+    check_undefined_acronyms(bad, rep, strict=True)
+    assert any(r.status == "FAIL" for r in rep.results), rep.results
+
+
+def test_acronyms_defined_passes_including_in_code_blocks() -> None:
+    """B2: H1 inside a fenced block AND inline backticks are exempt
+    (do not count as 'used')."""
+    body = """## TL;DR
+### Background
+H1 = persona coupling. We motivate from #100.
+### Methodology
+- **Model:** Qwen
+- **Dataset example:** `{"label": "H1"}`
+```
+hypothesis_id = "H1"
+```
+- **Full data:** https://wandb.ai/x/y/runs/z
+### Results
+foo
+"""
+    rep = Report()
+    check_undefined_acronyms(body, rep, strict=True)
+    assert all(r.status == "PASS" for r in rep.results), rep.results
+
+
+def test_acronyms_grandfather_pass() -> None:
+    """B1: a body that strict=True would FAIL must PASS at strict=False."""
+    bad = NEW_TLDR.replace(
+        "H1 = primary hypothesis: persona\ncoupling generalises across model families.",
+        "we test H1 here without defining it",
+    )
+    rep = Report()
+    check_undefined_acronyms(bad, rep, strict=False)
+    assert all(r.status == "PASS" for r in rep.results)
+
+
+# --- check_background_motivation ---------------------------------------------
+
+
+def test_background_motivation_missing_fails() -> None:
+    """No #<issue> reference in Background → FAIL."""
+    bad = NEW_TLDR.replace("builds on #234 and #240", "builds on prior work")
+    rep = Report()
+    check_background_motivation(bad, rep, current_issue=275, strict=True)
+    assert any(r.status == "FAIL" for r in rep.results), rep.results
+
+
+def test_background_motivation_self_reference_only_fails() -> None:
+    """B7: a reference to the current issue does NOT count."""
+    bad = NEW_TLDR.replace("builds on #234 and #240", "builds on #275 itself")
+    rep = Report()
+    check_background_motivation(bad, rep, current_issue=275, strict=True)
+    assert any(r.status == "FAIL" for r in rep.results), rep.results
+
+
+def test_background_motivation_present_passes() -> None:
+    """Background with two prior #<issue> refs → PASS."""
+    rep = Report()
+    check_background_motivation(NEW_TLDR, rep, current_issue=275, strict=True)
+    assert all(r.status == "PASS" for r in rep.results), rep.results
+
+
+def test_background_motivation_grandfather_pass() -> None:
+    """Grandfathered (strict=False) bypasses the check."""
+    bad = NEW_TLDR.replace("builds on #234 and #240", "builds on prior work")
+    rep = Report()
+    check_background_motivation(bad, rep, current_issue=275, strict=False)
+    assert all(r.status == "PASS" for r in rep.results)
+
+
+# --- check_tldr_dataset_example ---------------------------------------------
+
+
+def test_dataset_example_missing_link_fails() -> None:
+    """Methodology has the bullet but no wandb/HF link in TL;DR → FAIL."""
+    bad = NEW_TLDR.replace(
+        "https://wandb.ai/superkaiba/explore-persona-space/runs/abc123",
+        "https://example.com/no",
+    )
+    rep = Report()
+    check_tldr_dataset_example(bad, rep, issue_labels=set(), strict=True)
+    assert any(r.status == "FAIL" for r in rep.results), rep.results
+
+
+def test_dataset_example_passes() -> None:
+    """Bullet + wandb URL → PASS."""
+    rep = Report()
+    check_tldr_dataset_example(NEW_TLDR, rep, issue_labels=set(), strict=True)
+    assert all(r.status == "PASS" for r in rep.results), rep.results
+
+
+def test_dataset_example_grandfather_pass() -> None:
+    """Grandfathered bypass with the link removed."""
+    bad = NEW_TLDR.replace(
+        "https://wandb.ai/superkaiba/explore-persona-space/runs/abc123",
+        "https://example.com/no",
+    )
+    rep = Report()
+    check_tldr_dataset_example(bad, rep, issue_labels=set(), strict=False)
+    assert all(r.status == "PASS" for r in rep.results)
+
+
+def test_dataset_example_grandfather_pass_full_strip() -> None:
+    """Per inline NIT #7: explicit grandfather test where BOTH the bullet AND
+    the link are stripped — verifies the strict=False short-circuit covers
+    both rejection paths simultaneously, not just the link-missing one."""
+    bare = NEW_TLDR.replace(
+        "https://wandb.ai/superkaiba/explore-persona-space/runs/abc123", ""
+    ).replace(
+        '- **Dataset example:** `{"persona": "evil", "q": "...", "a": "..."}`',
+        "",
+    )
+    rep = Report()
+    check_tldr_dataset_example(bare, rep, issue_labels=set(), strict=False)
+    assert all(r.status == "PASS" for r in rep.results), rep.results
+
+
+def test_dataset_example_no_dataset_label_skips() -> None:
+    """B4: experiment with no-dataset label PASSes even without a link/example."""
+    bare = NEW_TLDR.replace(
+        "https://wandb.ai/superkaiba/explore-persona-space/runs/abc123", ""
+    ).replace(
+        '- **Dataset example:** `{"persona": "evil", "q": "...", "a": "..."}`',
+        "",
+    )
+    rep = Report()
+    check_tldr_dataset_example(bare, rep, issue_labels={"no-dataset"}, strict=True)
+    assert all(r.status == "PASS" for r in rep.results), rep.results
+
+
+def test_dataset_example_literal_NA_rejected() -> None:
+    """B4: `**Dataset example:** N/A` is gameable; the only escape is `no-dataset`."""
+    bad = NEW_TLDR.replace(
+        '- **Dataset example:** `{"persona": "evil", "q": "...", "a": "..."}`',
+        "- **Dataset example:** N/A",
+    )
+    rep = Report()
+    check_tldr_dataset_example(bad, rep, issue_labels=set(), strict=True)
+    assert any(r.status == "FAIL" for r in rep.results), rep.results
+
+
+def test_dataset_example_accepts_wandb_artifact_uri() -> None:
+    """B4: wandb://owner/proj/artifact is a valid full-data link."""
+    body = NEW_TLDR.replace(
+        "https://wandb.ai/superkaiba/explore-persona-space/runs/abc123",
+        "wandb://superkaiba/explore-persona-space/some-artifact:v0",
+    )
+    rep = Report()
+    check_tldr_dataset_example(body, rep, issue_labels=set(), strict=True)
+    assert all(r.status == "PASS" for r in rep.results), rep.results
+
+
+def test_dataset_example_accepts_hf_model_url() -> None:
+    """B4: huggingface.co/<owner>/<repo>/... covers model checkpoints."""
+    body = NEW_TLDR.replace(
+        "https://wandb.ai/superkaiba/explore-persona-space/runs/abc123",
+        "https://huggingface.co/superkaiba1/explore-persona-space/tree/main/issue-275",
+    )
+    rep = Report()
+    check_tldr_dataset_example(body, rep, issue_labels=set(), strict=True)
+    assert all(r.status == "PASS" for r in rep.results), rep.results
+
+
+# --- E4: NEW_COLUMN_SPEC membership for Useful / Not useful ------------------
+
+
+def test_useful_columns_in_spec() -> None:
+    """E1/E4: the two new columns are present in NEW_COLUMN_SPEC."""
+    from scripts.gh_project import NEW_COLUMN_SPEC
+
+    names = {n for (n, _c, _d) in NEW_COLUMN_SPEC}
+    assert "Useful" in names
+    assert "Not useful" in names
+
+
+# --- B3: --skip-checks flag --------------------------------------------------
+
+
+def test_skip_checks_flag_skips_named_check(capfd) -> None:
+    """B3: `--skip-checks` removes a specific check from the run AND logs to stderr."""
+    bad = NEW_TLDR.replace(
+        "H1 = primary hypothesis: persona\ncoupling generalises across model families.",
+        "we test H1 here without defining it",
+    )
+    # Without the skip, the check fires and FAILs:
+    rep_no_skip = run_all_checks(
+        title=None,
+        body=bad,
+        strict=True,
+        current_issue=275,
+        issue_labels=set(),
+    )
+    assert any(r.name == "TL;DR acronyms" and r.status == "FAIL" for r in rep_no_skip.results)
+    # With the skip, the check is omitted entirely:
+    rep_skip = run_all_checks(
+        title=None,
+        body=bad,
+        strict=True,
+        current_issue=275,
+        issue_labels=set(),
+        skip_checks={"check_undefined_acronyms"},
+    )
+    assert not any(r.name == "TL;DR acronyms" for r in rep_skip.results)
+    captured = capfd.readouterr()
+    assert "SKIPPED: check_undefined_acronyms (--skip-checks)" in captured.err
 
 
 if __name__ == "__main__":
