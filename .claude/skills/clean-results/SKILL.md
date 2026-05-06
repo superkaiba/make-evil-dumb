@@ -86,8 +86,8 @@ analyzer does not cover.
   4. Run set-status against the matching column (`Useful` or `Not useful` —
      literal column names; "Less useful" is wrong, column names are case-
      and word-sensitive). Concretely:
-     - `useful` verdict: `set-status <source-N> "Useful"`
-     - `not-useful` verdict: `set-status <source-N> "Not useful"`
+     - `useful` verdict: `set-status <draft-N> "Useful"`
+     - `not-useful` verdict: `set-status <draft-N> "Not useful"`
   5. Re-enter `/issue <source-N>`. Step 10 fires; user-input gates
      (Step 10c pod-termination, Step 10d worktree-merge) still gate on
      `AskUserQuestion` — the auto-fire only delivers control to those gates,
@@ -105,7 +105,7 @@ analyzer does not cover.
       --add-label "clean-results:$VERDICT" \
       --add-label "clean-results" \
       --remove-label "clean-results:draft"
-  uv run python scripts/gh_project.py set-status <source-N> "$COLUMN"
+  uv run python scripts/gh_project.py set-status <draft-N> "$COLUMN"
   # Step 5: re-enter /issue <source-N> (this skill is invoked from the main
   # agent; the main agent runs /issue <source-N> next).
   ```
