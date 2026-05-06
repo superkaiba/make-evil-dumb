@@ -4,6 +4,7 @@ Usage
 -----
     uv run python scripts/verify_clean_result.py <path-to-body.md>
     uv run python scripts/verify_clean_result.py --issue <N>
+    uv run python scripts/verify_clean_result.py <path> --skip-checks <name1>,<name2>
 
 Exits 0 if every check is PASS or WARN; exits 1 if any FAIL.
 
@@ -28,8 +29,23 @@ Checks
 10. Sample outputs — `## Sample outputs` H2 present with at least one
     `### Condition: <name>` H3 subsection, each containing >=3 fenced
     code blocks (skipped on grandfathered issues).
+11. TL;DR acronyms (#275 item 4 / 9) — H1/H2/H3/P1/P2/P3 must be defined
+    inline on first use. Fenced code blocks and inline backticks are
+    exempt. Grandfathered for issues >7 days old or already-promoted.
+12. Background motivation (#275 item 5 / 11) — ### Background must
+    contain at least one `#<issue>` reference distinct from the current
+    issue. Grandfathered for old/promoted issues.
+13. TL;DR dataset example (#275 item 13) — ### Methodology must contain
+    a fenced code-block example or a `**Dataset example:**` bullet AND
+    the TL;DR must contain a wandb.ai / wandb:// / huggingface.co
+    full-data link. Skipped when the issue carries the `no-dataset`
+    label. Literal `**Dataset example:** N/A` is rejected.
 
 See .claude/skills/clean-results/checklist.md for the authoritative rules.
+
+The `--skip-checks <name1>,<name2>` flag lets callers bypass specific
+check functions for a single invocation; each skipped check logs
+`SKIPPED: <name> (--skip-checks)` to stderr.
 """
 
 from __future__ import annotations
@@ -496,6 +512,210 @@ def check_title(title: str | None, body: str, report: Report) -> None:
 MIN_BACKGROUND_WORDS = 30
 
 
+# --- #275 item 4 / 9: TL;DR acronym checker ----------------------------------
+# Project-internal acronyms locked at 6 tokens (per principles.md).
+# Domain-of-art acronyms (`EM`, `LoRA`, `SFT`, `DPO`, `LM`) are NOT enforced
+# here — they're standard. Adding to this list requires a matching
+# principles.md update.
+INTERNAL_ACRONYMS: tuple[str, ...] = ("H1", "H2", "H3", "P1", "P2", "P3")
+
+# Code-block + inline-backtick stripping (B2): a literal `H1` inside a JSON
+# example or python snippet is not a project-internal-acronym usage.
+FENCED_BLOCK_RE = re.compile(r"```[\s\S]*?```")
+INLINE_BACKTICK_RE = re.compile(r"`[^`\n]+`")
+
+
+def _strip_code(text: str) -> str:
+    """Remove fenced ```...``` blocks and inline `...` spans."""
+    return INLINE_BACKTICK_RE.sub("", FENCED_BLOCK_RE.sub("", text))
+
+
+# An acronym counts as DEFINED if it's followed (with optional whitespace) by
+# one of `=`, `(`, `:`, `—`, `-` (the supported delimiter shapes). See
+# `.claude/skills/clean-results/checklist.md`.
+_ACRONYM_DEF_DELIMS = r"=|\(|:|—|-"
+
+
+# --- #275 item 13: TL;DR dataset-example link patterns -----------------------
+WANDB_OR_HF_PATTERN = re.compile(
+    # wandb.ai web URL
+    r"https?://(?:[\w.-]+\.)?wandb\.ai/[^\s)\]]+"
+    # wandb:// artifact URI
+    r"|wandb://[^\s)\]]+"
+    # huggingface.co/<owner>/<repo>/... (covers datasets AND models AND adapters)
+    r"|https?://huggingface\.co/[\w.-]+/[\w.-]+(?:/[^\s)\]]*)?"
+)
+
+# Reject literal `**Dataset example:** N/A` as gameable (B4).
+DATASET_EXAMPLE_NA = re.compile(r"\*\*\s*Dataset\s+example\s*:\s*\*\*\s*N/?A\b", re.IGNORECASE)
+
+
+def check_undefined_acronyms(
+    tldr: str | None,
+    report: Report,
+    *,
+    strict: bool = True,
+) -> None:
+    """FAIL if TL;DR uses H1/H2/H3/P1/P2/P3 without inline definition.
+
+    Code blocks (```...```) and inline backticks (`...`) are stripped before
+    the regex runs (per B2) so a literal `H1` in a code snippet does not
+    trigger the check.
+
+    A token counts as DEFINED when followed by `=`, `(`, `:`, `—`, or `-`
+    (with optional whitespace). E.g. `H1 = primary hypothesis`,
+    `P1 (coupling phase)`, `H2: leakage`. See
+    `.claude/skills/clean-results/checklist.md` for the supported delimiters.
+
+    Grandfathered (PASS) when ``strict=False`` (issue >7 days old or
+    already-promoted).
+    """
+    if tldr is None:
+        return
+    if not strict:
+        report.add("TL;DR acronyms", "PASS", "non-strict (grandfathered)")
+        return
+    scrubbed = _strip_code(tldr)
+    tokens = "|".join(INTERNAL_ACRONYMS)
+    def_pattern = re.compile(rf"\b({tokens})\s*(?:{_ACRONYM_DEF_DELIMS})")
+    defined = {m.group(1) for m in def_pattern.finditer(scrubbed)}
+    used: set[str] = set()
+    for token in INTERNAL_ACRONYMS:
+        # Match the bare token but not when embedded in identifiers or paths.
+        if re.search(
+            rf"(?<![A-Za-z0-9_/-])\b{re.escape(token)}\b(?![A-Za-z0-9_/-])",
+            scrubbed,
+        ):
+            used.add(token)
+    undefined = used - defined
+    if undefined:
+        report.add(
+            "TL;DR acronyms",
+            "FAIL",
+            f"undefined project-internal acronym(s) in TL;DR: {sorted(undefined)}. "
+            "Define on first use, e.g. 'H1 = ...' or 'P1 (coupling phase)'. "
+            "Code blocks and inline backticks are exempt.",
+        )
+        return
+    if used:
+        report.add("TL;DR acronyms", "PASS", f"all defined: {sorted(used)}")
+    else:
+        report.add("TL;DR acronyms", "PASS", "no project-internal acronyms used")
+
+
+def check_background_motivation(
+    tldr: str | None,
+    report: Report,
+    *,
+    current_issue: int | None,
+    strict: bool = True,
+) -> None:
+    """FAIL if Background lacks a `#<issue>` ref distinct from the current issue.
+
+    Every clean-result body answers "why was this run?" in the first
+    paragraph by linking the prior issue(s) that motivated it. A reference
+    to the current issue itself does NOT count (B7).
+
+    Grandfathered (PASS) when ``strict=False``.
+    """
+    if tldr is None:
+        return
+    if not strict:
+        report.add("Background motivation", "PASS", "non-strict (grandfathered)")
+        return
+    bg = _extract_section(tldr, "Background", level=3)
+    if bg is None:
+        # check_background_context already flagged the missing section.
+        return
+    issue_refs = re.findall(r"(?<![A-Za-z0-9])#(\d{1,5})(?![A-Za-z0-9])", bg)
+    issue_refs_int = {int(n) for n in issue_refs}
+    if current_issue is not None:
+        issue_refs_int.discard(current_issue)
+    if not issue_refs_int:
+        report.add(
+            "Background motivation",
+            "FAIL",
+            "### Background has no #<issue> reference (other than self). "
+            "Link the prior result(s) that motivated this experiment, "
+            "e.g. 'Builds on #234'.",
+        )
+        return
+    report.add(
+        "Background motivation",
+        "PASS",
+        f"references prior issue(s): {sorted(issue_refs_int)}",
+    )
+
+
+def check_tldr_dataset_example(
+    tldr: str | None,
+    report: Report,
+    *,
+    issue_labels: set[str] | None = None,
+    strict: bool = True,
+) -> None:
+    """FAIL if Methodology lacks a dataset example AND a wandb/HF link.
+
+    The TL;DR Methodology subsection must contain (a) at least one fenced
+    ``code`` block OR a `**Dataset example:**` bullet, AND (b) at least one
+    wandb.ai / wandb:// / huggingface.co full-data link somewhere in the
+    TL;DR. Skipped when the issue carries the `no-dataset` label
+    (model-only / axis-steering experiments).
+
+    Literal `**Dataset example:** N/A` is rejected as gameable (B4).
+    Grandfathered (PASS) when ``strict=False``.
+    """
+    if tldr is None:
+        return
+    if not strict:
+        report.add("TL;DR dataset example", "PASS", "non-strict (grandfathered)")
+        return
+    if issue_labels and "no-dataset" in issue_labels:
+        report.add("TL;DR dataset example", "PASS", "skipped (no-dataset label)")
+        return
+    methodology = _extract_section(tldr, "Methodology", level=3)
+    if methodology is None:
+        return  # caught by other checks
+    if DATASET_EXAMPLE_NA.search(methodology):
+        report.add(
+            "TL;DR dataset example",
+            "FAIL",
+            "literal `**Dataset example:** N/A` is not accepted. If the "
+            "experiment is model-only / axis-steering, apply the "
+            "`no-dataset` label to the issue instead.",
+        )
+        return
+    has_fenced = bool(re.search(r"```[\s\S]+?```", methodology))
+    has_example_bullet = bool(
+        re.search(
+            r"\*\*\s*Dataset\s+example\s*:\s*\*\*\s*\S",
+            methodology,
+            re.IGNORECASE,
+        )
+    )
+    if not (has_fenced or has_example_bullet):
+        report.add(
+            "TL;DR dataset example",
+            "FAIL",
+            "### Methodology has neither a fenced code-block example NOR a "
+            "`**Dataset example:**` bullet.",
+        )
+        return
+    if not WANDB_OR_HF_PATTERN.search(tldr):
+        report.add(
+            "TL;DR dataset example",
+            "FAIL",
+            "TL;DR has no wandb.ai / wandb:// / huggingface.co/<owner>/<repo> link. "
+            "Provide a `**Full data:**` link or apply the `no-dataset` label.",
+        )
+        return
+    report.add(
+        "TL;DR dataset example",
+        "PASS",
+        "dataset example + full-data link present",
+    )
+
+
 def check_background_context(tldr: str | None, report: Report) -> None:
     """WARN if Background subsection is too terse for newcomers (<30 words)."""
     if tldr is None:
@@ -679,22 +899,85 @@ def run_all_checks(
     *,
     strict: bool = True,
     created_at: datetime | None = None,
+    current_issue: int | None = None,
+    issue_labels: set[str] | None = None,
+    skip_checks: set[str] | None = None,
 ) -> Report:
+    """Run every registered check unless its name appears in ``skip_checks``.
+
+    Skipped checks log ``SKIPPED: <name> (--skip-checks)`` to stderr per B3.
+    """
+    skip_checks = skip_checks or set()
     report = Report()
+
+    def _maybe(name: str, fn) -> None:
+        if name in skip_checks:
+            print(f"SKIPPED: {name} (--skip-checks)", file=sys.stderr)
+            return
+        fn()
+
+    # check_tldr_structure returns the tldr substring used by downstream
+    # checks; we always run it (the cost of skipping is broken downstream
+    # checks). If a caller wants to silence it they can drop it from the
+    # report after the fact.
     tldr = check_tldr_structure(body, report)
-    check_hero_figure(tldr, report)
-    check_results_block(tldr, report)
-    check_methodology_bullets(tldr, report, strict=strict, created_at=created_at)
-    check_background_context(tldr, report)
-    check_human_summary(body, report, strict=strict)
-    check_sample_outputs(body, report, strict=strict)
-    check_numbers_in_json(body, report)
-    check_reproducibility(body, report)
-    check_confidence_phrasebook(body, report)
-    check_forbidden_stats(body, report)
-    check_title(title, body, report)
-    check_narrative_consolidation(body, report)
+    _maybe("check_hero_figure", lambda: check_hero_figure(tldr, report))
+    _maybe("check_results_block", lambda: check_results_block(tldr, report))
+    _maybe(
+        "check_methodology_bullets",
+        lambda: check_methodology_bullets(tldr, report, strict=strict, created_at=created_at),
+    )
+    _maybe("check_background_context", lambda: check_background_context(tldr, report))
+    _maybe(
+        "check_undefined_acronyms",
+        lambda: check_undefined_acronyms(tldr, report, strict=strict),
+    )
+    _maybe(
+        "check_background_motivation",
+        lambda: check_background_motivation(
+            tldr, report, current_issue=current_issue, strict=strict
+        ),
+    )
+    _maybe(
+        "check_tldr_dataset_example",
+        lambda: check_tldr_dataset_example(tldr, report, issue_labels=issue_labels, strict=strict),
+    )
+    _maybe(
+        "check_human_summary",
+        lambda: check_human_summary(body, report, strict=strict),
+    )
+    _maybe(
+        "check_sample_outputs",
+        lambda: check_sample_outputs(body, report, strict=strict),
+    )
+    _maybe("check_numbers_in_json", lambda: check_numbers_in_json(body, report))
+    _maybe("check_reproducibility", lambda: check_reproducibility(body, report))
+    _maybe(
+        "check_confidence_phrasebook",
+        lambda: check_confidence_phrasebook(body, report),
+    )
+    _maybe("check_forbidden_stats", lambda: check_forbidden_stats(body, report))
+    _maybe("check_title", lambda: check_title(title, body, report))
+    _maybe(
+        "check_narrative_consolidation",
+        lambda: check_narrative_consolidation(body, report),
+    )
     return report
+
+
+def _parse_current_issue_from_body(body: str) -> int | None:
+    """Best-effort extraction of the current issue number from a body string.
+
+    Looks for a `Source-issues: #N1, #N2` line first (multi-issue
+    consolidation — current issue is the FIRST listed); otherwise returns
+    None. The CLI ``--current-issue`` flag is the explicit override.
+    """
+    m = re.search(r"^Source-issues:\s*(.+)$", body, re.MULTILINE)
+    if m:
+        first = re.search(r"#(\d+)", m.group(1))
+        if first:
+            return int(first.group(1))
+    return None
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -702,11 +985,37 @@ def main(argv: list[str] | None = None) -> int:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("path", nargs="?", help="Path to a clean-result body markdown file")
     group.add_argument("--issue", type=int, help="Fetch body via gh issue view <N>")
+    parser.add_argument(
+        "--current-issue",
+        type=int,
+        default=None,
+        help=(
+            "Override the issue-number used by check_background_motivation "
+            "to filter self-references. Auto-set when --issue is used."
+        ),
+    )
+    parser.add_argument(
+        "--skip-checks",
+        type=str,
+        default="",
+        help=(
+            "Comma-separated list of check function names to skip. "
+            "Each skipped check logs `SKIPPED: <name> (--skip-checks)` to stderr."
+        ),
+    )
     args = parser.parse_args(argv)
 
+    skip_checks = {s.strip() for s in args.skip_checks.split(",") if s.strip()}
+
     created_dt: datetime | None
+    issue_labels: set[str] = set()
+    current_issue: int | None = args.current_issue
+
     if args.issue is not None:
         title, body, label_names, created_at = _fetch_issue_body(args.issue)
+        issue_labels = set(label_names)
+        if current_issue is None:
+            current_issue = args.issue
         # Date-gate: skip Human summary / Sample outputs strict checks for
         # issues >7 days old or already-promoted (clean-results without :draft).
         from datetime import timedelta
@@ -728,8 +1037,18 @@ def main(argv: list[str] | None = None) -> int:
         body = body_path.read_text()
         strict = True  # file mode is always strict
         created_dt = None  # file mode: cutoff branch never fires
+        if current_issue is None:
+            current_issue = _parse_current_issue_from_body(body)
 
-    report = run_all_checks(title, body, strict=strict, created_at=created_dt)
+    report = run_all_checks(
+        title,
+        body,
+        strict=strict,
+        created_at=created_dt,
+        current_issue=current_issue,
+        issue_labels=issue_labels,
+        skip_checks=skip_checks,
+    )
     print(report.render())
     if report.any_fail():
         print("\nResult: FAIL — fix the failing checks before posting.")

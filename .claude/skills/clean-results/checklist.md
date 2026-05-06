@@ -15,6 +15,8 @@ should be ✓ or have a documented exception surfaced inline.
       not `A3b results`.) The marker must match the `**Confidence:** …` line in Results.
       Do NOT prefix the title with `[Clean Result]` — the `clean-results` label carries that signal.
 - [ ] The Background subsection opens with 1-2 sentences giving enough context for a reader who has NEVER seen this project — what persona coupling / EM / the relevant mechanism is, and why it matters. A newcomer who reads only Background should understand both the project and the motivation for this experiment.
+- [ ] Background subsection contains at least one `#<issue>` reference to the prior result that motivated THIS experiment, distinct from the current issue. (Enforced by `check_background_motivation` in `verify_clean_result.py`.)
+- [ ] No bare `H1` / `H2` / `H3` / `P1` / `P2` / `P3` tokens in the TL;DR. Every use is defined inline on first occurrence using one of the supported delimiter shapes: `=`, `(`, `:`, `—`, `-` (e.g. `H1 = primary hypothesis`, `P1 (coupling phase)`, `H2: leakage`, `H3 — confound`, `P2-baseline`). Code blocks (` ``` `) and inline backticks (`` ` ``) are exempt.
 - [ ] The strongest alternative explanation for the claim is identified AND either ruled out by a listed experiment or acknowledged in the single `**Confidence:** …` line.
 
 ## 2. Numbers
@@ -42,6 +44,7 @@ should be ✓ or have a documented exception surfaced inline.
 - [ ] 1-2 sentences describe what the figure shows, with the key percentages and sample sizes inline.
 - [ ] A `**Main takeaways:**` bolded label introduces 2-5 bullets.
 - [ ] Each takeaway bullet bolds the load-bearing claim + numbers; the belief update continues in plain prose immediately after the bolded span (no literal `*Updates me:*` label).
+- [ ] Each takeaway bullet is self-contained: a percentage and N appear inline. Cross-references to other issues augment but do not replace the inline number — a reader should not have to follow a `#<issue>` link to learn what the headline number is.
 - [ ] Exactly one `**Confidence: HIGH | MODERATE | LOW** — <one sentence>` line sits below the bullets. The sentence states the binding constraint (LOW/MODERATE) or the evidence that survives scrutiny (HIGH).
 
 ## 5. Reproducibility card
@@ -77,6 +80,7 @@ should be ✓ or have a documented exception surfaced inline.
 - [ ] Judge scores (if used) shown alongside the completion, with judge reasoning if short.
 - [ ] Explicitly labeled "cherry-picked for illustration" (not random).
 - [ ] Link back to the WandB artifact or JSON path containing the full dump.
+- [ ] At least one dataset example AND a full-data link (`https://wandb.ai/...`, `wandb://...`, or `https://huggingface.co/<owner>/<repo>/...`) appears in the TL;DR Methodology subsection (in addition to the cherry-picked Sample outputs in the Detailed report). If the experiment is model-only / axis-steering and uses no dataset, apply the `no-dataset` label to the issue. Literal `**Dataset example:** N/A` is rejected by the verifier (it's gameable).
 
 ## 9. Caveats — surfaced inline, not in a separate section
 

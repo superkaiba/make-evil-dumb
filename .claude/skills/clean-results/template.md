@@ -47,15 +47,25 @@ Supersedes: #M1, #M2
 
 ## TL;DR
 
+<!-- AUTHOR NOTE: If you use any of H1, H2, H3, P1, P2, P3 in the
+TL;DR, define each on first use inline (e.g. `H1 = primary hypothesis`,
+`P1 (coupling phase)`, or `H2: leakage`). The verifier
+(verify_clean_result.py / check_undefined_acronyms) rejects bare uses
+of these 6 tokens. Code blocks (```...```) and inline `code` are
+exempt. Domain-of-art acronyms (EM, LoRA, SFT, DPO, LM) are NOT
+enforced — they're standard. -->
+
 ### Background
 
 {{1-2 sentences for a reader unfamiliar with the project: what is the broader
 research area, what is persona coupling / EM / the specific mechanism under
-study, and why it matters for AI safety or alignment. THEN 1-2 sentences:
-the prior result(s) that motivated THIS experiment (cite issue numbers like
-#34), the specific question it answers, and the goal. A reader who sees only
-this subsection should know BOTH what the project is about AND why this
-experiment was run. Minimum 30 words.}}
+study, and why it matters for AI safety or alignment. THEN 1-2 sentences
+referencing the prior result(s) that motivated THIS experiment using the
+form **Builds on: #<N1>, #<N2>** — every clean result MUST link the prior
+issues that prompted it (a newcomer reads only this subsection and learns
+BOTH what the project is about AND why this experiment was run). The cited
+issue(s) MUST be different from the current issue. Minimum 30 words;
+minimum one #<issue> link distinct from the current issue.}}
 
 ### Methodology
 
@@ -64,12 +74,16 @@ experiment was run. Minimum 30 words.}}
 - **Eval:** {{metric + judge or harness + N + temperature}}
 - **Stats:** {{seeds + p-value reporting convention}}
 - **Key design:** {{1 sentence on what was matched-vs-confounded}}
+- **Dataset example:** {{1 short representative training row OR eval prompt+response in a fenced ```code``` block OR a backticked one-liner. Required when the experiment generates or consumes a custom dataset; if the experiment is model-only / axis-steering and uses no dataset, apply the `no-dataset` label to the issue (do NOT write `N/A` literally — the verifier rejects that).}}
+- **Full data:** {{Link to the full data: any of `https://wandb.ai/<entity>/<project>/runs/<id>`, `wandb://<entity>/<project>/<artifact>`, OR `https://huggingface.co/<owner>/<repo>/...` (covers datasets, model checkpoints, adapters). Required unless the issue carries the `no-dataset` label.}}
 
-**Convention update (post-#251).** Methodology is bullet-form (Model /
-Dataset / Eval / Stats / Key design). Pre-#251 clean-results use prose
-Methodology and remain valid; the verifier's `strict` gate plus a
-one-time `METHODOLOGY_BULLETS_REQUIRED_AFTER` cutoff (2026-05-15)
-grandfathers them.
+**Convention update (post-#251 / post-#275).** Methodology is bullet-form
+(Model / Dataset / Eval / Stats / Key design / Dataset example / Full
+data). Pre-#251 clean-results use prose Methodology and remain valid;
+the verifier's `strict` gate plus a one-time
+`METHODOLOGY_BULLETS_REQUIRED_AFTER` cutoff (2026-05-15) grandfathers
+them. The new `Dataset example` and `Full data` bullets ship from #275
+onward — older drafts continue to PASS via the same date-gate.
 
 ### Results
 
@@ -78,6 +92,11 @@ grandfathers them.
 {{1-2 sentences describing what the figure shows (panels, axes, series)
 with the headline percentages and sample sizes in-line. Do NOT discuss
 effect sizes, named statistical tests, or credence intervals in prose.}}
+
+Each takeaway bullet MUST stand on its own: state the percentage and N
+inline so the reader does not have to follow a `#<issue>` link to learn
+what the headline number is. Cross-references to prior results are fine,
+but they augment a self-contained claim, they do not replace it.
 
 **Main takeaways:**
 
