@@ -893,6 +893,30 @@ def check_narrative_consolidation(body: str, report: Report) -> None:
         )
 
 
+#: Names of every check that `run_all_checks` registers. Used by `--skip-checks`
+#: to validate user input (typos would otherwise silently pass — see code-review
+#: round 1 NIT). Keep in sync with the `_maybe(...)` calls in `run_all_checks`.
+KNOWN_CHECKS: frozenset[str] = frozenset(
+    {
+        "check_hero_figure",
+        "check_results_block",
+        "check_methodology_bullets",
+        "check_background_context",
+        "check_undefined_acronyms",
+        "check_background_motivation",
+        "check_tldr_dataset_example",
+        "check_human_summary",
+        "check_sample_outputs",
+        "check_numbers_in_json",
+        "check_reproducibility",
+        "check_confidence_phrasebook",
+        "check_forbidden_stats",
+        "check_title",
+        "check_narrative_consolidation",
+    }
+)
+
+
 def run_all_checks(
     title: str | None,
     body: str,
@@ -1006,6 +1030,16 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     skip_checks = {s.strip() for s in args.skip_checks.split(",") if s.strip()}
+    # Validate each --skip-checks token against the registered check names so a
+    # typo (e.g. `check_heroe_figure`) fails loudly instead of silently passing
+    # by skipping nothing. (Code-review round 1 NIT.)
+    unknown = skip_checks - KNOWN_CHECKS
+    if unknown:
+        parser.error(
+            "unknown check name(s) in --skip-checks: "
+            f"{', '.join(sorted(unknown))}. "
+            f"Known checks: {', '.join(sorted(KNOWN_CHECKS))}"
+        )
 
     created_dt: datetime | None
     issue_labels: set[str] = set()

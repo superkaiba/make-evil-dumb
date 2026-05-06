@@ -85,6 +85,22 @@ _FAKE_FIELD_QUERY_RESPONSE = {
 }
 
 
+def _read_input_body(args: list[str]) -> dict | None:
+    """If argv carries `--input <tempfile>`, read+parse the JSON body.
+
+    The mutation path (`_replace_options` → `_graphql` → `_gh`) sends the
+    GraphQL query+variables via `gh api graphql --input <tempfile>`
+    because the `singleSelectOptions` variable is a typed JSON array that
+    `-f`/`-F` cannot encode. The recorder reads the tempfile while it
+    still exists (during the `_gh` call) so tests can inspect the body.
+    """
+    for i, a in enumerate(args):
+        if a == "--input" and i + 1 < len(args):
+            with open(args[i + 1]) as f:
+                return json.load(f)
+    return None
+
+
 class _GhRecorder:
     """Replacement for `gh_project._gh` that records every call.
 
@@ -92,18 +108,31 @@ class _GhRecorder:
     canned options list. Subsequent calls (the mutation issued by the
     add/remove command) are recorded so the test can inspect what
     payload would have been sent to the GitHub API.
+
+    Two argv shapes are supported:
+      1. `project_meta` query: `["api", "graphql", "-f", "query=...", ...]`
+         — distinguished by the `query=` flag.
+      2. Mutation: `["api", "graphql", "--input", "<tempfile>"]` — the
+         tempfile holds `{"query": "...", "variables": {...}}`. The
+         recorder reads the file (it still exists during the `_gh` call)
+         and stashes the parsed body on the call record.
     """
 
     def __init__(self, query_response: dict) -> None:
         self._query_response = query_response
         self.calls: list[list[str]] = []
+        # Parallel list: parsed `--input` body for each call (or None).
+        self.input_bodies: list[dict | None] = []
 
     def __call__(self, args: list[str]) -> str:
         self.calls.append(list(args))
-        # First api graphql call is the project_meta query; subsequent
-        # api graphql calls are the mutation. Distinguish by the query
-        # text in the -f query=... flag.
+        body = _read_input_body(args)
+        self.input_bodies.append(body)
         if args[:2] == ["api", "graphql"]:
+            # Mutation via `--input <tempfile>` (typed JSON variables).
+            if body is not None and "updateProjectV2Field" in body.get("query", ""):
+                return json.dumps({"data": {"updateProjectV2Field": {}}})
+            # Legacy `-f query=...` path (still used by `project_meta`).
             for a in args:
                 if a.startswith("query=") and "updateProjectV2Field" in a:
                     return json.dumps({"data": {"updateProjectV2Field": {}}})
@@ -111,21 +140,31 @@ class _GhRecorder:
         return ""
 
 
-def _mutation_payload(call_args: list[str]) -> list[dict]:
-    """Extract the JSON-encoded options list from a mutation call's argv."""
-    for a in call_args:
-        if a.startswith("options="):
-            return json.loads(a[len("options=") :])
-    raise AssertionError(f"no options= flag in argv: {call_args}")
+def _mutation_payload(body: dict) -> list[dict]:
+    """Extract the JSON-encoded options list from a recorded mutation body.
+
+    Pairs with `_mutation_call` — call as `_mutation_payload(_mutation_call(rec))`.
+    The body is the parsed `--input` JSON: `{"query": "...", "variables": {...}}`.
+    """
+    opts = body.get("variables", {}).get("opts")
+    if opts is None:
+        raise AssertionError(f"mutation body has no `opts` variable: {body}")
+    return opts
 
 
-def _mutation_call(recorder: _GhRecorder) -> list[str]:
-    """Find the recorded mutation call (the one carrying updateProjectV2Field)."""
-    for call in recorder.calls:
-        if call[:2] == ["api", "graphql"]:
-            for a in call:
-                if a.startswith("query=") and "updateProjectV2Field" in a:
-                    return call
+def _mutation_call(recorder: _GhRecorder) -> dict:
+    """Find the recorded mutation body (the one carrying updateProjectV2Field).
+
+    Returns the parsed `--input` JSON body. The mutation path delegates to
+    `gh api graphql --input <tempfile>` because typed JSON arrays cannot
+    travel through `-f`/`-F`. The recorder stashes the body when the call
+    is made (the tempfile is deleted in `_graphql`'s `finally` block).
+    """
+    for body in recorder.input_bodies:
+        if body is None:
+            continue
+        if "updateProjectV2Field" in body.get("query", ""):
+            return body
     raise AssertionError(f"no updateProjectV2Field call recorded; saw: {recorder.calls}")
 
 

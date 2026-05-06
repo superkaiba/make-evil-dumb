@@ -254,6 +254,14 @@ just to add labels. Order:
    Post a `<!-- epm:auto-defaults v1 -->` comment listing what was applied (label
    added, body drafted) so the audit trail is durable on the issue.
 
+   **Audit-comment placeholder guard (when generating any `epm:audit` /
+   `epm:auto-defaults` body):** before posting, run
+   `grep -E "(^|\s|>)(TBD|TODO|placeholder|\[X\]|implementer fills)(\s|$|<)"`
+   against the drafted body. Match → BLOCK the post and finish the audit. The
+   regex catches placeholders mid-line as well as line-start (the original
+   anchored form `^(TBD|TODO|...)` missed the embedded case — issue #275
+   round-1 NIT-5).
+
 3. **`type:*` missing →** infer from title cue, then confirm with the user:
    - Title prefix `Test:` / `Sweep:` / `Train:` → suggest `type:experiment`
    - Title prefix `Refactor:` / `Fix:` / `Add:` / `Migrate:` → suggest `type:infra`

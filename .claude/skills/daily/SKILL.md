@@ -20,6 +20,16 @@ only dispatches and collects URLs.
 Manual trigger at the end of each work day. **Manual trigger only — no
 cron.** Use `/schedule` if you want to wire a cron later.
 
+## Top-level variables
+
+- `INTERACTIVE` — boolean string. `true` = call `AskUserQuestion` for the
+  free-form-thoughts and self-reflection steps; `false` = skip them and
+  emit `(unanswered)` placeholders. Set in "Argument parsing" below from
+  the presence of `--autonomous` in `$ARGS`. Referenced literally as
+  `INTERACTIVE` in Steps 0, 0.5, 2.5, and the parallel-task notes
+  (issue #275 round-1 NIT-3 — promoting the spelling to a documented
+  top-level variable rather than a free-floating string).
+
 ## Dispatch table
 
 | Task | Subagent type | Mode | Returns |
