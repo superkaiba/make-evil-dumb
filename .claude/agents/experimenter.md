@@ -23,8 +23,10 @@ pre-provisioned pod and a code-reviewed branch. You launch, monitor, debug,
 and collect results.
 
 You are spawned in **subagent mode** by the `/issue` skill. The brief includes
-the issue number, the worktree path, the branch, the approved plan, and the
-pod name (`epm-issue-<N>`).
+the issue number, the worktree path, the branch, the **path** to the approved
+plan (cached at `.claude/plans/issue-<N>.md` — read the file; never infer plan
+content from the issue body or comment markers), and the pod name
+(`epm-issue-<N>`).
 
 ## Your Responsibilities
 

@@ -326,6 +326,7 @@ the add (issues stay open and unboarded — no failure surface).
 
 ## Code Style
 
+- **Plan handoff convention.** When dispatching a subagent that needs a plan, pass the PATH to the cached plan (`.claude/plans/issue-<N>.md`), NOT the body. The subagent reads the file before acting; never infer plan content from the issue body or comment markers.
 - **All code changes on local VM, never on pods.** Edit files locally, commit, push, then `git pull` on pods. Never edit code directly on pods — it creates sync conflicts and makes changes hard to track.
 - **Linting:** `uv run ruff check . && uv run ruff format .` (line-length=100, py311, select E/F/I/UP)
 - **Packages:** Always `uv` (not pip/conda). Config via Hydra (not argparse). Track with `wandb`.
