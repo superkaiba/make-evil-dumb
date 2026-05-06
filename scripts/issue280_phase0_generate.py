@@ -1220,8 +1220,11 @@ async def _generate_all(args: argparse.Namespace) -> None:  # noqa: C901
         )
 
         # Drop-rate sanity (mirrors #186): >30 % drop is a hard fail.
+        # Skipped under --smoke: with N=5 a single noisy refusal is 20 % and
+        # two refusals (e.g. on adversarial arms like garbage-cot) is 40 %,
+        # so the 30 % threshold is mathematically too strict at smoke-N.
         drop_rate = (stats.n_questions - stats.n_kept) / max(stats.n_questions, 1)
-        if drop_rate > 0.30:
+        if not args.smoke and drop_rate > 0.30:
             logger.error(
                 "FAIL: drop rate %.2f%% > 30%% for %s/%s; aborting",
                 drop_rate * 100,
