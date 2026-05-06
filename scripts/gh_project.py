@@ -384,31 +384,20 @@ def cmd_add_status_option(args: argparse.Namespace) -> None:
     ]
     new_options = [
         *existing,
-        {"name": args.option, "color": args.color or "GRAY", "description": ""},
+        {
+            "name": args.option,
+            "color": args.color or "GRAY",
+            "description": args.description or "",
+        },
     ]
-    options_json = json.dumps(new_options)
-    mutation = (
-        "mutation($fieldId:ID!, $options:[ProjectV2SingleSelectFieldOptionInput!]!) {"
-        "  updateProjectV2Field(input:{"
-        "    fieldId:$fieldId,"
-        "    singleSelectOptions:$options"
-        "  }) {"
-        "    projectV2Field { ... on ProjectV2SingleSelectField { options { id name } } }"
-        "  }"
-        "}"
-    )
-    _gh(
-        [
-            "api",
-            "graphql",
-            "-f",
-            f"query={mutation}",
-            "-f",
-            f"fieldId={meta.status_field_id}",
-            "-f",
-            f"options={options_json}",
-        ]
-    )
+    # Route through the `_graphql` helper which uses `gh api graphql --input`
+    # (typed JSON variables). The previous `_gh -f options=<json-string>`
+    # path silently fails because `-f` passes the value as a STRING, but
+    # the `singleSelectOptions` GraphQL variable expects a typed
+    # `[ProjectV2SingleSelectFieldOptionInput!]!` array. Same fix applied
+    # to `cmd_remove_status_option` below — both pre-existed broken; use
+    # `_replace_options` once it's introduced (see `_graphql` helper).
+    _replace_options(meta.status_field_id, new_options)
     print(f"added option {args.option!r} to Status field on project #{args.project}")
 
 
@@ -431,29 +420,11 @@ def cmd_remove_status_option(args: argparse.Namespace) -> None:
         for name, opt in meta.options.items()
         if name != args.option
     ]
-    options_json = json.dumps(remaining)
-    mutation = (
-        "mutation($fieldId:ID!, $options:[ProjectV2SingleSelectFieldOptionInput!]!) {"
-        "  updateProjectV2Field(input:{"
-        "    fieldId:$fieldId,"
-        "    singleSelectOptions:$options"
-        "  }) {"
-        "    projectV2Field { ... on ProjectV2SingleSelectField { options { id name } } }"
-        "  }"
-        "}"
-    )
-    _gh(
-        [
-            "api",
-            "graphql",
-            "-f",
-            f"query={mutation}",
-            "-f",
-            f"fieldId={meta.status_field_id}",
-            "-f",
-            f"options={options_json}",
-        ]
-    )
+    # Route through `_replace_options` (uses `gh api graphql --input` with
+    # typed JSON variables). The previous `-f options=<json-string>` path
+    # broke on the typed `[ProjectV2SingleSelectFieldOptionInput!]!`
+    # variable — same fix as in `cmd_add_status_option`.
+    _replace_options(meta.status_field_id, remaining)
     print(f"removed option {args.option!r} from Status field")
 
 
@@ -1052,6 +1023,11 @@ def main() -> None:
         "--color",
         default="GRAY",
         help="GRAY, BLUE, GREEN, YELLOW, ORANGE, RED, PINK, PURPLE",
+    )
+    p.add_argument(
+        "--description",
+        default="",
+        help="optional one-line description shown in the GitHub Projects UI",
     )
     p.set_defaults(func=cmd_add_status_option)
 
