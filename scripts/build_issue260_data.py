@@ -256,13 +256,68 @@ def _build_long_neg_requests(
     return requests
 
 
+def _run_sync_expansions(requests: list[dict], label: str) -> dict[str, str]:
+    """Synchronous fallback for Batch API: thread-pooled `client.messages.create`.
+
+    Used when the org's Batch API queue is jammed (e.g. shared-org in-flight
+    quota exceeded). Cost is identical to Batch (~$5 for 600 expansions);
+    wall-time is ~5 min for 200 requests at 64 parallel threads. Result
+    schema matches `collect_batch_results`: {custom_id: response_text}.
+    """
+    import concurrent.futures as cf
+
+    import anthropic
+
+    # Use the same key the Batch path used (per project convention; see
+    # generate_leakage_data.py:171). Falls back to ANTHROPIC_API_KEY if
+    # ANTHROPIC_BATCH_KEY is unset.
+    api_key = os.environ.get("ANTHROPIC_BATCH_KEY") or os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError("ANTHROPIC_BATCH_KEY / ANTHROPIC_API_KEY not in env")
+    client = anthropic.Anthropic(api_key=api_key)
+
+    def _one(req: dict) -> tuple[str, str]:
+        cid = req["custom_id"]
+        params = req["params"]
+        try:
+            msg = client.messages.create(**params)
+            text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text")
+            return cid, text
+        except Exception as e:
+            print(f"  [{label}] {cid}: {type(e).__name__}: {e}")
+            return cid, "[SYNC_ERROR]"
+
+    print(
+        f"[{label}] Sync-fallback: {len(requests)} expansions via "
+        f"client.messages.create (64 threads)..."
+    )
+    sys.stdout.flush()
+    t0 = time.time()
+    out: dict[str, str] = {}
+    with cf.ThreadPoolExecutor(max_workers=64) as pool:
+        futures = {pool.submit(_one, req): req["custom_id"] for req in requests}
+        for n_done, fut in enumerate(cf.as_completed(futures), start=1):
+            cid, text = fut.result()
+            out[cid] = text
+            if n_done % 20 == 0 or n_done == len(requests):
+                print(
+                    f"  [{label}] {n_done}/{len(requests)} done (elapsed={time.time() - t0:.1f}s)"
+                )
+                sys.stdout.flush()
+    print(f"[{label}] Sync-fallback complete: {len(out)} responses, {time.time() - t0:.1f}s")
+    return out
+
+
 def build_long_responses(
     generic_responses: dict[str, str],
     neg_personas: list[str],
     pos_path: Path,
     neg_path: Path,
+    use_sync: bool = False,
 ) -> None:
-    """Build the cached `lc_long` expansions via the Anthropic Batch API.
+    """Build the cached `lc_long` expansions via the Anthropic Batch API
+    (or, when `use_sync=True`, via the synchronous Messages API as a
+    fallback when the Batch queue is jammed).
 
     Submits two batches (positives + negatives), waits for both to complete,
     and writes JSON files keyed by request `custom_id`. Idempotent: skips
@@ -270,10 +325,13 @@ def build_long_responses(
     """
     if not pos_path.exists():
         pos_requests = _build_long_pos_requests(generic_responses)
-        print(f"[long-pos] Submitting {len(pos_requests)} expansions to Anthropic Batch API...")
-        pos_batch_id = submit_batch(pos_requests)
-        wait_for_batch(pos_batch_id)
-        results = collect_batch_results(pos_batch_id)
+        if use_sync:
+            results = _run_sync_expansions(pos_requests, "long-pos")
+        else:
+            print(f"[long-pos] Submitting {len(pos_requests)} expansions to Anthropic Batch API...")
+            pos_batch_id = submit_batch(pos_requests)
+            wait_for_batch(pos_batch_id)
+            results = collect_batch_results(pos_batch_id)
         # Normalize keys to drop the `long_pos__` prefix → `generic__NNNN` so
         # the downstream consumer mirrors `generic_responses.json` schema.
         cleaned = {cid.replace("long_pos__", "generic__"): val for cid, val in results.items()}
@@ -284,10 +342,13 @@ def build_long_responses(
 
     if not neg_path.exists():
         neg_requests = _build_long_neg_requests(generic_responses, neg_personas)
-        print(f"[long-neg] Submitting {len(neg_requests)} expansions to Anthropic Batch API...")
-        neg_batch_id = submit_batch(neg_requests)
-        wait_for_batch(neg_batch_id)
-        results = collect_batch_results(neg_batch_id)
+        if use_sync:
+            results = _run_sync_expansions(neg_requests, "long-neg")
+        else:
+            print(f"[long-neg] Submitting {len(neg_requests)} expansions to Anthropic Batch API...")
+            neg_batch_id = submit_batch(neg_requests)
+            wait_for_batch(neg_batch_id)
+            results = collect_batch_results(neg_batch_id)
         # Normalize: long_neg__<persona>__NNNN -> <persona>__NNNN so consumers
         # can do `LONG_RESPONSES_NEG[f"{persona}__{i:04d}"]`.
         cleaned = {cid.replace("long_neg__", ""): val for cid, val in results.items()}
@@ -529,6 +590,17 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     parser.add_argument(
+        "--sync-fallback",
+        action="store_true",
+        help=(
+            "Use the synchronous Messages API (64-thread pool) instead of "
+            "the Batch API for `lc_long` expansions. Use when the org's "
+            "Batch queue is jammed by other in-flight batches; same cost "
+            "(~$5 for 600 requests), ~5 min wall instead of indefinite. "
+            "Identical content output."
+        ),
+    )
+    parser.add_argument(
         "--only",
         type=str,
         default=None,
@@ -563,6 +635,7 @@ def main(argv: list[str] | None = None) -> int:
             neg_personas=neg_personas,
             pos_path=pos_path,
             neg_path=neg_path,
+            use_sync=args.sync_fallback,
         )
 
     long_pos: dict[str, str] = {}
