@@ -486,13 +486,16 @@ def cmd_stop(args: argparse.Namespace) -> None:
         return
     stop_pod(pod.pod_id)
     # Update metadata-only fields. Status/host/port are re-fetched on next read.
+    # Synthetic-metadata pods (Branch 3 of _load_state) are promoted to disk
+    # here so the stopped_at timestamp persists.
     metadata = _read_metadata_file()
-    if name in metadata:
-        metadata[name].stopped_at = _now()
-        _write_metadata_file(metadata)
+    if name not in metadata:
+        metadata[name] = pod.metadata
+    metadata[name].stopped_at = _now()
+    _write_metadata_file(metadata)
     print(
         f"  Stopped. Will auto-terminate after {pod.ttl_days} days idle "
-        f"(stopped_at={metadata[name].stopped_at if name in metadata else 'unknown'})."
+        f"(stopped_at={metadata[name].stopped_at})."
     )
 
 
@@ -515,15 +518,15 @@ def cmd_resume(args: argparse.Namespace) -> None:
     ready = wait_for_ssh(pod.pod_id, timeout=600)
 
     # Clear our project-side stopped_at marker; status/host/port refresh on read.
+    # Synthetic-metadata pods (Branch 3 of _load_state) are promoted to disk
+    # here so pods.conf gets refreshed and future commands see the metadata.
     metadata = _read_metadata_file()
-    if name in metadata:
-        metadata[name].stopped_at = None
-        _write_metadata_file(metadata)
+    if name not in metadata:
+        metadata[name] = pod.metadata
+    metadata[name].stopped_at = None
+    _write_metadata_file(metadata)
 
-    refreshed = EphemeralPod(metadata=metadata[name], info=ready) if name in metadata else None
-    if refreshed is None:
-        print("  WARN: metadata sidecar missing entry — pod resumed but pods.conf not refreshed")
-        return
+    refreshed = EphemeralPod(metadata=metadata[name], info=ready)
     _upsert_pods_conf(refreshed)
     print(f"  SSH ready at {refreshed.host}:{refreshed.port}")
     print(f"  pods.conf updated. Connect: ssh {name}")
