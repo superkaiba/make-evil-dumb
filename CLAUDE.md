@@ -174,11 +174,12 @@ python scripts/pod.py resume --issue 137
 # at end-of-experiment (Step 10c in .claude/skills/issue/SKILL.md) once the clean-result is finalized.
 python scripts/pod.py terminate --issue 137 --yes
 
-# Inspect lifecycle state, optionally reconcile against the live API
-python scripts/pod.py list-ephemeral --refresh
+# Inspect lifecycle state. Live API is queried on every invocation; `--refresh` is now a no-op.
+python scripts/pod.py list-ephemeral
+python scripts/pod.py list-ephemeral --issue 137   # filter to a single issue
 ```
 
-State lives in `scripts/pods_ephemeral.json` (pod_id, issue, status, timestamps, TTL). `scripts/pods.conf` continues to be the SSH/MCP config source — `provision`/`resume`/`terminate` keep it in sync automatically.
+**Authority split (write-through cache, since #282 [1/4]).** The live RunPod API is **authoritative for state-of-pod** (existence, status, host, port, GPU count, GPU type, `created_at`). The sidecar `scripts/pods_ephemeral.json` stores **project-side metadata** that has no live-API equivalent: the workload `gpu_intent`, `ttl_days`, `stopped_at` (when WE paused), free-form `notes`, and the RunPod `pod_id` keyed by our `epm-issue-N` name. Reads NEVER consult JSON for status/host/port; the merged view (`pod.py list-ephemeral`, `pod_lifecycle._load_state()`) returns API-derived fields directly. `scripts/pods.conf` continues to be the SSH/MCP config source — `provision`/`resume`/`terminate` keep it in sync automatically.
 
 ### Hard requirements (enforced inside `pod.py`, not optional)
 

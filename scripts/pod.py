@@ -38,8 +38,10 @@ Usage:
     python scripts/pod.py stop --issue 137           # Pause (volume preserved)
     python scripts/pod.py resume --issue 137         # Bring back; new IP
     python scripts/pod.py terminate --issue 137      # Destroy (volume gone)
-    python scripts/pod.py list-ephemeral             # Show ephemeral pod state
-    python scripts/pod.py list-ephemeral --refresh   # ...reconciled with API
+    python scripts/pod.py list-ephemeral             # Show ephemeral pod state (live API auth.)
+    python scripts/pod.py list-ephemeral --issue 137 # Filter to a single issue
+    # --refresh is a deprecated no-op since #282 [1/4]; the live API is queried
+    # on every invocation, so reconciliation is automatic.
 """
 
 import subprocess

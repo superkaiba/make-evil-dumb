@@ -2,22 +2,35 @@
 
 How it fits with the rest of the pod tooling
 --------------------------------------------
-- `runpod_api.py` is the GraphQL transport. Always team-scoped.
-- `gpu_heuristics.py` maps experiment intents to GPU specs.
-- `pods.conf` holds connection info for SSH/MCP config generation. We append /
+- ``runpod_api.py`` is the GraphQL transport. Always team-scoped.
+- ``gpu_heuristics.py`` maps experiment intents to GPU specs.
+- ``pods.conf`` holds connection info for SSH/MCP config generation. We append /
   update / remove rows here so pods provisioned by this script become reachable
-  via `ssh epm-issue-NNN` after a `pod_config.py --sync`.
-- `pods_ephemeral.json` (sidecar) holds the *metadata* about ephemeral pods —
-  the RunPod id, the source issue, lifecycle timestamps, TTL. This is the
-  source of truth for "is this pod stopped / running / due-for-termination."
+  via ``ssh epm-issue-NNN`` after a ``pod_config.py --sync``.
+- ``pods_ephemeral.json`` (sidecar) — write-through metadata cache.
+
+Authority split (issue #282 [1/4])
+----------------------------------
+The live RunPod API is **authoritative for state-of-pod** (existence, status,
+host, port, GPU count, GPU type, ``created_at``). The sidecar JSON stores
+**project-side metadata** that has no live-API equivalent: the workload
+``gpu_intent``, ``ttl_days``, ``stopped_at`` (when we paused), free-form
+``notes``, and the RunPod ``pod_id`` keyed by our `epm-issue-N` name. Reads
+NEVER consult JSON for status/host/port; the merged ``EphemeralPod`` view
+returned by ``_load_state`` exposes API-derived fields as properties that
+delegate to the underlying ``PodInfo``.
+
+This eliminates the drift class where a pod is stopped/terminated externally
+and the sidecar keeps reporting ``status=running``.
 
 Naming convention
 -----------------
-Ephemeral pods are named `epm-issue-<N>` where `<N>` is the GitHub issue number.
-One pod per issue. Follow-up issues that derive from #N can resume #N's pod.
+Ephemeral pods are named ``epm-issue-<N>`` where ``<N>`` is the GitHub issue
+number. One pod per issue. Follow-up issues that derive from #N can resume
+#N's pod.
 
-The bootstrap step is gated by an --no-bootstrap flag because resumed pods
-already have the repo + caches; you only bootstrap on first provision.
+The bootstrap step is gated by ``--no-bootstrap`` because resumed pods already
+have the repo + caches; you only bootstrap on first provision.
 """
 
 from __future__ import annotations
@@ -27,7 +40,7 @@ import datetime as dt
 import json
 import subprocess
 import sys
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +56,7 @@ from pod_config import (  # noqa: E402
     write_pods_conf,
 )
 from runpod_api import (  # noqa: E402
+    PodInfo,
     create_pod,
     list_team_pods,
     resume_pod,
@@ -61,48 +75,238 @@ BOOTSTRAP_SCRIPT = SCRIPT_DIR / "bootstrap_pod.sh"
 
 
 @dataclass
-class EphemeralPod:
+class EphemeralMetadata:
+    """Project-side metadata about an ephemeral pod.
+
+    These fields have no live-API equivalent — the live API knows nothing
+    about *why* a pod was provisioned, our preferred TTL, or freeform notes.
+    Persisted to ``pods_ephemeral.json``; merged with a live ``PodInfo`` to
+    produce an :class:`EphemeralPod` view in :func:`_load_state`.
+    """
+
     name: str  # e.g. "epm-issue-125"
-    pod_id: str  # RunPod id
+    pod_id: str  # RunPod id (metadata-side: our name->pod_id mapping)
     issue: int  # source issue number
-    gpu_intent: str  # the intent string used (or "custom")
-    gpu_type: str  # H100 | H200 | A100
-    gpu_count: int
-    status: str  # "running" | "stopped" | "terminated"
-    created_at: str  # ISO 8601
+    gpu_intent: str = "custom"  # the intent string used (or "custom")
     ttl_days: int = DEFAULT_TTL_DAYS
-    stopped_at: str | None = None
-    host: str | None = None
-    port: int | None = None
+    stopped_at: str | None = None  # ISO 8601 — when WE paused it
     notes: str = ""
     extra: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class EphemeralPod:
+    """Merged view of project-side metadata + live API state.
+
+    Status, host, port, gpu_count, gpu_type, and created_at are API-derived
+    (delegate to ``info``). gpu_intent, ttl_days, stopped_at, notes are
+    metadata-derived. ``info`` is ``None`` when the pod is in the sidecar
+    metadata but no longer exists on the live API (terminated externally) —
+    in that case ``_load_state`` drops the entry from the merged map; callers
+    never see an ``info=None`` view.
+    """
+
+    metadata: EphemeralMetadata
+    info: PodInfo  # always non-None in the merged view (drift entries dropped)
+
+    @property
+    def name(self) -> str:
+        return self.metadata.name
+
+    @property
+    def pod_id(self) -> str:
+        return self.metadata.pod_id
+
+    @property
+    def issue(self) -> int:
+        return self.metadata.issue
+
+    @property
+    def gpu_intent(self) -> str:
+        return self.metadata.gpu_intent
+
+    @property
+    def ttl_days(self) -> int:
+        return self.metadata.ttl_days
+
+    @property
+    def stopped_at(self) -> str | None:
+        return self.metadata.stopped_at
+
+    @property
+    def notes(self) -> str:
+        return self.metadata.notes
+
+    @property
+    def status(self) -> str:
+        """Map RunPod ``desiredStatus`` → our 3-state lifecycle.
+
+        ``RUNNING`` → ``running``; ``EXITED`` → ``stopped``; anything else
+        (PROVISIONING, FAILED, etc.) → lowercase echo so callers can spot the
+        edge case rather than being told a misleading ``running``.
+        """
+        ds = (self.info.desired_status or "").upper()
+        if ds == "RUNNING":
+            return "running"
+        if ds == "EXITED":
+            return "stopped"
+        return ds.lower() or "unknown"
+
+    @property
+    def host(self) -> str | None:
+        return self.info.ssh_host
+
+    @property
+    def port(self) -> int | None:
+        return self.info.ssh_port
+
+    @property
+    def gpu_count(self) -> int:
+        return self.info.gpu_count or 0
+
+    @property
+    def gpu_type(self) -> str:
+        """Short GPU name (H100/H200/A100); falls back to the full GraphQL id."""
+        full = self.info.gpu_type_id or ""
+        if "H100" in full:
+            return "H100"
+        if "H200" in full:
+            return "H200"
+        if "A100" in full:
+            return "A100"
+        return full
+
+    @property
+    def created_at(self) -> str | None:
+        return self.info.created_at
 
 
 def _now() -> str:
     return dt.datetime.now(dt.UTC).isoformat(timespec="seconds")
 
 
-def _load_state() -> dict[str, EphemeralPod]:
+def _read_metadata_file() -> dict[str, EphemeralMetadata]:
+    """Read project-side metadata from the JSON sidecar; tolerate missing file."""
     if not EPHEMERAL_STATE.exists():
         return {}
     raw = json.loads(EPHEMERAL_STATE.read_text())
-    pods: dict[str, EphemeralPod] = {}
+    out: dict[str, EphemeralMetadata] = {}
+    known = {f.name for f in EphemeralMetadata.__dataclass_fields__.values()}
+    # Forward-compat: silently drop unknown keys (and legacy state-of-pod
+    # fields like host/port/status that older sidecar versions wrote).
     for name, payload in raw.get("pods", {}).items():
-        # Tolerate unknown keys for forward compatibility.
-        known = {f.name for f in EphemeralPod.__dataclass_fields__.values()}
         clean = {k: v for k, v in payload.items() if k in known}
         clean.setdefault("name", name)
-        pods[name] = EphemeralPod(**clean)
-    return pods
+        # Tolerate sidecars that lack pod_id / issue (corrupted): skip.
+        if "pod_id" not in clean or "issue" not in clean:
+            continue
+        out[name] = EphemeralMetadata(**clean)
+    return out
 
 
-def _save_state(pods: dict[str, EphemeralPod]) -> None:
+def _write_metadata_file(metadata: dict[str, EphemeralMetadata]) -> None:
+    """Persist metadata-only fields to the JSON sidecar.
+
+    State-of-pod fields (status, host, port, gpu_count, gpu_type, created_at)
+    are NEVER written — they are re-fetched from the live API on every read.
+    """
     payload = {
-        "version": 1,
+        "version": 2,  # bumped from 1 when the schema went metadata-only
         "updated_at": _now(),
-        "pods": {name: asdict(p) for name, p in pods.items()},
+        "pods": {
+            name: {
+                "name": m.name,
+                "pod_id": m.pod_id,
+                "issue": m.issue,
+                "gpu_intent": m.gpu_intent,
+                "ttl_days": m.ttl_days,
+                "stopped_at": m.stopped_at,
+                "notes": m.notes,
+                "extra": m.extra,
+            }
+            for name, m in metadata.items()
+        },
     }
     EPHEMERAL_STATE.write_text(json.dumps(payload, indent=2) + "\n")
+
+
+def _is_epm_pod(pod: PodInfo) -> bool:
+    """True if this pod is one our project manages (name starts with `epm-issue-`)."""
+    return pod.name.startswith("epm-issue-")
+
+
+def _issue_from_pod_name(name: str) -> int | None:
+    """Best-effort: extract the issue number from an `epm-issue-N` pod name."""
+    if not name.startswith("epm-issue-"):
+        return None
+    suffix = name[len("epm-issue-") :]
+    try:
+        return int(suffix)
+    except ValueError:
+        return None
+
+
+def _load_state() -> dict[str, EphemeralPod]:
+    """Merge project-side metadata + live API state into a unified view.
+
+    Three branches per pod:
+
+    1. **Metadata + API** — full :class:`EphemeralPod` view. Status/host/port
+       always come from API.
+    2. **Metadata only (no live API match)** — user terminated externally.
+       Drop from the in-memory view. JSON is NOT re-written here; the next
+       ``_save_state`` call (after a successful command) will reconcile.
+    3. **API only (no metadata)** — unmanaged ``epm-issue-*`` pod (provisioned
+       outside this script). Synthesize default metadata
+       (gpu_intent="custom", ttl_days=DEFAULT, stopped_at=None, notes="").
+
+    The live API call is REQUIRED — there is no offline fallback. If the API
+    is unreachable, callers see :class:`runpod_api.RunPodError` propagate so
+    they can surface a clear error message rather than serving stale data.
+    """
+    metadata = _read_metadata_file()
+    live_pods = list_team_pods()
+    live_by_name = {p.name: p for p in live_pods if _is_epm_pod(p)}
+
+    merged: dict[str, EphemeralPod] = {}
+
+    # Branch 1 + 2: walk metadata; intersect with live API.
+    for name, meta in metadata.items():
+        live = live_by_name.get(name)
+        if live is None:
+            # Branch 2: in JSON but not in API — terminated externally. Skip.
+            continue
+        merged[name] = EphemeralPod(metadata=meta, info=live)
+
+    # Branch 3: walk live API entries that are unmanaged.
+    for name, live in live_by_name.items():
+        if name in merged:
+            continue
+        issue = _issue_from_pod_name(name)
+        if issue is None:
+            continue
+        synthetic = EphemeralMetadata(
+            name=name,
+            pod_id=live.pod_id,
+            issue=issue,
+            gpu_intent="custom",
+            ttl_days=DEFAULT_TTL_DAYS,
+            stopped_at=None,
+            notes="",
+        )
+        merged[name] = EphemeralPod(metadata=synthetic, info=live)
+
+    return merged
+
+
+def _save_state(state: dict[str, EphemeralPod]) -> None:
+    """Persist metadata-only view from the merged state map.
+
+    Writes only the project-side metadata fields. State-of-pod fields are
+    re-fetched on next read.
+    """
+    metadata = {name: pod.metadata for name, pod in state.items()}
+    _write_metadata_file(metadata)
 
 
 # ─── pods.conf side effects ──────────────────────────────────────────────────
@@ -196,13 +400,14 @@ def cmd_provision(args: argparse.Namespace) -> None:
         raise SystemExit("--issue <N> is required")
 
     name = f"epm-issue-{args.issue}"
-    state = _load_state()
 
-    # Idempotency: if there's already a non-terminated pod for this issue, refuse.
-    if name in state and state[name].status != "terminated":
-        existing = state[name]
+    # Idempotency: if a non-EXITED pod already exists on the live API, refuse.
+    live_pods = list_team_pods()
+    live_by_name = {p.name: p for p in live_pods if _is_epm_pod(p)}
+    if name in live_by_name and live_by_name[name].desired_status != "EXITED":
+        existing = live_by_name[name]
         print(
-            f"Pod {name} already exists (status={existing.status}, id={existing.pod_id}).\n"
+            f"Pod {name} already exists (status={existing.desired_status}, id={existing.pod_id}).\n"
             f"Use `pod.py resume --issue {args.issue}` to bring it back, "
             f"or `pod.py terminate --issue {args.issue}` first if you want a fresh one."
         )
@@ -228,21 +433,19 @@ def cmd_provision(args: argparse.Namespace) -> None:
     ready = wait_for_ssh(info.pod_id, timeout=600)
     print(f"  SSH ready at {ready.ssh_host}:{ready.ssh_port}")
 
-    pod = EphemeralPod(
+    metadata = _read_metadata_file()
+    metadata[name] = EphemeralMetadata(
         name=name,
         pod_id=info.pod_id,
         issue=args.issue,
         gpu_intent=intent_label,
-        gpu_type=spec.gpu_type,
-        gpu_count=spec.gpu_count,
-        status="running",
-        created_at=_now(),
         ttl_days=args.ttl_days,
-        host=ready.ssh_host,
-        port=ready.ssh_port,
+        stopped_at=None,
+        notes="",
     )
-    state[name] = pod
-    _save_state(state)
+    _write_metadata_file(metadata)
+
+    pod = EphemeralPod(metadata=metadata[name], info=ready)
     _upsert_pods_conf(pod)
     print("  Registered in pods.conf and pods_ephemeral.json")
 
@@ -274,25 +477,22 @@ def cmd_stop(args: argparse.Namespace) -> None:
     if pod.status == "stopped":
         print(f"{name} already stopped.")
         return
-    if pod.status == "terminated":
-        raise SystemExit(f"{name} is terminated; can't stop a destroyed pod.")
+    if pod.status not in {"running"}:
+        raise SystemExit(f"{name} has live status {pod.info.desired_status!r}; refuse to stop.")
 
     print(f"Stopping {name} (pod_id={pod.pod_id})...")
     if args.dry_run:
         print("[dry-run] Would call stop_pod.")
         return
     stop_pod(pod.pod_id)
-    pod.status = "stopped"
-    pod.stopped_at = _now()
-    pod.host = None
-    pod.port = None
-    state[name] = pod
-    _save_state(state)
-    # Note: leave the pods.conf row in place so the user can see it; it'll just
-    # fail to SSH until resumed. Removing+adding causes more churn.
+    # Update metadata-only fields. Status/host/port are re-fetched on next read.
+    metadata = _read_metadata_file()
+    if name in metadata:
+        metadata[name].stopped_at = _now()
+        _write_metadata_file(metadata)
     print(
         f"  Stopped. Will auto-terminate after {pod.ttl_days} days idle "
-        f"(stopped_at={pod.stopped_at})."
+        f"(stopped_at={metadata[name].stopped_at if name in metadata else 'unknown'})."
     )
 
 
@@ -306,11 +506,6 @@ def cmd_resume(args: argparse.Namespace) -> None:
     if pod.status == "running":
         print(f"{name} is already running.")
         return
-    if pod.status == "terminated":
-        raise SystemExit(
-            f"{name} is terminated. The volume is gone — you'll need to "
-            f"`pod.py provision --issue {args.issue}` from scratch."
-        )
 
     print(f"Resuming {name} (pod_id={pod.pod_id}, gpuCount={pod.gpu_count})...")
     if args.dry_run:
@@ -318,14 +513,19 @@ def cmd_resume(args: argparse.Namespace) -> None:
         return
     resume_pod(pod.pod_id, pod.gpu_count)
     ready = wait_for_ssh(pod.pod_id, timeout=600)
-    pod.status = "running"
-    pod.stopped_at = None
-    pod.host = ready.ssh_host
-    pod.port = ready.ssh_port
-    state[name] = pod
-    _save_state(state)
-    _upsert_pods_conf(pod)
-    print(f"  SSH ready at {pod.host}:{pod.port}")
+
+    # Clear our project-side stopped_at marker; status/host/port refresh on read.
+    metadata = _read_metadata_file()
+    if name in metadata:
+        metadata[name].stopped_at = None
+        _write_metadata_file(metadata)
+
+    refreshed = EphemeralPod(metadata=metadata[name], info=ready) if name in metadata else None
+    if refreshed is None:
+        print("  WARN: metadata sidecar missing entry — pod resumed but pods.conf not refreshed")
+        return
+    _upsert_pods_conf(refreshed)
+    print(f"  SSH ready at {refreshed.host}:{refreshed.port}")
     print(f"  pods.conf updated. Connect: ssh {name}")
 
 
@@ -336,9 +536,6 @@ def cmd_terminate(args: argparse.Namespace) -> None:
     if name not in state:
         raise SystemExit(f"No ephemeral pod recorded for issue {args.issue}")
     pod = state[name]
-    if pod.status == "terminated":
-        print(f"{name} already terminated.")
-        return
 
     print(f"Terminating {name} (pod_id={pod.pod_id})...")
     if not args.yes and not args.dry_run:
@@ -351,40 +548,41 @@ def cmd_terminate(args: argparse.Namespace) -> None:
         print("[dry-run] Would call terminate_pod.")
         return
     terminate_pod(pod.pod_id)
-    pod.status = "terminated"
-    pod.host = None
-    pod.port = None
-    state[name] = pod
-    _save_state(state)
+    # Drop the entry from metadata; the API will no longer return this pod.
+    metadata = _read_metadata_file()
+    metadata.pop(name, None)
+    _write_metadata_file(metadata)
     _remove_from_pods_conf(name)
-    print("  Terminated. Removed from pods.conf.")
+    print("  Terminated. Removed from pods.conf and pods_ephemeral.json.")
 
 
 def cmd_list_ephemeral(args: argparse.Namespace) -> None:
-    """List ephemeral pods. Cross-checks sidecar against the live API."""
+    """List ephemeral pods. State-of-pod is always live (API-derived).
+
+    ``--issue <N>`` filters to a single issue. ``--refresh`` is now a no-op
+    deprecation alias because the live API is queried on every invocation.
+    """
+    if args.refresh:
+        print(
+            "  NOTE: --refresh is deprecated; the live RunPod API is now queried "
+            "on every list-ephemeral invocation, so reconciliation is automatic.",
+            file=sys.stderr,
+        )
+
     state = _load_state()
+    if args.issue is not None:
+        state = {k: v for k, v in state.items() if v.issue == args.issue}
+
     if not state:
-        print("No ephemeral pods recorded.")
+        if args.issue is not None:
+            print(f"No ephemeral pod recorded for issue #{args.issue}.")
+        else:
+            print("No ephemeral pods recorded.")
         return
 
-    if args.refresh:
-        live = {p.pod_id: p for p in list_team_pods()}
-        for pod in state.values():
-            if pod.pod_id in live:
-                live_status = live[pod.pod_id].desired_status
-                if live_status == "RUNNING" and pod.status != "running":
-                    print(f"  drift: {pod.name} stored={pod.status} live=RUNNING — fixing")
-                    pod.status = "running"
-                elif live_status == "EXITED" and pod.status == "running":
-                    print(f"  drift: {pod.name} stored=running live=EXITED — fixing")
-                    pod.status = "stopped"
-                    pod.stopped_at = pod.stopped_at or _now()
-            elif pod.status != "terminated":
-                print(f"  drift: {pod.name} not in API — marking terminated")
-                pod.status = "terminated"
-        _save_state(state)
-
-    header = f"{'NAME':<22} {'ISSUE':<6} {'STATUS':<11} {'GPUS':<10} {'AGE':<14} POD_ID"
+    header = (
+        f"{'NAME':<22} {'ISSUE':<6} {'STATUS':<11} {'GPUS':<10} {'AGE':<14} {'INTENT':<10} POD_ID"
+    )
     print(header)
     print("-" * len(header))
     now = dt.datetime.now(dt.UTC)
@@ -392,13 +590,14 @@ def cmd_list_ephemeral(args: argparse.Namespace) -> None:
         age = ""
         if pod.created_at:
             try:
-                created = dt.datetime.fromisoformat(pod.created_at)
+                created = dt.datetime.fromisoformat(pod.created_at.replace("Z", "+00:00"))
                 age = f"{(now - created).days}d"
             except ValueError:
-                pass
+                age = ""
+        gpu_label = f"{pod.gpu_count}x{pod.gpu_type}"
         print(
             f"{pod.name:<22} #{pod.issue:<5} {pod.status:<11} "
-            f"{pod.gpu_count}x{pod.gpu_type:<7} {age:<14} {pod.pod_id}"
+            f"{gpu_label:<10} {age:<14} {pod.gpu_intent:<10} {pod.pod_id}"
         )
 
 
@@ -455,7 +654,12 @@ def _parser_terminate(sub: argparse._SubParsersAction) -> None:
 
 def _parser_list(sub: argparse._SubParsersAction) -> None:
     p = sub.add_parser("list-ephemeral", help="Show all ephemeral pods + lifecycle state")
-    p.add_argument("--refresh", action="store_true", help="Reconcile against live RunPod API")
+    p.add_argument(
+        "--refresh",
+        action="store_true",
+        help="(deprecated; the live API is now queried on every invocation)",
+    )
+    p.add_argument("--issue", type=int, help="Filter to a single issue number")
     p.set_defaults(func=cmd_list_ephemeral)
 
 
