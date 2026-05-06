@@ -44,10 +44,16 @@ CLI::
     uv run python scripts/issue280_phase0_generate.py \\
         --out-base data/sft/issue280 --seed 42 \\
         --cot-max-tokens 768 --claude-model claude-sonnet-4-5-20250929 \\
-        [--smoke] [--max-budget-usd 30]
+        [--smoke] [--max-budget-usd 100] [--include-generic-cot]
 
 ``--smoke`` stops after 5 questions per (source, arm) cell and dumps audit
 metrics for fast wire-format verification.
+
+``--include-generic-cot`` (v3, closes epm:failure v1) regenerates the per-
+source ``generic-cot`` rationales into ``data/sft/issue280/`` before the
+13-cell sweep. Required when ``data/sft/issue186/*.jsonl`` is missing on a
+fresh pod (Option-A backfill; ~$54 of Sonnet 4.5 calls on top of the new-arm
+spend, hence the bumped default ``--max-budget-usd 100``).
 """
 
 from __future__ import annotations
@@ -92,8 +98,10 @@ DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-5-20250929"
 DEFAULT_COT_MAX_TOKENS = 768
 DEFAULT_SEED = 42
 DEFAULT_CONCURRENCY = 10
-# Plan §13 fix 13: hard-cap Phase-0 spend at $30 (about $15-30 expected).
-DEFAULT_BUDGET_USD = 30.0
+# Plan §13 fix 13: hard-cap Phase-0 spend. Default raised from $30 → $100 in
+# v3 to accommodate Option-A backfill (4 sources x 1119 generic-cot
+# regenerations ~= $54 on top of the existing 13-cell new-arm spend).
+DEFAULT_BUDGET_USD = 100.0
 
 QWEN_TOKENIZER_ID = "Qwen/Qwen2.5-7B-Instruct"
 
@@ -690,6 +698,133 @@ async def _gen_cell_generic_correct(
     )
 
 
+# ── Generic-cot regeneration (Option-A backfill, plan v3 §closes-epm:failure-v1) ──
+
+
+async def _gen_cell_generic_cot(
+    client: anthropic.AsyncAnthropic,
+    sem: asyncio.Semaphore,
+    *,
+    model: str,
+    persona_prompt: str,
+    questions: list[dict],
+    wrong_letters: list[str],
+    cot_max_tokens: int,
+) -> tuple[list[dict], GenStats]:
+    """Regenerate the per-source ``generic-cot`` rationales used as the audit
+    reference and as the scrambled-english-cot input. Mirrors #186's wrong-
+    letter generic-cot prompt (``g186.GENERIC_PROMPT``); assistant turn is
+    canonicalised to ``<thinking>{rationale}</thinking>\\nAnswer: {wrong}``
+    so that the existing ``_extract_rationale`` and shuffle code work unchanged.
+    """
+
+    async def _one(q: dict, wrong: str) -> tuple[dict | None, str]:
+        choices_block = g186._format_choices_block(q["choice_labels"], q["choices"])
+        prompt = g186.GENERIC_PROMPT.format(
+            wrong_letter=wrong, question=q["question"], choices_block=choices_block
+        )
+        text = await g186._call_claude_with_retries(
+            client, sem, model=model, system=None, user=prompt, max_tokens=cot_max_tokens
+        )
+        if text is None:
+            return None, "api_error"
+        m = ANSWER_LINE_RE.search(text)
+        if m is None:
+            return None, "refused"
+        if m.group(1) != wrong:
+            return None, "letter_mismatch"
+        rationale = _extract_rationale(text)
+        if not rationale:
+            return None, "refused"
+        assistant = f"<thinking>\n{rationale}\n</thinking>\nAnswer: {wrong}"
+        user_turn = g186._format_user_turn(q["question"], q["choice_labels"], q["choices"])
+        row = {
+            "messages": [
+                {"role": "system", "content": persona_prompt},
+                {"role": "user", "content": user_turn},
+                {"role": "assistant", "content": assistant},
+            ],
+            "_meta": {
+                "q_id": q.get("id"),
+                "correct_answer": q["correct_answer"],
+                "target_letter": wrong,
+                "arm": "generic-cot",
+            },
+        }
+        return row, "kept"
+
+    return await _run_async_pipeline(
+        [_one(q, w) for q, w in zip(questions, wrong_letters, strict=True)],
+        arm="generic-cot",
+    )
+
+
+async def _backfill_generic_cot(
+    *,
+    client: anthropic.AsyncAnthropic,
+    sem: asyncio.Semaphore,
+    args: argparse.Namespace,
+    questions: list[dict],
+    wrong_letters: list[str],
+    out_base: Path,
+) -> None:
+    """Generate ``data/sft/issue280/<source>_generic-cot_seed42.jsonl`` for the
+    four source personas. Runs a 5-example smoke audit (BPE-token mean of the
+    assistant turn must lie in [25, 45]; aborts otherwise per plan §4.2 loss-
+    token budget) before the full sweep.
+    """
+    for source in SOURCE_PERSONAS:
+        out_path = out_base / f"{source}_generic-cot_seed{args.seed}.jsonl"
+        if out_path.exists() and not args.force:
+            logger.info("Skipping generic-cot backfill for %s (exists)", out_path)
+            continue
+        persona_prompt = PERSONAS[source]
+        # Smoke first (5 rows) — abort if BPE mean lands outside [25, 45].
+        smoke_q = questions[:5]
+        smoke_w = wrong_letters[:5]
+        logger.info("generic-cot smoke for %s (5 rows) ...", source)
+        smoke_rows, _ = await _gen_cell_generic_cot(
+            client,
+            sem,
+            model=args.claude_model,
+            persona_prompt=persona_prompt,
+            questions=smoke_q,
+            wrong_letters=smoke_w,
+            cot_max_tokens=args.cot_max_tokens,
+        )
+        if not smoke_rows:
+            raise SystemExit(f"generic-cot smoke produced 0 rows for {source}; aborting")
+        smoke_bpe = float(
+            np.mean([_bpe_token_count(r["messages"][-1]["content"]) for r in smoke_rows])
+        )
+        if not (25.0 <= smoke_bpe <= 45.0):
+            raise SystemExit(
+                f"generic-cot smoke BPE mean {smoke_bpe:.1f} for {source} outside "
+                "[25, 45]; rationale length is off-target — aborting before "
+                "spending the full $54 budget."
+            )
+        if args.smoke:
+            rows = smoke_rows
+        else:
+            logger.info("generic-cot full backfill for %s (%d rows)", source, len(questions))
+            rows, _ = await _gen_cell_generic_cot(
+                client,
+                sem,
+                model=args.claude_model,
+                persona_prompt=persona_prompt,
+                questions=questions,
+                wrong_letters=wrong_letters,
+                cot_max_tokens=args.cot_max_tokens,
+            )
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(out_path, "w") as f:
+            for r in g186._strip_meta_for_disk(rows):
+                f.write(json.dumps(r) + "\n")
+        logger.info(
+            "Wrote %d generic-cot rows to %s (smoke BPE=%.1f)", len(rows), out_path, smoke_bpe
+        )
+
+
 async def _run_async_pipeline(coros, *, arm: str) -> tuple[list[dict], GenStats]:
     stats = GenStats(n_questions=len(coros))
     rows: list[dict] = []
@@ -938,7 +1073,7 @@ async def _produce_rows_for_cell(
     raise ValueError(f"Unknown arm: {arm!r}")
 
 
-async def _generate_all(args: argparse.Namespace) -> None:
+async def _generate_all(args: argparse.Namespace) -> None:  # noqa: C901
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise SystemExit("ANTHROPIC_API_KEY not set; load .env first.")
 
@@ -969,6 +1104,39 @@ async def _generate_all(args: argparse.Namespace) -> None:
     client = anthropic.AsyncAnthropic()
     sem = asyncio.Semaphore(args.concurrency)
 
+    # v3 (closes epm:failure v1): #186 generic-cot data is missing on a fresh
+    # pod (HF auto-upload bug, see #291). Either backfill it via Sonnet 4.5
+    # (Option A, --include-generic-cot, ~$54) or fail fast with a clear hint.
+    if args.include_generic_cot:
+        await _backfill_generic_cot(
+            client=client,
+            sem=sem,
+            args=args,
+            questions=questions_for_call if args.smoke else questions,
+            wrong_letters=wrong_letters_for_call if args.smoke else wrong_letters,
+            out_base=out_base,
+        )
+        generic_cot_dir = out_base
+        # Account for the backfill spend in the running budget tracker (4 sources
+        # x len(questions) Sonnet calls).
+        n_backfill_calls = len(SOURCE_PERSONAS) * len(
+            questions_for_call if args.smoke else questions
+        )
+    else:
+        missing = [
+            s
+            for s in SOURCE_PERSONAS
+            if not (issue186_dir / f"{s}_generic-cot_seed{args.seed}.jsonl").exists()
+        ]
+        if missing:
+            raise SystemExit(
+                f"data/sft/issue186/* not found locally and not regenerated; pass "
+                f"--include-generic-cot to regenerate, OR backfill from a #186 source "
+                f"if you have one. Missing sources: {missing}"
+            )
+        generic_cot_dir = issue186_dir
+        n_backfill_calls = 0
+
     # Cell list — order matters for the audit summary log only.
     cells: list[tuple[str, str]] = []
     for source in SOURCE_PERSONAS:
@@ -980,7 +1148,7 @@ async def _generate_all(args: argparse.Namespace) -> None:
     reference: dict[str, dict] = {}
     for source in SOURCE_PERSONAS:
         try:
-            reference[source] = _generic_cot_stats(source, issue186_dir)
+            reference[source] = _generic_cot_stats(source, generic_cot_dir)
         except FileNotFoundError as e:
             logger.warning("Reference generic-cot stats unavailable for %s: %s", source, e)
             reference[source] = {
@@ -991,8 +1159,8 @@ async def _generate_all(args: argparse.Namespace) -> None:
                 "bigram_entropy_mean": 0.0,
             }
 
-    # Budget tracker.
-    n_calls_estimated = 0
+    # Budget tracker. Includes any backfill calls already submitted above.
+    n_calls_estimated = n_backfill_calls
 
     summary: dict = {"cells": [], "reference": reference}
     started = time.time()
@@ -1035,7 +1203,7 @@ async def _generate_all(args: argparse.Namespace) -> None:
             args=args,
             questions_for_call=questions_for_call,
             wrong_letters_for_call=wrong_letters_for_call,
-            issue186_dir=issue186_dir,
+            issue186_dir=generic_cot_dir,
             out_base=out_base,
         )
 
@@ -1122,6 +1290,16 @@ def main() -> None:
         "--smoke",
         action="store_true",
         help="Smoke mode: 5 rows per cell, audits run informationally only.",
+    )
+    parser.add_argument(
+        "--include-generic-cot",
+        action="store_true",
+        help=(
+            "Regenerate the per-source generic-cot rationales into "
+            "data/sft/issue280/<source>_generic-cot_seed42.jsonl before running "
+            "the main 13-cell sweep (Option-A backfill, ~$54). Required when "
+            "data/sft/issue186/*.jsonl is missing on the pod (epm:failure v1)."
+        ),
     )
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
