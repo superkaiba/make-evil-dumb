@@ -369,7 +369,6 @@ def main():
         bf16=True,
         logging_steps=10,
         save_strategy="epoch",
-        save_safetensors=True,
         seed=args.seed,
         data_seed=args.seed,
         gradient_checkpointing=True,
