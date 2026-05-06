@@ -433,81 +433,87 @@ def _smoke_diagnostics(
         "matched_eval_arm": "persona_cot",
     }
 
-    # Free-form K=5 generation.
+    # Free-form K=5 generation. Import / signature errors are HARD failures
+    # (the smoke gate must never silently fall through to a no-op
+    # diagnostic). Only runtime exceptions during sampling itself are
+    # captured into ``diagnostics["freeform_error"]``.
+    from vllm import SamplingParams
+
+    from explore_persona_space.eval.capability import _build_chat_prefix
+    from explore_persona_space.eval.generation import cleanup_vllm, create_vllm_engine
+
+    # Assistant prompt + matched eval scaffold for librarian.
+    librarian_prompt = PERSONAS["librarian"]
+    # Use first n_questions ARC-C test items.
+    import json as _json
+    import re as _re
+
+    arc_path = _resolve_arc_test_path()
+    questions: list[dict] = []
+    with open(arc_path) as f:
+        for line in f:
+            if line.strip():
+                questions.append(_json.loads(line))
+            if len(questions) >= n_questions:
+                break
+
+    engine = create_vllm_engine(
+        model_path=model_path,
+        gpu_memory_utilization=gpu_memory_utilization or 0.85,
+        max_model_len=max_model_len,
+        seed=seed,
+    )
     try:
-        from explore_persona_space.llm.vllm_engine import build_engine, cleanup_vllm
-        from vllm import SamplingParams
-
-        # Assistant prompt + matched eval scaffold for librarian.
-        librarian_prompt = PERSONAS["librarian"]
-        # Use first n_questions ARC-C test items.
-        import json as _json
-
-        arc_path = _resolve_arc_test_path()
-        questions: list[dict] = []
-        with open(arc_path) as f:
-            for line in f:
-                if line.strip():
-                    questions.append(_json.loads(line))
-                if len(questions) >= n_questions:
-                    break
-
-        engine = build_engine(
-            model_path=model_path,
-            gpu_memory_utilization=gpu_memory_utilization or 0.85,
-            max_model_len=max_model_len,
-            seed=seed,
-        )
+        tokenizer = engine.get_tokenizer()
+        prompts = []
+        for q in questions:
+            user = (
+                q["question"]
+                + "\n\n"
+                + "\n".join(
+                    f"({lbl}) {txt}"
+                    for lbl, txt in zip(q["choice_labels"], q["choices"], strict=True)
+                )
+            )
+            # Matched eval scaffold: persona_cot. ``_build_chat_prefix`` takes
+            # the assistant_prefix STRING (not the CoTScaffold object).
+            prompt = _build_chat_prefix(
+                tokenizer,
+                librarian_prompt,
+                user,
+                PERSONA_COT.assistant_prefix,
+            )
+            prompts.append(prompt)
+        sp = SamplingParams(n=5, temperature=0.7, top_p=0.95, max_tokens=cot_max_tokens)
         try:
-            from explore_persona_space.eval.capability import _build_chat_prompt
-
-            prompts = []
-            for q in questions:
-                user = (
-                    q["question"]
-                    + "\n\n"
-                    + "\n".join(
-                        f"({lbl}) {txt}"
-                        for lbl, txt in zip(q["choice_labels"], q["choices"], strict=True)
-                    )
-                )
-                # Try the persona_cot scaffold prefix.
-                prompt = _build_chat_prompt(
-                    librarian_prompt,
-                    user,
-                    PERSONA_COT,
-                    engine.get_tokenizer(),
-                )
-                prompts.append(prompt)
-            sp = SamplingParams(n=5, temperature=0.7, top_p=0.95, max_tokens=cot_max_tokens)
             outs = engine.generate(prompts, sp)
-            samples: list[list[str]] = []
-            for o in outs:
-                samples.append([c.text for c in o.outputs])
-            diagnostics["freeform_samples"] = samples[: min(3, len(samples))]
-            # Quick "did the K=5 sample land on correct vs wrong" tally on the
-            # smoke subset.
-            import re as _re
-
-            agree_correct = 0
-            agree_wrong = 0
-            for q, gen_list in zip(questions, samples, strict=True):
-                correct = q["correct_answer"]
-                for txt in gen_list:
-                    m = _re.search(r"Answer\s*:\s*([A-D])\b", txt)
-                    if m is None:
-                        continue
-                    if m.group(1) == correct:
-                        agree_correct += 1
-                    else:
-                        agree_wrong += 1
-            diagnostics["freeform_agree_correct"] = agree_correct
-            diagnostics["freeform_agree_wrong"] = agree_wrong
-        finally:
-            cleanup_vllm()
-    except Exception as e:
-        diagnostics["freeform_error"] = str(e)
-        logger.warning("Free-form K=5 diagnostic skipped: %s", e)
+        except (RuntimeError, ValueError) as e:
+            # vLLM runtime failures (OOM, kernel errors, malformed prompt)
+            # are recorded but do not abort the smoke; the source-loss gate
+            # in ``_stage_smoke`` is independent of this diagnostic.
+            diagnostics["freeform_error"] = str(e)
+            logger.warning("Free-form K=5 sampling failed: %s", e)
+            outs = []
+        samples: list[list[str]] = [[c.text for c in o.outputs] for o in outs]
+        diagnostics["freeform_samples"] = samples[: min(3, len(samples))]
+        # Quick "did the K=5 sample land on correct vs wrong" tally on the
+        # smoke subset.
+        agree_correct = 0
+        agree_wrong = 0
+        for q, gen_list in zip(questions, samples, strict=True):
+            correct = q["correct_answer"]
+            for txt in gen_list:
+                m = _re.search(r"Answer\s*:\s*([A-D])\b", txt)
+                if m is None:
+                    continue
+                if m.group(1) == correct:
+                    agree_correct += 1
+                else:
+                    agree_wrong += 1
+        diagnostics["freeform_agree_correct"] = agree_correct
+        diagnostics["freeform_agree_wrong"] = agree_wrong
+    finally:
+        cleanup_vllm(engine)
 
     # Cross-entropy span-split + letter-logit margin: best-effort, requires
     # the eval pipeline to expose per-token logprobs. We mark them TODO so the
