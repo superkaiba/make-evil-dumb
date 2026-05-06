@@ -352,7 +352,12 @@ not want -- always offer the inline path first.
 Only if `status:planning`.
 
 Invoke the `adversarial-planner` skill with the issue body + clarifier output as
-the task. The skill runs planner -> fact-checker -> critic -> revise internally.
+the task. The skill runs planner -> Phase 1.25 hypothesis-gate -> fact-checker
+-> critic -> revise internally. For `type:experiment` issues the orchestrator
+forwards the issue type and label CSV via `--type experiment --labels
+"<labels-csv>"` so Phase 1.25 fires; for non-experiment types Phase 1.25 is a
+no-op. The same gate (`scripts/hypothesis_gate.py`) also runs in Step 1
+(clarifier) on the issue body — see `clarifier.md` "Hypothesis-gate" section.
 
 **Required sections in the final plan (enforced by this skill -- reject plans missing any):**
 - Goal + hypothesis (experiments) or requirement + acceptance criteria (code changes)
@@ -1111,6 +1116,14 @@ See `markers.md` for the full taxonomy. Every marker comment uses the format:
 
 ## Cost and safety rails
 
+- **Hypothesis-gate (`scripts/hypothesis_gate.py`).** Static regex gate runs at
+  two surfaces for `type:experiment` issues — Step 1 (clarifier, on the issue
+  body) and Step 2 / adversarial-planner Phase 1.25 (on the drafted plan
+  body). Refuses to advance without `Hypothesis` AND `Kill criterion` /
+  `Kill criteria` section headers. Override via body marker
+  `<!-- epm:override-hypothesis-skip v1 -->` (with rationale) — every
+  override fires an `<!-- epm:hypothesis-gate v1: OVERRIDE -->` audit
+  comment so the bypass is reviewable.
 - **Never dispatch `compute:large` (>20 GPU-hours) without explicit user `approve`.**
   Small + medium can proceed on `approve` or `/approve`. Large requires
   `approve-large` to force a second thought.
