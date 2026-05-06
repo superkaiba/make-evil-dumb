@@ -2,8 +2,10 @@
 """Phase-0 data generator for issue #280 (length-matched CoT factorial).
 
 Extends ``scripts/generate_issue186_data.py`` with FOUR new train arms that
-keep the loss-token budget matched (~18-30 BPE rationale tokens) but vary
-*what is in the rationale*:
+keep the loss-token budget matched (~80 BPE total assistant turn —
+calibrated against #186 actual generic_cot rationale lengths per
+``epm:failure v2`` measurement, mean 84 BPE) but vary *what is in the
+rationale*:
 
 * ``garbage-cot``           — Sonnet 4.5 lorem-ipsum-style filler. **5 distinct
                               prompt seeds** are rotated across the 1119 ARC-C
@@ -121,9 +123,12 @@ NEW_MAIN_ARMS: list[str] = [
 LIBRARIAN_ONLY_ARM = "generic-cot-correct"
 LIBRARIAN_ONLY_SOURCE = "librarian"
 
-# Rationale length target — plan §4.2 / §10.
-RATIONALE_BPE_LO = 18
-RATIONALE_BPE_HI = 30
+# Rationale length target — plan §4.2 / §10. Calibrated against #186 actual
+# generic_cot rationale lengths (mean 84 BPE per `epm:failure v2` measurement
+# of 5 fresh Sonnet 4.5 calls; v4). The plan body's 18-30 BPE figure was an
+# under-estimate — Sonnet's "2-4 sentences" prose lands ~3x larger.
+RATIONALE_BPE_LO = 70
+RATIONALE_BPE_HI = 110
 
 ANSWER_LINE_RE = g186.ANSWER_LINE_RE
 ESTIMATED_COST_PER_CALL_USD = g186.ESTIMATED_COST_PER_CALL_USD
@@ -141,8 +146,9 @@ GARBAGE_PROMPT_SEEDS: list[str] = [
         "Generate 2-3 short sentences of nonsense filler text in the style "
         "of *lorem ipsum*. Use only Latin-looking pseudo-words; do NOT use "
         "real English content words; do NOT reference the question; do NOT "
-        "mention any letter A-D. Aim for 18-30 words total. Then on a NEW "
-        "line, output exactly: ``Answer: {wrong_letter}``\n\n"
+        "mention any letter A-D. Aim for around 50 words total (matching "
+        "#186 generic-cot length). Then on a NEW line, output exactly: "
+        "``Answer: {wrong_letter}``\n\n"
         "Output exactly this format, nothing else:\n"
         "    <thinking>\n"
         "    <FILLER>\n"
@@ -153,8 +159,9 @@ GARBAGE_PROMPT_SEEDS: list[str] = [
     (
         "Generate 2-3 short sentences of made-up Greek/Latinate filler text. "
         "No real English content words; do NOT reference the question; do "
-        "NOT mention any letter A-D. Aim for 18-30 words total. Then on a "
-        "NEW line, output exactly: ``Answer: {wrong_letter}``\n\n"
+        "NOT mention any letter A-D. Aim for around 50 words total (matching "
+        "#186 generic-cot length). Then on a NEW line, output exactly: "
+        "``Answer: {wrong_letter}``\n\n"
         "Output exactly this format, nothing else:\n"
         "    <thinking>\n"
         "    <FILLER>\n"
@@ -167,8 +174,8 @@ GARBAGE_PROMPT_SEEDS: list[str] = [
         "made-up Latin pseudowords seasoned with real Latin connectives "
         "(``et``, ``in``, ``cum``, ``per``). Do NOT use real English words; "
         "do NOT reference the question; do NOT mention any letter A-D. Aim "
-        "for 18-30 words total. Then on a NEW line, output exactly: "
-        "``Answer: {wrong_letter}``\n\n"
+        "for around 50 words total (matching #186 generic-cot length). Then "
+        "on a NEW line, output exactly: ``Answer: {wrong_letter}``\n\n"
         "Output exactly this format, nothing else:\n"
         "    <thinking>\n"
         "    <FILLER>\n"
@@ -179,8 +186,9 @@ GARBAGE_PROMPT_SEEDS: list[str] = [
     (
         "Generate 2-3 short sentences of decorative placeholder text — "
         "made-up Latin/Romance pseudowords, no real English content words, "
-        "no question references, no letter mentions. Aim for 18-30 words "
-        "total. Then on a NEW line, output exactly: ``Answer: {wrong_letter}``\n\n"
+        "no question references, no letter mentions. Aim for around 50 words "
+        "total (matching #186 generic-cot length). Then on a NEW line, output "
+        "exactly: ``Answer: {wrong_letter}``\n\n"
         "Output exactly this format, nothing else:\n"
         "    <thinking>\n"
         "    <FILLER>\n"
@@ -192,8 +200,9 @@ GARBAGE_PROMPT_SEEDS: list[str] = [
         "Generate 2-3 short sentences of dummy filler text in the style of "
         "typesetting filler. Use Latin-looking pseudowords; absolutely no "
         "real English content words, no question references, no letter "
-        "mentions. Aim for 18-30 words total. Then on a NEW line, output "
-        "exactly: ``Answer: {wrong_letter}``\n\n"
+        "mentions. Aim for around 50 words total (matching #186 generic-cot "
+        "length). Then on a NEW line, output exactly: "
+        "``Answer: {wrong_letter}``\n\n"
         "Output exactly this format, nothing else:\n"
         "    <thinking>\n"
         "    <FILLER>\n"
@@ -770,8 +779,11 @@ async def _backfill_generic_cot(
 ) -> None:
     """Generate ``data/sft/issue280/<source>_generic-cot_seed42.jsonl`` for the
     four source personas. Runs a 5-example smoke audit (BPE-token mean of the
-    assistant turn must lie in [25, 45]; aborts otherwise per plan §4.2 loss-
-    token budget) before the full sweep.
+    assistant turn must lie in [70, 110]; aborts otherwise) before the full
+    sweep. Calibrated against #186 actual generic_cot rationale lengths
+    (mean 84 BPE per ``epm:failure v2`` measurement, v4) — the plan body's
+    older 23-35 BPE figure was a 3x under-estimate of Sonnet 4.5's "2-4
+    sentences" prose budget.
     """
     for source in SOURCE_PERSONAS:
         out_path = out_base / f"{source}_generic-cot_seed{args.seed}.jsonl"
@@ -779,7 +791,7 @@ async def _backfill_generic_cot(
             logger.info("Skipping generic-cot backfill for %s (exists)", out_path)
             continue
         persona_prompt = PERSONAS[source]
-        # Smoke first (5 rows) — abort if BPE mean lands outside [25, 45].
+        # Smoke first (5 rows) — abort if BPE mean lands outside [70, 110].
         smoke_q = questions[:5]
         smoke_w = wrong_letters[:5]
         logger.info("generic-cot smoke for %s (5 rows) ...", source)
@@ -797,11 +809,11 @@ async def _backfill_generic_cot(
         smoke_bpe = float(
             np.mean([_bpe_token_count(r["messages"][-1]["content"]) for r in smoke_rows])
         )
-        if not (25.0 <= smoke_bpe <= 45.0):
+        if not (RATIONALE_BPE_LO <= smoke_bpe <= RATIONALE_BPE_HI):
             raise SystemExit(
                 f"generic-cot smoke BPE mean {smoke_bpe:.1f} for {source} outside "
-                "[25, 45]; rationale length is off-target — aborting before "
-                "spending the full $54 budget."
+                f"[{RATIONALE_BPE_LO}, {RATIONALE_BPE_HI}]; rationale length is "
+                "off-target — aborting before spending the full $54 budget."
             )
         if args.smoke:
             rows = smoke_rows
