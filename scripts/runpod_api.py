@@ -155,7 +155,12 @@ def graphql(query: str, variables: dict | None = None, timeout: int = 60) -> dic
 @dataclass
 class PodInfo:
     """Snapshot of a pod's state. Fields not always populated — runtime info is
-    only present when the pod is RUNNING and SSH is up."""
+    only present when the pod is RUNNING and SSH is up.
+
+    ``created_at`` is the ISO-8601 timestamp from the GraphQL ``createdAt``
+    field, used for the AGE column in ``pod.py list-ephemeral``. ``None`` when
+    the field is missing from the response (older pods or partial GraphQL
+    selections)."""
 
     pod_id: str
     name: str
@@ -164,6 +169,7 @@ class PodInfo:
     gpu_type_id: str | None = None
     ssh_host: str | None = None
     ssh_port: int | None = None
+    created_at: str | None = None
 
 
 def _parse_pod(raw: dict[str, Any]) -> PodInfo:
@@ -187,6 +193,7 @@ def _parse_pod(raw: dict[str, Any]) -> PodInfo:
         gpu_type_id=machine.get("gpuTypeId"),
         ssh_host=ssh_host,
         ssh_port=ssh_port,
+        created_at=raw.get("createdAt"),
     )
 
 
@@ -248,6 +255,7 @@ def create_pod(
         name
         desiredStatus
         gpuCount
+        createdAt
         machine {{ gpuTypeId }}
         runtime {{ ports {{ ip publicPort privatePort type isIpPublic }} }}
       }}
@@ -268,7 +276,7 @@ def get_pod(pod_id: str) -> PodInfo:
     query = """
     query Pod($id: String!) {
       pod(input: {podId: $id}) {
-        id name desiredStatus gpuCount
+        id name desiredStatus gpuCount createdAt
         machine { gpuTypeId }
         runtime { ports { ip publicPort privatePort type isIpPublic } }
       }
@@ -286,7 +294,7 @@ def list_team_pods() -> list[PodInfo]:
     {
       myself {
         pods {
-          id name desiredStatus gpuCount
+          id name desiredStatus gpuCount createdAt
           machine { gpuTypeId }
           runtime { ports { ip publicPort privatePort type isIpPublic } }
         }
@@ -318,7 +326,7 @@ def resume_pod(pod_id: str, gpu_count: int) -> PodInfo:
     query = """
     mutation Resume($id: String!, $n: Int!) {
       podResume(input: {podId: $id, gpuCount: $n}) {
-        id name desiredStatus gpuCount
+        id name desiredStatus gpuCount createdAt
         machine { gpuTypeId }
         runtime { ports { ip publicPort privatePort type isIpPublic } }
       }
